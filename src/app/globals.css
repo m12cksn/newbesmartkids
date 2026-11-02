@@ -1,26 +1,115 @@
 @import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "besmartkids";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-primary: #208f6d;
+  --color-primary-content: #ffffff;
+  --color-success: #208f6d;
+  --color-success-content: #ffffff;
+  --color-warning: #ffd34f;
+  --color-warning-content: #3f3210;
+  --color-base-100: #ffffff;
+  --color-base-200: #f5faf7;
+  --color-base-300: #e1eee6;
+  --color-base-content: #17352a;
+  --color-neutral: #17352a;
+  --color-neutral-content: #ffffff;
+}
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
+@import "@fontsource/poppins/800.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fbf9;
+  --foreground: #17352a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "Poppins", Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.question-shell {
+  min-height: min(100dvh, 760px);
+}
+
+.question-content {
+  max-height: calc(100dvh - 12rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@keyframes question-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes answer-pop {
+  0% { transform: scale(0.98); }
+  70% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
+
+.animate-question-enter { animation: question-enter 360ms ease-out both; }
+.animate-answer-pop { animation: answer-pop 260ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-question-enter,
+  .animate-answer-pop { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .question-shell {
+    min-height: 100dvh;
+  }
+
+  .question-content {
+    max-height: none;
+  }
+}
+
+::selection {
+  background: #b7efc5;
+  color: #123d2b;
+}
+
+@keyframes float-card {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes float-card-reverse {
+  0%, 100% { transform: translateY(0) rotate(3deg); }
+  50% { transform: translateY(8px) rotate(-1deg); }
+}
+
+.animate-float-card { animation: float-card 6s ease-in-out infinite; }
+.animate-float-card-reverse { animation: float-card-reverse 7s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-card,
+  .animate-float-card-reverse { animation: none; }
 }
