@@ -106,3 +106,14 @@ Status: Project rules. Proposed additions must be reviewed before merge; once me
 - Offer direct group selection and object counting/marking where appropriate, plus controls to split a whole into parts.
 - Difficulty must reflect cognitive demand, not only the question's position: easy identification, medium comparison/number bonds, challenging multi-step reasoning. Vary wording, representation, and task within each subtopic; textbook pages are references, not scripts to duplicate.
 - Before merging: check TypeScript/build, browser interaction, mobile viewport, all 24 answer keys, and accessible controls. Do not claim production readiness without those checks.
+
+
+## Mandatory pre-merge and pre-deploy QA gate (all future changes)
+- **Never merge to `master` or approve a production deployment while any required test is failing, pending, skipped without justification, or unverified.** A successful build alone is insufficient.
+- For every code PR: run `npm ci`, relevant content/data unit tests, `npm run build`, and Playwright Chromium end-to-end tests against the production build. Run lint/typecheck when scripts are available. Fix failures and rerun against the **latest commit SHA**; older successful runs do not count.
+- Browser QA must cover the affected student journey end to end: navigation, correct and incorrect answers, feedback, progression, retry/result, interactive math visuals, and keyboard input. Check at least mobile 390 px, a narrow mobile 320 px, tablet 768 px, and desktop 1280 px; inspect touch interactions and horizontal overflow. A scrollable internal carousel/number line is allowed, but document-level horizontal overflow is not.
+- Confirm responsive screenshots or visual inspection, accessibility/focus, and console/runtime errors. Distinguish automated assertions from manual visual testing; never claim coverage that was not executed.
+- Report test command, commit SHA, outcome, browser/viewport, and known limitations in the PR. If any check is unavailable, mark it **NOT VERIFIED** and block merge/deployment until resolved or the owner explicitly accepts a documented exception.
+- Require owner approval before merge or production deploy. After merge, verify the deployment status and run a smoke test on the actual deployed URL; a green preview does not prove production works.
+- On failure: diagnose, fix on the feature branch, rerun all gates, and only then request merge. Do not bypass failing CI merely because the owner asks to proceed; explain the remaining risk and ask for explicit exception if necessary.
+- Repository branch protection should require the CI status check before merging to `master`; this document alone does not technically enforce GitHub settings.
