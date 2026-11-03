@@ -113,3 +113,17 @@ h4 {
   .animate-float-card,
   .animate-float-card-reverse { animation: none; }
 }
+
+
+/* Educational motion: short, meaningful, and compatible with the DaisyUI theme. */
+@keyframes bsk-dot-appear { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: scale(1); } }
+@keyframes bsk-branch-draw { from { opacity: 0; stroke-dashoffset: 120; } to { opacity: 1; stroke-dashoffset: 0; } }
+@keyframes bsk-group-appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.bsk-multiple-dot { transform-box: fill-box; transform-origin: center; animation: bsk-dot-appear 300ms ease-out both; }
+.bsk-meeting-line { stroke-dasharray: 5 5; animation: bsk-group-appear 450ms ease-out both; }
+.bsk-factor-branch { stroke-dasharray: 120; animation: bsk-branch-draw 450ms ease-out both; }
+.bsk-factor-node { transform-box: fill-box; transform-origin: center; animation: bsk-dot-appear 320ms ease-out both; }
+.bsk-group-enter { animation: bsk-group-appear 320ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .bsk-multiple-dot, .bsk-meeting-line, .bsk-factor-branch, .bsk-factor-node, .bsk-group-enter { animation: none !important; }
+}
