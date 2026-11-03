@@ -59,3 +59,11 @@ Status: Proposed on feature branch; apply to every new page and learning experie
 - Use original or properly licensed illustrations; record attribution where required. Do not copy third-party visual source code or proprietary assets without permission.
 - Keep the DaisyUI visual identity and established design tokens even when a third-party library is introduced.
 - Record new dependencies and rationale in the PR. Branch, preview, and owner-review rules remain in force; no automatic merge to master.
+
+## Mandatory early-grade math content and assessment rules
+- Teach each number using **concrete quantity + numeral + Indonesian number word** (example: 10 (sepuluh) benda); ensure reading and writing are explicitly covered, not only counting.
+- Build original question interactions based on the teacher-provided end-of-chapter assessment: ten-frames, counting objects, comparing groups, fill-in number sequences, number-bond diagrams, and nested decompositions. Do not reduce every reference format to a generic multiple-choice template.
+- Match interaction type to learning objective: numeric fill-in for missing digits, tap/count for quantities, select/compare for groups, and editable number-bond nodes for decompositions. Provide accessible keyboard/touch alternatives.
+- When a question is multiple choice, **exactly four meaningful, distinct options (A–D)** are mandatory. Correct answers must vary across A/B/C/D with approximately balanced distribution across the assessment; never systematically use one letter. Do not use irrelevant distractors just to fill four choices.
+- Verify all displayed objects, question wording, correct answers, distractors, feedback, and number words against the source concept. Avoid visual/answer mismatches and repeated near-identical questions.
+- Review variety by subtopic, interaction type, difficulty, and visual representation before approval. Record the mix in PR; verify it in browser.
