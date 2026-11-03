@@ -29,6 +29,14 @@ await page.getByRole("button",{name:"Langkah maju →"}).click();
 await page.getByText(/Sekarang di 4/).waitFor();
 await page.getByRole("button",{name:"Ulangi"}).click();
 await page.getByText(/Sekarang di 3/).waitFor();
-assert.ok((await page.locator("body").evaluate(el=>el.scrollWidth))<=400,"mobile horizontal overflow");
+const overflow=await page.evaluate(()=>({viewport:document.documentElement.clientWidth,document:document.documentElement.scrollWidth,body:document.body.scrollWidth,offenders:[...document.querySelectorAll("body *")].filter(el=>{const r=el.getBoundingClientRect();const s=getComputedStyle(el);return r.right>document.documentElement.clientWidth+1&&s.position!=="fixed"&&s.position!=="absolute"&&s.overflowX!=="auto"&&s.overflowX!=="scroll"}).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==="string"?el.className.slice(0,100):"",right:Math.round(el.getBoundingClientRect().right)}))}));console.log("Mobile overflow diagnostics",JSON.stringify(overflow));assert.ok(overflow.document<=overflow.viewport+1,"mobile horizontal overflow");
+for(const width of [320,390,768,1280]){
+  await page.setViewportSize({width,height:844});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByRole("heading",{name:"Penjumlahan sampai dengan 10"}).waitFor();
+  const dimensions=await page.evaluate(()=>({viewport:document.documentElement.clientWidth,document:document.documentElement.scrollWidth}));
+  assert.ok(dimensions.document<=dimensions.viewport+1,`document overflow at ${width}px: ${JSON.stringify(dimensions)}`);
+  console.log(`PASS: no document overflow at ${width}px`);
+}
 console.log("PASS: mobile practice, inline equations, number bond and active number line");
 }finally{await browser.close()}
