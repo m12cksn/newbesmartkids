@@ -1,0 +1,22 @@
+name: Grade 1 Addition QA
+on:
+  push:
+    branches: [feat/grade1-addition-to-10]
+  pull_request:
+    paths:
+      - 'src/components/learn/GradeOneAddition.tsx'
+      - 'src/components/learn/AdditionInteractions.tsx'
+      - 'src/data/grade-one-addition*.ts'
+      - 'scripts/verify-grade-one-addition.mjs'
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --test scripts/verify-grade-one-addition.mjs
+      - run: npm run build
