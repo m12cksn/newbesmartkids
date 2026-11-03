@@ -1,4 +1,4 @@
-export type GradeOneQuestion = {id:string;section:number;kind:"count"|"compare"|"bond"|"sequence";a:number;b?:number;sequence?:Array<number|null>;prompt:string;options:string[];answer:string;explanation:string};
+export type GradeOneQuestion = {id:string;section:number;kind:"count"|"compare"|"bond"|"sequence";format:"multiple_choice"|"number_input";a:number;b?:number;sequence?:Array<number|null>;prompt:string;options:string[];answer:string;explanation:string};
 export const gradeOneQuestions:GradeOneQuestion[] = [
   {
     "id": "g1-c-01",
@@ -6,14 +6,16 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "count",
     "a": 6,
     "b": 0,
-    "prompt": "Ada berapa titik di dalam bingkai?",
+    "prompt": "Ada berapa benda? Pilih lambang bilangan yang tepat.",
     "options": [
-      "5",
       "6",
-      "7"
+      "5",
+      "7",
+      "8"
     ],
     "answer": "6",
-    "explanation": "Ada 6 titik. Hitung satu per satu."
+    "explanation": "Ada 6 (enam) benda. Hitung satu per satu.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-02",
@@ -21,14 +23,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "count",
     "a": 8,
     "b": 0,
-    "prompt": "Hitung titik berikut.",
-    "options": [
-      "7",
-      "8",
-      "9"
-    ],
+    "prompt": "Hitung benda, lalu tulis lambang bilangannya.",
+    "options": [],
     "answer": "8",
-    "explanation": "Ada 8 titik. Hitung satu per satu."
+    "explanation": "Ada 8 (delapan) benda. Hitung satu per satu.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-03",
@@ -36,14 +35,16 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "count",
     "a": 5,
     "b": 0,
-    "prompt": "Berapa banyak benda yang kamu lihat?",
+    "prompt": "Ada berapa benda? Pilih lambang bilangan yang tepat.",
     "options": [
       "4",
+      "6",
       "5",
-      "6"
+      "7"
     ],
     "answer": "5",
-    "explanation": "Ada 5 titik. Hitung satu per satu."
+    "explanation": "Ada 5 (lima) benda. Hitung satu per satu.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-04",
@@ -51,14 +52,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "count",
     "a": 9,
     "b": 0,
-    "prompt": "Pilih lambang bilangan sembilan.",
-    "options": [
-      "8",
-      "9",
-      "10"
-    ],
+    "prompt": "Hitung benda, lalu tulis lambang bilangannya.",
+    "options": [],
     "answer": "9",
-    "explanation": "Ada 9 titik. Hitung satu per satu."
+    "explanation": "Ada 9 (sembilan) benda. Hitung satu per satu.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-05",
@@ -66,14 +64,16 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "count",
     "a": 10,
     "b": 0,
-    "prompt": "Hitung semua titik.",
+    "prompt": "Ada berapa benda? Pilih lambang bilangan yang tepat.",
     "options": [
+      "10",
       "8",
       "9",
-      "10"
+      "0"
     ],
     "answer": "10",
-    "explanation": "Ada 10 titik. Hitung satu per satu."
+    "explanation": "Ada 10 (sepuluh) benda. Hitung satu per satu.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-06",
@@ -81,14 +81,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "count",
     "a": 7,
     "b": 0,
-    "prompt": "Tuliskan banyak titik dengan memilih angka.",
-    "options": [
-      "6",
-      "7",
-      "8"
-    ],
+    "prompt": "Hitung benda, lalu tulis lambang bilangannya.",
+    "options": [],
     "answer": "7",
-    "explanation": "Ada 7 titik. Hitung satu per satu."
+    "explanation": "Ada 7 (tujuh) benda. Hitung satu per satu.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-07",
@@ -99,11 +96,13 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Kelompok mana lebih banyak?",
     "options": [
       "A",
-      "B",
-      "Sama banyak"
+      "Sama banyak",
+      "NaN",
+      "B"
     ],
     "answer": "B",
-    "explanation": "Kelompok A memiliki 3 benda dan kelompok B 5 benda."
+    "explanation": "Kelompok A memiliki 3 benda dan kelompok B 5 benda.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-08",
@@ -113,12 +112,14 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 4,
     "prompt": "Kelompok mana lebih sedikit?",
     "options": [
-      "A",
       "B",
-      "Sama banyak"
+      "A",
+      "Sama banyak",
+      "NaN"
     ],
     "answer": "B",
-    "explanation": "Kelompok A memiliki 7 benda dan kelompok B 4 benda."
+    "explanation": "Kelompok A memiliki 7 benda dan kelompok B 4 benda.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-09",
@@ -129,11 +130,13 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Bagaimana banyak benda kedua kelompok?",
     "options": [
       "A lebih banyak",
+      "Sama banyak",
       "B lebih banyak",
-      "Sama banyak"
+      "NaN"
     ],
     "answer": "Sama banyak",
-    "explanation": "Kelompok A memiliki 6 benda dan kelompok B 6 benda."
+    "explanation": "Kelompok A memiliki 6 benda dan kelompok B 6 benda.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-10",
@@ -144,11 +147,13 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Kelompok mana lebih banyak?",
     "options": [
       "A",
+      "Sama banyak",
       "B",
-      "Sama banyak"
+      "NaN"
     ],
     "answer": "B",
-    "explanation": "Kelompok A memiliki 8 benda dan kelompok B 9 benda."
+    "explanation": "Kelompok A memiliki 8 benda dan kelompok B 9 benda.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-11",
@@ -159,11 +164,13 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Kelompok mana lebih sedikit?",
     "options": [
       "A",
-      "B",
-      "Sama banyak"
+      "Sama banyak",
+      "NaN",
+      "B"
     ],
     "answer": "B",
-    "explanation": "Kelompok A memiliki 5 benda dan kelompok B 2 benda."
+    "explanation": "Kelompok A memiliki 5 benda dan kelompok B 2 benda.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-12",
@@ -175,10 +182,12 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "options": [
       "A",
       "B",
-      "Sama banyak"
+      "Sama banyak",
+      "NaN"
     ],
     "answer": "A",
-    "explanation": "Kelompok A memiliki 10 benda dan kelompok B 7 benda."
+    "explanation": "Kelompok A memiliki 10 benda dan kelompok B 7 benda.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-13",
@@ -186,14 +195,16 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "bond",
     "a": 5,
     "b": 2,
-    "prompt": "5 dipisah menjadi 2 dan berapa?",
+    "prompt": "Lengkapi pasangan bilangan 5 (lima). Jika satu bagian 2, berapa bagian lainnya?",
     "options": [
       "2",
+      "4",
       "3",
-      "4"
+      "5"
     ],
     "answer": "3",
-    "explanation": "5 dapat dipisahkan menjadi 2 dan 3."
+    "explanation": "5 dapat dipisahkan menjadi 2 dan 3.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-14",
@@ -201,14 +212,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "bond",
     "a": 7,
     "b": 4,
-    "prompt": "7 dipisah menjadi 4 dan berapa?",
-    "options": [
-      "2",
-      "3",
-      "5"
-    ],
+    "prompt": "Lengkapi pasangan bilangan 7 (tujuh). Jika satu bagian 4, berapa bagian lainnya?",
+    "options": [],
     "answer": "3",
-    "explanation": "7 dapat dipisahkan menjadi 4 dan 3."
+    "explanation": "7 dapat dipisahkan menjadi 4 dan 3.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-15",
@@ -216,14 +224,16 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "bond",
     "a": 9,
     "b": 5,
-    "prompt": "9 dipisah menjadi 5 dan berapa?",
+    "prompt": "Lengkapi pasangan bilangan 9 (sembilan). Jika satu bagian 5, berapa bagian lainnya?",
     "options": [
-      "3",
       "4",
-      "5"
+      "3",
+      "5",
+      "6"
     ],
     "answer": "4",
-    "explanation": "9 dapat dipisahkan menjadi 5 dan 4."
+    "explanation": "9 dapat dipisahkan menjadi 5 dan 4.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-16",
@@ -231,14 +241,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "bond",
     "a": 6,
     "b": 1,
-    "prompt": "6 dipisah menjadi 1 dan berapa?",
-    "options": [
-      "4",
-      "5",
-      "6"
-    ],
+    "prompt": "Lengkapi pasangan bilangan 6 (enam). Jika satu bagian 1, berapa bagian lainnya?",
+    "options": [],
     "answer": "5",
-    "explanation": "6 dapat dipisahkan menjadi 1 dan 5."
+    "explanation": "6 dapat dipisahkan menjadi 1 dan 5.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-17",
@@ -246,14 +253,16 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "bond",
     "a": 8,
     "b": 3,
-    "prompt": "8 dipisah menjadi 3 dan berapa?",
+    "prompt": "Lengkapi pasangan bilangan 8 (delapan). Jika satu bagian 3, berapa bagian lainnya?",
     "options": [
       "4",
+      "6",
       "5",
-      "6"
+      "7"
     ],
     "answer": "5",
-    "explanation": "8 dapat dipisahkan menjadi 3 dan 5."
+    "explanation": "8 dapat dipisahkan menjadi 3 dan 5.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-18",
@@ -261,14 +270,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "kind": "bond",
     "a": 7,
     "b": 2,
-    "prompt": "7 dipisah menjadi 2 dan berapa?",
-    "options": [
-      "4",
-      "5",
-      "6"
-    ],
+    "prompt": "Lengkapi pasangan bilangan 7 (tujuh). Jika satu bagian 2, berapa bagian lainnya?",
+    "options": [],
     "answer": "5",
-    "explanation": "7 dapat dipisahkan menjadi 2 dan 5."
+    "explanation": "7 dapat dipisahkan menjadi 2 dan 5.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-19",
@@ -285,10 +291,12 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "options": [
       "1",
       "4",
-      "5"
+      "5",
+      "6"
     ],
     "answer": "4",
-    "explanation": "Urutan yang benar mengisi tempat kosong dengan 4."
+    "explanation": "Urutan yang benar mengisi tempat kosong dengan 4.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-20",
@@ -301,14 +309,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       null,
       8
     ],
-    "prompt": "Lengkapi urutan: 6, ..., 8",
-    "options": [
-      "5",
-      "7",
-      "9"
-    ],
+    "prompt": "Isi angka yang hilang pada urutan bilangan berikut.",
+    "options": [],
     "answer": "7",
-    "explanation": "Urutan yang benar mengisi tempat kosong dengan 7."
+    "explanation": "Urutan yang benar mengisi tempat kosong dengan 7.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-21",
@@ -324,11 +329,13 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Lengkapi urutan mundur: 9, 8, ...",
     "options": [
       "6",
-      "7",
-      "10"
+      "10",
+      "8",
+      "7"
     ],
     "answer": "7",
-    "explanation": "Urutan yang benar mengisi tempat kosong dengan 7."
+    "explanation": "Urutan yang benar mengisi tempat kosong dengan 7.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-22",
@@ -341,14 +348,11 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       null,
       8
     ],
-    "prompt": "Lengkapi urutan mundur: 10, ..., 8",
-    "options": [
-      "7",
-      "9",
-      "10"
-    ],
+    "prompt": "Isi angka yang hilang pada urutan bilangan berikut.",
+    "options": [],
     "answer": "9",
-    "explanation": "Urutan yang benar mengisi tempat kosong dengan 9."
+    "explanation": "Urutan yang benar mengisi tempat kosong dengan 9.",
+    "format": "number_input"
   },
   {
     "id": "g1-c-23",
@@ -365,10 +369,12 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "options": [
       "3",
       "4",
-      "7"
+      "7",
+      "5"
     ],
     "answer": "4",
-    "explanation": "Urutan yang benar mengisi tempat kosong dengan 4."
+    "explanation": "Urutan yang benar mengisi tempat kosong dengan 4.",
+    "format": "multiple_choice"
   },
   {
     "id": "g1-c-24",
@@ -382,13 +388,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       null,
       1
     ],
-    "prompt": "Lengkapi urutan mundur: 4, 3, ..., 1",
-    "options": [
-      "1",
-      "2",
-      "5"
-    ],
+    "prompt": "Isi angka yang hilang pada urutan bilangan berikut.",
+    "options": [],
     "answer": "2",
-    "explanation": "Urutan yang benar mengisi tempat kosong dengan 2."
+    "explanation": "Urutan yang benar mengisi tempat kosong dengan 2.",
+    "format": "number_input"
   }
 ];
