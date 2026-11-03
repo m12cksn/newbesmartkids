@@ -279,13 +279,13 @@ export const additionQuestions:AdditionQuestion[]=[
   {
     "id": "g1-add-24",
     "section": "word",
-    "a": 2,
-    "b": 3,
+    "a": 1,
+    "b": 2,
     "kind": "car",
     "format": "wheels",
     "difficulty": "menantang",
-    "prompt": "Di parkiran ada 2 mobil dan 3 motor. Berapa jumlah semua roda jika setiap mobil memiliki 4 roda dan setiap motor memiliki 2 roda?",
-    "answer": 14,
-    "explanation": "2 mobil × 4 roda = 8 roda, 3 motor × 2 roda = 6 roda, jadi 8 + 6 = 14 roda."
+    "prompt": "Di parkiran ada 1 mobil dan 2 motor. Berapa jumlah semua roda jika mobil memiliki 4 roda dan setiap motor memiliki 2 roda?",
+    "answer": 8,
+    "explanation": "1 mobil memiliki 4 roda. 2 motor memiliki 2 + 2 = 4 roda. Jadi 4 + 4 = 8 roda."
   }
 ];
