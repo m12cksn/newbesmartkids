@@ -50,3 +50,12 @@ Status: Proposed on feature branch; apply to every new page and learning experie
 - **Manim** is reserved for optional pre-rendered explanatory videos, not live in-browser interactions.
 - Avoid heavy animation libraries or unnecessary dependencies; verify compatibility and bundle cost before installing Motion.
 - Every animation must correspond to a learning event, and the lesson must remain understandable without animation.
+
+
+## Additional assets and dependencies (authorized when justified)
+- Developers may install additional illustration, icon, visualization, interaction, or animation libraries when they materially improve clarity, accessibility, or the learning experience.
+- First prefer existing dependencies, React/SVG/Motion, and reusable components. Add only what a specific learning interaction needs; avoid package proliferation.
+- Evaluate license, security, Next.js compatibility, bundle size, performance on low-end mobile, maintenance status, and accessibility before installing.
+- Use original or properly licensed illustrations; record attribution where required. Do not copy third-party visual source code or proprietary assets without permission.
+- Keep the DaisyUI visual identity and established design tokens even when a third-party library is introduced.
+- Record new dependencies and rationale in the PR. Branch, preview, and owner-review rules remain in force; no automatic merge to master.
