@@ -42,9 +42,9 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Ada berapa bintang pada gambar?",
     "options": [
       "5",
-      "3",
       "4",
-      "6"
+      "6",
+      "3"
     ],
     "answer": "5",
     "explanation": "Terlihat 5 (lima) bintang. Setiap bintang dihitung tepat satu kali.",
