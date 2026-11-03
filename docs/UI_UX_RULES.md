@@ -117,3 +117,12 @@ Status: Project rules. Proposed additions must be reviewed before merge; once me
 - Require owner approval before merge or production deploy. After merge, verify the deployment status and run a smoke test on the actual deployed URL; a green preview does not prove production works.
 - On failure: diagnose, fix on the feature branch, rerun all gates, and only then request merge. Do not bypass failing CI merely because the owner asks to proceed; explain the remaining risk and ask for explicit exception if necessary.
 - Repository branch protection should require the CI status check before merging to `master`; this document alone does not technically enforce GitHub settings.
+
+## Mandatory design parity gate — approved chapter is the visual contract
+- **Grade 1 Chapter 2 (Penjumlahan sampai dengan 10) is the approved baseline for Chapter 3 and subsequent Grade 1 lessons.** New chapters must reuse its page shell, return-to-grade link, hero heading scale, video/CTA two-column panel, section tabs, white lesson card, controls, spacing, typography, colors, and bottom navigation. Adapt only the mathematical visuals and chapter-specific copy.
+- Before implementing a new chapter, read the complete existing chapter component, the shared layout and `src/app/globals.css`. Prefer extracting reusable shared components from the approved chapter rather than recreating the layout with different DaisyUI utility classes.
+- Never mix `bg-base-100`, `bg-success/5`, `text-success` or other theme-dependent tokens into a new screen without checking computed appearance in the actual active theme. A dark panel with low-contrast dark text is a **release blocker**.
+- Create side-by-side screenshots of the approved chapter and the new chapter at 390 px and 1280 px, in the same browser and theme. Compare header, back navigation, video panel, section tabs, learning card, CTA, contrast, and spacing. Save review evidence in the PR.
+- Automated build and overflow tests alone **do not prove visual consistency**. A new chapter cannot be declared ready until screenshot comparison and contrast/readability review have been performed, recorded, and approved.
+- For each new lesson, add browser assertions for visible back link, video panel, heading, section navigation, lesson card, and primary CTA, plus checks for text readability. Keep tests for math content and interactions separate.
+- When a design discrepancy is found, fix it on the feature branch before merge or deploy. Do not treat a functional page as finished if it violates the approved visual baseline.
