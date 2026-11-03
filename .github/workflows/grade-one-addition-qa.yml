@@ -28,3 +28,4 @@ jobs:
             sleep 2
           done
           node scripts/smoke-grade-one-addition.mjs
+          node scripts/smoke-grade-one-subtraction.mjs
