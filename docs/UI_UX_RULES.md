@@ -59,3 +59,23 @@ Status: Proposed on feature branch; apply to every new page and learning experie
 - Use original or properly licensed illustrations; record attribution where required. Do not copy third-party visual source code or proprietary assets without permission.
 - Keep the DaisyUI visual identity and established design tokens even when a third-party library is introduced.
 - Record new dependencies and rationale in the PR. Branch, preview, and owner-review rules remain in force; no automatic merge to master.
+
+## Mandatory early-grade math content and assessment rules
+- Teach each number using **concrete quantity + numeral + Indonesian number word** (example: 10 (sepuluh) benda); ensure reading and writing are explicitly covered, not only counting.
+- Build original question interactions based on the teacher-provided end-of-chapter assessment: ten-frames, counting objects, comparing groups, fill-in number sequences, number-bond diagrams, and nested decompositions. Do not reduce every reference format to a generic multiple-choice template.
+- Match interaction type to learning objective: numeric fill-in for missing digits, tap/count for quantities, select/compare for groups, and editable number-bond nodes for decompositions. Provide accessible keyboard/touch alternatives.
+- When a question is multiple choice, **exactly four meaningful, distinct options (A–D)** are mandatory. Correct answers must vary across A/B/C/D with approximately balanced distribution across the assessment; never systematically use one letter. Do not use irrelevant distractors just to fill four choices.
+- Verify all displayed objects, question wording, correct answers, distractors, feedback, and number words against the source concept. Avoid visual/answer mismatches and repeated near-identical questions.
+- Review variety by subtopic, interaction type, difficulty, and visual representation before approval. Record the mix in PR; verify it in browser.
+
+## Visual diversity requirement
+- Do not default every elementary math problem to identical dots or circles. Rotate meaningful original representations: fruit, pencils, toy cars, stars, flowers, building blocks, ten-frames, number bonds, and number lines, according to the concept.
+- Use accessible SVG/React primitives and consistent visual counting semantics; check every illustrated object count against the answer key.
+- Prefer original lightweight assets and reusable components over copying external GitHub source or adding a heavy canvas library. Document any third-party license and performance impact.
+
+## Grade 1 interactive QA checklist
+- Text must name the actual illustrated objects (e.g. 8 pensil, 9 bintang); do not show generic or mismatched nouns. Handle zero with an explicit empty state rather than implying invisible objects are present.
+- Place missing-number inputs inside number-bond and number-sequence diagrams, not only in a disconnected answer field. Support click/touch and keyboard.
+- Offer direct group selection and object counting/marking where appropriate, plus controls to split a whole into parts.
+- Difficulty must reflect cognitive demand, not only the question's position: easy identification, medium comparison/number bonds, challenging multi-step reasoning. Vary wording, representation, and task within each subtopic; textbook pages are references, not scripts to duplicate.
+- Before merging: check TypeScript/build, browser interaction, mobile viewport, all 24 answer keys, and accessible controls. Do not claim production readiness without those checks.
