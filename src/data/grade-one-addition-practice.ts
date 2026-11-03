@@ -1,0 +1,147 @@
+import type {AdditionQuestion} from "./grade-one-addition";
+export const additionPracticeQuestions:AdditionQuestion[]=[
+  {
+    "id": "g1-add-practice-1",
+    "section": "story",
+    "a": 1,
+    "b": 2,
+    "kind": "apple",
+    "format": "count",
+    "difficulty": "mudah",
+    "prompt": "Ada 1 apel. Ditambahkan 2 apel. Berapa semuanya?",
+    "answer": 3,
+    "explanation": "1 + 2 = 3 apel."
+  },
+  {
+    "id": "g1-add-practice-2",
+    "section": "story",
+    "a": 3,
+    "b": 3,
+    "kind": "star",
+    "format": "equation",
+    "difficulty": "sedang",
+    "prompt": "Ada 3 bintang. Ditambahkan 3 bintang. Berapa semuanya?",
+    "answer": 6,
+    "explanation": "3 + 3 = 6 bintang."
+  },
+  {
+    "id": "g1-add-practice-3",
+    "section": "bond",
+    "a": 2,
+    "b": 2,
+    "kind": "block",
+    "format": "bond",
+    "difficulty": "mudah",
+    "prompt": "Ada 2 balok. Berapa lagi agar menjadi 4 balok?",
+    "answer": 2,
+    "explanation": "2 + 2 = 4."
+  },
+  {
+    "id": "g1-add-practice-4",
+    "section": "bond",
+    "a": 5,
+    "b": 3,
+    "kind": "flower",
+    "format": "bond",
+    "difficulty": "sedang",
+    "prompt": "Ada 5 bunga. Berapa lagi agar menjadi 8 bunga?",
+    "answer": 3,
+    "explanation": "5 + 3 = 8."
+  },
+  {
+    "id": "g1-add-practice-5",
+    "section": "forward",
+    "a": 2,
+    "b": 2,
+    "kind": "car",
+    "format": "line",
+    "difficulty": "mudah",
+    "prompt": "Mulai dari 2, lalu maju 2 langkah. Di bilangan berapa berhenti?",
+    "answer": 4,
+    "explanation": "Dari 2, maju ke 3, 4. Hasilnya 4."
+  },
+  {
+    "id": "g1-add-practice-6",
+    "section": "forward",
+    "a": 4,
+    "b": 3,
+    "kind": "apple",
+    "format": "line",
+    "difficulty": "sedang",
+    "prompt": "Mulai dari 4, lalu maju 3 langkah. Di bilangan berapa berhenti?",
+    "answer": 7,
+    "explanation": "Dari 4, maju ke 5, 6, 7. Hasilnya 7."
+  },
+  {
+    "id": "g1-add-practice-7",
+    "section": "repeat",
+    "a": 2,
+    "b": 3,
+    "kind": "flower",
+    "format": "groups",
+    "difficulty": "mudah",
+    "prompt": "Ada 3 kelompok bunga, masing-masing 2. Berapa semuanya?",
+    "answer": 6,
+    "explanation": "2 + 2 + 2 = 6 bunga."
+  },
+  {
+    "id": "g1-add-practice-8",
+    "section": "repeat",
+    "a": 3,
+    "b": 2,
+    "kind": "pencil",
+    "format": "groups",
+    "difficulty": "sedang",
+    "prompt": "Ada 2 kelompok pensil, masing-masing 3. Berapa semuanya?",
+    "answer": 6,
+    "explanation": "3 + 3 = 6 pensil."
+  },
+  {
+    "id": "g1-add-practice-9",
+    "section": "ten",
+    "a": 7,
+    "b": 3,
+    "kind": "star",
+    "format": "make10",
+    "difficulty": "mudah",
+    "prompt": "Ada 7 bintang. Berapa lagi agar menjadi 10?",
+    "answer": 3,
+    "explanation": "7 + 3 = 10."
+  },
+  {
+    "id": "g1-add-practice-10",
+    "section": "ten",
+    "a": 4,
+    "b": 6,
+    "kind": "apple",
+    "format": "make10",
+    "difficulty": "sedang",
+    "prompt": "Ada 4 apel. Berapa lagi agar menjadi 10?",
+    "answer": 6,
+    "explanation": "4 + 6 = 10."
+  },
+  {
+    "id": "g1-add-practice-11",
+    "section": "word",
+    "a": 2,
+    "b": 2,
+    "kind": "car",
+    "format": "story",
+    "difficulty": "mudah",
+    "prompt": "Ada 2 mobil mainan. Ditambahkan 2 mobil mainan. Berapa semuanya?",
+    "answer": 4,
+    "explanation": "2 + 2 = 4 mobil mainan."
+  },
+  {
+    "id": "g1-add-practice-12",
+    "section": "word",
+    "a": 3,
+    "b": 4,
+    "kind": "flower",
+    "format": "story",
+    "difficulty": "sedang",
+    "prompt": "Ada 3 bunga. Ditambahkan 4 bunga. Berapa semuanya?",
+    "answer": 7,
+    "explanation": "3 + 4 = 7 bunga."
+  }
+];
