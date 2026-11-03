@@ -86,3 +86,11 @@ Status: Project rules. Proposed additions must be reviewed before merge; once me
 - Derive the student-facing summary, video recording script/storyboard, interactive manipulatives, questions, and explanations from the same verified source material and subtopics.
 - Keep video playback optional for reading/solving; lazy-load third-party players and preserve an accessible fallback.
 - Each lesson follows: video -> concise summary and visual explanation -> interactive practice -> result and review.
+
+## Mandatory early-grade math content and assessment rules
+- Teach each number using **concrete quantity + numeral + Indonesian number word** (example: 10 (sepuluh) benda); ensure reading and writing are explicitly covered, not only counting.
+- Build original question interactions based on the teacher-provided end-of-chapter assessment: ten-frames, counting objects, comparing groups, fill-in number sequences, number-bond diagrams, and nested decompositions. Do not reduce every reference format to a generic multiple-choice template.
+- Match interaction type to learning objective: numeric fill-in for missing digits, tap/count for quantities, select/compare for groups, and editable number-bond nodes for decompositions. Provide accessible keyboard/touch alternatives.
+- When a question is multiple choice, **exactly four meaningful, distinct options (A–D)** are mandatory. Correct answers must vary across A/B/C/D with approximately balanced distribution across the assessment; never systematically use one letter. Do not use irrelevant distractors just to fill four choices.
+- Verify all displayed objects, question wording, correct answers, distractors, feedback, and number words against the source concept. Avoid visual/answer mismatches and repeated near-identical questions.
+- Review variety by subtopic, interaction type, difficulty, and visual representation before approval. Record the mix in PR; verify it in browser.
