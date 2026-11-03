@@ -1,6 +1,6 @@
 # BeSmartKids — UI/UX Rules (Project Standard)
 
-Status: Proposed on feature branch; apply to every new page and learning experience after review.
+Status: Project rules. Proposed additions must be reviewed before merge; once merged, apply to every change.
 
 ## Source of truth
 - Existing repository design is the source of truth. Inspect `src/app/globals.css`, homepage components, and existing learning/practice components before changing UI.
@@ -59,3 +59,43 @@ Status: Proposed on feature branch; apply to every new page and learning experie
 - Use original or properly licensed illustrations; record attribution where required. Do not copy third-party visual source code or proprietary assets without permission.
 - Keep the DaisyUI visual identity and established design tokens even when a third-party library is introduced.
 - Record new dependencies and rationale in the PR. Branch, preview, and owner-review rules remain in force; no automatic merge to master.
+
+## CoreSpeed Labs UX reference — mandatory for all future changes
+- Use https://corespeedlabs.com/ as a **reference for UI/UX quality and interaction patterns**, not as a source to copy proprietary code, illustrations, text, logos, or exact layouts. The result must be an original BeSmartKids implementation.
+- Preserve BeSmartKids branding throughout: name, logo, green theme (#208f6d), Poppins, and DaisyUI/Tailwind design tokens. Do not introduce CoreSpeed branding.
+- Aim for CoreSpeed-like polish: restrained editorial composition, elegant typography, clear visual hierarchy, spacious but efficient layout, compact consistent radius, responsive components, focused actions, and smooth purposeful transitions.
+- Prioritize a learning-focused interface: one clear question per view, obvious answer controls, minimal distraction, concise feedback, and progress/next actions visible without unnecessary scrolling. Do not force fit-to-viewport at the cost of accessibility or legibility.
+- Before any UI change, compare the affected page with the current BeSmartKids design and the CoreSpeed reference across mobile, tablet, and desktop. Record differences and intentional adaptations in the PR.
+- Do not claim exact visual parity without browser comparison; if the reference is unavailable, note that and preserve the documented design system.
+
+## Performance and 10,000-user capacity — mandatory change gate
+- Capacity planning assumption: **10,000 registered learners, up to 5,000 concurrently active learners (50%)**. This is a target to validate, **not a proven capacity claim**.
+- Every PR must explain potential impacts on bundle size, route loading, network requests, caching, database/auth traffic, video delivery, mobile responsiveness, and operational cost. A documentation-only change can mark nonapplicable items N/A.
+- Split lesson/question data by topic or route; never ship the entire question bank to every visitor. Prefer server components and static/cached public content where safe; use client components only for interactive portions. Apply dynamic imports/lazy loading to costly math widgets and media.
+- Use optimized SVG and properly sized/compressed image assets; defer offscreen media. Use YouTube embeds or lazy-loaded players rather than serving video files from the Next.js deployment. Do not autoplay videos.
+- Run calculations, answer checking, feedback, and session scores in the browser when possible per MVP blueprint. Do not add per-answer database writes or background polling. Supabase remains for authentication and access grants only.
+- Enforce premium access server-side before protected data is returned; do not expose paid question data through public static assets or public cache. Public pages may use CDN caching; authenticated/private responses require appropriate nonpublic cache policies.
+- Avoid global imports of lesson modules, large animation packages, unnecessary dependencies, blocking scripts, and continuously running animations. Support low-end mobile and prefers-reduced-motion.
+- Performance targets on representative real-user measurements: p75 LCP <= 2.5 s, p75 INP <= 200 ms, p75 CLS <= 0.1. Record actual results and testing conditions; do not present targets as measurements.
+- Validate concurrency incrementally using authorized staging tests at 100, 500, 1,000, 2,500, then 5,000 virtual users with realistic mix of cached page visits, login/access checks, and lessons. Monitor p95 latency, error rate, cache hit rate, bandwidth, Vercel/Supabase quotas and costs; stop on unsafe failure thresholds. Never run uncontrolled load tests against production.
+- No PR is considered performance-approved merely because lint/build passes; record route-level bundle impact and any available browser/performance test results, or explicitly state what remains untested.
+- If a change increases payload, requests, or server-side processing, justify it and document a mitigation before merging.
+
+## Required lesson/video workflow
+- Every material must have a video section at the top, using the teacher's own recorded lesson when available and a clear "video coming soon" state otherwise.
+- Derive the student-facing summary, video recording script/storyboard, interactive manipulatives, questions, and explanations from the same verified source material and subtopics.
+- Keep video playback optional for reading/solving; lazy-load third-party players and preserve an accessible fallback.
+- Each lesson follows: video -> concise summary and visual explanation -> interactive practice -> result and review.
+
+## Mandatory early-grade math content and assessment rules
+- Teach each number using **concrete quantity + numeral + Indonesian number word** (example: 10 (sepuluh) benda); ensure reading and writing are explicitly covered, not only counting.
+- Build original question interactions based on the teacher-provided end-of-chapter assessment: ten-frames, counting objects, comparing groups, fill-in number sequences, number-bond diagrams, and nested decompositions. Do not reduce every reference format to a generic multiple-choice template.
+- Match interaction type to learning objective: numeric fill-in for missing digits, tap/count for quantities, select/compare for groups, and editable number-bond nodes for decompositions. Provide accessible keyboard/touch alternatives.
+- When a question is multiple choice, **exactly four meaningful, distinct options (A–D)** are mandatory. Correct answers must vary across A/B/C/D with approximately balanced distribution across the assessment; never systematically use one letter. Do not use irrelevant distractors just to fill four choices.
+- Verify all displayed objects, question wording, correct answers, distractors, feedback, and number words against the source concept. Avoid visual/answer mismatches and repeated near-identical questions.
+- Review variety by subtopic, interaction type, difficulty, and visual representation before approval. Record the mix in PR; verify it in browser.
+
+## Visual diversity requirement
+- Do not default every elementary math problem to identical dots or circles. Rotate meaningful original representations: fruit, pencils, toy cars, stars, flowers, building blocks, ten-frames, number bonds, and number lines, according to the concept.
+- Use accessible SVG/React primitives and consistent visual counting semantics; check every illustrated object count against the answer key.
+- Prefer original lightweight assets and reusable components over copying external GitHub source or adding a heavy canvas library. Document any third-party license and performance impact.
