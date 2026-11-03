@@ -272,9 +272,9 @@ export const additionQuestions:AdditionQuestion[]=[
     "kind": "car",
     "format": "story",
     "difficulty": "sedang",
-    "prompt": "Di parkiran ada 3 mobil, lalu datang 4 mobil. Berapa kendaraan yang ada sekarang?",
+    "prompt": "Di parkiran ada 3 mobil mainan. Datang lagi 4 mobil mainan. Berapa jumlah mobil mainan sekarang?",
     "answer": 7,
-    "explanation": "3 mobil + 4 mobil = 7 mobil. Jadi ada 7 kendaraan."
+    "explanation": "3 mobil mainan + 4 mobil mainan = 7 mobil mainan."
   },
   {
     "id": "g1-add-24",
@@ -284,8 +284,8 @@ export const additionQuestions:AdditionQuestion[]=[
     "kind": "flower",
     "format": "story",
     "difficulty": "menantang",
-    "prompt": "Di taman ada 2 burung di pohon. Datang lagi 3 burung. Berapa burung sekarang?",
+    "prompt": "Di taman ada 2 bunga. Kemudian tumbuh 3 bunga lagi. Berapa jumlah bunga sekarang?",
     "answer": 5,
-    "explanation": "2 burung + 3 burung = 5 burung."
+    "explanation": "2 bunga + 3 bunga = 5 bunga."
   }
 ];
