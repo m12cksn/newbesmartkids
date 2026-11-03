@@ -41,9 +41,9 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 0,
     "prompt": "Ada berapa bintang pada gambar?",
     "options": [
+      "5",
       "3",
       "4",
-      "5",
       "6"
     ],
     "answer": "5",
@@ -74,8 +74,8 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 0,
     "prompt": "Ada berapa balok pada gambar?",
     "options": [
-      "10",
       "8",
+      "10",
       "9"
     ],
     "answer": "10",
@@ -153,10 +153,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 9,
     "prompt": "Berapa selisih banyak mobil mainan pada kelompok A dan B?",
     "options": [
-      "1",
       "2",
       "0",
-      "3"
+      "3",
+      "1"
     ],
     "answer": "1",
     "explanation": "Kelompok A memiliki 8 mobil mainan dan kelompok B 9 mobil mainan. Selisihnya 1.",
@@ -186,9 +186,9 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 7,
     "prompt": "Berapa selisih banyak bunga pada kelompok A dan B?",
     "options": [
+      "3",
       "4",
       "2",
-      "3",
       "5"
     ],
     "answer": "3",
