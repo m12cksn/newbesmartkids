@@ -68,7 +68,7 @@ export const additionQuestions:AdditionQuestion[]=[
     "kind": "star",
     "format": "input",
     "difficulty": "menantang",
-    "prompt": "Ada 4 bintang, lalu datang 5 bintang lagi. Berapa jumlahnya sekarang?",
+    "prompt": "Di meja ada 4 bintang kertas. Ibu menambahkan 5 bintang kertas. Berapa bintang kertas sekarang?",
     "answer": 9,
     "explanation": "4 + 5 = 9. Jadi ada 9 bintang."
   },
@@ -128,7 +128,7 @@ export const additionQuestions:AdditionQuestion[]=[
     "kind": "pencil",
     "format": "input",
     "difficulty": "menantang",
-    "prompt": "Lengkapi pasangan bilangan: 7 pensil ditambah berapa agar menjadi 9?",
+    "prompt": "Di kotak ada 7 pensil. Agar jumlahnya 9, berapa pensil yang perlu ditambahkan?",
     "answer": 2,
     "explanation": "7 + 2 = 9."
   },
@@ -154,7 +154,7 @@ export const additionQuestions:AdditionQuestion[]=[
     "difficulty": "mudah",
     "prompt": "Mulai dari 3. Melangkah maju 2 kali. Di angka berapa kamu berhenti?",
     "answer": 5,
-    "explanation": "3 + 2 = 5. Jadi ada 5 mobil mainan."
+    "explanation": "Mulai dari 3, lalu maju 2 langkah: 4, 5. Jadi 3 + 2 = 5."
   },
   {
     "id": "g1-add-14",
@@ -166,7 +166,7 @@ export const additionQuestions:AdditionQuestion[]=[
     "difficulty": "sedang",
     "prompt": "Mulai dari 5. Melangkah maju 3 kali. Di angka berapa kamu berhenti?",
     "answer": 8,
-    "explanation": "5 + 3 = 8. Jadi ada 8 apel."
+    "explanation": "Mulai dari 5, lalu maju 3 langkah: 6, 7, 8. Jadi 5 + 3 = 8."
   },
   {
     "id": "g1-add-15",
@@ -178,7 +178,7 @@ export const additionQuestions:AdditionQuestion[]=[
     "difficulty": "sedang",
     "prompt": "Mulai dari 2. Melangkah maju 6 kali. Di angka berapa kamu berhenti?",
     "answer": 8,
-    "explanation": "2 + 6 = 8. Jadi ada 8 bintang."
+    "explanation": "Mulai dari 2, lalu maju 6 langkah: 3, 4, 5, 6, 7, 8. Jadi 2 + 6 = 8."
   },
   {
     "id": "g1-add-16",
@@ -190,7 +190,7 @@ export const additionQuestions:AdditionQuestion[]=[
     "difficulty": "menantang",
     "prompt": "Mulai dari 6. Melangkah maju 4 kali. Di angka berapa kamu berhenti?",
     "answer": 10,
-    "explanation": "6 + 4 = 10. Jadi ada 10 balok."
+    "explanation": "Mulai dari 6, lalu maju 4 langkah: 7, 8, 9, 10. Jadi 6 + 4 = 10."
   },
   {
     "id": "g1-add-17",
@@ -274,18 +274,18 @@ export const additionQuestions:AdditionQuestion[]=[
     "difficulty": "sedang",
     "prompt": "Di parkiran ada 3 mobil, lalu datang 4 mobil. Berapa kendaraan yang ada sekarang?",
     "answer": 7,
-    "explanation": "3 + 4 = 7. Jadi ada 7 mobil mainan."
+    "explanation": "3 mobil + 4 mobil = 7 mobil. Jadi ada 7 kendaraan."
   },
   {
     "id": "g1-add-24",
     "section": "word",
-    "a": 1,
-    "b": 2,
-    "kind": "car",
-    "format": "wheels",
+    "a": 2,
+    "b": 3,
+    "kind": "flower",
+    "format": "story",
     "difficulty": "menantang",
-    "prompt": "Di parkiran ada 1 mobil dan 2 motor. Berapa jumlah semua roda jika mobil memiliki 4 roda dan setiap motor memiliki 2 roda?",
-    "answer": 8,
-    "explanation": "1 mobil memiliki 4 roda. 2 motor memiliki 2 + 2 = 4 roda. Jadi 4 + 4 = 8 roda."
+    "prompt": "Di taman ada 2 burung di pohon. Datang lagi 3 burung. Berapa burung sekarang?",
+    "answer": 5,
+    "explanation": "2 burung + 3 burung = 5 burung."
   }
 ];
