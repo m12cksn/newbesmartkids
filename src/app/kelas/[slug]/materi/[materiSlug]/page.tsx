@@ -1,6 +1,7 @@
 import Link from "next/link";
 import KpkFpbExperience from "@/components/learn/KpkFpbExperience";
 import GradeOneCounting from "@/components/learn/GradeOneCounting";
+import GradeOneAddition from "@/components/learn/GradeOneAddition";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { classes } from "@/components/home/home-data";
@@ -26,6 +27,10 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
 
   if (material.id === "kelas-1-membilang-10") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 1</Link></div><GradeOneCounting/><SiteFooter/></main>;
+  }
+
+  if (material.id === "kelas-1-penjumlahan-10") {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 1</Link></div><GradeOneAddition/><SiteFooter/></main>;
   }
 
   if (material.id === "kelas-5-kpk-fpb") {
