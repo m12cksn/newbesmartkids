@@ -14,6 +14,19 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-5-kpk-fpb",
+    classId: 5,
+    chapter: 2,
+    slug: "kpk-dan-fpb",
+    title: "KPK dan FPB",
+    topic: "Bilangan",
+    description: "Pelajari kelipatan, faktor, KPK, FPB, faktorisasi prima, dan soal cerita melalui visual interaktif.",
+    videoStatus: "coming_soon",
+    summary: "KPK digunakan untuk menemukan kelipatan bersama yang paling kecil, sedangkan FPB untuk mencari faktor bersama terbesar. Keduanya dapat ditentukan lewat daftar bilangan atau faktorisasi prima.",
+    questionIds: [],
+  },
+
+  {
     id: "kelas-1-membilang-10",
     classId: 1,
     chapter: 1,
