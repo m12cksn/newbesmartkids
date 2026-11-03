@@ -9,9 +9,9 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Ada berapa benda? Pilih lambang bilangan yang tepat.",
     "options": [
       "6",
+      "4",
       "5",
-      "7",
-      "8"
+      "7"
     ],
     "answer": "6",
     "explanation": "Ada 6 (enam) benda. Hitung satu per satu.",
@@ -37,10 +37,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 0,
     "prompt": "Ada berapa benda? Pilih lambang bilangan yang tepat.",
     "options": [
+      "3",
       "4",
-      "6",
       "5",
-      "7"
+      "6"
     ],
     "answer": "5",
     "explanation": "Ada 5 (lima) benda. Hitung satu per satu.",
@@ -69,7 +69,7 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       "10",
       "8",
       "9",
-      "0"
+      "7"
     ],
     "answer": "10",
     "explanation": "Ada 10 (sepuluh) benda. Hitung satu per satu.",
@@ -97,7 +97,7 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "options": [
       "A",
       "Sama banyak",
-      "NaN",
+      "Tidak dapat ditentukan",
       "B"
     ],
     "answer": "B",
@@ -115,7 +115,7 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       "B",
       "A",
       "Sama banyak",
-      "NaN"
+      "Tidak dapat ditentukan"
     ],
     "answer": "B",
     "explanation": "Kelompok A memiliki 7 benda dan kelompok B 4 benda.",
@@ -129,10 +129,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 6,
     "prompt": "Bagaimana banyak benda kedua kelompok?",
     "options": [
-      "A lebih banyak",
+      "A",
       "Sama banyak",
-      "B lebih banyak",
-      "NaN"
+      "B",
+      "Tidak dapat ditentukan"
     ],
     "answer": "Sama banyak",
     "explanation": "Kelompok A memiliki 6 benda dan kelompok B 6 benda.",
@@ -149,7 +149,7 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       "A",
       "Sama banyak",
       "B",
-      "NaN"
+      "Tidak dapat ditentukan"
     ],
     "answer": "B",
     "explanation": "Kelompok A memiliki 8 benda dan kelompok B 9 benda.",
@@ -165,7 +165,7 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "options": [
       "A",
       "Sama banyak",
-      "NaN",
+      "Tidak dapat ditentukan",
       "B"
     ],
     "answer": "B",
@@ -183,7 +183,7 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
       "A",
       "B",
       "Sama banyak",
-      "NaN"
+      "Tidak dapat ditentukan"
     ],
     "answer": "A",
     "explanation": "Kelompok A memiliki 10 benda dan kelompok B 7 benda.",
@@ -197,10 +197,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 2,
     "prompt": "Lengkapi pasangan bilangan 5 (lima). Jika satu bagian 2, berapa bagian lainnya?",
     "options": [
+      "1",
       "2",
-      "4",
       "3",
-      "5"
+      "4"
     ],
     "answer": "3",
     "explanation": "5 dapat dipisahkan menjadi 2 dan 3.",
@@ -227,9 +227,9 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "prompt": "Lengkapi pasangan bilangan 9 (sembilan). Jika satu bagian 5, berapa bagian lainnya?",
     "options": [
       "4",
+      "2",
       "3",
-      "5",
-      "6"
+      "5"
     ],
     "answer": "4",
     "explanation": "9 dapat dipisahkan menjadi 5 dan 4.",
@@ -255,10 +255,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "b": 3,
     "prompt": "Lengkapi pasangan bilangan 8 (delapan). Jika satu bagian 3, berapa bagian lainnya?",
     "options": [
+      "3",
       "4",
-      "6",
       "5",
-      "7"
+      "6"
     ],
     "answer": "5",
     "explanation": "8 dapat dipisahkan menjadi 3 dan 5.",
@@ -289,10 +289,10 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     ],
     "prompt": "Lengkapi urutan: 2, 3, ...",
     "options": [
-      "1",
+      "2",
       "4",
-      "5",
-      "6"
+      "3",
+      "5"
     ],
     "answer": "4",
     "explanation": "Urutan yang benar mengisi tempat kosong dengan 4.",
@@ -328,8 +328,8 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     ],
     "prompt": "Lengkapi urutan mundur: 9, 8, ...",
     "options": [
+      "5",
       "6",
-      "10",
       "8",
       "7"
     ],
@@ -367,9 +367,9 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     ],
     "prompt": "Lengkapi urutan: ..., 5, 6",
     "options": [
-      "3",
+      "2",
       "4",
-      "7",
+      "3",
       "5"
     ],
     "answer": "4",
