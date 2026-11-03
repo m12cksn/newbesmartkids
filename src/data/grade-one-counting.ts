@@ -76,7 +76,8 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "options": [
       "8",
       "10",
-      "9"
+      "9",
+      "0"
     ],
     "answer": "10",
     "explanation": "Terlihat 10 (sepuluh) balok. Setiap balok dihitung tepat satu kali.",
