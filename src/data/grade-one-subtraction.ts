@@ -38,5 +38,14 @@ q("e11","inverse","Jika 7 + 1 = 8, maka 8 − 7 = ...",8,7),
 q("e12","inverse","Jika 7 − 4 = 3, maka 7 − 3 = ...",7,3),
 q("e13","word","Ibu mempunyai 6 telur. Dua telur pecah. Berapa telur yang utuh?",6,2,"egg"),
 q("e14","word","Kira mempunyai 8 balon. Dua diberikan kepada Mei. Berapa sisanya?",8,2,"balloon"),
-q("e15","word","Ada 9 kelereng. Dua diberikan kepada Kira dan empat kepada Upe. Berapa sisanya?",9,6)
+q("e15","word","Ada 9 kelereng. Dua diberikan kepada Kira dan empat kepada Upe. Berapa sisanya?",9,6),
+q("e16","story","Ada 9 balon. Empat balon meletus. Berapa balon yang tersisa?",9,4,"balloon"),
+q("e17","bond","Bilangan 10 terdiri atas 6 dan berapa?",10,6),
+q("e18","bond","Bilangan 8 terdiri atas 3 dan berapa?",8,3),
+q("e19","backward","Mulai dari 7 dan mundur 0 langkah. Berhenti di angka berapa?",7,0),
+q("e20","backward","Mulai dari 6 dan mundur 6 langkah. Berhenti di angka berapa?",6,6),
+q("e21","ten","Ada 10 kotak, 5 diwarnai. Berapa yang belum diwarnai?",10,5),
+q("e22","inverse","Jika 5 + 4 = 9, maka 9 − 5 = ...",9,5),
+q("e23","word","Ada 7 siswa di kelas. Lima siswa masih di kelas. Berapa siswa yang pergi?",7,5),
+q("e24","word","Kira mempunyai 10 bola. Empat bola diberikan kepada Tika. Berapa sisanya?",10,4,"ball")
 ];
