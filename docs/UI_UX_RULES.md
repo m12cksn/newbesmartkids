@@ -126,3 +126,23 @@ Status: Project rules. Proposed additions must be reviewed before merge; once me
 - Automated build and overflow tests alone **do not prove visual consistency**. A new chapter cannot be declared ready until screenshot comparison and contrast/readability review have been performed, recorded, and approved.
 - For each new lesson, add browser assertions for visible back link, video panel, heading, section navigation, lesson card, and primary CTA, plus checks for text readability. Keep tests for math content and interactions separate.
 - When a design discrepancy is found, fix it on the feature branch before merge or deploy. Do not treat a functional page as finished if it violates the approved visual baseline.
+
+## Permanent curriculum template — Chapters 1 and 2, and every future lesson
+This section is a **mandatory product contract**, not optional design inspiration. Audit the actual existing Chapter 1 and Chapter 2 implementations before creating or changing any lesson. Chapter 2 establishes the approved visual/learning flow; Chapter 1 is also a reference for media and student journey. Do not claim a chapter has a playable video until its actual video source and playback are verified.
+
+### Video is mandatory on every chapter
+- Every chapter must have a prominent **video learning section** in the same approved position and visual structure as the existing chapter pages, including a title, video area, and primary start-learning action.
+- If a playable video exists, preserve and test the actual embed/player, playback, accessibility/title, mobile aspect ratio, and fallback; do not replace it with a placeholder.
+- If no video has been supplied, keep a clearly labelled **"Video pembelajaran segera hadir"** placeholder. Never silently remove the video section or falsely imply the video is already available.
+- For each chapter, record in the PR whether its video is **PLAYABLE / PLACEHOLDER / NOT VERIFIED**, with the media source or reason. Production readiness and content completeness are different claims.
+
+### Non-negotiable chapter experience
+- Reuse the approved Chapter 2 shell: return-to-class link, grade/chapter eyebrow, hero title and description, two-column video + CTA panel, horizontal subtopic tabs, light two-column interactive lesson card, and bottom previous/next actions.
+- Preserve the learning progression: concept and interactive example → subtopic practice → next subtopic → final evaluation → result/review. A student should not accidentally skip the intended learning sequence.
+- Keep practice and final assessment as separate data banks. Chapter 2 uses 2 practice questions per section and 24 final questions; future chapter counts must be justified by curriculum coverage, not arbitrarily reduced.
+- Match question interaction to the textbook objective: number bonds, counting/marking, number line, ten-frame, missing numbers, contextual word problems, and multi-step questions when relevant. Use original visual assets and accurate object counts.
+- Keep a single question per screen, clear answer fields, feedback, progression, retry/review, and child-friendly Indonesian.
+- Preserve the approved palette, light surfaces, readable contrast, typography, spacing, and mobile layout. Never introduce a new theme for a chapter without explicit approval.
+- Before coding, inspect the existing chapter source, shared math objects/interactions, route, lesson data, CSS/theme, and any video player; extract shared components rather than duplicating inconsistent UI.
+- Before merge: verify media section and real playback when present; end-to-end learning and assessment; answer keys; visual comparison against Chapter 2 at 390 and 1280 px; overflow at 320/390/768/1280 px; accessibility and build. Record actual evidence in PR. Any unverified required item blocks merge unless owner explicitly accepts a documented exception.
+- Every future lesson PR must include a **Chapter parity checklist**: video status, header/back link, hero, tabs, lesson card, visual interaction, practice, evaluation, results, responsive screenshots, and QA status.
