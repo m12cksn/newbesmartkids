@@ -67,3 +67,8 @@ Status: Proposed on feature branch; apply to every new page and learning experie
 - When a question is multiple choice, **exactly four meaningful, distinct options (A–D)** are mandatory. Correct answers must vary across A/B/C/D with approximately balanced distribution across the assessment; never systematically use one letter. Do not use irrelevant distractors just to fill four choices.
 - Verify all displayed objects, question wording, correct answers, distractors, feedback, and number words against the source concept. Avoid visual/answer mismatches and repeated near-identical questions.
 - Review variety by subtopic, interaction type, difficulty, and visual representation before approval. Record the mix in PR; verify it in browser.
+
+## Visual diversity requirement
+- Do not default every elementary math problem to identical dots or circles. Rotate meaningful original representations: fruit, pencils, toy cars, stars, flowers, building blocks, ten-frames, number bonds, and number lines, according to the concept.
+- Use accessible SVG/React primitives and consistent visual counting semantics; check every illustrated object count against the answer key.
+- Prefer original lightweight assets and reusable components over copying external GitHub source or adding a heavy canvas library. Document any third-party license and performance impact.
