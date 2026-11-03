@@ -99,3 +99,10 @@ Status: Project rules. Proposed additions must be reviewed before merge; once me
 - Do not default every elementary math problem to identical dots or circles. Rotate meaningful original representations: fruit, pencils, toy cars, stars, flowers, building blocks, ten-frames, number bonds, and number lines, according to the concept.
 - Use accessible SVG/React primitives and consistent visual counting semantics; check every illustrated object count against the answer key.
 - Prefer original lightweight assets and reusable components over copying external GitHub source or adding a heavy canvas library. Document any third-party license and performance impact.
+
+## Grade 1 interactive QA checklist
+- Text must name the actual illustrated objects (e.g. 8 pensil, 9 bintang); do not show generic or mismatched nouns. Handle zero with an explicit empty state rather than implying invisible objects are present.
+- Place missing-number inputs inside number-bond and number-sequence diagrams, not only in a disconnected answer field. Support click/touch and keyboard.
+- Offer direct group selection and object counting/marking where appropriate, plus controls to split a whole into parts.
+- Difficulty must reflect cognitive demand, not only the question's position: easy identification, medium comparison/number bonds, challenging multi-step reasoning. Vary wording, representation, and task within each subtopic; textbook pages are references, not scripts to duplicate.
+- Before merging: check TypeScript/build, browser interaction, mobile viewport, all 24 answer keys, and accessible controls. Do not claim production readiness without those checks.
