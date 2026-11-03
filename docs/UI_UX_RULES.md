@@ -40,3 +40,13 @@ Status: Proposed on feature branch; apply to every new page and learning experie
 - Lesson path: multiples → factors → KPK → FPB → prime factor trees → word problems → 20-question assessment.
 - Rebuild prior standalone HTML concept as native Next.js/React components in the existing DaisyUI design, not an embedded iframe or a parallel theme.
 - Use a feature branch and request review before merging.
+
+
+## Visual animation technology standard (mandatory)
+- **React + SVG** is the default for original, crisp, responsive, accessible mathematical visuals and direct manipulation.
+- **Motion for React** is the default animation library for meaningful transitions: number-line jumps, grouping, highlighting factors, answer feedback, and guided demonstrations. Honor `prefers-reduced-motion`.
+- **DaisyUI + Tailwind** style the surrounding learning interface; they are not a substitute for mathematical SVG visuals.
+- **React Konva** may be introduced only when complex canvas manipulation is justified; prefer lightweight SVG first.
+- **Manim** is reserved for optional pre-rendered explanatory videos, not live in-browser interactions.
+- Avoid heavy animation libraries or unnecessary dependencies; verify compatibility and bundle cost before installing Motion.
+- Every animation must correspond to a learning event, and the lesson must remain understandable without animation.
