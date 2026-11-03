@@ -1,4 +1,5 @@
 import Link from "next/link";
+import KpkFpbExperience from "@/components/learn/KpkFpbExperience";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { classes } from "@/components/home/home-data";
@@ -21,6 +22,10 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   const classItem = classes.find((item) => item.slug === slug);
   const material = getMaterialBySlug(materiSlug);
   if (!classItem || !material || material.classId !== classItem.id) notFound();
+
+  if (material.id === "kelas-5-kpk-fpb") {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 5</Link></div><KpkFpbExperience/><SiteFooter/></main>;
+  }
 
   return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12"><Link href={`/kelas/${classItem.slug}`} className="btn btn-ghost btn-sm mb-6 px-0 text-base-content/60 hover:bg-transparent hover:text-success">&lt;- Kembali ke materi kelas {classItem.id}</Link><LearnExperience steps={getLearnSteps(material.slug)} materialTitle={material.title} questions={getQuestionsByMaterial(material.id)} /></div><SiteFooter /></main>;
 }
