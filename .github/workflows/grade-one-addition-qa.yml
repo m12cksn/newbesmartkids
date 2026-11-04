@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
+      - run: npm install --no-audit --no-fund
       - run: node --test scripts/verify-grade-one-addition.mjs
       - run: node --test scripts/verify-grade-one-subtraction.mjs
       - run: node --test scripts/verify-grade-one-shapes.mjs
