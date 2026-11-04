@@ -17,6 +17,7 @@ jobs:
       - run: npm ci
       - run: node --test scripts/verify-grade-one-addition.mjs
       - run: node --test scripts/verify-grade-one-subtraction.mjs
+      - run: node --test scripts/verify-grade-one-shapes.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
