@@ -12,36 +12,31 @@ try{
  await page.getByRole("button",{name:"Latihan submateri →"}).click();
  await page.getByText("Soal 1 dari 2").waitFor();
  await page.getByRole("button",{name:"Bentuk lengkung",exact:true}).click();
- await page.getByRole("button",{name:"Periksa jawaban"}).click();
- await page.getByText("Benar!",{exact:true}).waitFor();
- await page.getByRole("button",{name:/Berikutnya/}).click();
+ await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  // Complete all subtopic practices and 24 assessment questions with correct answers.
  await page.getByRole("button",{name:"Segitiga",exact:true}).click();
- await page.getByRole("button",{name:"Periksa jawaban"}).click();
- await page.getByRole("button",{name:/Submateri berikutnya/}).click();
+ await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  await page.getByRole("button",{name:"Latihan submateri →"}).click();
  for(const answer of ["Jam dinding","Bingkai foto"]){
   await page.getByRole("button",{name:answer,exact:true}).click();
-  await page.getByRole("button",{name:"Periksa jawaban"}).click();
-  await page.getByRole("button",{name:/Berikutnya|Submateri berikutnya/}).click();
+  await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  }
  await page.getByRole("button",{name:"Gabungkan segitiga"}).click();
  await page.getByText("Dua segitiga → satu segi empat").waitFor();
  await page.getByRole("button",{name:"Latihan submateri →"}).click();
  for(const answer of ["Segi empat","Dua segitiga"]){
   await page.getByRole("button",{name:answer,exact:true}).click();
-  await page.getByRole("button",{name:"Periksa jawaban"}).click();
-  await page.getByRole("button",{name:/Berikutnya|Mulai evaluasi/}).click();
+  await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  }
- const assessmentAnswers=["Keduanya memiliki tepi melengkung","Segi empat","Pintu","Empat sisi lurus","Potongan semangka segitiga","Dua segitiga","Penggaris segitiga","Tiga sisi utama","Dua sisi miring","Telur","Jumlah sisinya","Segitiga","Pintu, buku, jendela","Segi empat","Sama-sama bertepi lengkung","Melon","Diagonal","Keduanya tetap segitiga","Buku dan pintu","Dua","Dua","Empat","Empat","Piring dan telur; jendela dan buku"];
+ const assessmentAnswers=["Keduanya memiliki tepi melengkung","Pintu","Diagonal","Potongan semangka segitiga","Segi empat","Sama-sama bertepi lengkung","Tiga sisi utama","Buku dan pintu","Dua segitiga","Telur","Pintu, buku, jendela","Keduanya tetap segitiga","Empat sisi lurus","Dua","Dua sisi miring","Melon","Penggaris segitiga","Empat","Jumlah sisinya","Piring dan telur; jendela dan buku","Segi empat","Empat","Segitiga","Dua"];
  for(let i=0;i<assessmentAnswers.length;i++){
   await page.getByText(`Soal ${i+1} dari 24`).waitFor();
   await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click();
-  await page.getByRole("button",{name:"Periksa jawaban"}).click();
-  await page.getByText("Benar!",{exact:true}).waitFor();
-  await page.getByRole("button",{name:i===23?"Lihat hasil":"Berikutnya →"}).click();
+  await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  }
  await page.getByText("24/24").waitFor();
+ await page.getByText("Soal 24.",{exact:false}).waitFor();
+ assert.equal(await page.getByText("✓ Benar",{exact:true}).count(),24);
  for(const width of [320,390,768,1280]){
   await page.setViewportSize({width,height:844});
   await page.reload({waitUntil:"domcontentloaded"});
