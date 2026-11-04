@@ -20,7 +20,7 @@ export const shapeAssessment:ShapeQuestion[]=[
 q("e01","describe","Amati jam dan piring pada gambar. Ciri bentuk yang sama adalah ...",["Keduanya memiliki tepi melengkung","Keduanya memiliki tiga sudut","Keduanya memiliki empat sudut"],"Keduanya memiliki tepi melengkung","sedang"),
 q("e02","compose","Dua segitiga pada gambar disatukan tepat di sisi miring. Bentuk luar yang muncul adalah ...",["Segi empat","Lingkaran","Segitiga"],"Segi empat","sedang"),
 q("e03","group","Dari tiga benda pada gambar, mana yang tidak satu kelompok berdasarkan bentuk?",["Pintu","Piring","Jam dinding"],"Pintu","sedang"),
-q("e04","describe","Bentuk jendela dan bingkai foto pada gambar memiliki kesamaan ...",["Empat sisi lurus","Tiga sisi lurus","Tepi melengkung"],"Empat sisi lurus","sedang"),
+q("e04","describe","Amati jendela dan bingkai foto. Ciri apa yang dimiliki keduanya?",["Empat sisi lurus","Tiga sisi lurus","Tepi melengkung"],"Empat sisi lurus","sedang"),
 q("e05","group","Perhatikan penggaris segitiga dan risol pada gambar. Benda lain yang cocok dalam kelompok itu adalah ...",["Potongan semangka segitiga","Piring bundar","Buku"],"Potongan semangka segitiga","sedang"),
 q("e06","compose","Persegi pada gambar dipotong mengikuti garis miring dari sudut ke sudut. Hasilnya adalah ...",["Dua segitiga","Dua lingkaran","Dua persegi"],"Dua segitiga","sedang"),
 q("e07","group","Pada gambar, benda mana yang berbeda bentuk dari dua benda lainnya?",["Penggaris segitiga","Buku","Jendela"],"Penggaris segitiga","sedang"),
