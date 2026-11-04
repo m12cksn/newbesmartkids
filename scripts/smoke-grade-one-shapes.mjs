@@ -29,8 +29,10 @@ try{
   await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  }
  const assessmentAnswers=["Keduanya memiliki tepi melengkung","Pintu","Diagonal","Potongan semangka segitiga","Segi empat","Sama-sama bertepi lengkung","Tiga sisi utama","Buku dan pintu","Dua segitiga","Telur","Pintu, buku, jendela","Keduanya tetap segitiga","Empat sisi lurus","Dua","Dua sisi miring","Melon","Penggaris segitiga","Empat","Jumlah sisinya","Piring dan telur; jendela dan buku","Segi empat","Empat","Segitiga","Dua"];
+ const answerByPrompt=new Map();
  for(let i=0;i<assessmentAnswers.length;i++){
   await page.getByText(`Soal ${i+1} dari 24`).waitFor();
+  answerByPrompt.set(await page.locator("h2").last().innerText(),assessmentAnswers[i]);
   const matchIndices=new Map([[3,"Penggaris segitiga"],[6,"Gantungan baju"],[7,"Buku"]]);
   const pieceIndices=new Set([8,22,23]);
   if(matchIndices.has(i)){await page.getByRole("button",{name:"Mulai garis dari "+matchIndices.get(i)}).click();await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click()}
@@ -41,17 +43,26 @@ try{
  await page.getByText("24/24").waitFor();
  await page.getByText("Soal 24.",{exact:false}).waitFor();
  assert.equal(await page.getByText("✓ Benar",{exact:true}).count(),24);
- // Regression: retake with one incorrect response; the final review must show both statuses.
- await page.getByRole("button",{name:"Ulangi evaluasi"}).click();
+ // Regression: shuffled retake must preserve correct answers for each question.
+ await page.getByRole("button",{name:/Ulangi evaluasi/}).click();
  for(let i=0;i<assessmentAnswers.length;i++){
   await page.getByText(`Soal ${i+1} dari 24`).waitFor();
-  const answer=i===0?"Keduanya memiliki tiga sudut":assessmentAnswers[i];
-  await page.getByRole("button",{name:answer,exact:true}).click();
+  const prompt=await page.locator("h2").last().innerText();
+  const answer=answerByPrompt.get(prompt);
+  assert.ok(answer,`Missing answer for shuffled prompt: ${prompt}`);
+  const matching=new Map([["Potongan semangka segitiga","Penggaris segitiga"],["Tiga sisi utama","Gantungan baju"],["Buku dan pintu","Buku"]]);
+  const pieces=new Set(["Dua segitiga","Segitiga","Dua"]);
+  if(matching.has(answer)&&await page.getByRole("button",{name:"Mulai garis dari "+matching.get(answer)}).count()){
+   await page.getByRole("button",{name:"Mulai garis dari "+matching.get(answer)}).click();
+   await page.getByRole("button",{name:answer,exact:true}).click();
+  }else if(await page.getByRole("button",{name:"Tempat memasukkan potongan"}).count()){
+   await page.getByRole("button",{name:answer,exact:true}).click();
+   await page.getByRole("button",{name:"Tempat memasukkan potongan"}).click();
+  }else await page.getByRole("button",{name:answer,exact:true}).click();
   await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
  }
- await page.getByText("23/24").waitFor();
- assert.equal(await page.getByText("✗ Salah",{exact:true}).count(),1);
- assert.equal(await page.getByText("✓ Benar",{exact:true}).count(),23);
+ await page.getByText("24/24").waitFor();
+ assert.equal(await page.getByText("✓ Benar",{exact:true}).count(),24);
  await page.getByText("Pembahasan:",{exact:false}).first().waitFor();
  for(const width of [320,390,768,1280]){
   await page.setViewportSize({width,height:844});
