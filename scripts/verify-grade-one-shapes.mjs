@@ -17,5 +17,6 @@ test("Chapter 4 question inventory",()=>{
 test("All literal option arrays include their answer",()=>{
  const matches=[...source.matchAll(/q\("(p\d\d|e\d\d)","[^"]+","[^"]+",\[([^\]]+)\],"([^"]+)"/g)];
  for(const m of matches){const options=[...m[2].matchAll(/"([^"]+)"/g)].map(x=>x[1]);assert.equal(options.length,3,m[1]);assert.ok(options.includes(m[3]),m[1]);}
- assert.ok(matches.length>=20,"most questions must have validated literal choices");
+ assert.equal(matches.length,20,"all questions with inline option arrays must be validated");
+ assert.equal((source.match(/,names,"/g)||[]).length,10,"remaining questions use shared shape choices");
 });
