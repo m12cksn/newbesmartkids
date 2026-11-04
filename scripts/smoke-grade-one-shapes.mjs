@@ -37,6 +37,18 @@ try{
  await page.getByText("24/24").waitFor();
  await page.getByText("Soal 24.",{exact:false}).waitFor();
  assert.equal(await page.getByText("✓ Benar",{exact:true}).count(),24);
+ // Regression: retake with one incorrect response; the final review must show both statuses.
+ await page.getByRole("button",{name:"Ulangi evaluasi"}).click();
+ for(let i=0;i<assessmentAnswers.length;i++){
+  await page.getByText(`Soal ${i+1} dari 24`).waitFor();
+  const answer=i===0?"Keduanya memiliki tiga sudut":assessmentAnswers[i];
+  await page.getByRole("button",{name:answer,exact:true}).click();
+  await page.getByRole("button",{name:"Periksa jawaban & lanjut"}).click();
+ }
+ await page.getByText("23/24").waitFor();
+ assert.equal(await page.getByText("✗ Salah",{exact:true}).count(),1);
+ assert.equal(await page.getByText("✓ Benar",{exact:true}).count(),23);
+ await page.getByText("Pembahasan:",{exact:false}).first().waitFor();
  for(const width of [320,390,768,1280]){
   await page.setViewportSize({width,height:844});
   await page.reload({waitUntil:"domcontentloaded"});
