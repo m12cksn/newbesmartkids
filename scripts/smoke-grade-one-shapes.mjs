@@ -16,7 +16,7 @@ try{
  await page.getByText("Benar!",{exact:true}).waitFor();
  await page.getByRole("button",{name:/Berikutnya/}).click();
  // Complete all subtopic practices and 24 assessment questions with correct answers.
- await page.getByRole("button",{name:"Bentuk lengkung",exact:true}).click();
+ await page.getByRole("button",{name:"Segitiga",exact:true}).click();
  await page.getByRole("button",{name:"Periksa jawaban"}).click();
  await page.getByRole("button",{name:/Submateri berikutnya/}).click();
  await page.getByRole("button",{name:"Latihan submateri →"}).click();
