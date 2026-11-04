@@ -30,3 +30,4 @@ jobs:
           done
           node scripts/smoke-grade-one-addition.mjs
           node scripts/smoke-grade-one-subtraction.mjs
+          node scripts/smoke-grade-one-shapes.mjs
