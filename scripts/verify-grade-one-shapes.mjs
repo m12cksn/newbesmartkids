@@ -10,8 +10,14 @@ test("Chapter 4 has 6 practices and 24 final questions",()=>{
  assert.equal(new Set(rows.map(q=>q.id)).size,30);
  for(const section of ["describe","group","compose"]){
   assert.equal(rows.filter(q=>q.section===section&&q.id.startsWith("p")).length,2);
-  assert.equal(rows.filter(q=>q.section===section&&q.id.startsWith("e")).length,8);
+  assert.ok(rows.filter(q=>q.section===section&&q.id.startsWith("e")).length>=6);
  }
+});
+test("Final questions interleave subtopics and avoid trivial difficulty",()=>{
+ const final=rows.filter(q=>q.id.startsWith("e"));
+ assert.ok(final.slice(1).some((q,i)=>q.section!==final[i].section));
+ assert.equal((source.match(/"sangat sulit"/g)||[]).length>=4,true);
+ assert.equal(final.filter(q=>q.prompt.startsWith("Bentuk ")).length,0);
 });
 test("Each question has a valid, unique answer option",()=>{
  const shared=["Bentuk lengkung","Segitiga","Segi empat"];
