@@ -33,7 +33,7 @@ try{
   await page.getByRole("button",{name:"Periksa jawaban"}).click();
   await page.getByRole("button",{name:/Berikutnya|Mulai evaluasi/}).click();
  }
- const assessmentAnswers=["Bentuk lengkung","Segi empat","Segitiga","Segi empat","Bentuk lengkung","Segitiga","Segi empat","Bentuk lengkung","Piring bundar","Jendela","Kue risol segitiga","Tiga sisi lurus","Empat sisi lurus","Jam, piring, telur","Bentuk","Warna","Segi empat","Dua segitiga","Segitiga","Bangun baru","Saling bertemu","Potongan lengkung yang cocok","Berbagai bentuk datar","Segitiga"];
+ const assessmentAnswers=["Keduanya memiliki tepi melengkung","Segi empat","Pintu","Empat sisi lurus","Potongan semangka segitiga","Dua segitiga","Penggaris segitiga","Tiga sisi utama","Dua sisi miring","Telur","Jumlah sisinya","Segitiga","Pintu, buku, jendela","Segi empat","Sama-sama bertepi lengkung","Melon","Diagonal","Keduanya tetap segitiga","Buku dan pintu","Dua","Dua","Empat","Empat","Piring dan telur; jendela dan buku"];
  for(let i=0;i<assessmentAnswers.length;i++){
   await page.getByText(`Soal ${i+1} dari 24`).waitFor();
   await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click();
