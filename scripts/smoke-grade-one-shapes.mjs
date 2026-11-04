@@ -15,6 +15,33 @@ try{
  await page.getByRole("button",{name:"Periksa jawaban"}).click();
  await page.getByText("Benar!",{exact:true}).waitFor();
  await page.getByRole("button",{name:/Berikutnya/}).click();
+ // Complete all subtopic practices and 24 assessment questions with correct answers.
+ await page.getByRole("button",{name:"Bentuk lengkung",exact:true}).click();
+ await page.getByRole("button",{name:"Periksa jawaban"}).click();
+ await page.getByRole("button",{name:/Submateri berikutnya/}).click();
+ await page.getByRole("button",{name:"Latihan submateri →"}).click();
+ for(const answer of ["Jam dinding","Bingkai foto"]){
+  await page.getByRole("button",{name:answer,exact:true}).click();
+  await page.getByRole("button",{name:"Periksa jawaban"}).click();
+  await page.getByRole("button",{name:/Berikutnya|Submateri berikutnya/}).click();
+ }
+ await page.getByRole("button",{name:"Gabungkan segitiga"}).click();
+ await page.getByText("Dua segitiga → satu segi empat").waitFor();
+ await page.getByRole("button",{name:"Latihan submateri →"}).click();
+ for(const answer of ["Segi empat","Dua segitiga"]){
+  await page.getByRole("button",{name:answer,exact:true}).click();
+  await page.getByRole("button",{name:"Periksa jawaban"}).click();
+  await page.getByRole("button",{name:/Berikutnya|Mulai evaluasi/}).click();
+ }
+ const assessmentAnswers=["Bentuk lengkung","Segi empat","Segitiga","Segi empat","Bentuk lengkung","Segitiga","Segi empat","Bentuk lengkung","Piring bundar","Jendela","Kue risol segitiga","Tiga sisi lurus","Empat sisi lurus","Jam, piring, telur","Bentuk","Warna","Segi empat","Dua segitiga","Segitiga","Bangun baru","Saling bertemu","Potongan lengkung yang cocok","Berbagai bentuk datar","Segitiga"];
+ for(let i=0;i<assessmentAnswers.length;i++){
+  await page.getByText(`Soal ${i+1} dari 24`).waitFor();
+  await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click();
+  await page.getByRole("button",{name:"Periksa jawaban"}).click();
+  await page.getByText("Benar!",{exact:true}).waitFor();
+  await page.getByRole("button",{name:i===23?"Lihat hasil":"Berikutnya →"}).click();
+ }
+ await page.getByText("24/24").waitFor();
  for(const width of [320,390,768,1280]){
   await page.setViewportSize({width,height:844});
   await page.reload({waitUntil:"domcontentloaded"});
