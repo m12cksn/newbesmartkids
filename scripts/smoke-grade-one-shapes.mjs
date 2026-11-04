@@ -31,8 +31,8 @@ try{
  const assessmentAnswers=["Keduanya memiliki tepi melengkung","Pintu","Diagonal","Potongan semangka segitiga","Segi empat","Sama-sama bertepi lengkung","Tiga sisi utama","Buku dan pintu","Dua segitiga","Telur","Pintu, buku, jendela","Keduanya tetap segitiga","Empat sisi lurus","Dua","Dua sisi miring","Melon","Penggaris segitiga","Empat","Jumlah sisinya","Piring dan telur; jendela dan buku","Segi empat","Empat","Segitiga","Dua"];
  for(let i=0;i<assessmentAnswers.length;i++){
   await page.getByText(`Soal ${i+1} dari 24`).waitFor();
-  const matchIndices=new Map([[3,"Buku"],[6,"Penggaris segitiga"],[7,"Gantungan baju"]]);
-  const pieceIndices=new Set([8,21,23]);
+  const matchIndices=new Map([[3,"Penggaris segitiga"],[6,"Gantungan baju"],[7,"Buku"]]);
+  const pieceIndices=new Set([8,22,23]);
   if(matchIndices.has(i)){await page.getByRole("button",{name:"Mulai garis dari "+matchIndices.get(i)}).click();await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click()}
   else if(pieceIndices.has(i)){await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click();await page.getByRole("button",{name:"Tempat memasukkan potongan"}).click()}
   else await page.getByRole("button",{name:assessmentAnswers[i],exact:true}).click();
