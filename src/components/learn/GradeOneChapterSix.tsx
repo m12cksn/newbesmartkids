@@ -4,53 +4,19 @@ import {NumberSequence,PlaceValue} from "@/components/math-visual";
 import {StrategyLab} from "@/components/math-visual/StrategyLab";
 import {ChapterSixExercise,chapter6Practice,chapter6Evaluation} from "./ChapterSixExercises";
 type Topic="A"|"B1"|"B2"|"C";
-type Question={text:string;answer:number;kind:"compare"|"add"|"subtract"|"story";a:number;b:number;icon?:string};
 const topics:{id:Topic;label:string;title:string;description:string}[]=[
 {id:"A",label:"A. Lebih, Kurang, Selisih",title:"Mengenal Konsep Lebih dari, Kurang dari, dan Selisih",description:"Bandingkan dua kelompok benda. Selisih adalah beda banyaknya benda: kurangkan jumlah yang lebih besar dengan jumlah yang lebih kecil."},
 {id:"B1",label:"B1. Satuan + Satuan",title:"Penjumlahan Satuan dengan Satuan",description:"Penjumlahan dapat dilakukan dengan menghitung maju, membuat 10 lebih dulu, atau menggabungkan dua kelompok. Contoh: 7 + 6 = 13."},
 {id:"B2",label:"B2. Puluhan + Satuan",title:"Penjumlahan Puluhan dengan Satuan",description:"Pisahkan puluhan dan satuan. Contoh: 12 + 3 = 10 + (2 + 3) = 15. Kita juga dapat menghitung maju dari 12."},
 {id:"C",label:"C. Pengurangan",title:"Pengurangan yang Hasilnya Kurang dari 20",description:"Pengurangan dapat diselesaikan dengan menghitung mundur, pasangan bilangan, atau nilai tempat. Contoh: 15 − 3 = 12."}
 ];
-const practice:Record<Topic,Question[]>={
-A:[{text:"Ada 8 kelereng merah dan 7 kelereng biru. Berapa selisihnya?",answer:1,kind:"compare",a:8,b:7},{text:"Ada 6 mangga dan 8 apel. Berapa kurangnya mangga dari apel?",answer:2,kind:"compare",a:6,b:8}],
-B1:[{text:"Hitung dengan cara menghitung maju: 7 + 6 = ...",answer:13,kind:"add",a:7,b:6},{text:"Gunakan cara membuat 10: 6 + 5 = ...",answer:11,kind:"add",a:6,b:5}],
-B2:[{text:"Malosi mempunyai 12 pensil. Ia mendapat 3 pensil lagi. Berapa semuanya?",answer:15,kind:"add",a:12,b:3},{text:"Hitung: 14 + 3 = ...",answer:17,kind:"add",a:14,b:3}],
-C:[{text:"Hitung mundur: 15 − 4 = ...",answer:11,kind:"subtract",a:15,b:4},{text:"Gunakan nilai tempat: 16 − 4 = ...",answer:12,kind:"subtract",a:16,b:4}]
-};
-const evaluation:Question[]=[
-{text:"Ada 8 kue lapis dan 6 onde-onde. Berapa selisihnya?",answer:2,kind:"compare",a:8,b:6},
-{text:"Tika mempunyai 8 gantungan kunci, Kira 6. Berapa selisihnya?",answer:2,kind:"compare",a:8,b:6},
-{text:"Kelompok B memiliki 9 benda. Kelompok A memiliki 3 benda lebih sedikit. Berapa benda A?",answer:6,kind:"subtract",a:9,b:3},
-{text:"15 + 3 = ...",answer:18,kind:"add",a:15,b:3},
-{text:"16 + 3 = ...",answer:19,kind:"add",a:16,b:3},
-{text:"12 + 5 = ...",answer:17,kind:"add",a:12,b:5},
-{text:"14 + 5 = ...",answer:19,kind:"add",a:14,b:5},
-{text:"18 − 5 = ...",answer:13,kind:"subtract",a:18,b:5},
-{text:"17 − 6 = ...",answer:11,kind:"subtract",a:17,b:6},
-{text:"13 − 2 = ...",answer:11,kind:"subtract",a:13,b:2},
-{text:"15 − 4 = ...",answer:11,kind:"subtract",a:15,b:4},
-{text:"Ada 12 anak ayam. Datang lagi 3 anak ayam. Berapa semuanya?",answer:15,kind:"add",a:12,b:3},
-{text:"Ada 4 kepik merah. Kepik kuning 2 lebih sedikit. Berapa kepik kuning?",answer:2,kind:"subtract",a:4,b:2},
-{text:"Ada 4 kepik merah dan 2 kepik kuning. Berapa semuanya?",answer:6,kind:"add",a:4,b:2},
-{text:"7 + 6 = ...",answer:13,kind:"add",a:7,b:6},
-{text:"6 + 5 = ...",answer:11,kind:"add",a:6,b:5},
-{text:"12 + 3 = ...",answer:15,kind:"add",a:12,b:3},
-{text:"13 + 4 = ...",answer:17,kind:"add",a:13,b:4},
-{text:"15 − 3 = ...",answer:12,kind:"subtract",a:15,b:3},
-{text:"17 − 4 = ...",answer:13,kind:"subtract",a:17,b:4},
-{text:"19 − 6 = ...",answer:13,kind:"subtract",a:19,b:6},
-{text:"Ibu mempunyai 13 bolu. Dimakan 2. Berapa sisa bolu?",answer:11,kind:"subtract",a:13,b:2},
-{text:"Wei mempunyai 11 pensil. Pensil Kira 3 lebih sedikit. Berapa pensil Kira?",answer:8,kind:"subtract",a:11,b:3},
-{text:"Wei mempunyai 11 pensil dan Kira 8 pensil. Berapa jumlahnya?",answer:19,kind:"add",a:11,b:8}
-];
-function Manipulative({a,b,kind}:{a:number;b:number;kind:Question["kind"]}){return <div className="w-full space-y-3"><div className="grid grid-cols-2 gap-3"><div className="rounded-xl border border-base-300 bg-white p-2 text-center"><p className="text-xs font-bold">Kelompok A · {a}</p><div className="mt-2 flex min-h-14 flex-wrap justify-center gap-1">{Array.from({length:a},(_,i)=><span key={i} className="text-lg" aria-hidden>🔴</span>)}</div></div><div className="rounded-xl border border-base-300 bg-white p-2 text-center"><p className="text-xs font-bold">Kelompok B · {b}</p><div className="mt-2 flex min-h-14 flex-wrap justify-center gap-1">{Array.from({length:b},(_,i)=><span key={i} className="text-lg" aria-hidden>🔵</span>)}</div></div></div><p className="text-center text-lg font-extrabold">{a} {kind==="add"?"+":kind==="compare"?"dan":"−"} {b} {kind==="compare"?"· cari selisih": "= ?"}</p></div>}
 export default function GradeOneChapterSix(){
- const [tab,setTab]=useState(0),[strategy,setStrategy]=useState(0),[a,setA]=useState(7),[b,setB]=useState(6),[mode,setMode]=useState<"learn"|"quiz"|"result">("learn"),[evaluationMode,setEvaluationMode]=useState(false),[step,setStep]=useState(0),[answer,setAnswer]=useState(""),[checked,setChecked]=useState(false),[score,setScore]=useState(0);
+ const [tab,setTab]=useState(0),[strategy,setStrategy]=useState(0),[a,setA]=useState(7),[b,setB]=useState(6),[mode,setMode]=useState<"learn"|"quiz"|"result">("learn"),[evaluationMode,setEvaluationMode]=useState(false),[step,setStep]=useState(0),[score,setScore]=useState(0);
  const topic=topics[tab];const questions=evaluationMode?chapter6Evaluation:chapter6Practice[topic.id];const q=questions[step];
  const maxA=topic.id==="B2"?16:topic.id==="C"?19:topic.id==="B1"?9:12;const maxB=topic.id==="A"?10:6;
  const strategies:Record<Topic,Array<{label:string;id:"compare"|"count"|"make10"|"place"|"back"}>>={A:[{label:"Pasangkan benda",id:"compare"}],B1:[{label:"Menghitung maju",id:"count"},{label:"Membuat 10",id:"make10"}],B2:[{label:"Menghitung maju",id:"count"},{label:"Nilai tempat",id:"place"}],C:[{label:"Menghitung mundur",id:"back"},{label:"Nilai tempat",id:"place"}]};
- function start(isEvaluation:boolean){setEvaluationMode(isEvaluation);setStep(0);setAnswer("");setChecked(false);setScore(0);setMode("quiz");}
- function next(){if(step===questions.length-1)setMode("result");else{setStep(s=>s+1);setAnswer("");setChecked(false)}}
+ function start(isEvaluation:boolean){setEvaluationMode(isEvaluation);setStep(0);setScore(0);setMode("quiz");}
+ function next(){if(step===questions.length-1)setMode("result");else{setStep(s=>s+1);}}
  function chooseTab(index:number){setTab(index);setMode("learn");setStrategy(0);setA(index===2?12:index===3?15:7);setB(index===2||index===3?3:6)}
  return <section className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
   <p className="text-xs font-bold uppercase tracking-widest text-success">Kelas 1 / Bab 6</p><h1 className="mt-2 text-3xl font-extrabold sm:text-5xl">Penjumlahan dan Pengurangan sampai dengan 20</h1><p className="mt-3 max-w-3xl text-base-content/65">Belajar membandingkan kelompok, mencari selisih, menjumlahkan, dan mengurangkan bilangan menggunakan benda dan nilai tempat.</p>
