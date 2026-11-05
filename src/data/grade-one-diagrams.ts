@@ -27,23 +27,23 @@ const fruit: Datum[] = [
   { label: "Mangga", icon: "mangga", count: 4 },
   { label: "Belimbing", icon: "belimbing", count: 5 },
 ];
-const favorites = [
-  { ...fruit[0] }, { ...fruit[1], count: 4 }, { ...fruit[3], count: 7 },
-  { label: "Jambu air", icon: "jambu", count: 5 },
+const favorites: Datum[] = [
+  { label: "Jagung", icon: "jagung", count: 8 }, { label: "Wortel", icon: "wortel", count: 5 },
+  { label: "Brokoli", icon: "brokoli", count: 9 }, { label: "Tomat", icon: "tomat", count: 6 },
 ];
 const pencils: Datum[] = [
-  { label: "Kuning", icon: "pensil", color: "#ca8a04", count: 4 },
-  { label: "Biru", icon: "pensil", color: "#2563eb", count: 3 },
-  { label: "Merah", icon: "pensil", color: "#dc2626", count: 5 },
-  { label: "Hitam", icon: "pensil", color: "#1e293b", count: 6 },
+  { label: "Jingga", icon: "pensil", color: "#ea580c", count: 6 },
+  { label: "Ungu", icon: "pensil", color: "#7e22ce", count: 4 },
+  { label: "Hijau", icon: "pensil", color: "#15803d", count: 9 },
+  { label: "Hitam", icon: "pensil", color: "#1e293b", count: 7 },
 ];
 const clothes: Datum[] = [
-  { label: "Kaus pendek", count: 5 }, { label: "Kaus panjang", count: 4 },
-  { label: "Celana", count: 3 },
+  { label: "Kaus pendek", icon: "kaus-pendek", count: 7 },
+  { label: "Kaus panjang", icon: "kaus-panjang", count: 5 },
+  { label: "Celana", icon: "celana", count: 4 },
 ];
 const animals: Datum[] = [
-  { label: "Ayam", count: 4 }, { label: "Bebek", count: 2 },
-  { label: "Kelinci", count: 5 },
+  { label: "Ikan", count: 6 }, { label: "Katak", count: 3 }, { label: "Kura-kura", count: 8 },
 ];
 
 type Visual = "objects" | "table" | "diagram" | "build";
@@ -54,6 +54,8 @@ export type DiagramQuestion = Source & {
   explanation: string;
   options?: string[];
   target?: string;
+  cell?: string;
+  worksheet?: "list" | "table" | "marks";
   difficulty: "sedang" | "menantang" | "sangat menantang";
 };
 const sources = {
@@ -61,13 +63,13 @@ const sources = {
   cakes: { title: "Kue Kesukaan", rows: cakes, visual: "table", unit: "anak" },
   vegetables: { title: "Sayur Kesukaan", rows: vegetables, visual: "diagram", unit: "anak" },
   fruit: { title: "Buah dari Pasar", rows: fruit, visual: "build", unit: "buah" },
-  favorites: { title: "Buah Kesukaan", rows: favorites, visual: "diagram", unit: "anak" },
+  favorites: { title: "Sayur Favorit Kelas", rows: favorites, visual: "diagram", unit: "anak" },
   pencils: { title: "Pensil Warna", rows: pencils, visual: "objects", unit: "pensil" },
-  clothes: { title: "Pakaian Kira", rows: clothes, visual: "build", unit: "pakaian" },
-  fruitList: { title: "Daftar Buah-buahan", rows: [{ ...fruit[0], count: 5 }, { ...fruit[1], count: 4 }, { ...fruit[2], count: 6 }], visual: "objects", unit: "buah" },
-  toys: { title: "Mainan Kesukaan", rows: [{ label: "Boneka", count: 3 }, { label: "Gasing", count: 5 }, { label: "Kelereng", count: 4 }, { label: "Bola", count: 6 }], visual: "table", unit: "anak" },
-  animals: { title: "Hewan Pak Budi", rows: animals, visual: "build", unit: "hewan",
-    clue: "Ada 4 ayam. Bebek 2 lebih sedikit dari ayam. Kelinci 1 lebih banyak dari ayam." },
+  clothes: { title: "Pakaian Nara", rows: clothes, visual: "build", unit: "pakaian" },
+  fruitList: { title: "Daftar Buah-buahan", rows: [{ ...fruit[3], count: 8 }, { label: "Jambu air", icon: "jambu", count: 6 }, { ...fruit[2], count: 9 }], visual: "objects", unit: "buah" },
+  toys: { title: "Permainan Kesukaan", rows: [{ label: "Lompat tali", count: 4 }, { label: "Puzzle", count: 6 }, { label: "Petak umpet", count: 3 }, { label: "Sepak bola", count: 7 }], visual: "table", unit: "anak" },
+  animals: { title: "Hewan di Kolam Bu Rani", rows: animals, visual: "build", unit: "hewan",
+    clue: "Ada 6 ikan. Katak 3 lebih sedikit dari ikan. Kura-kura 2 lebih banyak dari ikan." },
 } satisfies Record<string, Source>;
 
 function question(source: keyof typeof sources, prompt: string, answer: string | number,
@@ -82,20 +84,62 @@ function build(source: "fruit" | "animals" | "clothes", target: string, answer: 
     target, answer: String(answer), explanation, difficulty: "sedang" };
 }
 
+function practice(source: keyof typeof sources, prompt: string, answer: string | number, explanation: string,
+  worksheet?: DiagramQuestion["worksheet"]): DiagramQuestion {
+  return { ...question(source, prompt, answer, explanation, "sedang"), worksheet };
+}
+
+function fillCounts(source: "fruitList" | "pencils", worksheet: "list" | "table"): DiagramQuestion[] {
+  return sources[source].rows.map(row => ({
+    ...practice(source, `Hitung dan isi jumlah untuk ${row.label.toLowerCase()}.`, row.count,
+      `Hitung satu per satu gambar ${row.label.toLowerCase()}. Jumlahnya ${row.count}.`, worksheet),
+    cell: row.label,
+  }));
+}
+
 export const diagramPractice = {
   daftar: [
-    question("fruitList", "Berapa buah apel dalam daftar?", 4, "Hitung 4 gambar apel.", "sedang"),
-    question("fruitList", "Buah apa yang paling banyak?", "Mangga", "Ada 6 mangga, lebih banyak dari jeruk dan apel.", "sedang", ["Jeruk", "Mangga", "Apel"]),
+    ...fillCounts("fruitList", "list"),
+    practice("fruitList", "Buah apa yang paling banyak?", "Mangga", "Ada 9 mangga, lebih banyak dari 8 belimbing dan 6 jambu air.", "list"),
+    practice("fruitList", "Buah apa yang paling sedikit?", "Jambu air", "Jambu air berjumlah 6, paling sedikit.", "list"),
   ],
   tabel: [
-    question("pencils", "Hitung pensil merah. Berapa jumlah yang ditulis pada baris Merah di tabel?", 5, "Ada 5 pensil merah.", "sedang"),
-    question("toys", "Berapa anak yang memilih bola dan gasing jika digabung?", 11, "Pada tabel, bola 6 dan gasing 5. Jumlahnya 11 anak.", "menantang"),
+    ...fillCounts("pencils", "table"),
+    practice("pencils", "Berapa banyak pensil hijau?", 9, "Pada baris hijau tercatat 9.", "table"),
+    practice("pencils", "Berapa banyak pensil jingga?", 6, "Pada baris jingga tercatat 6.", "table"),
+    practice("pencils", "Mana yang lebih banyak, pensil hijau atau jingga? Tulis warnanya.", "Hijau", "9 lebih besar dari 6.", "table"),
+    practice("pencils", "Warna pensil apa yang paling banyak?", "Hijau", "Hijau memiliki jumlah terbesar, yaitu 9.", "table"),
+    practice("pencils", "Warna pensil apa yang paling sedikit?", "Ungu", "Ungu memiliki jumlah terkecil, yaitu 4.", "table"),
+    practice("pencils", "Berapa jumlah pensil hitam dan hijau?", 16, "7 + 9 = 16.", "table"),
+    practice("toys", "Berapa anak yang suka lompat tali?", 4, "Kolom lompat tali berisi angka 4."),
+    practice("toys", "Berapa anak yang suka sepak bola?", 7, "Kolom sepak bola berisi angka 7."),
+    practice("toys", "Permainan apa yang paling disukai?", "Sepak bola", "Sepak bola dipilih 7 anak, jumlah terbesar."),
+    practice("toys", "Berapa jumlah seluruh anak?", 20, "4 + 6 + 3 + 7 = 20."),
   ],
   diagram: [
-    question("favorites", "Berapa anak yang suka jambu air?", 5, "Ada 5 bintang pada baris jambu air.", "sedang"),
-    question("favorites", "Buah apa yang dipilih 4 anak?", "Apel", "Baris apel memiliki 4 bintang.", "sedang", ["Jeruk", "Belimbing", "Apel"]),
-    build("clothes", "Kaus pendek", 5, "Ada lima kaus pendek. Isi lima tanda."),
-    build("animals", "Bebek", 2, "Bebek 2 lebih sedikit dari 4 ayam. Jadi, ada 2 bebek."),
+    practice("favorites", "Berapa anak yang suka wortel?", 5, "Hitung 5 bintang pada baris wortel."),
+    practice("favorites", "Berapa anak yang suka tomat?", 6, "Hitung 6 bintang pada baris tomat."),
+    practice("favorites", "Sayur apa yang disukai 5 anak?", "Wortel", "Baris wortel berisi 5 bintang."),
+    practice("favorites", "Sayur apa yang disukai 9 anak?", "Brokoli", "Baris brokoli berisi 9 bintang."),
+    practice("favorites", "Sayur apa yang paling disukai?", "Brokoli", "Sembilan bintang adalah jumlah terbesar."),
+    practice("favorites", "Berapa lebihnya pemilih brokoli daripada wortel?", 4, "9 − 5 = 4 anak."),
+    ...clothes.map(row => ({ ...build("clothes", row.label, row.count, `Ada ${row.count} ${row.label.toLowerCase()}.`), worksheet: "marks" as const })),
+    practice("clothes", "Ada berapa kaus pendek?", 7, "Baris kaus pendek perlu 7 tanda.", "marks"),
+    practice("clothes", "Ada berapa kaus panjang?", 5, "Baris kaus panjang perlu 5 tanda.", "marks"),
+    practice("clothes", "Ada berapa celana?", 4, "Baris celana perlu 4 tanda.", "marks"),
+    practice("clothes", "Pakaian apa yang paling banyak?", "Kaus pendek", "Tujuh adalah jumlah terbesar.", "marks"),
+    practice("clothes", "Pakaian apa yang paling sedikit?", "Celana", "Empat adalah jumlah terkecil.", "marks"),
+    practice("clothes", "Berapa lebihnya kaus pendek daripada celana?", 3, "7 − 4 = 3 pakaian.", "marks"),
+    practice("clothes", "Berapa jumlah semua pakaian?", 16, "7 + 5 + 4 = 16.", "marks"),
+    ...animals.map(row => ({ ...build("animals", row.label, row.count,
+      row.label === "Ikan" ? "Di cerita ada 6 ikan." : row.label === "Katak" ? "6 − 3 = 3 katak." : "6 + 2 = 8 kura-kura."),
+      worksheet: "marks" as const })),
+    practice("animals", "Ada berapa ikan?", 6, "Baris ikan perlu 6 tanda.", "marks"),
+    practice("animals", "Ada berapa katak?", 3, "Kurangi 6 dengan 3. Ada 3 katak.", "marks"),
+    practice("animals", "Ada berapa kura-kura?", 8, "Tambahkan 2 pada 6. Ada 8 kura-kura.", "marks"),
+    practice("animals", "Berapa jumlah semua hewan?", 17, "6 + 3 + 8 = 17.", "marks"),
+    practice("animals", "Hewan apa yang paling banyak?", "Kura-kura", "Kura-kura berjumlah 8, paling banyak.", "marks"),
+    practice("animals", "Hewan apa yang paling sedikit?", "Katak", "Katak berjumlah 3, paling sedikit.", "marks"),
   ],
 };
 

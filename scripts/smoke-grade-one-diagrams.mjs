@@ -12,7 +12,7 @@ for (const q of [...diagramAssessment, ...Object.values(diagramPractice).flat()]
   assert.equal(new Set(q.rows.map(row => row.label)).size, q.rows.length);
   assert.ok(q.rows.every(row => Number.isInteger(row.count) && row.count >= 0));
   if (q.options) assert.equal(q.options.filter(value => value === q.answer).length, 1);
-  else assert.match(q.answer, /^\d+$/);
+  else assert.ok(q.answer.trim());
   if (q.target) assert.equal(q.rows.find(row => row.label === q.target)?.count, Number(q.answer));
 }
 
@@ -27,9 +27,15 @@ try {
     const button = name => page.getByRole("button", { name, exact: true });
     const checkWidth = async () => assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     const answer = async (q, value) => {
-      if (q.target) await button(`${q.target}: tanda ${value}`).click();
+      if (q.worksheet === "marks" && q.target) {
+        const first = button(`${q.target}: tanda 1`);
+        await first.click();
+        await first.click();
+        assert.equal(await first.getAttribute("aria-pressed"), "false");
+        for (let i = 1; i <= Number(value); i++) await button(`${q.target}: tanda ${i}`).click();
+      } else if (q.target) await button(`${q.target}: tanda ${value}`).click();
       else if (q.options) await button(value).click();
-      else await page.getByRole("textbox", { name: "Jawaban" }).fill(value);
+      else await page.getByRole("textbox", { name: q.cell ? `Jumlah ${q.cell}` : "Jawaban" }).fill(value);
     };
 
     await page.goto("http://127.0.0.1:3000/kelas/matematika-dasar-kelas-1");
@@ -80,7 +86,7 @@ try {
     await page.getByText("Jawabanmu 0. Jawaban benar 7.").waitFor();
     assert.deepEqual(errors, []);
     await page.close();
-    console.log(`Bab 8: ${width}px · 8 latihan · 24 evaluasi · skor 96`);
+    console.log(`Bab 8: ${width}px · 44 latihan · 24 evaluasi · skor 96`);
   }
 } finally {
   await browser.close();
