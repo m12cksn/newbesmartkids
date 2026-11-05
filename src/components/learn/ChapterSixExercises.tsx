@@ -1,8 +1,8 @@
 "use client";
 import {useEffect,useState} from "react";
-export type Exercise={prompt:string;type:"objects"|"choice"|"numberline"|"make10"|"bond"|"place"|"draw"|"story"|"equation";a:number;b:number;answer:number;emoji?:string;options?:number[];operation?:"+"|"-";detail?:string};
+export type Exercise={prompt:string;type:"objects"|"choice"|"numberline"|"make10"|"bond"|"place"|"draw"|"story"|"equation";a:number;b:number;answer:number;emoji?:string;secondEmoji?:string;options?:number[];operation?:"+"|"-";detail?:string};
 export const chapter6Practice:Record<"A"|"B1"|"B2"|"C",Exercise[]>={
- A:[{prompt:"Ada 8 kelereng merah dan 7 kelereng biru. Pasangkan benda, lalu tentukan selisihnya.",type:"objects",a:8,b:7,answer:1,emoji:"🔴"},
+ A:[{prompt:"Ada 8 kelereng merah dan 7 kelereng biru. Pasangkan benda, lalu tentukan selisihnya.",type:"objects",a:8,b:7,answer:1,emoji:"🔴",secondEmoji:"🔵"},
  {prompt:"Kelompok B berisi 9 benda. Gambarlah kelompok A yang 3 lebih sedikit.",type:"draw",a:9,b:3,answer:6,emoji:"⭐"}],
  B1:[{prompt:"7 + 6. Hitung maju 6 langkah mulai dari 7.",type:"numberline",a:7,b:6,answer:13,operation:"+"},
  {prompt:"6 + 5. Pecah 5 untuk membuat 10, lalu tentukan hasilnya.",type:"make10",a:6,b:5,answer:11,operation:"+"}],
@@ -12,7 +12,7 @@ export const chapter6Practice:Record<"A"|"B1"|"B2"|"C",Exercise[]>={
  {prompt:"16 − 4. Gunakan tabel puluhan dan satuan untuk mencari sisanya.",type:"place",a:16,b:4,answer:12,operation:"-"}]
 };
 export const chapter6Evaluation:Exercise[]=[
- {prompt:"Ada 8 kue lapis dan 6 onde-onde. Berapa selisihnya?",type:"objects",a:8,b:6,answer:2,emoji:"🍰"},
+ {prompt:"Ada 8 potong kue dan 6 donat. Berapa selisihnya?",type:"objects",a:8,b:6,answer:2,emoji:"🍰",secondEmoji:"🍩"},
  {prompt:"Tika memiliki 8 gantungan kunci dan Kira 6. Pilih selisih yang benar.",type:"choice",a:8,b:6,answer:2,options:[1,2,3,4]},
  {prompt:"Kelompok B berisi 9 benda. Gambarlah kelompok A yang 3 lebih sedikit.",type:"draw",a:9,b:3,answer:6,emoji:"⭐"},
  {prompt:"15 + 3 = ...",type:"numberline",a:15,b:3,answer:18,operation:"+"},
@@ -48,7 +48,7 @@ export function ChapterSixExercise({question:q,onComplete}:{question:Exercise;on
  return <div className="w-full space-y-3">
  <p className="text-lg font-extrabold leading-snug">{q.prompt}</p>
  <div className="rounded-xl bg-emerald-50 p-3 text-slate-900">
- {q.type==="objects"?<><div className="grid grid-cols-2 gap-2">{[q.a,q.b].map((n,k)=><div key={k} className="rounded-xl bg-white p-2 text-center"><p className="text-xs font-bold">{k?"Kelompok B":"Kelompok A"}</p><div className="mt-2 flex flex-wrap justify-center gap-1">{range(q.prompt.includes("kepik kuning")&&k?1:n).map(i=><span key={i} className="text-xl">{q.prompt.includes("kepik kuning")&&k?"❔":k?"🟡":q.emoji||"🔴"}</span>)}</div></div>)}</div><p className="mt-2 text-center text-xs">Hitung selisih kedua kelompok.</p></>:
+ {q.type==="objects"?<><div className="grid grid-cols-2 gap-2">{[q.a,q.b].map((n,k)=><div key={k} className="rounded-xl bg-white p-2 text-center"><p className="text-xs font-bold">{k?"Kelompok B":"Kelompok A"}</p><div className="mt-2 flex flex-wrap justify-center gap-1">{range(q.prompt.includes("kepik kuning")&&k?1:n).map(i=><span key={i} className="text-xl">{q.prompt.includes("kepik kuning")&&k?"❔":k?(q.secondEmoji??"🟡"):(q.emoji??"🔴")}</span>)}</div></div>)}</div><p className="mt-2 text-center text-xs">{q.prompt.includes("kepik kuning")?"Kurangi jumlah kepik merah sesuai petunjuk.":"Hitung selisih kedua kelompok."}</p></>:
  q.type==="choice"?<div className="grid grid-cols-2 gap-2">{(q.options||[]).map(n=><button key={n} type="button" disabled={checked} aria-pressed={choice===n} onClick={()=>setChoice(n)} className={`min-h-12 rounded-xl border-2 bg-white text-xl font-bold ${choice===n?"border-emerald-600":"border-slate-200"}`}>{n}</button>)}</div>:
  q.type==="draw"?<><p className="mb-2 text-sm">Ketuk + untuk menggambar benda A. Kelompok B berisi {q.a} benda; kelompok A harus {q.b} lebih sedikit.</p><div className="flex min-h-16 flex-wrap gap-1 rounded-lg bg-white p-2">{range(draw).map(i=><span key={i} className="text-2xl">{q.emoji||"⭐"}</span>)}</div><div className="mt-2 flex justify-center gap-2"><button type="button" disabled={checked||draw===0} className="btn btn-outline btn-sm" onClick={()=>setDraw(n=>n-1)}>− Hapus</button><span className="grid min-w-10 place-items-center font-bold">{draw}</span><button type="button" disabled={checked||draw>=20} className="btn btn-success btn-sm" onClick={()=>setDraw(n=>n+1)}>+ Gambar</button></div></>:
  q.type==="numberline"?<><p className="mb-2 text-sm">Ketuk satu langkah setiap kali ({steps}/{q.b}), lalu tuliskan bilangan tempat kamu berhenti.</p><div className="grid grid-cols-7 gap-1 sm:grid-cols-11">{range(21).map(i=><span key={i} className={`grid h-8 place-items-center rounded text-xs font-bold ${i===(q.operation==="-"?q.a-steps:q.a+steps)?"bg-emerald-600 text-white":"bg-white"}`}>{i}</span>)}</div><div className="mt-3 flex items-center justify-center gap-2"><button type="button" disabled={checked||steps===0} className="btn btn-outline btn-sm" onClick={()=>setSteps(n=>n-1)}>↶</button><button type="button" disabled={checked||steps>=q.b} className="btn btn-success btn-sm" onClick={()=>setSteps(n=>n+1)}>{q.operation==="-"?"← Mundur":"Maju →"}</button></div></>:
