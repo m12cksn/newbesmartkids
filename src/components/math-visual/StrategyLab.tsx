@@ -20,10 +20,10 @@ export function StrategyLab({strategy,a,b}:{strategy:Strategy;a:number;b:number}
   <button type="button" className="btn btn-success btn-sm w-full" disabled={matched>=Math.min(a,b)} onClick={()=>setMatched(v=>v+1)}>Pasangkan 1 benda</button>
   {matched===Math.min(a,b)?<p role="status" className="text-center font-bold">Selisih = {Math.abs(a-b)} benda</p>:null}
  </>:strategy==="make10"?<>
-  <p className="text-sm font-bold">Pecah {b} untuk membuat 10 dari {a}</p>
+  <p className="text-sm font-bold">{a+b>=10&&a<=10?"Pecah "+b+" untuk membuat 10 dari "+a:"Pecah bilangan kedua menjadi dua bagian"}</p>
   <div className="flex flex-wrap items-center justify-center gap-2 text-xl font-extrabold"><span>{a}</span><span>+</span><span className="rounded-lg bg-white px-3 py-2">{part}</span><span>+</span><span className="rounded-lg bg-white px-3 py-2">{b-part}</span></div>
   <label className="block text-center text-sm font-semibold">Geser untuk memecah {b}<input className="range range-success mt-2 w-full" type="range" min={0} max={b} value={part} onChange={e=>setPart(Number(e.target.value))}/></label>
-  <p role="status" className="text-center font-semibold">{a}+{part}={a+part}{a+part===10?`; lalu 10+${b-part}=${a+b} ✓`:" · Coba buat 10!"}</p>
+  <p role="status" className="text-center font-semibold">{a}+{part}={a+part}{a+part===10?`; lalu 10+${b-part}=${a+b} ✓` :a+b<10?" · Jumlahnya belum mencapai 10.":" · Coba buat 10!"}</p>
  </>:strategy==="place"?<>
   <p className="text-sm font-bold">Pisahkan puluhan dan satuan</p>
   <div className="grid grid-cols-2 gap-3 text-center"><div className="rounded-xl bg-white p-3"><p className="text-xs">Puluhan</p><p className="text-3xl font-bold">{Math.floor(a/10)}</p></div><div className="rounded-xl bg-white p-3"><p className="text-xs">Satuan</p><p className="text-3xl font-bold">{a%10}</p></div></div>
