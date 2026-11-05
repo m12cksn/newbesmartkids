@@ -17,14 +17,14 @@ const cakes: Datum[] = [
   { label: "Kue lapis", count: 5 }, { label: "Kue bugis", count: 6 },
 ];
 const vegetables: Datum[] = [
-  { label: "Brokoli", icon: "🥦", count: 4 },
-  { label: "Wortel", icon: "🥕", count: 7 },
-  { label: "Jagung", icon: "🌽", count: 5 },
+  { label: "Brokoli", icon: "brokoli", count: 4 },
+  { label: "Wortel", icon: "wortel", count: 7 },
+  { label: "Jagung", icon: "jagung", count: 5 },
 ];
 const fruit: Datum[] = [
-  { label: "Jeruk", icon: "🍊", count: 6 },
-  { label: "Apel", icon: "🍎", count: 3 },
-  { label: "Mangga", icon: "🥭", count: 4 },
+  { label: "Jeruk", icon: "jeruk", count: 6 },
+  { label: "Apel", icon: "apel", count: 3 },
+  { label: "Mangga", icon: "mangga", count: 4 },
   { label: "Belimbing", icon: "belimbing", count: 5 },
 ];
 const favorites = [
@@ -38,12 +38,12 @@ const pencils: Datum[] = [
   { label: "Hitam", icon: "pensil", color: "#1e293b", count: 6 },
 ];
 const clothes: Datum[] = [
-  { label: "Kaus pendek", icon: "👕", count: 5 }, { label: "Kaus panjang", count: 4 },
-  { label: "Celana", icon: "👖", count: 3 },
+  { label: "Kaus pendek", count: 5 }, { label: "Kaus panjang", count: 4 },
+  { label: "Celana", count: 3 },
 ];
 const animals: Datum[] = [
-  { label: "Ayam", icon: "🐔", count: 4 }, { label: "Bebek", icon: "🦆", count: 2 },
-  { label: "Kelinci", icon: "🐇", count: 5 },
+  { label: "Ayam", count: 4 }, { label: "Bebek", count: 2 },
+  { label: "Kelinci", count: 5 },
 ];
 
 type Visual = "objects" | "table" | "diagram" | "build";

@@ -25,7 +25,17 @@ function Symbol({ row }: { row: Datum }) {
         : <path d="M10 4c-2 2-2 6-6 12-2 6 16 6 16 0-4-6-4-10-6-12z" fill="#e11d48" stroke="#9f1239"/>}
     </svg>;
   }
-  if (row.icon) return <span aria-hidden="true" className="text-lg leading-none">{row.icon}</span>;
+  const illustrations = {
+    brokoli: <><path d="m9 12 1 10h4l2-10" fill="#65a30d"/><path d="M5 15a4 4 0 0 1-1-7 4 4 0 0 1 6-4 4 4 0 0 1 7 1 5 5 0 0 1 2 9c-4 2-10 2-14 1Z" fill="#15803d"/></>,
+    wortel: <><path d="m15 8 2-6m1 7 4-5M16 10l6-1" stroke="#15803d" strokeWidth="2"/><path d="M15 7q7 1 4 7L3 22q-2 0-1-2L10 8q2-2 5-1Z" fill="#ea580c"/><path d="m8 12 3 2m-6 2 2 2" stroke="#fdba74"/></>,
+    jagung: <><ellipse cx="13" cy="10" rx="5" ry="8" fill="#facc15"/><path d="M11 5v9m4-9v9M8 8h10m-10 4h10" stroke="#ca8a04"/><path d="M12 22C6 19 4 14 5 9c3 4 6 4 8 8 1-4 5-5 7-9 1 6-2 11-8 14Z" fill="#15803d"/></>,
+    jeruk: <><circle cx="12" cy="13" r="8" fill="#f97316" stroke="#c2410c"/><path d="M12 6q2-5 8-4-2 5-8 4Z" fill="#15803d"/></>,
+    apel: <><path d="M12 7C6 2 1 9 5 17c2 5 5 5 7 4 3 1 5 1 7-4 4-8-1-15-7-10Z" fill="#dc2626"/><path d="m12 7 1-5m0 3q2-4 7-3-1 4-7 3Z" fill="#15803d" stroke="#15803d"/></>,
+    mangga: <><path d="M5 7C10 2 17 3 20 8c4 8-5 15-11 13-3-1-4-3-3-6 2-4-5-4-1-8Z" fill="#f59e0b" stroke="#b45309"/><path d="M11 5q2-5 8-3-3 4-8 3Z" fill="#15803d"/></>,
+  };
+  if (row.icon && row.icon in illustrations) {
+    return <svg aria-hidden="true" className="size-5 shrink-0" viewBox="0 0 24 24">{illustrations[row.icon as keyof typeof illustrations]}</svg>;
+  }
   if (row.color) return <span aria-hidden="true" className="size-5 shrink-0 rounded-full border border-slate-800/20 shadow-inner" style={{ background: `radial-gradient(circle at 34% 28%, white -20%, ${row.color} 55%)` }}/>;
   return null;
 }
@@ -106,7 +116,7 @@ function LessonActivity({ topic }: { topic: typeof topics[number]["id"] }) {
   return <div className="space-y-3">
     <p className="font-semibold">Ada 4 bebek. Buat baris bebek pada diagram.</p>
     <p className="text-sm">● mewakili 1 bebek. Sentuh tanda terakhir yang ingin kamu isi.</p>
-    <p className="font-bold">🦆 Bebek</p>
+    <p className="font-bold">Bebek</p>
     <Marks count={marks} onChange={setMarks} label="Bebek"/>
     {marks === 4 && <p role="status" className="font-bold text-success">Tepat! Empat tanda mewakili empat bebek.</p>}
   </div>;
