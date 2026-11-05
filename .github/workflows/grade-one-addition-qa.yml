@@ -32,5 +32,6 @@ jobs:
           node scripts/smoke-grade-one-addition.mjs
           node scripts/smoke-grade-one-subtraction.mjs
           node scripts/smoke-grade-one-shapes.mjs
+          node scripts/smoke-grade-one-chapters-five-six.mjs
           node scripts/smoke-grade-one-measurement.mjs
           node --experimental-strip-types scripts/smoke-grade-one-chapters-one-to-three.mjs
