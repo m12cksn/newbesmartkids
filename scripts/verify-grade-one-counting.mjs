@@ -1,11 +1,15 @@
 // Run with: node --test scripts/verify-grade-one-counting.mjs
-import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
-const file=readFileSync(new URL("../src/data/grade-one-counting.ts",import.meta.url),"utf8");
-const start=file.indexOf("export const gradeOneQuestions:GradeOneQuestion[] = ");
-assert.ok(start>=0,"question bank export exists");
-const questions=JSON.parse(file.slice(start).split(" = ")[1].trim().replace(/;$/,""));
+import { gradeOneQuestions as questions, gradeOnePractice } from "../src/data/grade-one-counting.ts";
+
+test("two separate practice questions per subtopic", () => {
+  assert.equal(gradeOnePractice.length, 8);
+  assert.equal(new Set([...gradeOnePractice, ...questions].map(q => q.id)).size, 32);
+  for (let section = 0; section < 4; section++) {
+    assert.equal(gradeOnePractice.filter(q => q.section === section).length, 2);
+  }
+});
 const nouns=["apel","pensil","bintang","mobil mainan","balok","bunga"];
 const names=["nol","satu","dua","tiga","empat","lima","enam","tujuh","delapan","sembilan","sepuluh"];
 const supported=new Set(["tap_count","number_input","multiple_choice","select_group","bond_input","split_objects","sequence_pick","sequence_input"]);
