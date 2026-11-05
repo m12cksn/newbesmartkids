@@ -5,11 +5,17 @@ import { balls, diagramAssessment, diagramPractice, type Datum, type DiagramQues
 
 const topics = [
   { id: "daftar", title: "Daftar", group: "A. Mengelompokkan Data",
-    explanation: "Pisahkan benda menurut jenis atau warna. Hitung setiap kelompok, lalu tulis nama kelompok dan jumlahnya dalam daftar." },
+    explanation: "Pisahkan benda menurut jenis atau warna. Hitung setiap kelompok, lalu tulis nama kelompok dan jumlahnya dalam daftar.",
+    steps: ["Pilih aturan pengelompokan. Bola bisa dipisah menurut warna, buah menurut jenis.", "Hitung tiap benda satu kali. Catat nama kelompok dan jumlahnya, misalnya: Ada 7 bola merah.", "Bandingkan jumlahnya. Angka terbesar berarti paling banyak. Jika dua angkanya sama, kedua kelompok sama banyak."],
+    example: "Coba kelompokkan bola di samping. Setelah selesai, warna mana yang paling banyak? Adakah dua warna dengan jumlah sama?" },
   { id: "tabel", title: "Tabel", group: "A. Mengelompokkan Data",
-    explanation: "Tabel terdiri dari baris dan kolom. Cari nama kelompok, lalu baca jumlah pada baris atau kolom yang sama." },
+    explanation: "Tabel terdiri dari baris dan kolom. Cari nama kelompok, lalu baca jumlah pada baris atau kolom yang sama.",
+    steps: ["Judul memberi tahu data apa yang ditampilkan. Baris dibaca mendatar, sedangkan kolom dibaca dari atas ke bawah.", "Pada tabel menurun, cari warna di sebelah kiri lalu baca angka di sebelah kanannya. Pada tabel mendatar, cari warna di atas lalu baca angka di bawahnya.", "Untuk mencari selisih, kurangi jumlah besar dengan jumlah kecil. Untuk mencari total, jumlahkan setiap kelompok satu kali."],
+    example: "Bola merah ada 7 dan kuning ada 4. Merah lebih banyak 3. Ganti posisi tabel dan temukan kembali kedua angka itu." },
   { id: "diagram", title: "Diagram Gambar", group: "B. Diagram Gambar",
-    explanation: "Lihat arti satu tanda pada legenda. Jika satu tanda mewakili satu benda, hitung tanda untuk mengetahui jumlahnya." },
+    explanation: "Lihat arti satu tanda pada legenda. Jika satu tanda mewakili satu benda, hitung tanda untuk mengetahui jumlahnya.",
+    steps: ["Baca judul dan legenda. Satu bintang bisa berarti satu anak, sedangkan satu lingkaran bisa berarti satu benda.", "Untuk membaca diagram, temukan kelompoknya lalu hitung tanda. Jika jumlahnya yang diketahui, cari baris dengan jumlah tanda tersebut.", "Untuk membuat diagram, tulis nama setiap kelompok. Mulai dari tepi yang sama dan isi satu tanda untuk setiap benda. Bandingkan baris atau jumlahkan tanda jika ditanya total."],
+    example: "Ada 4 bebek. Isi 4 tanda. Jika datang 1 bebek lagi, tambahkan 1 tanda. Berapa tanda sekarang?" },
 ] as const;
 
 function Symbol({ row }: { row: Datum }) {
@@ -26,6 +32,10 @@ function Symbol({ row }: { row: Datum }) {
     </svg>;
   }
   const illustrations = {
+    "kaus-pendek": <path d="m8 3-6 4 3 5 3-2v11h8V10l3 2 3-5-6-4c-2 3-6 3-8 0Z" fill="#ea580c" stroke="#9a3412"/>,
+    "kaus-panjang": <path d="m8 3-5 3-2 14 4 1 3-11v12h8V10l3 11 4-1-2-14-5-3c-2 3-6 3-8 0Z" fill="#0891b2" stroke="#155e75"/>,
+    celana: <path d="M5 3h14l1 19h-6l-2-11-2 11H4z" fill="#9333ea" stroke="#581c87"/>,
+    tomat: <><circle cx="12" cy="14" r="8" fill="#dc2626"/><path d="m12 7 1-5 2 4 5 1-5 2-3 3-2-3-5-2z" fill="#15803d"/></>,
     brokoli: <><path d="m9 12 1 10h4l2-10" fill="#65a30d"/><path d="M5 15a4 4 0 0 1-1-7 4 4 0 0 1 6-4 4 4 0 0 1 7 1 5 5 0 0 1 2 9c-4 2-10 2-14 1Z" fill="#15803d"/></>,
     wortel: <><path d="m15 8 2-6m1 7 4-5M16 10l6-1" stroke="#15803d" strokeWidth="2"/><path d="M15 7q7 1 4 7L3 22q-2 0-1-2L10 8q2-2 5-1Z" fill="#ea580c"/><path d="m8 12 3 2m-6 2 2 2" stroke="#fdba74"/></>,
     jagung: <><ellipse cx="13" cy="10" rx="5" ry="8" fill="#facc15"/><path d="M11 5v9m4-9v9M8 8h10m-10 4h10" stroke="#ca8a04"/><path d="M12 22C6 19 4 14 5 9c3 4 6 4 8 8 1-4 5-5 7-9 1 6-2 11-8 14Z" fill="#15803d"/></>,
@@ -40,7 +50,7 @@ function Symbol({ row }: { row: Datum }) {
   return null;
 }
 
-function Table({ rows, sideways = false }: { rows: Datum[]; sideways?: boolean }) {
+function Table({ rows, sideways = false, renderCount = row => row.count }: { rows: Datum[]; sideways?: boolean; renderCount?: (row: Datum) => React.ReactNode }) {
   return <table className="table table-sm w-full bg-base-100">
     <caption className="sr-only">Tabel jumlah setiap kelompok</caption>
     {sideways ? <>
@@ -48,7 +58,7 @@ function Table({ rows, sideways = false }: { rows: Datum[]; sideways?: boolean }
       <tbody><tr><th scope="row">Jumlah</th>{rows.map(row => <td key={row.label}>{row.count}</td>)}</tr></tbody>
     </> : <>
       <thead><tr><th scope="col">Kelompok</th><th scope="col">Jumlah</th></tr></thead>
-      <tbody>{rows.map(row => <tr key={row.label}><th scope="row">{row.label}</th><td>{row.count < 0 ? "?" : row.count}</td></tr>)}</tbody>
+      <tbody>{rows.map(row => <tr key={row.label}><th scope="row">{row.label}</th><td>{renderCount(row)}</td></tr>)}</tbody>
     </>}
   </table>;
 }
@@ -79,6 +89,39 @@ function Marks({ count, onChange, label, disabled = false }: {
       </button>)}
     </div>
     <p className="text-sm font-semibold" aria-live="polite">{count} tanda terisi</p>
+  </div>;
+}
+
+function ColorMarks({ label, value = "", onChange, disabled }: {
+  label: string; value?: string; onChange: (value: string) => void; disabled: boolean;
+}) {
+  return <div className="flex flex-wrap gap-1">
+    {Array.from({ length: 9 }, (_, i) => {
+      const mark = String(i + 1);
+      const colored = value.includes(mark);
+      return <button key={mark} type="button" aria-label={`${label}: tanda ${mark}`} aria-pressed={colored} disabled={disabled}
+        className="grid size-8 place-items-center rounded border border-base-300 text-success aria-pressed:bg-success/20"
+        onClick={() => onChange(colored ? value.replace(mark, "") : value + mark)}>{colored ? "●" : "○"}</button>;
+    })}
+  </div>;
+}
+
+function CountObjects({ rows }: { rows: Datum[] }) {
+  const [marked, setMarked] = useState<string[]>([]);
+  const objects = Array.from({ length: Math.max(...rows.map(row => row.count)) }, (_, index) =>
+    [...rows.slice(index % rows.length), ...rows.slice(0, index % rows.length)]
+      .filter(row => row.count > index).map(row => ({ row, id: `${row.label}-${index}` }))).flat();
+
+  return <div className="mb-2">
+    <p className="text-sm">Ketuk gambar untuk menandai benda yang sudah dihitung.</p>
+    <div className="flex flex-wrap gap-1 py-2">
+      {objects.map(({ row, id }, index) => <button key={id} type="button" aria-label={`${row.label}, gambar ${index + 1}`}
+        aria-pressed={marked.includes(id)} className="grid size-9 place-items-center rounded border border-base-300 aria-pressed:bg-success/25"
+        onClick={() => setMarked(previous => previous.includes(id) ? previous.filter(value => value !== id) : [...previous, id])}>
+        <Symbol row={row}/>
+      </button>)}
+    </div>
+    {marked.length > 0 && <button type="button" className="btn btn-ghost btn-xs" onClick={() => setMarked([])}>Hapus tanda hitung</button>}
   </div>;
 }
 
@@ -131,13 +174,25 @@ function Quiz({ questions, title, practice, close }: {
   const heading = useRef<HTMLHeadingElement>(null);
   const question = questions[index];
   const answer = answers[index];
-  const hasAnswer = answer !== undefined && answer !== "";
+  const hasAnswer = Boolean(answer?.trim());
   const isCorrect = (item: DiagramQuestion, value?: string) =>
-    item.options ? value === item.answer : Boolean(value) && Number(value) === Number(item.answer);
+    item.worksheet === "marks" && item.target ? value?.length === Number(item.answer) :
+    Boolean(value?.trim()) && (/^\d+$/.test(item.answer)
+      ? Number(value) === Number(item.answer)
+      : value!.trim().toLowerCase().replace(/\s+/g, " ") === item.answer.toLowerCase());
   const score = questions.filter((item, i) => isCorrect(item, answers[i])).length;
   const record = (value: string) => setAnswers(previous => ({ ...previous, [index]: value }));
 
   useEffect(() => { heading.current?.focus(); }, [index]);
+
+  const numeric = question ? /^\d+$/.test(question.answer) : false;
+  const input = (label: string) => <input aria-label={label} className={`input input-bordered ${numeric ? "w-20" : "w-full max-w-64"}`}
+    inputMode={numeric ? "numeric" : "text"} maxLength={numeric ? 2 : 50} value={answer ?? ""} disabled={checked}
+    onChange={event => record(numeric ? event.target.value.replace(/\D/g, "") : event.target.value)}/>;
+  const saved = (row: Datum) => {
+    const related = questions.findIndex(item => item.title === question.title && (item.cell ?? item.target) === row.label);
+    return answers[related];
+  };
 
   return <section className="mx-auto max-w-2xl space-y-3 rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6">
     <div className="flex items-center justify-between gap-2">
@@ -149,7 +204,24 @@ function Quiz({ questions, title, practice, close }: {
       <h2 ref={heading} tabIndex={-1} className="text-lg font-extrabold">{question.prompt}</h2>
       <div className="rounded-xl bg-success/5 p-2 sm:p-4">
         <p className="mb-1 text-sm font-bold">{question.title}</p>
-        {question.visual === "table" ? <Table rows={question.rows}/>
+        {question.worksheet === "list" || question.worksheet === "table" ? <>
+          <CountObjects key={question.title} rows={question.rows}/>
+          {question.worksheet === "list" ? <ul className="space-y-1 rounded bg-base-100 p-2">
+            {question.rows.map(row => <li key={row.label} className="flex items-center gap-2">
+              Ada {question.cell === row.label ? input(`Jumlah ${row.label}`) : <strong>{saved(row) ?? "___"}</strong>} {row.label.toLowerCase()}.
+            </li>)}
+          </ul> : <Table rows={question.rows} renderCount={row => question.cell === row.label ? input(`Jumlah ${row.label}`) : saved(row) ?? "—"}/>}
+        </> : question.worksheet === "marks" ? <>
+          {question.clue ? <p className="text-sm">{question.clue}</p> : <CountObjects key={question.title} rows={question.rows}/>}
+          <p className="my-2 text-sm">Satu tanda mewakili satu {question.unit}. Ketuk tanda untuk mewarnai atau menghapus warnanya.</p>
+          {question.rows.map(row => <div key={row.label} className="border-t border-base-300 py-2">
+            <p className="mb-1 font-bold">{row.label}</p>
+            {row.label === question.target ? <ColorMarks key={row.label} label={row.label} value={answer} onChange={record} disabled={checked}/>
+              : <span className="text-lg tracking-wider text-success" aria-label={`${(saved(row) ?? "").length} tanda terisi`}>
+                {Array.from({length: 9}, (_, i) => saved(row)?.includes(String(i + 1)) ? "●" : "○").join(" ")}
+              </span>}
+          </div>)}
+        </> : question.visual === "table" ? <div className="overflow-x-auto"><Table rows={question.rows} sideways={practice}/></div>
           : question.visual === "build" ? <>
             <p className="mb-2 text-sm">{question.clue ?? question.rows.map(row => `${row.count} ${row.label.toLowerCase()}`).join(" · ")}</p>
             <p className="mb-2 text-sm">● mewakili 1 {question.unit}. Sentuh tanda terakhir yang ingin kamu isi.</p>
@@ -158,15 +230,14 @@ function Quiz({ questions, title, practice, close }: {
           </> : <>
             {question.visual === "diagram" && <p className="text-sm">★ mewakili 1 {question.unit}.</p>}
             <DataRows rows={question.rows} diagram={question.visual === "diagram"}/>
-            {question.title === "Pensil Warna" && <Table rows={question.rows.map(row => ({ ...row, count: row.label === "Merah" ? -1 : row.count }))}/>}
+
           </>}
       </div>
       {question.options ? <div className="grid grid-cols-2 gap-2">{question.options.map(option =>
         <button key={option} disabled={checked} aria-pressed={answer === option} onClick={() => record(option)}
           className={`btn h-auto min-h-11 whitespace-normal px-2 ${answer === option ? "btn-success" : "btn-outline"}`}>{option}</button>
-      )}</div> : question.visual !== "build" && <label className="flex items-center gap-3 text-sm font-bold">Jawaban
-        <input className="input input-bordered w-24" inputMode="numeric" maxLength={2} value={answer ?? ""} disabled={checked}
-          onChange={event => record(event.target.value.replace(/\D/g, ""))}/>
+      )}</div> : question.visual !== "build" && !question.cell && <label className="flex items-center gap-3 text-sm font-bold">Jawaban
+        {input("Jawaban")}
       </label>}
       {practice && checked && <p role="status" className="rounded-lg bg-base-200 p-2 text-sm">
         <strong>{isCorrect(question, answer) ? "Tepat! " : "Belum tepat. "}</strong>{question.explanation}
@@ -184,7 +255,7 @@ function Quiz({ questions, title, practice, close }: {
       {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
         <summary className="cursor-pointer font-bold">Bahas jawaban yang salah</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((item, i) => !isCorrect(item, answers[i]) &&
-          <li key={i}><strong>Soal {i + 1}. {item.prompt}</strong><p>Jawabanmu {answers[i]}. Jawaban benar {item.answer}.</p><p>{item.explanation}</p></li>)}</ol>
+          <li key={i}><strong>Soal {i + 1}. {item.prompt}</strong><p>Jawabanmu {item.worksheet === "marks" && item.target ? answers[i]?.length : answers[i]}. Jawaban benar {item.answer}.</p><p>{item.explanation}</p></li>)}</ol>
       </details>}
       <button className="btn btn-success" onClick={close}>Kembali ke materi</button>
     </>}
@@ -224,6 +295,10 @@ export default function GradeOneChapterEight() {
           <div className="p-6"><p className="text-sm font-bold text-success">{topic.group}</p>
             <h2 className="mt-2 text-2xl font-extrabold">{topic.title}</h2>
             <p className="mt-3 leading-relaxed">{topic.explanation}</p>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
+              {topic.steps.map(step => <li key={step}>{step}</li>)}
+            </ol>
+            <p className="mt-4 rounded-lg bg-success/5 p-3 text-sm"><strong>Coba bersama. </strong>{topic.example}</p>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
