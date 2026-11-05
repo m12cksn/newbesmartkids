@@ -17,7 +17,7 @@ const evals:Item[]=[...items.filter(x=>x.topic==="A").slice(0,4),...items.filter
 evals.forEach(x=>add("E",x.prompt,x.answer,{count:x.count,sequence:x.sequence,choices:x.choices,hint:x.hint}));
 add("E","10 + 7 = ...","17");add("E","10 + 9 = ...","19");add("E","Bilangan setelah 18 adalah ...","19");add("E","Bilangan sebelum 12 adalah ...","11");
 
-const topics:Topic[]=["A","B","C","D"];
+const topics:Exclude<Topic,"E">[]=["A","B","C","D"];
 const descriptions:Record<Exclude<Topic,"E">,string>={
  A:"Hitung benda satu per satu dari 11 sampai 20. Sepuluh benda dapat dikelompokkan terlebih dahulu, kemudian hitung sisanya.",
  B:"Membilang maju berarti bertambah satu. Membilang mundur berarti berkurang satu. Perhatikan urutan dari 11 sampai 20.",
