@@ -41,7 +41,6 @@ const range=(n:number)=>Array.from({length:Math.max(0,n)},(_,i)=>i);
 export function ChapterSixExercise({question:q,onComplete}:{question:Exercise;onComplete:(correct:boolean)=>void}){
  const [value,setValue]=useState("");const [steps,setSteps]=useState(0);const [draw,setDraw]=useState(0);const [part,setPart]=useState(0);const [tens,setTens]=useState("");const [units,setUnits]=useState("");const [choice,setChoice]=useState<number|null>(null);const [checked,setChecked]=useState(false);
  useEffect(()=>{setValue("");setSteps(0);setDraw(0);setPart(0);setTens("");setUnits("");setChoice(null);setChecked(false)},[q]);
- const subtract=q.operation==="-"||q.type==="objects"||q.type==="draw";
  const result=q.answer;
  const correct=q.type==="choice"?choice===result:q.type==="draw"?draw===result:q.type==="place"?Number(tens)===Math.floor(result/10)&&Number(units)===result%10:q.type==="numberline"?steps===q.b:q.type==="make10"?part===10-q.a&&Number(value)===result:Number(value)===result;
  const ready=q.type==="choice"?choice!==null:q.type==="draw"?true:q.type==="place"?tens!==""&&units!=="":q.type==="numberline"?steps===q.b:q.type==="make10"?value!==""&&part>0:value!=="";
