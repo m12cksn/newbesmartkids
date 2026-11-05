@@ -378,3 +378,20 @@ export const gradeOneQuestions:GradeOneQuestion[] = [
     "difficulty": "menantang"
   }
 ];
+
+const practiceVariants: [number, Partial<GradeOneQuestion>][] = [
+  [0, {a:4, answer:"4", explanation:"Ada 4 apel. Ketuk setiap apel satu kali."}],
+  [1, {a:7, answer:"7", explanation:"Ada 7 pensil pada gambar."}],
+  [6, {a:8, b:4, answer:"A", explanation:"Kelompok A berisi 8 apel, lebih banyak dari 4 apel di B."}],
+  [7, {a:3, b:7, answer:"A", explanation:"Kelompok A berisi 3 pensil, lebih sedikit dari 7 pensil di B."}],
+  [12, {a:6, b:2, answer:"4", prompt:"Ada 6 apel. Lengkapi bagian yang kosong pada diagram.", explanation:"6 terdiri dari 2 dan 4."}],
+  [13, {a:9, b:5, answer:"4", prompt:"Ada 9 pensil. 5 di kiri. Berapa pensil di kanan?", explanation:"5 ditambah 4 sama dengan 9."}],
+  [18, {sequence:[4,5,null,7], answer:"6", explanation:"Setelah 5 adalah 6, lalu 7."}],
+  [19, {sequence:[5,4,null,2], answer:"3", explanation:"Urutan mundur dari 5 adalah 5, 4, 3, 2."}],
+];
+
+export const gradeOnePractice = practiceVariants.map(([index, variant]) => ({
+  ...gradeOneQuestions[index],
+  ...variant,
+  id: `practice-${gradeOneQuestions[index].id}`,
+}));
