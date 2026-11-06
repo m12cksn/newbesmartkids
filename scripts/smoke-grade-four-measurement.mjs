@@ -33,6 +33,7 @@ try {
     await page.getByRole("heading", {name: "Pengukuran Luas & Volume", exact: true}).waitFor();
     await page.getByRole("slider", {name:"Kolom"}).fill("5");
     await page.getByText("0 petak dipilih. Luas daerah: 5 × 3 = 15 petak satuan.").waitFor();
+    assert.equal(await page.locator('[data-region="outside"]').count(), 0);
     await page.locator('button[data-region="inside"]').first().click();
     await page.getByText("1 petak dipilih.", {exact:false}).waitFor();
     await noOverflow();

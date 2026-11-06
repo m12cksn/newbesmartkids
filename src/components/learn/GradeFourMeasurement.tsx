@@ -44,7 +44,7 @@ function CupLab() {
 function Grid({ rows, value = "", onChange, disabled }: {
   rows: number[]; value?: string; onChange?: (value: string) => void; disabled?: boolean;
 }) {
-  const cols = Math.max(...rows) + 1;
+  const cols = Math.max(...rows);
   const selected = value ? value.split("|").map(Number) : [];
   return <div className="mx-auto grid w-full max-w-xs gap-px rounded-lg border border-base-300 bg-base-300 p-1"
     style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }} role="group" aria-label="Kisi luas">

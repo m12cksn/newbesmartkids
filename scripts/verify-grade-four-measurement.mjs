@@ -18,11 +18,11 @@ for (const q of [...practice.flat(), ...assessment]) {
   if (q.cubes) assert.equal(q.cubes.reduce((a,b) => a*b,1), Number(q.answer));
   if (q.rows && !q.options) assert.equal(totalCells(q.rows), Number(q.answer));
   if (q.action === "tiles") {
-    const cols = Math.max(...q.rows) + 1;
+    const cols = Math.max(...q.rows);
     const cells = q.rows.flatMap((width, row) => Array.from({length: width}, (_, col) => row * cols + col));
     assert.ok(correct(q, cells.join("|")));
     assert.ok(!correct(q, cells.slice(1).join("|")));
-    assert.ok(!correct(q, [...cells.slice(1), cols - 1].join("|")));
+    assert.ok(!correct(q, [...cells.slice(1), cols * q.rows.length].join("|")));
   } else {
     assert.ok(correct(q, q.answer));
   }

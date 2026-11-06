@@ -93,7 +93,7 @@ export function correct(q: MeasurementQuestion, answer = "") {
   if (!ready(q, answer)) return false;
   if (q.action === "tiles") {
     const selected = answer.split("|").map(Number);
-    const cells = q.rows!.flatMap((width, row) => Array.from({ length: width }, (_, col) => row * (Math.max(...q.rows!) + 1) + col));
+    const cells = q.rows!.flatMap((width, row) => Array.from({ length: width }, (_, col) => row * Math.max(...q.rows!) + col));
     return selected.length === cells.length && cells.every(cell => selected.includes(cell));
   }
   if (q.action === "decimal") return Number(answer.replace(",", ".")) === Number(q.answer.replace(",", "."));
