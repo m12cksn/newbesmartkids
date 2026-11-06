@@ -9,7 +9,7 @@ const topics = [
     steps: ["Hitung petak satu per satu, atau kalikan banyak kolom dan baris jika daerahnya berbentuk persegi panjang.", "Untuk daerah bertingkat, jumlahkan petak per baris atau bagi daerah menjadi beberapa persegi panjang.", "Gunakan cm² untuk permukaan kecil dan m² untuk permukaan yang lebih besar. Karena 1 m = 100 cm, maka 1 m² = 10.000 cm²."],
     remember: "Panjang diukur dengan cm atau m. Luas diukur dengan cm² atau m².", demo: "Ubah banyak baris dan kolom, lalu ketuk petak untuk menutup seluruh daerah." },
   { title: "Pengukuran Volume", intro: "Volume menunjukkan banyak ruang yang ditempati. Kapasitas wadah menunjukkan banyak cairan yang dapat ditampungnya.",
-    steps: ["Gunakan wadah satuan berukuran sama untuk membandingkan isi. Jika satuan lebih kecil, diperlukan lebih banyak takaran.", "Liter (L) dan mililiter (mL) adalah satuan baku. Satu liter sama dengan 1.000 mililiter.", "Samakan satuan sebelum menjumlahkan atau mengurangi. Dari mL ke L, bagi dengan 1.000."],
+    steps: ["Gunakan wadah satuan berukuran sama untuk membandingkan isi. Jika satuan lebih kecil, diperlukan lebih banyak takaran.", "Liter (L) dan mililiter (mL) adalah satuan baku. Satu liter sama dengan 1.000 mililiter.", "Samakan satuan sebelum menjumlahkan atau mengurangi. Dari mL ke L, bagi dengan 1.000.", "Untuk benda pejal, gunakan kubus satuan. Satu kubus dengan rusuk 1 cm berukuran 1 cm³, sedangkan rusuk 1 m menghasilkan 1 m³. 1 cm³ = 1 mL dan 1 m³ = 1.000 L."],
     remember: "Baca skala gelas ukur sejajar dengan permukaan cairan.", demo: "Tuang satu takaran beberapa kali. Ganti ukuran takaran dan lihat hubungan jumlah tuangan, mL, dan L." },
 ];
 
@@ -50,11 +50,46 @@ function AreaLab() {
   </div>;
 }
 
+function CubeLayers({ dimensions }: { dimensions: [number, number, number] }) {
+  const [length, width, layers] = dimensions;
+  return <div className="flex flex-wrap justify-center gap-2">
+    {Array.from({ length: layers }, (_, layer) => <figure key={layer} className="rounded-lg border border-base-300 bg-base-100 p-2">
+      <figcaption className="text-center text-xs font-bold">Lapisan {layer + 1}</figcaption>
+      <svg viewBox={`0 0 ${(length + width) * 14 + 2} ${(length + width) * 7 + 18}`} className="mx-auto h-20 max-w-full"
+        role="img" aria-label={`Lapisan ${layer + 1}, ${length} kolom dan ${width} baris kubus`}>
+        {Array.from({ length: width }, (_, row) => Array.from({ length }, (_, col) => {
+          const x = (width + col - row) * 14 + 1;
+          const y = (row + col) * 7 + 1;
+          return <g key={`${row}-${col}`} transform={`translate(${x} ${y})`} stroke="#075985" strokeWidth="0.7">
+            <path d="M-14 7 0 14V28L-14 21Z" fill="#38bdf8"/>
+            <path d="M0 14 14 7V21L0 28Z" fill="#0284c7"/>
+            <path d="M0 0 14 7 0 14-14 7Z" fill="#bae6fd"/>
+          </g>;
+        }))}
+      </svg>
+    </figure>)}
+  </div>;
+}
+
+function CubeLab() {
+  const [layers, setLayers] = useState(1);
+  return <div className="space-y-3">
+    <CubeLayers dimensions={[3, 2, layers]}/>
+    <label className="block font-bold">Banyak lapisan: {layers}
+      <input aria-label="Banyak lapisan" className="range range-info w-full" type="range" min={1} max={4} value={layers} onChange={e => setLayers(+e.target.value)}/>
+    </label>
+    <p aria-live="polite">3 × 2 × {layers} = {6 * layers} cm³.</p>
+  </div>;
+}
+
 function VolumeLab() {
+  const [showCubes, setShowCubes] = useState(false);
   const [size, setSize] = useState(250);
   const [amount, setAmount] = useState(0);
   const [pours, setPours] = useState(0);
   return <div className="space-y-3">
+    <button className="btn btn-outline btn-sm" onClick={() => setShowCubes(!showCubes)}>{showCubes ? "Peraga cairan" : "Peraga kubus satuan"}</button>
+    {showCubes ? <CubeLab/> : <>
     <label className="flex flex-wrap items-center gap-2 font-semibold">Ukuran takaran
       <select className="select select-bordered" value={size} onChange={e => { setSize(+e.target.value); setAmount(0); setPours(0); }}>
         {[100, 200, 250, 500].map(ml => <option key={ml} value={ml}>{ml} mL</option>)}
@@ -71,6 +106,7 @@ function VolumeLab() {
     </div>
     <p aria-live="polite">{pours} × {size} mL = {amount} mL = {String(amount / 1000).replace(".", ",")} L.</p>
     {amount === 1000 && <p className="font-bold text-success">Wadah penuh. Kapasitasnya 1 L.</p>}
+    </>}
   </div>;
 }
 
@@ -132,7 +168,7 @@ export default function GradeFourMeasurement() {
       {mode==="lesson"?<>
         <div className="grid overflow-hidden rounded-xl border border-base-300 bg-base-100 lg:grid-cols-2"><div className="min-w-0 bg-info/5 p-4 sm:p-6">{index === 0 ? <AreaLab/> : <VolumeLab/>}</div><div className="p-5 sm:p-6"><h2 className="text-2xl font-extrabold">{topic.title}</h2><p className="mt-3 leading-relaxed">{topic.intro}</p><ol className="mt-3 list-decimal space-y-3 pl-5 leading-relaxed">{topic.steps.map(s=><li key={s}>{s}</li>)}</ol><p className="mt-4 rounded-lg bg-warning/15 p-3 text-sm"><strong>Ingat. </strong>{topic.remember}</p><p className="mt-4 rounded-lg bg-info/10 p-3 text-sm"><strong>Coba bersama. </strong>{topic.demo}</p></div></div>
         <div className="mt-4 flex flex-wrap gap-2"><button className="btn btn-ghost" disabled={index===0} onClick={()=>go(index-1)}>← Materi sebelumnya</button><button className="btn btn-outline btn-success" onClick={()=>setMode("practice")}>Latihan submateri →</button>{index===0?<button className="btn btn-success" onClick={()=>go(1)}>Materi berikutnya →</button>:<button className="btn btn-success" onClick={()=>setMode("assessment")}>Evaluasi Bab 4 →</button>}</div>
-      </>:<GradeFourQuiz key={`${index}-${mode}`} title={mode==="practice"?`Latihan · ${topic.title}`:"Evaluasi Bab 4"} questions={mode==="practice"?practice[index]:assessment} practiceMode={mode==="practice"} close={()=>go(index)} isReady={ready} checkAnswer={correct} formatAnswer={(q, answer) => q.action === "tiles" ? `${answer.split("|").length} petak dipilih` : answer.replaceAll("|", ", ")} renderVisual={q => q.rows ? q.action !== "tiles" && <><Grid rows={q.rows}/>{q.unit && q.unit !== "petak satuan" && <p className="text-center text-sm">Setiap petak mewakili 1 {q.unit}.</p>}</> : q.source >= 4 && <VolumeQuestionVisual q={q}/>} renderAnswer={(q,answer,record,checked)=><Answer q={q} answer={answer} record={record} checked={checked}/>}/>}
+      </>:<GradeFourQuiz key={`${index}-${mode}`} title={mode==="practice"?`Latihan · ${topic.title}`:"Evaluasi Bab 4"} questions={mode==="practice"?practice[index]:assessment} practiceMode={mode==="practice"} close={()=>go(index)} isReady={ready} checkAnswer={correct} formatAnswer={(q, answer) => q.action === "tiles" ? `${answer.split("|").length} petak dipilih` : answer.replaceAll("|", ", ")} renderVisual={q => q.cubes ? <CubeLayers dimensions={q.cubes}/> : q.rows ? q.action !== "tiles" && <><Grid rows={q.rows}/>{q.unit && q.unit !== "petak satuan" && <p className="text-center text-sm">Setiap petak mewakili 1 {q.unit}.</p>}</> : q.source >= 4 && <VolumeQuestionVisual q={q}/>} renderAnswer={(q,answer,record,checked)=><Answer q={q} answer={answer} record={record} checked={checked}/>}/>}
     </div>
   </section>;
 }

@@ -10,11 +10,12 @@ const keys = [
 assert.equal(assessment.length, 24);
 assert.deepEqual(practice.map(set => set.length), [5, 5]);
 assert.deepEqual(assessment.map(q => q.answer), keys);
-assert.deepEqual(practice.flat().map(q => q.answer), ["12", "16", "m²", "(7 × 2) + (3 × 2)", "30000", "2 cangkir", "1,75", "Gelas ukur bertanda mL", "2,35", "2,125"]);
+assert.deepEqual(practice.flat().map(q => q.answer), ["12", "16", "m²", "(7 × 2) + (3 × 2)", "30000", "2 cangkir", "1,75", "12", "2,35", "2,125"]);
 assert.deepEqual([...new Set(assessment.map(q => q.source))].sort(), [1,2,3,4,5,6,7]);
 
 for (const q of [...practice.flat(), ...assessment]) {
   assert.equal(correct(q, ""), false);
+  if (q.cubes) assert.equal(q.cubes.reduce((a,b) => a*b,1), Number(q.answer));
   if (q.rows && !q.options) assert.equal(totalCells(q.rows), Number(q.answer));
   if (q.action === "tiles") {
     const cols = Math.max(...q.rows) + 1;

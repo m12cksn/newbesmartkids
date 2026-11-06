@@ -3,6 +3,7 @@ import type { Question } from "./grade-four-whole-numbers";
 export type MeasurementQuestion = Question & {
   source: number;
   rows?: number[];
+  cubes?: [number, number, number];
   action?: "tiles" | "decimal";
   unit?: string;
 };
@@ -38,7 +39,7 @@ export const practice: MeasurementQuestion[][] = [
   [
     choice(4, "Satu botol besar terisi penuh oleh 5 cangkir yang sama. Jika digunakan 3 cangkir, berapa cangkir lagi agar penuh?", ["2 cangkir", "3 cangkir", "5 cangkir"], "2 cangkir", "Gunakan cangkir yang sama agar ukuran konsisten. 5 − 3 = 2."),
     decimal(4, "Ubah 1.750 mL menjadi liter.", 1750, "1.750 ÷ 1.000 = 1,75 L."),
-    choice(6, "Alat ukur mana yang paling praktis untuk menakar 250 mL air?", ["Meteran", "Gelas ukur bertanda mL", "Timbangan"], "Gelas ukur bertanda mL", "Gelas ukur mengukur volume cairan. Baca skala mL pada permukaan air."),
+    { source: 6, prompt: "Setiap kubus satuan memiliki volume 1 cm³. Berapa volume susunan ini?", cubes: [3, 2, 2], answer: "12", unit: "cm³", explanation: "Tiap lapisan berisi 3 × 2 = 6 kubus. Dua lapisan berisi 12 kubus, jadi volumenya 12 cm³." },
     decimal(5, "Ada 3 L jus. Sebanyak 650 mL diminum. Berapa liter yang tersisa?", 2350, "3.000 − 650 = 2.350 mL = 2,35 L."),
     decimal(7, "Campur 1 L 250 mL air dengan 875 mL air. Berapa liter jumlahnya?", 2125, "1.250 + 875 = 2.125 mL = 2,125 L."),
   ],

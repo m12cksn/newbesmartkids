@@ -44,6 +44,11 @@ try {
         await page.getByText("Wadah penuh. Kapasitasnya 1 L.", {exact:true}).waitFor();
         await noOverflow();
         await screenshot("volume");
+        await button("Peraga kubus satuan").click();
+        await page.getByRole("slider", {name:"Banyak lapisan"}).fill("3");
+        await page.getByText("3 × 2 × 3 = 18 cm³.", {exact:true}).waitFor();
+        await noOverflow();
+        await screenshot("cubes");
       }
       await button("Latihan submateri →").click();
       for (const [i, q] of questions.entries()) {
