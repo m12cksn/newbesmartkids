@@ -24,6 +24,12 @@ const descriptions:Record<Exclude<Topic,"E">,string>={
  C:"Sepuluh satuan sama dengan satu puluhan. Bilangan 16 terdiri atas satu puluhan dan enam satuan.",
  D:"Bandingkan dua bilangan dengan menghitung benda atau melihat urutannya. Bilangan yang lebih besar berada setelah bilangan yang lebih kecil."
 };
+const demonstrations = {
+ A: {steps: ["Pisahkan sepuluh apel terlebih dahulu.", "Hitung apel sisanya. Satu puluhan dan tiga satuan membentuk 13.", "Tulis 13 dan baca tiga belas."], example: "Tambahkan apel sampai 13, lalu tambahkan satu lagi. Baca bilangan barunya."},
+ B: {steps: ["Cari bilangan awal pada jalur bilangan.", "Satu langkah maju menambah satu. Satu langkah mundur mengurangi satu.", "Lihat angka tempat kamu berhenti."], example: "Mulai di 15. Maju dua langkah sampai 17, lalu mundur satu langkah sampai 16."},
+ C: {steps: ["Kelompokkan setiap sepuluh benda menjadi satu puluhan.", "Hitung benda yang tersisa sebagai satuan.", "Saat mencapai 20, dua kelompok sepuluh membentuk dua puluhan dan nol satuan."], example: "Ubah 16 menjadi 19, lalu tambah satu. Tunjukkan apa yang berubah pada puluhan dan satuan."},
+ D: {steps: ["Bandingkan jumlah puluhan terlebih dahulu.", "Jika puluhannya sama, bandingkan satuannya.", "Pilih bilangan yang lebih besar dan jelaskan bagian yang membedakannya."], example: "Bandingkan 14 dan 18. Keduanya punya satu puluhan. Satuan mana yang lebih besar? Coba lagi dengan pasangan berikutnya."},
+};
 const words=["nol","satu","dua","tiga","empat","lima","enam","tujuh","delapan","sembilan","sepuluh","sebelas","dua belas","tiga belas","empat belas","lima belas","enam belas","tujuh belas","delapan belas","sembilan belas","dua puluh"];
 const assessment=[...items.filter(q=>q.topic==="E"),...items.filter(q=>q.topic==="A").slice(4,6),...items.filter(q=>q.topic==="B").slice(4,6)];
 function QuestionVisual({question,topic}:{question:Item;topic:Topic}){
@@ -39,6 +45,7 @@ export default function GradeOneChapterFive(){
  function start(t:Topic){setQuizTopic(t);setStep(0);setAnswer("");setChecked(false);setScore(0);setMode("quiz")}
  function next(){if(step+1>=qs.length){setMode("result")}else{setStep(v=>v+1);setAnswer("");setChecked(false)}}
  const selectedTopic=topics[tab];
+ const [comparisonAnswer,setComparisonAnswer]=useState<number|null>(null);
  return <section className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
   <p className="text-xs font-bold uppercase tracking-widest text-success">Kelas 1 / Bab 5</p>
   <h1 className="mt-2 text-3xl font-extrabold sm:text-5xl">Ayo Membilang sampai dengan 20</h1>
@@ -54,9 +61,13 @@ export default function GradeOneChapterFive(){
      {current==="A"?<><p className="font-semibold">Tambah atau kurangi apel, lalu baca bilangannya.</p><ObjectCounter count={count}/><div className="flex flex-wrap justify-center gap-2"><button className="btn btn-outline" onClick={()=>setCount(v=>Math.max(11,v-1))}>− Kurangi</button><button className="btn btn-success" onClick={()=>setCount(v=>Math.min(20,v+1))}>+ Tambah apel</button></div><p className="text-xl font-bold">{count} ({words[count]}) apel</p></>:
      current==="B"?<><p className="font-semibold">Langkahkan angka maju atau mundur.</p><div className="grid grid-cols-5 gap-2 sm:grid-cols-10">{Array.from({length:10},(_,i)=><span key={i} className={`grid size-10 place-items-center rounded-lg border font-bold ${position===i+11?"border-success bg-success text-success-content":"border-base-300 bg-base-100"}`}>{i+11}</span>)}</div><div className="flex gap-2"><button className="btn btn-outline" onClick={()=>setPosition(v=>Math.max(11,v-1))}>← Mundur</button><button className="btn btn-success" onClick={()=>setPosition(v=>Math.min(20,v+1))}>Maju →</button></div><p className="text-3xl font-extrabold">{position}</p></>:
      current==="C"?<><p className="font-semibold">Lihat puluhan dan satuannya.</p><TenFrame count={place}/><PlaceValue value={place}/><div className="flex gap-2"><button className="btn btn-outline" onClick={()=>setPlace(v=>Math.max(11,v-1))}>−</button><button className="btn btn-success" onClick={()=>setPlace(v=>Math.min(20,v+1))}>+</button></div></>:
-     <><p className="font-semibold">Pilih kelompok yang lebih banyak.</p><NumberComparison left={compare[0]} right={compare[1]} onSelect={()=>{}}/><p className="font-bold">{Math.max(...compare)} lebih besar dari {Math.min(...compare)}</p><button className="btn btn-outline" onClick={()=>setCompare(v=>v[0]===14?[19,12]:[14,18])}>Coba contoh lain</button></>}
+     <><p className="font-semibold">Pilih kelompok yang lebih banyak.</p><NumberComparison left={compare[0]} right={compare[1]} selected={comparisonAnswer} onSelect={setComparisonAnswer}/><p aria-live="polite" className="font-bold">{comparisonAnswer===null?"Pilih satu kelompok.":comparisonAnswer===Math.max(...compare)?`Tepat! ${Math.max(...compare)} lebih besar dari ${Math.min(...compare)}.`:"Coba lagi. Bandingkan satuannya."}</p><button className="btn btn-outline" onClick={()=>{setCompare(v=>v[0]===14?[19,12]:[14,18]);setComparisonAnswer(null)}}>Coba contoh lain</button></>}
     </div>
-    <div className="flex flex-col justify-between p-6 sm:p-7"><div><p className="text-xs font-bold uppercase tracking-wider text-success">Submateri {tab+1} dari 4</p><h2 className="mt-3 text-2xl font-extrabold">{selectedTopic}. {titles[selectedTopic]}</h2><p className="mt-4 leading-8 text-base-content/70">{descriptions[selectedTopic]}</p></div></div>
+    <div className="flex flex-col justify-between p-6 sm:p-7"><div><p className="text-xs font-bold uppercase tracking-wider text-success">Submateri {tab+1} dari 4</p><h2 className="mt-3 text-2xl font-extrabold">{selectedTopic}. {titles[selectedTopic]}</h2><p className="mt-4 leading-8 text-base-content/70">{descriptions[selectedTopic]}</p>
+      <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">
+       {demonstrations[selectedTopic].steps.map(instruction=><li key={instruction}>{instruction}</li>)}
+      </ol>
+      <p className="mt-4 rounded-lg bg-success/5 p-3 text-sm"><strong>Coba bersama. </strong>{demonstrations[selectedTopic].example}</p></div></div>
    </div><div className="mt-6 flex flex-wrap items-center justify-between gap-3"><button className="btn btn-ghost" disabled={tab===0} onClick={()=>setTab(v=>v-1)}>← Sebelumnya</button><div className="flex flex-wrap items-center justify-end gap-2"><button className="btn btn-success" onClick={()=>start(current)}>Latihan {titles[current]} →</button>{tab===3?<button className="btn btn-outline btn-success" onClick={()=>start("E")}>Evaluasi Bab 5 · 24 soal →</button>:null}</div></div></>{mode==="quiz"?<div id="latihan-bab-5" className="mt-6 flex w-full flex-col items-center rounded-xl border border-base-300 bg-base-100 px-3 py-5 text-base-content sm:px-5">
     <div className="flex w-full max-w-xl shrink-0 items-center justify-between gap-2 pb-2"><div className="min-w-0"><p className="text-xs font-bold text-success">{quizTopic==="E"?"Evaluasi Bab 5":`Latihan Materi ${quizTopic}`}</p><p className="text-sm font-semibold">Soal {step+1} dari {qs.length}</p></div><button className="btn btn-ghost btn-sm" onClick={()=>setMode("learn")}>✕ Kembali</button></div>
     <div className="flex w-full max-w-xl shrink-0 flex-col gap-3 rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm sm:p-6">
