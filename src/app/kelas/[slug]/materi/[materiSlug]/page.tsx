@@ -1,3 +1,4 @@
+import GradeFourPatterns from "@/components/learn/GradeFourPatterns";
 import GradeFourFractions from "@/components/learn/GradeFourFractions";
 import GradeFourWholeNumbers from "@/components/learn/GradeFourWholeNumbers";
 import GradeOneChapterEight from "@/components/learn/GradeOneChapterEight";
@@ -57,6 +58,10 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
 
   if (material.id === "kelas-4-bilangan-cacah-10000") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 4</Link></div><GradeFourWholeNumbers /><SiteFooter /></main>;
+  }
+
+  if (material.id === "kelas-4-pola") {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 4</Link></div><GradeFourPatterns /><SiteFooter /></main>;
   }
 
   if (material.id === "kelas-4-pecahan") {
