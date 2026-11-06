@@ -74,6 +74,38 @@ function VolumeLab() {
   </div>;
 }
 
+function VolumeQuestionVisual({ q }: { q: MeasurementQuestion }) {
+  if (q.prompt.includes("5 cangkir")) {
+    return <div className="mx-auto flex max-w-xs justify-between gap-1" role="img" aria-label="Lima takaran cangkir, tiga sudah dituang">
+      {Array.from({ length: 5 }, (_, i) => <svg key={i} viewBox="0 0 50 42" className="w-1/5 min-w-0" aria-hidden="true">
+        <path d="M32 12h6a7 7 0 0 1 0 14h-6" fill="none" stroke="#075985" strokeWidth="2"/>
+        <path d="M6 7h29l-4 26H10Z" fill={i < 3 ? "#7dd3fc" : "#f0f9ff"} stroke="#075985" strokeWidth="2"/>
+      </svg>)}
+    </div>;
+  }
+  const readings = [...q.prompt.matchAll(/(\d[\d.]* L(?: \d[\d.]* mL)?|\d[\d.]* mL)/g)]
+    .map(([label]) => {
+      const units = [...label.matchAll(/([\d.]+) (mL|L)/g)];
+      const amount = units.reduce((sum, [, digits, unit]) => sum + Number(digits.replaceAll(".", "")) * (unit === "L" ? 1000 : 1), 0);
+      return { label, amount };
+    });
+  if (!readings.length) return null;
+  const capacity = Math.ceil(Math.max(...readings.map(item => item.amount)) / 250) * 250;
+  return <div className="flex flex-wrap justify-center gap-3 rounded-lg bg-info/5 p-2">
+    {readings.map(({ label, amount }, index) => {
+      const level = 58 * amount / capacity;
+      return <figure key={index} className="min-w-0 flex-1 basis-16 max-w-32 text-center">
+        <svg viewBox="0 0 70 76" className="mx-auto h-20" role="img" aria-label={`Gelas ukur berisi ${label}`}>
+          <path d="M14 6h40v62H14Z" fill="#f0f9ff" stroke="#075985" strokeWidth="2"/>
+          <rect x="15" y={67 - level} width="38" height={level} fill="#7dd3fc"/>
+          {[19, 31, 43, 55].map(y => <path key={y} d={`M44 ${y}h10`} stroke="#075985" strokeWidth="2"/>)}
+        </svg>
+        <figcaption className="text-xs font-semibold">{label}</figcaption>
+      </figure>;
+    })}
+  </div>;
+}
+
 function Answer({ q, answer, record, checked }: { q: MeasurementQuestion; answer: string; record: (s: string) => void; checked: boolean }) {
   if (q.action === "tiles") return <Grid rows={q.rows!} value={answer} onChange={record} disabled={checked}/>;
   return <label className="flex flex-wrap items-center gap-2 font-bold">Jawaban
@@ -100,7 +132,7 @@ export default function GradeFourMeasurement() {
       {mode==="lesson"?<>
         <div className="grid overflow-hidden rounded-xl border border-base-300 bg-base-100 lg:grid-cols-2"><div className="min-w-0 bg-info/5 p-4 sm:p-6">{index === 0 ? <AreaLab/> : <VolumeLab/>}</div><div className="p-5 sm:p-6"><h2 className="text-2xl font-extrabold">{topic.title}</h2><p className="mt-3 leading-relaxed">{topic.intro}</p><ol className="mt-3 list-decimal space-y-3 pl-5 leading-relaxed">{topic.steps.map(s=><li key={s}>{s}</li>)}</ol><p className="mt-4 rounded-lg bg-warning/15 p-3 text-sm"><strong>Ingat. </strong>{topic.remember}</p><p className="mt-4 rounded-lg bg-info/10 p-3 text-sm"><strong>Coba bersama. </strong>{topic.demo}</p></div></div>
         <div className="mt-4 flex flex-wrap gap-2"><button className="btn btn-ghost" disabled={index===0} onClick={()=>go(index-1)}>← Materi sebelumnya</button><button className="btn btn-outline btn-success" onClick={()=>setMode("practice")}>Latihan submateri →</button>{index===0?<button className="btn btn-success" onClick={()=>go(1)}>Materi berikutnya →</button>:<button className="btn btn-success" onClick={()=>setMode("assessment")}>Evaluasi Bab 4 →</button>}</div>
-      </>:<GradeFourQuiz key={`${index}-${mode}`} title={mode==="practice"?`Latihan · ${topic.title}`:"Evaluasi Bab 4"} questions={mode==="practice"?practice[index]:assessment} practiceMode={mode==="practice"} close={()=>go(index)} isReady={ready} checkAnswer={correct} formatAnswer={(q, answer) => q.action === "tiles" ? `${answer.split("|").length} petak dipilih` : answer.replaceAll("|", ", ")} renderVisual={q => q.rows && q.action !== "tiles" ? <Grid rows={q.rows}/> : null} renderAnswer={(q,answer,record,checked)=><Answer q={q} answer={answer} record={record} checked={checked}/>}/>}
+      </>:<GradeFourQuiz key={`${index}-${mode}`} title={mode==="practice"?`Latihan · ${topic.title}`:"Evaluasi Bab 4"} questions={mode==="practice"?practice[index]:assessment} practiceMode={mode==="practice"} close={()=>go(index)} isReady={ready} checkAnswer={correct} formatAnswer={(q, answer) => q.action === "tiles" ? `${answer.split("|").length} petak dipilih` : answer.replaceAll("|", ", ")} renderVisual={q => q.rows ? q.action !== "tiles" && <><Grid rows={q.rows}/>{q.unit && q.unit !== "petak satuan" && <p className="text-center text-sm">Setiap petak mewakili 1 {q.unit}.</p>}</> : q.source >= 4 && <VolumeQuestionVisual q={q}/>} renderAnswer={(q,answer,record,checked)=><Answer q={q} answer={answer} record={record} checked={checked}/>}/>}
     </div>
   </section>;
 }
