@@ -19,6 +19,7 @@ jobs:
       - run: node --experimental-strip-types --test scripts/verify-grade-one-counting.mjs
       - run: node --test scripts/verify-grade-one-subtraction.mjs
       - run: node --test scripts/verify-grade-one-shapes.mjs
+      - run: node --experimental-strip-types scripts/verify-grade-four-patterns.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
@@ -37,4 +38,11 @@ jobs:
           node --experimental-strip-types scripts/smoke-grade-one-diagrams.mjs
           node --experimental-strip-types scripts/smoke-grade-four-whole-numbers.mjs
           node --experimental-strip-types scripts/smoke-grade-four-fractions.mjs
+          CHAPTER_SCREENSHOTS=/tmp/pattern-screenshots node --experimental-strip-types scripts/smoke-grade-four-patterns.mjs
           node --experimental-strip-types scripts/smoke-grade-one-chapters-one-to-three.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-four-patterns-screenshots
+          path: /tmp/pattern-screenshots
+          if-no-files-found: ignore

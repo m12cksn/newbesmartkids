@@ -12,11 +12,12 @@ function isCorrect(question: Question, answer: string | undefined) {
   return answer === question.answer;
 }
 
-export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, formatAnswer }: {
+export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer }: {
   questions: Q[]; title: string; practiceMode: boolean; close: () => void;
   renderVisual?: (question: Q) => ReactNode;
   renderAnswer?: (question: Q, answer: string, record: (value: string) => void, checked: boolean) => ReactNode;
   checkAnswer?: (question: Q, answer: string | undefined) => boolean;
+  isReady?: (question: Q, answer: string) => boolean;
   formatAnswer?: (question: Q, answer: string) => string;
 }) {
   const [index, setIndex] = useState(0);
@@ -26,7 +27,7 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
   const question = questions[index];
   const answer = answers[index] ?? "";
   const selected = answer ? answer.split("|") : [];
-  const ready = question?.mode === "order" ? selected.length === question.options?.length : Boolean(answer.trim());
+  const ready = question && isReady ? isReady(question, answer) : question?.mode === "order" ? selected.length === question.options?.length : Boolean(answer.trim());
   const score = questions.filter((q, i) => checkAnswer(q, answers[i])).length;
   const record = (value: string) => setAnswers(old => ({ ...old, [index]: value }));
   const go = (i: number) => { setChecked(false); setIndex(i); };

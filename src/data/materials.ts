@@ -14,6 +14,12 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-4-pola", classId: 4, chapter: 3, slug: "pola-gambar-dan-pola-bilangan",
+    title: "Pola Gambar dan Pola Bilangan", topic: "Pola",
+    description: "Susun pola gambar, lengkapi pola bilangan, dan pecahkan cerita dengan peraga interaktif.",
+    videoStatus: "coming_soon", summary: "Pola membesar dan mengecil, selisih tetap, tabel, dan soal cerita.", questionIds: [],
+  },
+  {
     id: "kelas-4-pecahan",
     classId: 4,
     chapter: 2,
