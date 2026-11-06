@@ -14,6 +14,18 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-4-pecahan",
+    classId: 4,
+    chapter: 2,
+    slug: "pecahan",
+    title: "Pecahan",
+    topic: "Bilangan",
+    description: "Bandingkan pecahan, cari pecahan senilai, dan hubungkan desimal dengan persen melalui peraga.",
+    videoStatus: "coming_soon",
+    summary: "Pelajari pecahan, desimal persepuluhan dan perseratusan, serta persen.",
+    questionIds: [],
+  },
+  {
     id: "kelas-4-bilangan-cacah-10000",
     classId: 4,
     chapter: 1,
