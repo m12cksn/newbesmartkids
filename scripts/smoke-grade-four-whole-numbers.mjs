@@ -41,13 +41,30 @@ try {
         await page.getByRole("textbox",{name:"Bilangan pertama"}).fill("10000");
         await button("Puluh ribu atas: 1").click();
         await page.getByText("Puluh ribu: angka 1 bernilai 10.000.", {exact:true}).waitFor();
+        if (i === 0) await page.getByText(/Pada 10\.000, angka 1 menempati puluh ribu dan bernilai 10\.000/).waitFor();
       } else if (i === 1) {
-        await button("Puluhan atas: 8").click();
         await page.getByText("Puluhan menentukan hasil: 4.286 > 4.268.").waitFor();
+        await page.getByRole("textbox", {name:"Bilangan kedua"}).fill("100");
+        await page.getByText("Ribuan menentukan hasil: 4.286 > 100.").waitFor();
+        assert.deepEqual(await page.locator("td.bg-warning\\/25").allTextContents(), ["4","0"]);
+        await page.getByRole("textbox", {name:"Bilangan kedua"}).fill("4286");
+        await page.getByText("Kedua bilangan sama.").waitFor();
+        assert.equal(await page.locator("td.bg-warning\\/25").count(), 0);
       } else if (i < 7) {
-        const next = button("Buka langkah");
-        for (let n = 0; n < 5 && !(await next.isDisabled()); n++) await next.click();
-        await page.getByText(`Hasilnya ${["4.433","2.216","48","21"][i-3]}.`, {exact:true}).waitFor();
+        const steps = [[13,1,13,1,14,1,4], [12,6,1,2,2], [40,8,48], [2,0,1,0]][i-3];
+        const entry = page.locator("#guided-operation-answer");
+        await entry.fill("99");
+        await button("Periksa langkah").click();
+        await page.getByRole("status").getByText(/Coba lagi/).waitFor();
+        assert.equal(await button("Langkah berikutnya").count(), 0);
+        for (const [n, value] of steps.entries()) {
+          await entry.fill(String(value));
+          await button("Periksa langkah").click();
+          await page.getByRole("status").getByText(/Tepat!/).waitFor();
+          await noOverflow();
+          await button(n === steps.length-1 ? "Lihat hasil peraga" : "Langkah berikutnya").click();
+        }
+        await page.getByRole("status").getByText(new RegExp(`= ${["4\\.433","2\\.216","48","21"][i-3]}\\.$`)).waitFor();
       } else {
         await button("Kelipatan").click();
         await page.getByText("18 × 6 = 108",{exact:true}).waitFor();

@@ -10,8 +10,8 @@ export type Question = {
 };
 const fill = (prompt: string, answer: number | string, explanation: string, diagram?: { value: number; missing: number }): Question =>
   ({ prompt, answer: String(answer), explanation, diagram });
-const choice = (prompt: string, answer: string, options: string[], explanation: string): Question =>
-  ({ prompt, answer, options, explanation, mode: "choice" });
+const choice = (prompt: string, answer: string, options: string[], explanation: string, diagram?: Question["diagram"]): Question =>
+  ({ prompt, answer, options, explanation, diagram, mode: "choice" });
 const order = (prompt: string, answer: number[], options: number[], explanation: string): Question =>
   ({ prompt, answer: answer.map(number).join("|"), options: options.map(number), explanation, mode: "order" });
 const multiple = (prompt: string, answer: number[], options: number[], explanation: string): Question =>
@@ -19,10 +19,10 @@ const multiple = (prompt: string, answer: number[], options: number[], explanati
 
 export const topics = [
   { title: "Menentukan dan menggunakan nilai tempat", steps: ["Baca bilangan dari digit paling kiri.", "Bedakan angka, tempatnya, dan nilainya. Pada 4.286, angka 2 menempati ratusan dan bernilai 200.", "Nol menunjukkan bahwa suatu tempat kosong."], demo: "Ubah angka 2 pada 4.286 menjadi 0. Baca bilangan baru dan periksa posisi ratusannya." },
-  { title: "Membandingkan dan mengurutkan", steps: ["Bandingkan digit dari posisi paling kiri.", "Jika sama, lanjutkan ke posisi berikutnya. Digit pertama yang berbeda menentukan bilangan terbesar.", "Untuk mengurutkan, pilih bilangan terkecil satu per satu atau lakukan sebaliknya."], demo: "Bandingkan 4.286 dengan 4.268. Ketuk posisi puluhan untuk melihat digit yang menentukan." },
+  { title: "Membandingkan dan mengurutkan", steps: ["Bandingkan digit dari posisi paling kiri.", "Jika sama, lanjutkan ke posisi berikutnya. Digit pertama yang berbeda menentukan bilangan terbesar.", "Untuk mengurutkan, pilih bilangan terkecil satu per satu atau lakukan sebaliknya."], demo: "Bandingkan 4.286 dengan 4.268, lalu ubah bilangan kedua menjadi 100. Amati perpindahan sorotan dari puluhan ke ribuan." },
   { title: "Komposisi dan dekomposisi", steps: ["Pisahkan bilangan berdasarkan nilai setiap digit.", "Tuliskan hasilnya sebagai penjumlahan.", "Gabungkan nilai-nilai itu untuk membentuk bilangan semula."], demo: "Uraikan 4.286 menjadi 4.000 + 200 + 80 + 6, lalu ubah angka puluhannya." },
-  { title: "Penjumlahan", steps: ["Sejajarkan satuan dengan satuan, puluhan dengan puluhan, dan seterusnya.", "Jumlahkan dari kanan ke kiri. Tukarkan 10 satuan dengan 1 puluhan, dan lakukan hal serupa di posisi lain.", "Baca hasil dari kiri ke kanan."], demo: "Buka langkah satuan dari 2.748 + 1.685. Perhatikan 13 satuan menjadi 1 puluhan dan 3 satuan." },
-  { title: "Pengurangan", steps: ["Sejajarkan digit berdasarkan nilai tempat.", "Kurangi mulai dari satuan. Jika angka atas lebih kecil, tukar satu unit dari kolom di kirinya menjadi sepuluh unit di kolom tersebut.", "Periksa dengan menambahkan sisa dan bilangan pengurang."], demo: "Pada 4.002 − 1.786, buka langkah satuan. Perhatikan bagaimana penukaran melewati dua kolom nol." },
+  { title: "Penjumlahan", steps: ["Sejajarkan satuan dengan satuan, puluhan dengan puluhan, dan seterusnya.", "Jumlahkan dari kanan ke kiri. Tukarkan 10 satuan dengan 1 puluhan, dan lakukan hal serupa di posisi lain.", "Baca hasil dari kiri ke kanan."], demo: "Kerjakan langkah satuan dari 2.748 + 1.685. Perhatikan 13 satuan menjadi 1 puluhan dan 3 satuan." },
+  { title: "Pengurangan", steps: ["Sejajarkan digit berdasarkan nilai tempat.", "Kurangi mulai dari satuan. Jika angka atas lebih kecil, tukar satu unit dari kolom di kirinya menjadi sepuluh unit di kolom tersebut.", "Periksa dengan menambahkan sisa dan bilangan pengurang."], demo: "Pada 4.002 − 1.786, kerjakan langkah satuan. Perhatikan bagaimana penukaran melewati dua kolom nol." },
   { title: "Perkalian", steps: ["Perkalian menghitung isi beberapa kelompok yang sama banyak.", "Pisahkan bilangan menjadi nilai tempat, lalu kalikan tiap bagian.", "Jumlahkan semua hasil kali bagian."], demo: "Mulai dari 12 × 4. Setelah itu pilih 128 × 6 dan buka hasil setiap bagian." },
   { title: "Pembagian", steps: ["Pembagian dapat berarti membagi sama rata atau mencari banyak kelompok.", "Kerjakan dari digit paling kiri. Bagi, kalikan, kurangkan, lalu turunkan digit berikutnya.", "Periksa dengan mengalikan hasil bagi dan pembagi, lalu menambahkan sisa bila ada."], demo: "Bagi 84 menjadi 4 kelompok. Coba juga 936 ÷ 4 dan ikuti langkah bersusunnya." },
   { title: "Faktor dan kelipatan", steps: ["Faktor membagi bilangan sampai habis.", "Cari pasangan perkalian yang hasilnya bilangan tersebut.", "Kelipatan diperoleh dengan mengalikan bilangan dengan 1, 2, 3, dan seterusnya."], demo: "Pilih 18. Bandingkan daftar pasangan faktor dengan kelipatan 18." },
@@ -32,7 +32,7 @@ export const practice: Question[][] = [
   [
     fill("Tulis lambang bilangan untuk tiga ribu enam puluh dua.", 3062, "3.000 + 60 + 2 = 3.062."),
     choice("Angka 7 pada 5.704 menempati posisi apa?", "Ratusan", ["Puluhan", "Ratusan", "Ribuan"], "Angka 7 berarti 700."),
-    fill("Berapa nilai angka 8 dalam 8.506?", 8000, "Angka 8 menempati ribuan.", { value: 8506, missing: 1 }),
+    choice("Angka 8 dalam 8.506 menempati posisi apa?", "Ribuan", ["Ratusan", "Ribuan", "Puluhan", "Satuan"], "Angka 8 menempati ribuan dan bernilai 8.000.", { value: 8506, missing: 1 }),
     choice("Bagaimana membaca 9.018?", "Sembilan ribu delapan belas", ["Sembilan ribu seratus delapan", "Sembilan ribu delapan belas", "Sembilan ribu delapan puluh"], "9.018 terdiri atas 9.000 dan 18."),
   ],
   [
