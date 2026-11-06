@@ -35,4 +35,5 @@ jobs:
           node scripts/smoke-grade-one-chapters-five-six.mjs
           node scripts/smoke-grade-one-measurement.mjs
           node --experimental-strip-types scripts/smoke-grade-one-diagrams.mjs
+          node --experimental-strip-types scripts/smoke-grade-four-whole-numbers.mjs
           node --experimental-strip-types scripts/smoke-grade-one-chapters-one-to-three.mjs
