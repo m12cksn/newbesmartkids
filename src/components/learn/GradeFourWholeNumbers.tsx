@@ -11,7 +11,7 @@ function PlaceTable({ value, other, selected, onSelect, missing }: {
 }) {
   return <table className="w-full table-fixed text-center text-xs sm:text-sm">
     <caption className="sr-only">Tabel nilai tempat</caption>
-    <thead><tr>{places.map(label => <th scope="col" key={label} className="break-words p-1">{label}</th>)}</tr></thead>
+    <thead><tr>{places.map(label => <th scope="col" key={label} className="px-0 py-1 text-[10px] sm:p-1 sm:text-sm">{label}</th>)}</tr></thead>
     <tbody>{(other === undefined ? [value] : [value, other]).map((n, row) => <tr key={row}>
       {digits(n).map((digit, i) => <td key={i} className={`border border-base-300 p-1 font-bold ${selected === i ? "bg-warning/25" : "bg-base-100"}`}>
         {onSelect ? <button type="button" aria-label={`${places[i]} ${row === 0 ? "atas" : "bawah"}: ${digit}`}
