@@ -14,6 +14,18 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-4-bilangan-cacah-10000",
+    classId: 4,
+    chapter: 1,
+    slug: "bilangan-cacah-sampai-10000",
+    title: "Bilangan Cacah sampai 10.000",
+    topic: "Bilangan",
+    description: "Jelajahi nilai tempat, operasi hitung, faktor, dan kelipatan dengan peraga interaktif.",
+    videoStatus: "coming_soon",
+    summary: "Baca, bandingkan, susun, dan hitung bilangan cacah sampai 10.000.",
+    questionIds: [],
+  },
+  {
     id: "kelas-5-kpk-fpb",
     classId: 5,
     chapter: 2,
