@@ -28,7 +28,7 @@ function method(rows: number[], options: string[], answer: string, explanation: 
 const decimal = (source: number, prompt: string, ml: number, explanation: string): MeasurementQuestion =>
   ({ source, prompt, action: "decimal", unit: "L", answer: String(ml / 1000).replace(".", ","), explanation });
 
-export const practice: MeasurementQuestion[][] = [
+const originalPractice: MeasurementQuestion[][] = [
   [
     area([4, 4, 4], "petak satuan", "tiles"),
     area([6, 4, 4, 2]),
@@ -43,6 +43,17 @@ export const practice: MeasurementQuestion[][] = [
     decimal(5, "Ada 3 L jus. Sebanyak 650 mL diminum. Berapa liter yang tersisa?", 2350, "3.000 − 650 = 2.350 mL = 2,35 L."),
     decimal(7, "Campur 1 L 250 mL air dengan 875 mL air. Berapa liter jumlahnya?", 2125, "1.250 + 875 = 2.125 mL = 2,125 L."),
   ],
+];
+
+export const practice: MeasurementQuestion[][] = [
+  [originalPractice[0][0], originalPractice[0][1], originalPractice[0][3]],
+  [originalPractice[0][2], area([5, 5, 5], "cm²"), originalPractice[0][4]],
+  [
+    originalPractice[1][0],
+    choice(4, "Dua teko berisi air. Teko A mengisi 4 cangkir dan teko B mengisi 6 cangkir yang sama. Teko mana berisi lebih banyak?", ["Teko A", "Teko B"], "Teko B", "Dengan cangkir yang sama, 6 takaran lebih banyak daripada 4."),
+    choice(4, "Wadah yang sama terisi oleh 4 gelas besar atau 8 gelas kecil. Berapa gelas kecil setara dengan 1 gelas besar?", ["1 gelas", "2 gelas", "4 gelas"], "2 gelas", "8 gelas kecil dibagi 4 gelas besar berarti 2 gelas kecil per gelas besar."),
+  ],
+  originalPractice[1].slice(1),
 ];
 
 export const assessment: MeasurementQuestion[] = [

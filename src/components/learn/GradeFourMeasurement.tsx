@@ -5,13 +5,41 @@ import GradeFourQuiz from "./GradeFourQuiz";
 import { assessment, practice, ready, correct, totalCells, type MeasurementQuestion } from "@/data/grade-four-measurement";
 
 const topics = [
-  { title: "Pengukuran Luas", intro: "Luas menyatakan seberapa besar permukaan yang tertutup. Susun persegi satuan yang sama besar, tanpa celah atau tumpang tindih.",
-    steps: ["Hitung petak satu per satu, atau kalikan banyak kolom dan baris jika daerahnya berbentuk persegi panjang.", "Untuk daerah bertingkat, jumlahkan petak per baris atau bagi daerah menjadi beberapa persegi panjang.", "Gunakan cm² untuk permukaan kecil dan m² untuk permukaan yang lebih besar. Karena 1 m = 100 cm, maka 1 m² = 10.000 cm²."],
-    remember: "Panjang diukur dengan cm atau m. Luas diukur dengan cm² atau m².", demo: "Ubah banyak baris dan kolom, lalu ketuk petak untuk menutup seluruh daerah." },
-  { title: "Pengukuran Volume", intro: "Volume menunjukkan banyak ruang yang ditempati. Kapasitas wadah menunjukkan banyak cairan yang dapat ditampungnya.",
-    steps: ["Gunakan wadah satuan berukuran sama untuk membandingkan isi. Jika satuan lebih kecil, diperlukan lebih banyak takaran.", "Liter (L) dan mililiter (mL) adalah satuan baku. Satu liter sama dengan 1.000 mililiter.", "Samakan satuan sebelum menjumlahkan atau mengurangi. Dari mL ke L, bagi dengan 1.000.", "Untuk benda pejal, gunakan kubus satuan. Satu kubus dengan rusuk 1 cm berukuran 1 cm³, sedangkan rusuk 1 m menghasilkan 1 m³. 1 cm³ = 1 mL dan 1 m³ = 1.000 L."],
-    remember: "Baca skala gelas ukur sejajar dengan permukaan cairan.", demo: "Tuang satu takaran beberapa kali. Ganti ukuran takaran dan lihat hubungan jumlah tuangan, mL, dan L." },
+  { title: "Luas · Satuan Tidak Baku", intro: "Luas adalah ukuran permukaan. Kita bisa mengukurnya dengan petak atau potongan kertas yang sama besar.",
+    steps: ["Tutupi daerah tanpa celah atau tumpang tindih.", "Hitung petaknya. Untuk persegi panjang, kalikan banyak kolom dengan banyak baris.", "Jika petaknya lebih kecil, permukaan yang sama memerlukan lebih banyak petak."],
+    remember: "Bandingkan luas dua daerah memakai petak dengan ukuran yang sama.", demo: "Ubah baris dan kolom, lalu ketuk petak untuk menutup daerah." },
+  { title: "Luas · Satuan Baku", intro: "Satuan baku punya ukuran tetap. Satu petak 1 cm × 1 cm mewakili 1 cm².",
+    steps: ["Gunakan cm² untuk permukaan kecil dan m² untuk permukaan besar.", "Kalikan panjang dan lebar yang sudah dinyatakan dalam satuan yang sama.", "Karena 1 m = 100 cm, maka 1 m² = 100 cm × 100 cm = 10.000 cm²."],
+    remember: "cm dan m mengukur panjang. cm² dan m² mengukur luas.", demo: "Ubah banyak petak berukuran 1 cm², lalu amati perubahan luasnya." },
+  { title: "Volume · Satuan Tidak Baku", intro: "Isi wadah bisa diukur dengan menghitung berapa kali takaran seperti cangkir dituangkan.",
+    steps: ["Gunakan satu jenis cangkir untuk setiap pengukuran.", "Tuang satu takaran penuh setiap kali, lalu hitung jumlah tuangannya.", "Cangkir yang lebih kecil perlu lebih banyak tuangan untuk memenuhi wadah yang sama."],
+    remember: "Jumlah cangkir hanya bisa langsung dibandingkan jika ukuran cangkirnya sama.", demo: "Penuhi wadah dengan cangkir besar. Kosongkan, lalu ulangi dengan cangkir kecil." },
+  { title: "Volume · Satuan Baku", intro: "Liter (L) dan mililiter (mL) mengukur volume cairan. Kubus satuan membantu mengukur volume benda pejal.",
+    steps: ["1 L = 1.000 mL. Bagi angka dalam mL dengan 1.000 untuk mengubahnya ke L.", "Samakan satuan sebelum menjumlahkan atau mengurangi.", "Kubus dengan rusuk 1 cm volumenya 1 cm³. Kubus dengan rusuk 1 m volumenya 1 m³. 1 cm³ = 1 mL dan 1 m³ = 1.000 L."],
+    remember: "Baca skala gelas ukur sejajar dengan permukaan cairan.", demo: "Tuang cairan dan baca skalanya. Buka peraga kubus satuan untuk menghitung volume dari jumlah lapisan." },
 ];
+
+function CupLab() {
+  const [small, setSmall] = useState(false);
+  const [pours, setPours] = useState(0);
+  const capacity = small ? 8 : 4;
+  return <div className="space-y-3">
+    <label className="block font-bold">Ukuran cangkir
+      <select className="select select-bordered mt-1 block" value={small ? "small" : "large"} onChange={e => { setSmall(e.target.value === "small"); setPours(0); }}>
+        <option value="large">Cangkir besar</option><option value="small">Cangkir kecil</option>
+      </select>
+    </label>
+    <svg viewBox="0 0 120 130" className="mx-auto w-32" role="img" aria-label={`Wadah berisi ${pours} dari ${capacity} takaran`}>
+      <path d="M20 12h80v107H20Z" fill="#f0f9ff" stroke="#075985" strokeWidth="3"/>
+      <rect x="22" y={117 - 102 * pours / capacity} width="76" height={102 * pours / capacity} fill="#38bdf8"/>
+    </svg>
+    <p aria-live="polite">{pours} takaran dituang.{pours === capacity && " Wadah penuh!"}</p>
+    <div className="flex flex-wrap gap-2">
+      <button className="btn btn-info btn-sm" disabled={pours === capacity} onClick={() => setPours(n => n + 1)}>Tuang satu cangkir</button>
+      <button className="btn btn-outline btn-sm" onClick={() => setPours(0)}>Kosongkan wadah</button>
+    </div>
+  </div>;
+}
 
 function Grid({ rows, value = "", onChange, disabled }: {
   rows: number[]; value?: string; onChange?: (value: string) => void; disabled?: boolean;
@@ -34,7 +62,7 @@ function Grid({ rows, value = "", onChange, disabled }: {
   </div>;
 }
 
-function AreaLab() {
+function AreaLab({ standard = false }: { standard?: boolean }) {
   const [width, setWidth] = useState(4);
   const [height, setHeight] = useState(3);
   const [value, setValue] = useState("");
@@ -44,7 +72,7 @@ function AreaLab() {
     <label className="block">Kolom: {width}<input className="range range-info w-full" type="range" min={2} max={7} value={width} aria-label="Kolom" onChange={e => { setWidth(+e.target.value); setValue(""); }}/></label>
     <label className="block">Baris: {height}<input className="range range-info w-full" type="range" min={2} max={6} value={height} aria-label="Baris" onChange={e => { setHeight(+e.target.value); setValue(""); }}/></label>
     <Grid rows={rows} value={value} onChange={setValue}/>
-    <p aria-live="polite">{count} petak dipilih. Luas daerah: {width} × {height} = {totalCells(rows)} petak satuan.</p>
+    <p aria-live="polite">{count} petak dipilih. Luas daerah: {width} × {height} = {totalCells(rows)} {standard ? "cm²" : "petak satuan"}.</p>
     {correct({ ...practice[0][0], rows }, value) && <p className="font-bold text-success">Daerah tertutup tepat!</p>}
     <button className="btn btn-outline btn-sm" onClick={() => setValue("")}>Kosongkan kisi</button>
   </div>;
@@ -161,13 +189,13 @@ export default function GradeFourMeasurement() {
     <p className="mt-3">Ukur permukaan dengan petak dan ukur isi wadah dengan takaran.</p>
     <div className="mt-6 grid overflow-hidden rounded-xl border border-base-300 bg-base-100 md:grid-cols-2">
       <div className="flex min-h-36 flex-col items-center justify-center bg-info/10 p-5 text-center"><span aria-hidden="true" className="text-3xl font-bold text-info">▶</span><p className="mt-2 font-bold">Video pembelajaran segera hadir</p></div>
-      <div className="p-5"><p aria-hidden="true" className="mb-2 font-bold text-info">cm² · m² · mL · L</p><h2 className="text-xl font-bold">Laboratorium Pengukuran</h2><p className="text-sm">Dua submateri, lima latihan per submateri, dan 24 soal evaluasi.</p><a href="#materi-pengukuran" className="btn btn-success btn-sm mt-3">Mulai belajar</a></div>
+      <div className="p-5"><p aria-hidden="true" className="mb-2 font-bold text-info">cm² · m² · mL · L</p><h2 className="text-xl font-bold">Laboratorium Pengukuran</h2><p className="text-sm">Empat submateri, 13 latihan, dan 24 soal evaluasi.</p><a href="#materi-pengukuran" className="btn btn-success btn-sm mt-3">Mulai belajar</a></div>
     </div>
     <div id="materi-pengukuran" className="mt-6">
-      <nav aria-label="Submateri pengukuran" className="mb-4 flex flex-wrap gap-2">{topics.map((t,i)=><button key={t.title} className={`btn btn-sm ${i===index?"btn-success":"btn-outline"}`} aria-current={i===index?"step":undefined} onClick={()=>go(i)}>{String.fromCharCode(65+i)}. {t.title}</button>)}</nav>
+      <nav aria-label="Submateri pengukuran" className="mb-4 flex flex-wrap gap-2">{topics.map((t,i)=><button key={t.title} className={`btn btn-sm h-auto min-h-9 whitespace-normal ${i===index?"btn-success":"btn-outline"}`} aria-current={i===index?"step":undefined} onClick={()=>go(i)}>{String.fromCharCode(65+i)}. {t.title}</button>)}</nav>
       {mode==="lesson"?<>
-        <div className="grid overflow-hidden rounded-xl border border-base-300 bg-base-100 lg:grid-cols-2"><div className="min-w-0 bg-info/5 p-4 sm:p-6">{index === 0 ? <AreaLab/> : <VolumeLab/>}</div><div className="p-5 sm:p-6"><h2 className="text-2xl font-extrabold">{topic.title}</h2><p className="mt-3 leading-relaxed">{topic.intro}</p><ol className="mt-3 list-decimal space-y-3 pl-5 leading-relaxed">{topic.steps.map(s=><li key={s}>{s}</li>)}</ol><p className="mt-4 rounded-lg bg-warning/15 p-3 text-sm"><strong>Ingat. </strong>{topic.remember}</p><p className="mt-4 rounded-lg bg-info/10 p-3 text-sm"><strong>Coba bersama. </strong>{topic.demo}</p></div></div>
-        <div className="mt-4 flex flex-wrap gap-2"><button className="btn btn-ghost" disabled={index===0} onClick={()=>go(index-1)}>← Materi sebelumnya</button><button className="btn btn-outline btn-success" onClick={()=>setMode("practice")}>Latihan submateri →</button>{index===0?<button className="btn btn-success" onClick={()=>go(1)}>Materi berikutnya →</button>:<button className="btn btn-success" onClick={()=>setMode("assessment")}>Evaluasi Bab 4 →</button>}</div>
+        <div className="grid overflow-hidden rounded-xl border border-base-300 bg-base-100 lg:grid-cols-2"><div className="min-w-0 bg-info/5 p-4 sm:p-6">{index < 2 ? <AreaLab key={index} standard={index === 1}/> : index === 2 ? <CupLab/> : <VolumeLab/>}</div><div className="p-5 sm:p-6"><h2 className="text-2xl font-extrabold">{topic.title}</h2><p className="mt-3 leading-relaxed">{topic.intro}</p><ol className="mt-3 list-decimal space-y-3 pl-5 leading-relaxed">{topic.steps.map(s=><li key={s}>{s}</li>)}</ol><p className="mt-4 rounded-lg bg-warning/15 p-3 text-sm"><strong>Ingat. </strong>{topic.remember}</p><p className="mt-4 rounded-lg bg-info/10 p-3 text-sm"><strong>Coba bersama. </strong>{topic.demo}</p></div></div>
+        <div className="mt-4 flex flex-wrap gap-2"><button className="btn btn-ghost" disabled={index===0} onClick={()=>go(index-1)}>← Materi sebelumnya</button><button className="btn btn-outline btn-success" onClick={()=>setMode("practice")}>Latihan submateri →</button>{index<topics.length-1?<button className="btn btn-success" onClick={()=>go(index+1)}>Materi berikutnya →</button>:<button className="btn btn-success" onClick={()=>setMode("assessment")}>Evaluasi Bab 4 →</button>}</div>
       </>:<GradeFourQuiz key={`${index}-${mode}`} title={mode==="practice"?`Latihan · ${topic.title}`:"Evaluasi Bab 4"} questions={mode==="practice"?practice[index]:assessment} practiceMode={mode==="practice"} close={()=>go(index)} isReady={ready} checkAnswer={correct} formatAnswer={(q, answer) => q.action === "tiles" ? `${answer.split("|").length} petak dipilih` : answer.replaceAll("|", ", ")} renderVisual={q => q.cubes ? <CubeLayers dimensions={q.cubes}/> : q.rows ? q.action !== "tiles" && <><Grid rows={q.rows}/>{q.unit && q.unit !== "petak satuan" && <p className="text-center text-sm">Setiap petak mewakili 1 {q.unit}.</p>}</> : q.source >= 4 && <VolumeQuestionVisual q={q}/>} renderAnswer={(q,answer,record,checked)=><Answer q={q} answer={answer} record={record} checked={checked}/>}/>}
     </div>
   </section>;

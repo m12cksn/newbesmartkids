@@ -38,8 +38,12 @@ try {
     await noOverflow();
     await screenshot("area");
     for (const [topic, questions] of practice.entries()) {
-      if (topic === 1) {
-        await button("B. Pengukuran Volume").click();
+      await button(["A. Luas · Satuan Tidak Baku", "B. Luas · Satuan Baku", "C. Volume · Satuan Tidak Baku", "D. Volume · Satuan Baku"][topic]).click();
+      if (topic === 2) {
+        for (let i=0;i<4;i++) await button("Tuang satu cangkir").click();
+        await page.getByText("4 takaran dituang. Wadah penuh!", {exact:true}).waitFor();
+      }
+      if (topic === 3) {
         for(let i=0;i<4;i++) await button("Tuang satu takaran").click();
         await page.getByText("Wadah penuh. Kapasitasnya 1 L.", {exact:true}).waitFor();
         await noOverflow();
@@ -58,7 +62,7 @@ try {
         await page.getByText("Tepat!", {exact: true}).waitFor();
         await button(i === questions.length - 1 ? "Lihat hasil" : "Lanjut →").click();
       }
-      await page.getByText("Benar 5 · Salah 0 · Skor 100/100", {exact:true}).waitFor();
+      await page.getByText(`Benar ${questions.length} · Salah 0 · Skor 100/100`, {exact:true}).waitFor();
       await button("Kembali ke materi").click();
     }
     await button("Evaluasi Bab 4 →").click();
