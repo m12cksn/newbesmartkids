@@ -14,6 +14,12 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "cambridge-grade-6-ratio", classId: 6, chapter: 11, slug: "cambridge-ratio-and-proportion",
+    title: "Ratio and Proportion", topic: "Cambridge Curriculum · Grade 6",
+    description: "Group counters, scale recipes and compare unit prices.",
+    videoStatus: "coming_soon", summary: "Understand equivalent ratios and direct proportions.", questionIds: [],
+  },
+  {
     id: "cambridge-grade-6-fractions", classId: 6, chapter: 10, slug: "cambridge-calculation-with-fractions",
     title: "Calculation with Fractions", topic: "Cambridge Curriculum · Grade 6",
     description: "Estimate and calculate with fractions using interactive fraction strips.",
