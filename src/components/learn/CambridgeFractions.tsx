@@ -4,42 +4,94 @@ import { useState } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { assessment, correct, fraction, practice, topics } from "@/data/cambridge-fractions";
 
-function Strip({ parts, filled, share = 0 }: { parts: number; filled: number; share?: number }) {
-  return <div role="img" aria-label={`${filled} of ${parts} parts shaded${share ? `, ${share} highlighted as one share` : ""}`}
-    className="grid h-9 gap-px overflow-hidden rounded-md border border-sky-700 bg-sky-700"
-    style={{ gridTemplateColumns: `repeat(${parts}, minmax(0, 1fr))` }}>
-    {Array.from({ length: parts }, (_, i) => <span key={i}
-      className={i < share ? "bg-emerald-500" : i < filled ? "bg-sky-300" : "bg-white"}/>)}
+const modelNames = ["Bar", "Circle", "Grid"] as const;
+type Model = typeof modelNames[number];
+
+function FractionModel({ parts, filled, share = 0, model }: {
+  parts: number; filled: number; share?: number; model: Model;
+}) {
+  const label = `${filled} of ${parts} parts shaded${share ? `, ${share} highlighted as one share` : ""}`;
+  const colour = (i: number) => i < share ? "#10b981" : i < filled ? "#7dd3fc" : "#fff";
+  if (model === "Circle") {
+    const point = (i: number) => {
+      const angle = 2 * Math.PI * i / parts - Math.PI / 2;
+      return `${50 + 47 * Math.cos(angle)} ${50 + 47 * Math.sin(angle)}`;
+    };
+    return <svg viewBox="0 0 100 100" className="mx-auto w-24" role="img" aria-label={label}>
+      {Array.from({ length: parts }, (_, i) => <path key={i} fill={colour(i)} stroke="#0369a1" strokeWidth="0.8"
+        d={`M50 50 L${point(i)} A47 47 0 0 1 ${point(i + 1)} Z`}/>)}
+    </svg>;
+  }
+  let columns = parts;
+  if (model === "Grid") {
+    for (let n = Math.floor(Math.sqrt(parts)); n > 1; n--) {
+      if (parts % n === 0) { columns = parts / n; break; }
+    }
+  }
+  return <div role="img" aria-label={label}
+    className={`grid gap-px overflow-hidden rounded-md border border-sky-700 bg-sky-700 ${model === "Bar" ? "h-9" : "mx-auto h-24 w-32"}`}
+    style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${parts / columns}, minmax(0, 1fr))` }}>
+    {Array.from({ length: parts }, (_, i) => <span key={i} style={{ backgroundColor: colour(i) }}/>)}
   </div>;
 }
 
 function FractionLab({ topic }: { topic: number }) {
+  const [model, setModel] = useState<Model>("Bar");
+  const [example, setExample] = useState(0);
   const [count, setCount] = useState(2);
   const [reveal, setReveal] = useState(false);
   const [subtract, setSubtract] = useState(false);
+  const [a, b, c, d, denominator] = [[3, 4, 1, 6, 12], [2, 3, 1, 4, 12], [3, 5, 1, 2, 10]][example];
+  const left = a * denominator / b;
+  const right = c * denominator / d;
+  const result = left + (subtract ? -right : right);
+  const symbol = subtract ? "−" : "+";
   return <div className="space-y-4">
-    <p className="font-extrabold">{["3/4 and 1/6", "One whole = 24", "3/5 in each group", "3/4 shared equally"][topic]}</p>
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Fraction model">
+      {modelNames.map(name => <button key={name} className="btn btn-sm btn-outline"
+        aria-pressed={model === name} onClick={() => setModel(name)}>{name}</button>)}
+    </div>
+    <p className="font-extrabold">{[`${a}/${b} ${symbol} ${c}/${d}`, "One whole = 24", "3/5 in each group", "3/4 shared equally"][topic]}</p>
     {topic === 0 ? <>
-      <div className="flex flex-wrap gap-2"><button className="btn btn-sm btn-outline h-auto min-h-8 max-w-full whitespace-normal" onClick={() => setReveal(!reveal)}>{reveal ? "Show original fractions" : "Show common denominator"}</button>
-      <button className="btn btn-sm btn-outline" onClick={() => setSubtract(!subtract)}>{subtract ? "Switch to addition" : "Switch to subtraction"}</button></div>
-      <Strip parts={reveal ? 12 : 4} filled={reveal ? 9 : 3}/>
-      <Strip parts={reveal ? 12 : 6} filled={reveal ? 2 : 1}/>
-      <p aria-live="polite">{reveal ? `9/12 ${subtract ? "−" : "+"} 2/12 = ${subtract ? 7 : 11}/12` : "The strips represent the same-sized whole."}</p>
+      <label className="block font-bold">Choose fractions
+        <select className="select select-bordered mt-1 block max-w-full" value={example}
+          onChange={e => { setExample(Number(e.target.value)); setReveal(false); }}>
+          <option value={0}>3/4 and 1/6</option><option value={1}>2/3 and 1/4</option><option value={2}>3/5 and 1/2</option>
+        </select>
+      </label>
+      <div className="flex flex-wrap gap-2">
+        <button className="btn btn-sm btn-outline h-auto min-h-8 max-w-full whitespace-normal" onClick={() => setReveal(!reveal)}>{reveal ? "Show original fractions" : "Show common denominator"}</button>
+        <button className="btn btn-sm btn-outline" onClick={() => setSubtract(!subtract)}>{subtract ? "Switch to addition" : "Switch to subtraction"}</button>
+      </div>
+      <p className="text-sm font-semibold">{a}/{b}{reveal && ` = ${left}/${denominator}`}</p>
+      <FractionModel model={model} parts={reveal ? denominator : b} filled={reveal ? left : a}/>
+      <p className="text-sm font-semibold">{c}/{d}{reveal && ` = ${right}/${denominator}`}</p>
+      <FractionModel model={model} parts={reveal ? denominator : d} filled={reveal ? right : c}/>
+      <div aria-live="polite" className="space-y-2">
+        {reveal ? <>
+          <p>The shaded amounts stay the same. Now every piece is 1/{denominator} of the whole, so you can {subtract ? "subtract" : "add"} the number of pieces.</p>
+          <p className="font-bold">{left}/{denominator} {symbol} {right}/{denominator} = {result}/{denominator}</p>
+          <div className="space-y-2">
+            <FractionModel model={model} parts={denominator} filled={Math.min(result, denominator)}/>
+            {result > denominator && <FractionModel model={model} parts={denominator} filled={result - denominator}/>}
+          </div>
+        </> : <p>Both wholes are the same size, but a 1/{b} piece and a 1/{d} piece are different sizes. Can you count them as the same kind of piece? Repartition both wholes to find out.</p>}
+      </div>
     </> : <>
       <label className="block font-bold">{["", "Groups taken (out of 4 per whole)", "Number of groups", "Number of equal shares"][topic]}: {count}
         <input className="range range-info w-full" type="range" min={topic === 3 ? 2 : 1} max={6} value={count} onChange={e => setCount(Number(e.target.value))}/>
       </label>
       {topic === 1 && <>
-        <Strip parts={4} filled={Math.min(4, count)}/>
-        {count > 4 && <Strip parts={4} filled={count - 4}/>}
+        <FractionModel model={model} parts={4} filled={Math.min(4, count)}/>
+        {count > 4 && <FractionModel model={model} parts={4} filled={count - 4}/>}
         <p aria-live="polite">{count}/4 of 24 = {count} × 6 = {count * 6}</p>
       </>}
       {topic === 2 && <>
-        {Array.from({length: count}, (_, i) => <Strip key={i} parts={5} filled={3}/>)}
+        {Array.from({length: count}, (_, i) => <FractionModel model={model} key={i} parts={5} filled={3}/>)}
         <p aria-live="polite">3/5 × {count} = {fraction(3 * count, 5)}</p>
       </>}
       {topic === 3 && <>
-        <Strip parts={4 * count} filled={3 * count} share={3}/>
+        <FractionModel model={model} parts={4 * count} filled={3 * count} share={3}/>
         <p aria-live="polite">One share (green): 3/4 ÷ {count} = {fraction(3, 4 * count)}</p>
       </>}
     </>}
