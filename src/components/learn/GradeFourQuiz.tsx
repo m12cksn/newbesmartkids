@@ -12,7 +12,8 @@ function isCorrect(question: Question, answer: string | undefined) {
   return answer === question.answer;
 }
 
-export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer }: {
+export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, english = false }: {
+  english?: boolean;
   questions: Q[]; title: string; practiceMode: boolean; close: () => void;
   renderVisual?: (question: Q) => ReactNode;
   renderAnswer?: (question: Q, answer: string, record: (value: string) => void, checked: boolean) => ReactNode;
@@ -20,6 +21,7 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
   isReady?: (question: Q, answer: string) => boolean;
   formatAnswer?: (question: Q, answer: string) => string;
 }) {
+  const label = (id: string, en: string) => english ? en : id;
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [checked, setChecked] = useState(false);
@@ -35,10 +37,10 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
 
   return <section className="mx-auto max-w-2xl space-y-3 rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6">
     <div className="flex flex-wrap items-center justify-between gap-2">
-      <p className="text-sm font-bold text-success">{title}{question && ` · Soal ${index + 1}/${questions.length}`}</p>
-      <button className="btn btn-ghost btn-sm" onClick={close}>Tutup</button>
+      <p className="text-sm font-bold text-success">{title}{question && ` · ${label("Soal", "Question")} ${index + 1}/${questions.length}`}</p>
+      <button className="btn btn-ghost btn-sm" onClick={close}>{label('Tutup', 'Close')}</button>
     </div>
-    <progress className="progress progress-success w-full" aria-label="Progres soal" value={index} max={questions.length}/>
+    <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/>
     {question ? <>
       <h2 ref={heading} tabIndex={-1} className="text-lg font-extrabold">{question.prompt}</h2>
       {renderVisual?.(question)}
@@ -59,24 +61,24 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
           onChange={event => record(event.target.value.replace(/[^\d.]/g, ""))}/>
       </label>}
       {practiceMode && checked && <p role="status" className="rounded-lg bg-info/10 p-3">
-        <strong>{checkAnswer(question, answer) ? "Tepat! " : "Belum tepat. "}</strong>{question.explanation}
+        <strong>{checkAnswer(question, answer) ? label("Tepat! ", "Correct! ") : label("Belum tepat. ", "Not quite. ")}</strong>{question.explanation}
       </p>}
       <div className="flex flex-wrap justify-between gap-2">
-        {index > 0 && <button className="btn btn-ghost btn-sm" onClick={() => go(index - 1)}>← Sebelumnya</button>}
-        {practiceMode && !checked ? <button className="btn btn-success ms-auto" disabled={!ready} onClick={() => setChecked(true)}>Periksa jawaban</button>
-          : ready && <button className="btn btn-success ms-auto" onClick={() => go(index + 1)}>{index + 1 === questions.length ? "Lihat hasil" : "Lanjut →"}</button>}
+        {index > 0 && <button className="btn btn-ghost btn-sm" onClick={() => go(index - 1)}>{label('← Sebelumnya', '← Previous')}</button>}
+        {practiceMode && !checked ? <button className="btn btn-success ms-auto" disabled={!ready} onClick={() => setChecked(true)}>{label('Periksa jawaban', 'Check answer')}</button>
+          : ready && <button className="btn btn-success ms-auto" onClick={() => go(index + 1)}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>}
       </div>
     </> : <>
-      <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? "Latihan selesai" : "Hasil evaluasi"}</h2>
-      <p className="font-bold">Benar {score} · Salah {questions.length - score} · Skor {Math.round(score / questions.length * 100)}/100</p>
+      <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? label("Latihan selesai", "Practice complete") : label("Hasil evaluasi", "Assessment results")}</h2>
+      <p className="font-bold">{label("Benar", "Correct")} {score} · {label("Salah", "Incorrect")} {questions.length - score} · {label("Skor", "Score")} {Math.round(score / questions.length * 100)}/100</p>
       {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
-        <summary className="cursor-pointer font-bold">Bahas jawaban yang salah</summary>
+        <summary className="cursor-pointer font-bold">{label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((q, i) => !checkAnswer(q, answers[i]) &&
-          <li key={i}><strong>Soal {i + 1}. {q.prompt}</strong>
-            <p>Jawabanmu {formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. Jawaban benar {q.answer.replaceAll("|", ", ")}.</p><p>{q.explanation}</p>
+          <li key={i}><strong>{label("Soal", "Question")} {i + 1}. {q.prompt}</strong>
+            <p>{label('Jawabanmu ', 'Your answer: ')}{formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. {label("Jawaban benar ", "Correct answer: ")}{q.answer.replaceAll("|", ", ")}.</p><p>{q.explanation}</p>
           </li>)}</ol>
       </details>}
-      <button className="btn btn-success" onClick={close}>Kembali ke materi</button>
+      <button className="btn btn-success" onClick={close}>{label('Kembali ke materi', 'Back to lesson')}</button>
     </>}
   </section>;
 }
