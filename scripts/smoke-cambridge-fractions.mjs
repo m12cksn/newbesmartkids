@@ -14,9 +14,19 @@ try {
     await page.getByRole("link",{name:/Calculation with Fractions/}).click();
     for (const [i, topic] of topics.entries()) {
       await button(topic.title).click();
+      await button("Circle").click();
+      assert.equal(await button("Circle").getAttribute("aria-pressed"),"true");
+      await button("Grid").click();
+      assert.equal(await button("Grid").getAttribute("aria-pressed"),"true");
       if (i===0) {
         await button("Show common denominator").click();
         await page.getByText("9/12 + 2/12 = 11/12",{exact:true}).waitFor();
+        await button("Switch to subtraction").click();
+        await page.getByText("9/12 − 2/12 = 7/12",{exact:true}).waitFor();
+        await page.getByRole("combobox",{name:"Choose fractions"}).selectOption("2");
+        await button("Switch to addition").click();
+        await button("Show common denominator").click();
+        await page.getByText("6/10 + 5/10 = 11/10",{exact:true}).waitFor();
       } else {
         await page.getByRole("slider").fill("5");
         await page.getByText(["","5/4 of 24 = 5 × 6 = 30","3/5 × 5 = 3","One share (green): 3/4 ÷ 5 = 3/20"][i],{exact:true}).waitFor();
