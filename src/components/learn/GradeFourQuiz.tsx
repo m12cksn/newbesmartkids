@@ -49,7 +49,7 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
         <button className="btn btn-ghost btn-sm" disabled={checked || !answer} onClick={() => record(selected.slice(0, -1).join("|"))}>Batalkan pilihan terakhir</button>
       </div>}
       {question.options ? <div className="flex flex-wrap gap-2">
-        {question.options.map(option => <button key={option} className="btn btn-outline h-auto min-h-11 whitespace-normal"
+        {question.options.map(option => <button key={option} className="btn btn-outline h-auto min-h-11 min-w-0 max-w-full whitespace-normal break-words"
           disabled={checked || (question.mode === "order" && selected.includes(option))}
           aria-pressed={selected.includes(option)} onClick={() => {
             if (question.mode === "order") record([...selected, option].join("|"));
