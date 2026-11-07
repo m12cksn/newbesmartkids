@@ -62,11 +62,12 @@ function Mapping({q,value,record,disabled}:{q:GeoQuestion;value:string;record:(v
  </div>;
 }
 function Construction({value,record,disabled}:{value:string;record:(v:string)=>void;disabled:boolean}){
- const [n,setN]=useState(value?Number(value):3),[closed,setClosed]=useState(Boolean(value));
+ const [n,setN]=useState(value?Number(value.split(":")[0]):3),[closed,setClosed]=useState(Boolean(value)),[moved,setMoved]=useState(value.includes(":irregular"));
+ const points=regularPoints(n).map(([x,y],i):Point=>i===0&&moved?[x+20,y+25]:[x,y]);
  return <div className="space-y-3"><label className="block font-bold">Banyak titik: {n}<input aria-label="Banyak titik" className="range range-success mt-3 w-full" type="range" min="3" max="12" value={n} disabled={disabled} onChange={e=>{setN(Number(e.target.value));setClosed(false);record("")}}/></label>
  <svg viewBox="0 0 200 200" role="img" aria-label={`${n} titik${closed?", terhubung tertutup":""}`} className="mx-auto w-full max-w-60">
- {closed&&<polygon points={pts(regularPoints(n))} fill="#a7f3d0" stroke="#065f46" strokeWidth="3"/>}{regularPoints(n).map(([x,y],i)=><circle key={i} cx={x} cy={y} r="4" fill="#0f766e"/>)}</svg>
- <button disabled={disabled} className="btn btn-outline" onClick={()=>{setClosed(true);record(String(n))}}>Hubungkan semua titik</button><p aria-live="polite">{closed?`${n} sisi lurus membentuk bangun tertutup.`:"Titik-titik belum dihubungkan."}</p></div>;
+ {closed&&<polygon points={pts(points)} fill="#a7f3d0" stroke="#065f46" strokeWidth="3"/>}{points.map(([x,y],i)=><circle key={i} cx={x} cy={y} r="4" fill="#0f766e"/>)}</svg>
+ <div className="flex flex-wrap gap-2"><button disabled={disabled} className="btn btn-outline" onClick={()=>{setMoved(!moved);setClosed(false);record("")}}>{moved?"Kembalikan titik":"Geser satu titik"}</button><button disabled={disabled} className="btn btn-outline" onClick={()=>{setClosed(true);record(String(n)+(moved?":irregular":""))}}>Hubungkan semua titik</button></div><p aria-live="polite">{closed?`${n} sisi lurus membentuk bangun tertutup.`:"Titik-titik belum dihubungkan."}</p></div>;
 }
 function Visual({q}:{q:GeoQuestion}){return <>{q.figures&&q.figures.length>0&&<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{q.figures.map((id,i)=><figure key={i} className="rounded-lg bg-info/5 p-2"><Drawing id={id}/><figcaption className="text-center font-bold">{String.fromCharCode(65+i)}</figcaption></figure>)}</div>}{q.layout&&q.task!=="assemble"&&<Pieces layout={q.layout}/>}</>}
 function Answer({q,value,record,disabled}:{q:GeoQuestion;value:string;record:(v:string)=>void;disabled:boolean}){

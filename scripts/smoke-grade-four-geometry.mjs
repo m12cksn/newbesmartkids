@@ -13,7 +13,7 @@ try {for(const width of [320,390,768,1280]){
   if(q.options){for(const v of value.split('|'))await b(v).click();return;}
   if(q.task==='sort'||q.task==='match'){for(const [i,v] of value.split('|').entries()){await b(`Gambar ${String.fromCharCode(65+i)}`).click();await b(`Tujuan ${Number(v)+1}: ${q.destinations[Number(v)]}`).click();if(i===0){assert.equal(await b('Lanjut →').count(),0);if(await b('Periksa jawaban').count())assert.ok(await b('Periksa jawaban').isDisabled());}}return;}
   if(q.task==='assemble'){for(const [i,v] of value.split('|').entries()){await b(`Potongan ${v}`).click();await b(`Tempat ${i+1}`).press('Enter');if(i===0)assert.equal(await b('Lanjut →').count(),0);}return;}
-  if(q.task==='construct'){await page.getByRole('slider',{name:'Banyak titik'}).fill(value);assert.equal(await b('Lanjut →').count(),0);await b('Hubungkan semua titik').click();return;}
+  if(q.task==='construct'){await page.getByRole('slider',{name:'Banyak titik'}).fill(value.split(':')[0]);if(q.irregular)await b('Geser satu titik').click();assert.equal(await b('Lanjut →').count(),0);await b('Hubungkan semua titik').click();return;}
   await page.getByRole('textbox',{name:'Jawaban',exact:true}).fill(value);
  }
  await page.goto((process.env.TEST_ORIGIN??'http://127.0.0.1:3000')+'/kelas/pola-dan-strategi-kelas-4');await page.getByRole('link',{name:/Bangun Datar/}).click();
@@ -33,5 +33,5 @@ try {for(const width of [320,390,768,1280]){
  for(const [i,q] of assessment.entries()){
   assert.equal(await b('Lanjut →').count(),0);assert.equal(await b('Lihat hasil').count(),0);await answer(q,i===0?'1|1|0|1':q.answer);await fit();await shot(`assessment-${i+1}`);await b(i===23?'Lihat hasil':'Lanjut →').click();
  }
- await page.getByText('Benar 23 · Salah 1 · Skor 96/100',{exact:true}).waitFor();await page.getByText('Bahas jawaban yang salah',{exact:true}).click();await page.getByText(/Jawaban benar A → Segibanyak/).waitFor();await shot('result');assert.deepEqual(errors,[]);await page.close();console.log(`PASS Geometry: all 49 questions and labs at ${width}px`);
+ await page.getByText('Benar 23 · Salah 1 · Skor 96/100',{exact:true}).waitFor();await page.getByText('Bahas jawaban yang salah',{exact:true}).click();await page.getByText(/Jawaban benar A → Segibanyak/).waitFor();await shot('result');await page.goto((process.env.TEST_ORIGIN??'http://127.0.0.1:3000')+'/kelas/matematika-dasar-kelas-1/materi/penjumlahan-sampai-dengan-10');await page.getByRole('heading',{name:'Penjumlahan sampai dengan 10'}).waitFor();await shot('reference-addition');assert.deepEqual(errors,[]);await page.close();console.log(`PASS Geometry: all 49 questions and labs at ${width}px`);
 }}finally{await browser.close()}
