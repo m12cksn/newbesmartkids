@@ -14,6 +14,12 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-4-bangun-datar", classId: 4, chapter: 5, slug: "bangun-datar",
+    title: "Bangun Datar", topic: "Geometri",
+    description: "Jelajahi ciri segibanyak, segitiga, segiempat, lalu susun dan uraikan bangun.",
+    videoStatus: "coming_soon", summary: "Ciri bangun datar, komposisi dan dekomposisi melalui eksplorasi interaktif.", questionIds: [],
+  },
+  {
     id: "cambridge-grade-6-ratio", classId: 6, chapter: 11, slug: "cambridge-ratio-and-proportion",
     title: "Ratio and Proportion", topic: "Cambridge Curriculum · Grade 6",
     description: "Group counters, scale recipes and compare unit prices.",

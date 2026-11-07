@@ -75,7 +75,7 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
         <summary className="cursor-pointer font-bold">{label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((q, i) => !checkAnswer(q, answers[i]) &&
           <li key={i}><strong>{label("Soal", "Question")} {i + 1}. {q.prompt}</strong>
-            <p>{label('Jawabanmu ', 'Your answer: ')}{formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. {label("Jawaban benar ", "Correct answer: ")}{q.answer.replaceAll("|", ", ")}.</p><p>{q.explanation}</p>
+            <p>{label('Jawabanmu ', 'Your answer: ')}{formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. {label("Jawaban benar ", "Correct answer: ")}{formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", ")}.</p><p>{q.explanation}</p>
           </li>)}</ol>
       </details>}
       <button className="btn btn-success" onClick={close}>{label('Kembali ke materi', 'Back to lesson')}</button>
