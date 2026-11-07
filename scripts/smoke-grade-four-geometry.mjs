@@ -7,7 +7,7 @@ const folder=process.env.CHAPTER_SCREENSHOTS??'/tmp/geometry-screenshots';await 
 try {for(const width of [320,390,768,1280]){
  const page=await browser.newPage({viewport:{width,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(10000);
  const b=name=>page.getByRole('button',{name,exact:true});
- const fit=async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow ${width}`);
+ const fit=async()=>{const info=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,offenders:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(-15).map(el=>({tag:el.tagName,text:el.textContent?.slice(0,70),cls:el.getAttribute('class'),right:el.getBoundingClientRect().right}))}));if(info.scroll>width){await page.screenshot({path:`${folder}/failure-${width}.png`,fullPage:true});console.log(info);}assert.ok(info.scroll<=width,`Overflow ${width}`)};
  const shot=async name=>{if(width===390||width===1280)await page.screenshot({path:`${folder}/${width}-${name}.png`,fullPage:true})};
  async function answer(q,value=q.answer){
   if(q.options){for(const v of value.split('|'))await b(v).click();return;}

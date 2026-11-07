@@ -50,12 +50,12 @@ function Mapping({q,value,record,disabled}:{q:GeoQuestion;value:string;record:(v
  const values=Array.from({length:q.items!.length},(_,i)=>value.split("|")[i]??"");
  return <div>
   <p className="mb-2 text-sm">{q.task==="match"?"Ketuk gambar, lalu ketuk cirinya untuk membuat garis penghubung.":"Ketuk gambar, lalu ketuk kotak tujuan. Gambar akan masuk ke kelompok pilihanmu."} Pilih lagi untuk mengubah.</p>
-  <div className="relative grid grid-cols-[1fr_1fr] gap-10">
+  <div className="relative grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6">
    {q.task==="match"&&<svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="Garis pasangan" role="img">{values.map((v,i)=>v!==""&&<line key={i} x1="40" y1={(i+.5)*100/values.length} x2="60" y2={(Number(v)+.5)*100/q.destinations!.length} stroke={colours[i]} strokeWidth="1"/>)}</svg>}
    <div className="flex flex-col justify-around gap-2">{q.items!.map((id,i)=><button key={i} disabled={disabled} aria-label={`Gambar ${String.fromCharCode(65+i)}`} aria-pressed={selected===i} onClick={()=>setSelected(i)} className={`rounded-lg border-2 p-1 ${selected===i?"border-success bg-success/10":"border-base-300"}`}>
     <span className="text-sm font-bold">{String.fromCharCode(65+i)}</span><Drawing id={id}/>{q.task==="match"&&values[i]!==""&&<span className="text-xs">Terhubung ke {Number(values[i])+1}</span>}
    </button>)}</div>
-   <div className="flex flex-col justify-around gap-2">{q.destinations!.map((label,j)=><button key={label} disabled={disabled||selected===null} aria-label={`Tujuan ${j+1}: ${label}`} className="min-h-20 rounded-lg border-2 border-dashed border-info bg-info/5 p-2 text-sm" onClick={()=>{if(selected!==null){values[selected]=String(j);record(values.join("|"));setSelected(null)}}}>
+   <div className="flex flex-col justify-around gap-2">{q.destinations!.map((label,j)=><button key={label} disabled={disabled||selected===null} aria-label={`Tujuan ${j+1}: ${label}`} className="min-h-20 min-w-0 break-words rounded-lg border-2 border-dashed border-info bg-info/5 p-2 text-sm" onClick={()=>{if(selected!==null){values[selected]=String(j);record(values.join("|"));setSelected(null)}}}>
     <strong>{j+1}. {label}</strong>{q.task==="sort"&&values.map((v,i)=>v===String(j)&&<span className="mt-1 block rounded bg-base-100 p-1" key={i}>{String.fromCharCode(65+i)}<Drawing id={q.items![i]}/></span>)}
    </button>)}</div>
   </div>

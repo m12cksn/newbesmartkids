@@ -34,6 +34,7 @@ jobs:
             if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
             sleep 2
           done
+          node --experimental-strip-types scripts/smoke-grade-four-geometry.mjs
           node scripts/smoke-grade-one-addition.mjs
           node scripts/smoke-grade-one-subtraction.mjs
           node scripts/smoke-grade-one-shapes.mjs
@@ -46,7 +47,6 @@ jobs:
           CHAPTER_SCREENSHOTS=/tmp/measurement-screenshots node --experimental-strip-types scripts/smoke-grade-four-measurement.mjs
           node --experimental-strip-types scripts/smoke-cambridge-fractions.mjs
           node --experimental-strip-types scripts/smoke-cambridge-ratio.mjs
-          node --experimental-strip-types scripts/smoke-grade-four-geometry.mjs
           node --experimental-strip-types scripts/smoke-grade-one-chapters-one-to-three.mjs
       - uses: actions/upload-artifact@v4
         if: always()
