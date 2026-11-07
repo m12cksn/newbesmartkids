@@ -14,6 +14,12 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "cambridge-grade-6-fractions", classId: 6, chapter: 10, slug: "cambridge-calculation-with-fractions",
+    title: "Calculation with Fractions", topic: "Cambridge Curriculum · Grade 6",
+    description: "Estimate and calculate with fractions using interactive fraction strips.",
+    videoStatus: "coming_soon", summary: "Add, subtract, multiply and divide fractions, and use fractions as operators.", questionIds: [],
+  },
+  {
     id: "kelas-4-pengukuran", classId: 4, chapter: 4, slug: "pengukuran-luas-dan-volume",
     title: "Pengukuran Luas & Volume", topic: "Pengukuran",
     description: "Ukur luas dengan petak, takar isi wadah, dan hubungkan liter dengan mililiter.",

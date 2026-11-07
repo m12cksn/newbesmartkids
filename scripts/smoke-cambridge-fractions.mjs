@@ -1,0 +1,50 @@
+import assert from "node:assert/strict";
+import { chromium } from "playwright";
+import { assessment, practice, topics } from "../src/data/cambridge-fractions.ts";
+const browser = await chromium.launch({headless:true});
+try {
+  for (const width of [320,390,768,1280]) {
+    const page = await browser.newPage({viewport:{width,height:900}});
+    const errors=[];
+    page.on("pageerror", error=>errors.push(error.message));
+    const button = name=>page.getByRole("button",{name,exact:true});
+    const fit = async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow at ${width}px`);
+    const answer = async(q,value=q.answer) => q.options ? button(value).click() : page.getByRole("textbox",{name:"Answer"}).fill(value);
+    await page.goto((process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000")+"/kelas/konsep-inti-matematika-kelas-6");
+    await page.getByRole("link",{name:/Calculation with Fractions/}).click();
+    for (const [i, topic] of topics.entries()) {
+      await button(topic.title).click();
+      if (i===0) {
+        await button("Show common denominator").click();
+        await page.getByText("9/12 + 2/12 = 11/12",{exact:true}).waitFor();
+      } else {
+        await page.getByRole("slider").fill("5");
+        await page.getByText(["","5/4 of 24 = 5 × 6 = 30","3/5 × 5 = 3","One share (green): 3/4 ÷ 5 = 3/20"][i],{exact:true}).waitFor();
+      }
+      await fit();
+      await button("Practise this topic").click();
+      for (const [j,q] of practice[i].entries()) {
+        assert.ok(await button("Check answer").isDisabled());
+        await answer(q);
+        await button("Check answer").click();
+        await page.getByText("Correct!",{exact:true}).waitFor();
+        await button(j===3?"View results":"Next →").click();
+      }
+      await page.getByText("Correct 4 · Incorrect 0 · Score 100/100",{exact:true}).waitFor();
+      await button("Back to lesson").click();
+    }
+    await button("Assessment").click();
+    for (const [i,q] of assessment.entries()) {
+      assert.equal(await button("Next →").count(),0);
+      await answer(q,i===0?"1/3":q.answer);
+      await fit();
+      await button(i===23?"View results":"Next →").click();
+    }
+    await page.getByText("Correct 23 · Incorrect 1 · Score 96/100",{exact:true}).waitFor();
+    await page.getByText("Review incorrect answers",{exact:true}).click();
+    await page.getByText(/Correct answer: 31\/36/).waitFor();
+    assert.deepEqual(errors,[]);
+    await page.close();
+    console.log(`PASS Cambridge fractions at ${width}px`);
+  }
+} finally {await browser.close();}
