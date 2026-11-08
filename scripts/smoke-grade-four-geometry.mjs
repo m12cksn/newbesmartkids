@@ -20,7 +20,13 @@ try {for(const width of [320,390,768,1280]){
  for(const [i,t] of topics.entries()){
   await b(t.title).click();
   if(i===0){await page.getByRole('slider').fill('8');await b('Buka garis terakhir').click();await page.getByText(/Sekarang ada 7 ruas garis/).waitFor();await b('Tutup garis terakhir').click();}
-  if(i===1||i===2){await page.getByRole('combobox').selectOption(i===1?'scalene':'trapezium');await b('Putar 45°').click();await b('Sorot sisi dan titik sudut').click();await page.getByText(/Diputar 45°/).waitFor();}
+  if(i===1){
+   for(const [label,sides,angles] of [['sama kaki','Sama kaki','Lancip'],['sama sisi','Sama sisi','Lancip'],['sembarang','Sembarang','Siku-siku'],['siku-siku','Sama kaki','Siku-siku'],['lancip','Sama sisi','Lancip'],['tumpul','Sembarang','Tumpul']]){
+    await b(`Coba segitiga ${label}`).click();assert.equal(await page.getByTestId('triangle-sides').innerText(),sides);assert.equal(await page.getByTestId('triangle-angles').innerText(),angles);await fit();
+   }
+   await page.getByRole('combobox').selectOption('scalene');await b('Putar 45°').click();assert.equal(await page.getByTestId('triangle-sides').innerText(),'Sembarang');assert.equal(await page.getByTestId('triangle-angles').innerText(),'Siku-siku');await b('Sembunyikan tanda').click();await b('Tampilkan tanda sisi dan sudut').click();await page.getByText(/Diputar 45°/).waitFor();
+  }
+  if(i===2){await page.getByRole('combobox').selectOption(i===1?'scalene':'trapezium');await b('Putar 45°').click();await b('Sorot sisi dan titik sudut').click();await page.getByText(/Diputar 45°/).waitFor();}
   if(i===3){await page.getByRole('combobox').selectOption('house');await answer({task:'assemble'},'1|3|2');await page.getByText('Tepat! Semua potongan mengisi target.',{exact:true}).waitFor();await b('Kosongkan susunan').click();await page.getByText('0 dari 3 potongan dipasang').waitFor();}
   if(i===4){await b('Potong menjadi empat').click();await b('Pisahkan potongan').click();await page.getByRole('img',{name:'4 persegi'}).waitFor();await b('Satukan kembali').click();}
   await fit();await shot(`lesson-${i}`);await b('Latihan materi').click();
