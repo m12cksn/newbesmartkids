@@ -11,7 +11,7 @@ try{
  for(const width of [320,390,768,1280]){
   const page=await browser.newPage({viewport:{width,height:900}});page.setDefaultTimeout(10000);const errors=[];page.on("pageerror",e=>errors.push(e.message));
   const button=name=>page.getByRole("button",{name,exact:true});
-  const fit=async()=>{const size=await page.evaluate(()=>({inner:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(size.scroll<=size.inner,`overflow ${width}: ${JSON.stringify(size)}`)};
+  const fit=async()=>{const size=await page.evaluate(()=>({inner:innerWidth,scroll:document.documentElement.scrollWidth,offenders:[...document.querySelectorAll("body *")].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(-12).map(el=>({tag:el.tagName,text:el.textContent?.trim().slice(0,60),class:el.getAttribute("class"),right:Math.round(el.getBoundingClientRect().right)}))}));assert.ok(size.scroll<=size.inner,`overflow ${width}: ${JSON.stringify(size)}`)};
   const shot=async name=>{if(width===390||width===1280)await page.screenshot({path:`${folder}/${width}-${name}.png`,fullPage:true})};
   const answer=async(q,value=q.answer)=>{
    if(q.options){await button(value.split("|")[0]).click();for(const v of value.split("|").slice(1))await button(v).click();return;}
