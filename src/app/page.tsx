@@ -1,3 +1,4 @@
+import { DailyPracticeCard } from "@/components/home/DailyPracticeCard";
 import { CallToAction } from "@/components/home/CallToAction";
 import { ClassExplorer } from "@/components/home/ClassExplorer";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -15,6 +16,7 @@ export default function Home() {
       <HeroSection />
       <HowItWorks />
       <ClassExplorer />
+      <DailyPracticeCard />
       <CallToAction />
       <SiteFooter />
     </main>
