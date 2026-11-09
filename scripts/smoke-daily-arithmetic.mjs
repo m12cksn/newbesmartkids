@@ -11,7 +11,7 @@ try{
   const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.clock.install({time:new Date('2026-11-09T16:50:00Z')});
   const button=name=>page.getByRole('button',{name,exact:true});
-  const fit=async()=>assert.ok(await page.evaluate(()=>[...document.querySelectorAll('main input,main button,main nav a')].every(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1})),`Controls overflow ${width}`);
+  const fit=async()=>assert.ok(await page.evaluate(()=>[...document.querySelectorAll('main input,main button,main nav a')].filter(el=>el.getClientRects().length>0).every(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1})),`Controls overflow ${width}`);
   await page.goto(origin);await page.getByRole('link',{name:'Mulai latihan harian →',exact:true}).click();await page.getByRole('textbox').first().waitFor();
   assert.ok((await page.url()).endsWith('/level-1'));
   for(const level of [1,2,3]){
@@ -19,7 +19,7 @@ try{
    await page.waitForURL(`**/level-${level}`);
    await page.getByRole('textbox',{name:`Jawaban soal 1: ${label(dailyQuestions('2026-11-09',level)[0])}`,exact:true}).waitFor({state:'visible'});
    await page.getByRole('textbox').first().waitFor();assert.equal(await page.getByRole('textbox').count(),7);await fit();
-   assert.equal(await page.locator('main').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(250, 249, 243)');
+   assert.equal(await page.locator('main:visible').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(250, 249, 243)');
    assert.ok(await page.getByRole('textbox').first().evaluate(el=>el.getBoundingClientRect().width>=40 && el.getBoundingClientRect().width<=70),'Answer boxes must have loaded styles');
    assert.ok(await button('Periksa jawaban').isDisabled());
    const qs=dailyQuestions('2026-11-09',level);
