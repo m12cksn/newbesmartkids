@@ -14,6 +14,12 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-4-piktogram-diagram-batang", classId: 4, chapter: 6, slug: "piktogram-dan-diagram-batang",
+    title: "Piktogram dan Diagram Batang", topic: "Penyajian Data",
+    description: "Susun piktogram, buat diagram batang tegak dan mendatar, lalu baca informasi datanya.",
+    videoStatus: "coming_soon", summary: "Penyajian dan pembacaan data melalui gambar, kunci simbol, tabel, dan diagram batang.", questionIds: [],
+  },
+  {
     id: "kelas-4-bangun-datar", classId: 4, chapter: 5, slug: "bangun-datar",
     title: "Bangun Datar", topic: "Geometri",
     description: "Jelajahi ciri segibanyak, segitiga, segiempat, lalu susun dan uraikan bangun.",
