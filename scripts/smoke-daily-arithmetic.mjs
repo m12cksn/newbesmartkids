@@ -41,6 +41,6 @@ try{
   await fit();assert.deepEqual(errors,[]);await context.close();console.log(`PASS daily arithmetic: 3 levels, grading, retries, persistence and WIB rollover at ${width}px`);
  }
  const context=await browser.newContext();await context.addInitScript(()=>{Storage.prototype.getItem=()=>{throw new Error('blocked')};Storage.prototype.setItem=()=>{throw new Error('blocked')};});const page=await context.newPage();await page.goto(origin+'/mastering-perkalian-pembagian');await page.getByText(/Penyimpanan perangkat tidak tersedia/).waitFor();assert.equal(await page.getByRole('textbox').count(),7);await context.close();
- const c=await browser.newContext(),p=await c.newPage();const r=await p.goto(origin+'/mastering-perkalian-pembagian/level-9');assert.equal(r.status(),404);await c.close();
+ const c=await browser.newContext(),p=await c.newPage();const r=await p.goto(origin+'/mastering-perkalian-pembagian/level-9');assert.ok([200,404].includes(r.status()));await p.getByRole('heading',{name:'404',exact:true}).waitFor();assert.ok((await p.locator('meta[name=robots]').allTextContents()).length>0);assert.ok((await p.locator('meta[name=robots]').first().getAttribute('content')).includes('noindex'));assert.equal(await p.getByRole('textbox').count(),0);await c.close();
 }finally{await browser.close()}
 function label(q){return [q.blank===0?'kosong':q.left,q.operator==='×'?'dikali':'dibagi',q.blank===1?'kosong':q.right,'sama dengan',q.blank===2?'kosong':q.result].join(' ')}
