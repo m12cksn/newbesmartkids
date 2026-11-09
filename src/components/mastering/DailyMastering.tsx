@@ -3,7 +3,49 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { BrandMark } from '@/components/home/BrandMark';
 import { LEVELS, wibDate, dailyQuestions, correctAnswer, questionLabel, readPractice, storageKey, type Level, type SavedPractice } from '@/lib/daily-arithmetic';
-import styles from './DailyMastering.module.css';
+import './DailyMastering.css';
+const styles = {
+  activeLevel: 'bsk-daily-activeLevel',
+  answer: 'bsk-daily-answer',
+  back: 'bsk-daily-back',
+  bottom: 'bsk-daily-bottom',
+  check: 'bsk-daily-check',
+  content: 'bsk-daily-content',
+  dailyNote: 'bsk-daily-dailyNote',
+  equation: 'bsk-daily-equation',
+  eyebrow: 'bsk-daily-eyebrow',
+  feedback: 'bsk-daily-feedback',
+  footer: 'bsk-daily-footer',
+  given: 'bsk-daily-given',
+  good: 'bsk-daily-good',
+  header: 'bsk-daily-header',
+  intro: 'bsk-daily-intro',
+  kicker: 'bsk-daily-kicker',
+  levelBadge: 'bsk-daily-levelBadge',
+  levels: 'bsk-daily-levels',
+  loading: 'bsk-daily-loading',
+  newDay: 'bsk-daily-newDay',
+  notice: 'bsk-daily-notice',
+  number: 'bsk-daily-number',
+  operator: 'bsk-daily-operator',
+  ornaments: 'bsk-daily-ornaments',
+  page: 'bsk-daily-page',
+  paper: 'bsk-daily-paper',
+  paperTop: 'bsk-daily-paperTop',
+  progress: 'bsk-daily-progress',
+  progressLabel: 'bsk-daily-progressLabel',
+  result: 'bsk-daily-result',
+  row: 'bsk-daily-row',
+  rowBody: 'bsk-daily-rowBody',
+  rows: 'bsk-daily-rows',
+  seven: 'bsk-daily-seven',
+  side: 'bsk-daily-side',
+  term: 'bsk-daily-term',
+  tip: 'bsk-daily-tip',
+  warning: 'bsk-daily-warning',
+  workspace: 'bsk-daily-workspace',
+  wrong: 'bsk-daily-wrong',
+};
 const empty = (date:string):SavedPractice => ({date,answers:Array(7).fill(''),checked:false});
 function LevelIcon({level}:{level:number}) { return <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{level===1?<><path d="M12 21V10M12 16C3 16 3 8 3 8s9-1 9 8ZM12 11c0-8 9-8 9-8s1 9-9 9"/></>:level===2?<><path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/></>:<><path d="m12 3 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z"/></>}</svg> }
 export default function DailyMastering({level}:{level:Level}) {

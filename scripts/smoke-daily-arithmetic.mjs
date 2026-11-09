@@ -17,6 +17,8 @@ try{
   for(const level of [1,2,3]){
    if(level>1)await page.getByRole('link',{name:new RegExp(`Level ${level}`)}).click();
    await page.getByRole('textbox').first().waitFor();assert.equal(await page.getByRole('textbox').count(),7);await fit();
+   assert.equal(await page.locator('main').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(250, 249, 243)');
+   assert.ok(await page.getByRole('textbox').first().evaluate(el=>el.getBoundingClientRect().width>=40 && el.getBoundingClientRect().width<=70),'Answer boxes must have loaded styles');
    assert.ok(await button('Periksa jawaban').isDisabled());
    const qs=dailyQuestions('2026-11-09',level);
    for(let i=0;i<7;i++)await page.getByRole('textbox').nth(i).fill(String(qs[i].answer+(i===0?1:0)));
