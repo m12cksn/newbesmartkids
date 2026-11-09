@@ -1,5 +1,5 @@
 export type Level = 1 | 2 | 3;
-export type DailyQuestion = { left: number; right: number; result: number; operator: '×' | '÷'; blank: 0 | 1 | 2; answer: number; fact: [number, number] };
+export type DailyQuestion = { left: number; right: number; result: number; operator: '×' | '÷' | '+' | '−'; blank: 0 | 1 | 2; answer: number; fact: [number, number] };
 export const LEVELS = [
   { id: 1 as Level, name: 'Dasar', description: 'Keluarga perkalian 1, 2, 5, dan 10.', detail: 'Bangun kebiasaan dengan bilangan 1–10.' },
   { id: 2 as Level, name: 'Lancar', description: 'Keluarga perkalian 3, 4, 6, 7, 8, dan 9.', detail: 'Latih ingatan dengan pasangan bilangan 2–12.' },

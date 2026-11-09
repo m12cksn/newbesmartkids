@@ -36,6 +36,8 @@ jobs:
             sleep 2
           done
           node --experimental-strip-types scripts/smoke-grade-four-geometry.mjs
+          node --experimental-strip-types scripts/smoke-daily-addition.mjs
+          node --experimental-strip-types scripts/smoke-daily-arithmetic.mjs
           node scripts/smoke-grade-one-addition.mjs
           node scripts/smoke-grade-one-subtraction.mjs
           node scripts/smoke-grade-one-shapes.mjs
