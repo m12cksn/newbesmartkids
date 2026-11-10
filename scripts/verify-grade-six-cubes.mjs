@@ -39,6 +39,8 @@ assert.deepEqual(project([[2,1,0],[1,0,1]],'kanan'),[[1,0],[1,1]]);
 assert.equal(pathCount([1,1],[3,3]),6);assert.equal(pathCount([0,0],[2,1]),3);
 assert.equal(walk([0,0],'L'),null);assert.equal(walk([0,0],'X'),null);
 assert.equal(pointLabel([3,3]),'D,4');
+const areas=[20,30,40].map(height=>Math.ceil(15/Math.floor(120/height))*(20*30*40/height));
+assert.deepEqual(areas,[3600,3200,3000]);assert.equal(practice[0][4].answer,'Tinggi kardus 40 cm');
 const faces={top:'P',bottom:'Q',front:'R',back:'S',right:'T',left:'U'};
 assert.deepEqual(roll(roll(faces,'R'),'L'),faces);assert.deepEqual(roll(roll(faces,'U'),'D'),faces);
 assert.equal(roll(faces,'R').right,'P');assert.equal(roll(faces,'U').back,'P');

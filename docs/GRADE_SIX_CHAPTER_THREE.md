@@ -32,7 +32,7 @@ Kesulitan: 8 sedang, 9 menantang, 7 sangat menantang. Kenaikan dari jumlah kubus
 - Kubus bertanda: depan adalah bidang kiri pada gambar miring, kanan bidang kanan. Simbol diproyeksikan ke bidangnya. Tidak menebak sisi yang tidak tampak.
 - Huruf A–F ke kanan, nomor 1–6 ke atas; titik di perpotongan garis. Denah kelas menandai papan di bawah baris 1 sehingga belakang = nomor bertambah. Jangan mengandalkan pengertian depan/belakang tanpa penanda.
 - Jarak adalah banyak langkah horizontal + vertikal. Beberapa urutan jalur terpendek diterima; jalan diagonal tidak ada. P bergerak bersama orientasi kubus saat digulingkan.
-- Perbandingan satu tumpukan kardus tidak diklaim sebagai optimasi luas lantai global. Gambar balok berukuran cm diberi label tidak berskala.
+- Soal penataan membandingkan seluruh luas alas tumpukan untuk tiga orientasi seragam: 15 kardus 20 × 30 × 40 cm, batas tinggi 120 cm. Sisa kardus memerlukan tumpukan baru; orientasi tinggi 40 cm mencapai luas 3.000 cm² (volume total dibagi batas tinggi). Gambar balok berukuran cm diberi label tidak berskala.
 
 ## Berkas dan QA
 
