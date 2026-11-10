@@ -7,7 +7,7 @@ Empat PDF scan: bab3 - mengonstruksi dan mengurai.pdf (6 hlm), bab3 - Visualisas
 | Materi | Tujuan dan peraga | Latihan |
 | --- | --- | --- |
 | A Mengonstruksi dan Mengurai | Bangun kolom kubus pada alas; urai lapisan; putar; buat balok dengan panjang/lebar/tinggi dalam kubus satuan | Hitung kubus tersembunyi, bangun ulang, isi banyak kubus per lapisan, hitung balok penyusun, pilih orientasi tumpukan |
-| B Visualisasi Spasial | Tampak depan/kanan/atas dengan acuan eksplisit; gambar proyeksi; kubus bertanda | Kanvas petak tiga arah, hubungkan arah dengan siluet dan lambang sisi |
+| B Visualisasi Spasial | Tampak depan/kanan/atas dengan acuan eksplisit; gambar proyeksi; kubus bertanda | Kanvas petak tiga arah, rekonstruksi dari tiga tampak, hubungkan arah dengan siluet dan lambang sisi |
 | C Lokasi | Titik perpotongan huruf–angka; jalur tetangga; jarak minimum; guling kubus bertanda P | Ketuk titik, denah kursi, bangun jalur, isi jarak, jumlah guling minimum |
 
 Lima latihan per materi (15 total). Video berupa placeholder jujur sampai tautan guru tersedia. Evaluasi wajib diisi sebelum lanjut; hasil menampilkan benar, salah, skor, serta pembahasan kesalahan.
@@ -19,7 +19,7 @@ Evaluasi sumber memuat 1) jumlah kubus susunan, 2) gambar kubus bertanda dari ti
 | Cakupan | Nomor evaluasi | Aktivitas |
 | --- | --- | --- |
 | Konstruksi/dekomposisi | 1,4,7,10,13,16,19,22 | Hitung, isi lapisan, bangun ulang, lengkapi balok, lepas lapisan |
-| Spasial dan kubus bertanda | 2,5,8,11,14,17,20,23 | Hubungkan arah–gambar/lambang, gambar tampak depan/kanan/atas |
+| Spasial dan kubus bertanda | 2,5,8,11,14,17,20,23 | Hubungkan arah–gambar/lambang, gambar tampak, rekonstruksi tiga tampak |
 | Lokasi dan jalur | 3,6,9,12,15,18,21,24 | Pilih titik, telusuri jalur yang sah, jarak, hitung jalur pengayaan |
 
 Kesulitan: 8 sedang, 9 menantang, 7 sangat menantang. Kenaikan dari jumlah kubus kecil/lokasi langsung ke rekonstruksi bertingkat, kombinasi perpindahan, dan beberapa jalur minimum. Mayoritas evaluasi memerlukan tindakan geometris (membangun, menggambar, memasangkan, memilih titik, menelusuri jalur), bukan pilihan ganda berulang.
@@ -27,7 +27,7 @@ Kesulitan: 8 sedang, 9 menantang, 7 sangat menantang. Kenaikan dari jumlah kubus
 ## Konvensi geometri yang harus dipertahankan
 
 - Matriks tinggi: indeks baris y=0 adalah depan, x bertambah ke kanan. Semua kolom terisi dari lantai. Tidak ada rongga/kubus melayang; kubus penyangga wajib dihitung.
-- Proyeksi depan: tinggi maksimum per kolom x. Proyeksi kanan: tinggi maksimum per baris y (depan di kiri kanvas). Proyeksi atas: jejak petak, belakang di atas kanvas. Semua peraga memberi tanda DEPAN dan KANAN.
+- Proyeksi depan: tinggi maksimum per kolom x. Proyeksi kanan: tinggi maksimum per baris y (depan di kiri kanvas). Proyeksi atas: jejak petak, belakang di atas kanvas. Semua peraga memberi tanda DEPAN dan KANAN. Rekonstruksi dari tiga tampak juga memberi jumlah kubus; enumerasi semua tinggi 1–3 pada jejak alas memastikan hanya satu jawaban.
 - SVG kubus dibuat dari koordinat voxel yang sama dengan data/proyeksi; permukaan internal disembunyikan. Warna membedakan lapisan, bukan banyak kubus.
 - Kubus bertanda: depan adalah bidang kiri pada gambar miring, kanan bidang kanan. Simbol diproyeksikan ke bidangnya. Tidak menebak sisi yang tidak tampak.
 - Huruf A–F ke kanan, nomor 1–6 ke atas; titik di perpotongan garis. Denah kelas menandai papan di bawah baris 1 sehingga belakang = nomor bertambah. Jangan mengandalkan pengertian depan/belakang tanpa penanda.

@@ -5,11 +5,11 @@ const all=[...practice.flat(),...assessment];assert.equal(new Set(all.map(q=>q.i
 assert.deepEqual([0,1,2].map(t=>assessment.filter(q=>q.topic===t).length),[8,8,8]);
 assert.deepEqual(['Sedang','Menantang','Sangat menantang'].map(l=>assessment.filter(q=>q.level===l).length),[8,9,7]);
 // Explicit independent keys for all evaluated numerical, coordinate, path and model tasks.
-assert.deepEqual(assessment.map(q=>q.answer),['5','2|0|1','D,4','5|2|0','0,1,0,1,1,1','RRRUU','1,2,1,0','1,1,0,1,0,1','B,3','11','2|0|1','4|4|8','7','1,0,1,1,1,1','LLLDDD','6|4|2','1|2|0','6','2,1,0,1,3,1','0|2|1','D,5','11','0,1,1,1,1,0,1,0,1','RRRRDDDD']);
+assert.deepEqual(assessment.map(q=>q.answer),['5','2|0|1','D,4','5|2|0','0,1,0,1,1,1','RRRUU','1,2,1,0','1,1,0,1,0,1','B,3','11','2|0|1','4|4|8','7','1,0,1,1,1,1','LLLDDD','6|4|2','1|2|0','6','2,1,0,1,3,1','0|2|1','D,5','11','2,1,0,0,2,1','RRRRDDDD']);
 for(const q of all){
  assert.ok(ready(q,q.answer),q.id);assert.ok(correct(q,q.answer),q.id);assert.ok(!ready(q,''),q.id);assert.ok(!correct(q,undefined),q.id);
  assert.ok(q.source&&q.explanation&&q.prompt,q.id);
- if(q.scene.kind==='cubes'){
+ if(q.scene.kind==='cubes'||q.scene.kind==='views'){
   const h=q.scene.heights;assert.ok(h.flat().every(v=>Number.isInteger(v)&&v>=0&&v<=3));assert.ok(h.every(row=>row.length===h[0].length));
   assert.equal([1,2,3].reduce((n,z)=>n+layerCount(h,z),0),count(h));
   assert.equal(count(rotate(h)),count(h));assert.deepEqual(rotate(rotate(rotate(rotate(h)))),h);
@@ -20,6 +20,13 @@ for(const q of all){
    const img=Array.from({length:rows},()=>Array(cols).fill(0));
    for(const [x,y,z] of vox)if(view==='depan')img[max-1-z][x]=1;else if(view==='kanan')img[max-1-z][y]=1;else img[h.length-1-y][x]=1;
    assert.deepEqual(project(h,view),img,q.id+' '+view);
+  }
+  if(q.scene.kind==='views'){
+   // Enumerate every allowed height on occupied footprint cells: exactly one model
+   // must match all three views AND the supplied total count.
+   const occupied=h.flat().map((v,i)=>v?i:-1).filter(i=>i>=0);let solutions=0;
+   for(let n=0;n<3**occupied.length;n++){let code=n;const vals=Array(h.flat().length).fill(0);for(const i of occupied){vals[i]=code%3+1;code=Math.floor(code/3);}const candidate=h.map((row,y)=>vals.slice(y*row.length,(y+1)*row.length));if(count(candidate)===count(h)&&['depan','kanan','atas'].every(v=>matrixKey(project(candidate,v))===matrixKey(project(h,v))))solutions++;}
+   assert.equal(solutions,1,q.id+' unique reconstruction');
   }
  }
  if(q.response.kind==='match'){
