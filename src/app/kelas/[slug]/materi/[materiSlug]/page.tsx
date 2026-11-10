@@ -1,4 +1,5 @@
 import GradeFourGeometry from "@/components/learn/GradeFourGeometry";
+import GradeSixRatio from "@/components/learn/GradeSixRatio";
 import GradeSixFractionsDecimals from "@/components/learn/GradeSixFractionsDecimals";
 import GradeFourDataDisplay from "@/components/learn/GradeFourDataDisplay";
 import CambridgeRatio from "@/components/learn/CambridgeRatio";
@@ -38,6 +39,9 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   const material = getMaterialBySlug(materiSlug);
   if (!classItem || !material || material.classId !== classItem.id) notFound();
 
+  if (material.id === "kelas-6-rasio") {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 6</Link></div><GradeSixRatio /><SiteFooter /></main>;
+  }
   if (material.id === "kelas-1-membilang-10") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 1</Link></div><GradeOneCounting/><SiteFooter/></main>;
   }
