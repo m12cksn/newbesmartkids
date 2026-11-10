@@ -25,6 +25,7 @@ jobs:
       - run: node --experimental-strip-types scripts/verify-cambridge-ratio.mjs
       - run: node --experimental-strip-types scripts/verify-grade-four-geometry.mjs
       - run: node --experimental-strip-types scripts/verify-grade-four-data-display.mjs
+      - run: node --experimental-strip-types scripts/verify-grade-six-fractions-decimals.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
@@ -52,11 +53,19 @@ jobs:
           node --experimental-strip-types scripts/smoke-cambridge-ratio.mjs
           node --experimental-strip-types scripts/smoke-grade-one-chapters-one-to-three.mjs
           CHAPTER_SCREENSHOTS=/tmp/data-display-screenshots node --experimental-strip-types scripts/smoke-grade-four-data-display.mjs
+          CHAPTER_SCREENSHOTS=/tmp/grade-six-fractions-screenshots node --experimental-strip-types scripts/smoke-grade-six-fractions-decimals.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: grade-four-patterns-screenshots
           path: /tmp/pattern-screenshots
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-six-fractions-decimals-screenshots
+          path: /tmp/grade-six-fractions-screenshots
           if-no-files-found: ignore
 
       - uses: actions/upload-artifact@v4

@@ -12,7 +12,7 @@ function isCorrect(question: Question, answer: string | undefined) {
   return answer === question.answer;
 }
 
-export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, english = false }: {
+export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false }: {
   english?: boolean;
   questions: Q[]; title: string; practiceMode: boolean; close: () => void;
   renderVisual?: (question: Q) => ReactNode;
@@ -20,6 +20,10 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
   checkAnswer?: (question: Q, answer: string | undefined) => boolean;
   isReady?: (question: Q, answer: string) => boolean;
   formatAnswer?: (question: Q, answer: string) => string;
+  /** Optional rich rendering for prompts, explanations and review text (e.g. stacked fractions). */
+  renderText?: (text: string) => ReactNode;
+  /** Optional small label shown above the prompt (e.g. difficulty). */
+  renderMeta?: (question: Q) => ReactNode;
 }) {
   const label = (id: string, en: string) => english ? en : id;
   const [index, setIndex] = useState(0);
@@ -42,7 +46,8 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
     </div>
     <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/>
     {question ? <>
-      <h2 ref={heading} tabIndex={-1} className="text-lg font-extrabold">{question.prompt}</h2>
+      {renderMeta?.(question)}
+      <h2 ref={heading} tabIndex={-1} className="text-lg font-extrabold">{renderText(question.prompt)}</h2>
       {renderVisual?.(question)}
       {question.mode === "order" && <div className="flex flex-wrap items-center gap-2">
         <p aria-live="polite">{selected.join(" → ") || "Ketuk angka sesuai urutan."}</p>
@@ -61,7 +66,7 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
           onChange={event => record(event.target.value.replace(/[^\d.]/g, ""))}/>
       </label>}
       {practiceMode && checked && <p role="status" className="rounded-lg bg-info/10 p-3">
-        <strong>{checkAnswer(question, answer) ? label("Tepat! ", "Correct! ") : label("Belum tepat. ", "Not quite. ")}</strong>{question.explanation}
+        <strong>{checkAnswer(question, answer) ? label("Tepat! ", "Correct! ") : label("Belum tepat. ", "Not quite. ")}</strong>{renderText(question.explanation)}
       </p>}
       <div className="flex flex-wrap justify-between gap-2">
         {index > 0 && <button className="btn btn-ghost btn-sm" onClick={() => go(index - 1)}>{label('← Sebelumnya', '← Previous')}</button>}
@@ -74,8 +79,8 @@ export default function GradeFourQuiz<Q extends Question>({ questions, title, pr
       {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
         <summary className="cursor-pointer font-bold">{label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((q, i) => !checkAnswer(q, answers[i]) &&
-          <li key={i}><strong>{label("Soal", "Question")} {i + 1}. {q.prompt}</strong>
-            <p>{label('Jawabanmu ', 'Your answer: ')}{formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. {label("Jawaban benar ", "Correct answer: ")}{formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", ")}.</p><p>{q.explanation}</p>
+          <li key={i}><strong>{label("Soal", "Question")} {i + 1}. {renderText(q.prompt)}</strong>
+            <p>{label('Jawabanmu ', 'Your answer: ')}{formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. {label("Jawaban benar ", "Correct answer: ")}{formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", ")}.</p><p>{renderText(q.explanation)}</p>
           </li>)}</ol>
       </details>}
       <button className="btn btn-success" onClick={close}>{label('Kembali ke materi', 'Back to lesson')}</button>
