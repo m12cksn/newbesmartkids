@@ -211,8 +211,8 @@ export function digitsOf(value: string) {
 }
 export function PlaceChart({ values, highlight }: { values: string[]; highlight?: number }) {
   return <div className="max-w-md overflow-hidden rounded-lg border border-base-300 bg-base-100 text-center text-sm">
-    <div className="grid grid-cols-[4.5rem_repeat(4,minmax(0,1fr))] bg-info/15 font-bold"><span className="p-1">Bilangan</span>{placeNames.map((p, i) => <span key={p} className={`hyphens-manual break-words p-1 text-[10px] leading-tight sm:text-xs ${i === 2 ? "border-l-2 border-dashed border-base-content/40" : ""}`}>{placeHead[i]}<span className="block font-normal opacity-70">{["10", "1", "0,1", "0,01"][i]}</span></span>)}</div>
-    {values.map(v => <div key={v} className="grid grid-cols-[4.5rem_repeat(4,minmax(0,1fr))] border-t border-base-300"><strong className="p-1.5 tabular-nums">{v}</strong>
+    <div className="grid grid-cols-[3.75rem_repeat(4,minmax(0,1fr))] bg-info/15 font-bold"><span className="p-1 text-[11px] sm:text-xs">Bilangan</span>{placeNames.map((p, i) => <span key={p} className={`hyphens-manual p-1 text-[10px] leading-tight sm:text-xs ${i === 2 ? "border-l-2 border-dashed border-base-content/40" : ""}`}>{placeHead[i]}<span className="block font-normal opacity-70">{["10", "1", "0,1", "0,01"][i]}</span></span>)}</div>
+    {values.map((v, row) => <div key={row} className="grid grid-cols-[3.75rem_repeat(4,minmax(0,1fr))] border-t border-base-300"><strong className="p-1.5 tabular-nums">{v}</strong>
       {digitsOf(v).map((d, i) => <span key={i} className={`p-1.5 text-base font-extrabold tabular-nums ${i === 2 ? "border-l-2 border-dashed border-base-content/40" : ""} ${highlight === i ? "bg-warning/50" : ""}`}>{d}</span>)}</div>)}
   </div>;
 }

@@ -18,14 +18,16 @@ Tidak ada halaman Uji Kompetensi. Atas persetujuan pengguna (10 Nov 2026), evalu
 
 ## Pemetaan subtopik
 
+Revisi 10 Nov 2026 atas permintaan Mr Iwan: materi tidak harus mengikuti cerita PDF. Peraga dibuat ulang sebagai versi BeSmartKids sendiri dengan pola Kelas 4: peraga umum (batang, kumpulan benda, persegi satuan, garis bilangan, 100 petak, papan nilai tempat), penjelasan singkat di samping, siswa menjalankan langkah sendiri, lalu "Coba sendiri" dengan umpan balik. Soal latihan dan evaluasi tidak berubah.
+
 | Subtopik | Tujuan | Peraga interaktif (dikendalikan siswa) | Latihan (4 soal) |
 |---|---|---|---|
-| A.1 Bilangan asli × pecahan | n × a/b sebagai penjumlahan berulang; ubah ke pecahan campuran | Kebun dan ember kecil: pilih isi ember, tambah ember, gabungkan potongan menjadi petak 1 m², tabel ×n | isian pecahan, arsir pita, pilihan bermodel, isian pecahan campuran |
-| A.2 Pecahan × bilangan asli | a/b bagian dari n benda | Kebun mangga: pohon dibagi b kelompok, ketuk a kelompok | tandai pohon, isian, soal cerita dua langkah, komutatif 8 × 3/4 |
-| B.1 Pecahan ÷ bilangan asli | a/b ÷ n = a/(b × n) | Botol dan gelas: pilih isi botol dan banyak gelas, tuang, lihat bagian tiap gelas | isian, arsir satu gelas, tanah Pak Rudi, pilihan |
-| B.2 Bilangan asli ÷ pecahan | n ÷ a/b = n × b/a, termasuk sisa | Botol jus: pilih ukuran gelas, isi gelas satu per satu sampai jus kurang | isian, arsir takaran 1/3 L, pilihan 3 ÷ 2/5, gula 6 ÷ 3/4 |
-| C.1 Pecahan → desimal | penyebut 10/100, 100 petak, garis bilangan | 100 petak dengan kuas kolom (0,1) dan petak (0,01) | pilih gambar 0,5 (lebih dari satu), arsir 0,25, timbangan, kain 3/4 m |
-| C.2 Membandingkan dan mengurutkan | nilai tempat, samakan angka di belakang koma | Papan nilai tempat + blok satuan/persepuluhan/perseratusan, sorot tempat pertama yang berbeda | isi nilai tempat, tanda < > =, urutkan jarak, lompat jauh |
+| A.1 Bilangan asli × pecahan | n × a/b sebagai penjumlahan berulang; ubah ke pecahan campuran | Slider penyebut, pembilang, banyak kelompok. Langkah: buat kelompok → beri nomor potongan → susun ulang menjadi utuh. Coba sendiri isian pecahan/campuran | isian pecahan, arsir pita, pilihan bermodel, isian pecahan campuran |
+| A.2 Pecahan × bilangan asli | a/b bagian dari n benda | Pilih pecahan dan banyak benda per kelompok, tekan "Bagi menjadi b kelompok", ketuk a kelompok; umpan balik bila terlalu banyak | tandai pohon, isian, soal cerita dua langkah, komutatif 8 × 3/4 |
+| B.1 Pecahan ÷ bilangan asli | a/b ÷ n = a/(b × n) | Persegi satuan: arsir a/b → potong setiap kolom menjadi n → ambil satu bagian (merah). Coba sendiri | isian, arsir satu gelas, tanah Pak Rudi, pilihan |
+| B.2 Bilangan asli ÷ pecahan | n ÷ a/b = n × b/a, termasuk sisa | Garis bilangan 0–n bertanda 1/b: tekan "Lompat a/b" sampai tidak cukup, sisa disorot. Coba sendiri | isian, arsir takaran 1/3 L, pilihan 3 ÷ 2/5, gula 6 ÷ 3/4 |
+| C.1 Pecahan → desimal | pecahan senilai berpenyebut 10/100 | Pilih pecahan dan pengali (×2…×50) sampai penyebut 10 atau 100; batang, 100 petak, garis bilangan 0–1. Coba sendiri isian desimal | pilih gambar 0,5, arsir 0,25, timbangan, kain 3/4 m |
+| C.2 Membandingkan dan mengurutkan | nilai tempat, samakan angka di belakang koma | Atur digit dua bilangan, tombol "Samakan angka di belakang koma", tabel nilai tempat dengan sorotan, garis bilangan titik A dan B | isi nilai tempat, tanda < > =, urutkan jarak, lompat jauh |
 
 ## Evaluasi 24 soal
 
