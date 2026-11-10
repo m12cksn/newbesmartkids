@@ -68,7 +68,7 @@ Posisi jawaban benar pada soal pilihan: 2, 3, 1, 0, 1, 0, 2 (indeks dari 0). Dat
 - [x] Kunci jawaban diperiksa dengan perhitungan independen di skrip verify
 - [x] Pengecoh mewakili miskonsepsi (kalikan alih-alih bagi, abaikan pembilang, 47 > 7, sisa dalam botol vs liter)
 - [x] Tes browser semua 24 soal evaluasi, 24 latihan, 6 lab, skor dan pembahasan di 320/390/768/1280
-- [ ] Review manusia oleh Mr Iwan pada preview
+- [x] Review manusia oleh Mr Iwan pada preview (soal disetujui; materi direvisi; merge diminta 10 Nov 2026)
 - [ ] Video: belum ada tautan; panel menampilkan placeholder jujur
 
 Ilustrasi (ember, petak kebun, pohon mangga/jeruk/jambu, kue pastel, botol, gelas, botol jus, kantong gula, cokelat, gelas ukur, timbangan digital) adalah SVG buatan sendiri; tidak ada aset pihak ketiga dan tidak ada dependensi baru.

@@ -34,7 +34,7 @@ Presence below is verified against src/data/materials.ts and component paths; it
 | Grade 1 | Bab 1 counting to 10; Bab 2 addition to 10; Bab 3 subtraction to 10; Bab 4 shapes; Bab 5 counting to 20; Bab 6 addition/subtraction to 20; Bab 7 object length; Bab 8 diagrams |
 | Grade 4 | Bab 1 whole numbers to 10,000; Bab 2 fractions; Bab 3 picture/number patterns; Bab 4 area/volume; Bab 5 plane shapes; Bab 6 pictograms/bar charts |
 | Grade 5 | KPK and FPB entry and dedicated experience |
-| Grade 6 | Bab 1 Pecahan dan Desimal (branch feat/grade-six-fractions-decimals, draft PR; not merged at time of writing) |
+| Grade 6 | Bab 1 Pecahan dan Desimal (PR #43; owner approved merge 10 Nov 2026, see note below) |
 | Cambridge Grade 6 | Calculation with Fractions (chapter 10); Ratio and Proportion (chapter 11) |
 
 Important corrections: Grade 1 Bab 1 in current code is counting to 10, not 20. Grade 4 Piktogram dan Diagram Batang is Bab 6, because Bab 5 is Bangun Datar and source PDFs label the data chapter Bab 6. Do not renumber from an old chat typo.
@@ -96,7 +96,7 @@ Local Turbopack previously failed with a persistence database error; `npx next b
 
 ## Open work and uncertainty
 
-10 Nov 2026: Mr Iwan requested Kelas 6 Bab 1 Pecahan dan Desimal (A.1, A.2, B.1, B.2, C.1, C.2). Implemented on branch feat/grade-six-fractions-decimals as a draft PR: 6 labs, 24 practice questions (4 per subtopic), 24 evaluation questions derived from Latihan 1.1-1.3 because no Uji Kompetensi pages were supplied. Local checks: dataset verify, lint on changed files, production build, browser smoke at 320/390/768/1280, plus regression smoke for Grade 4 data display/fractions/geometry and Cambridge fractions. Owner feedback (same day): questions approved; lessons should be BeSmartKids' own Grade-4-style version rather than following the PDF stories. Labs were rebuilt (src/components/learn/GradeSixLabs.tsx) with generic models, learner-driven steps and "Coba sendiri" checks; questions unchanged. Re-ran verify, lint, build and smoke at 320/390/768/1280. Awaiting owner review of the preview; not merged, not live. Details: docs/GRADE_SIX_CHAPTER_ONE.md.
+10 Nov 2026: Mr Iwan requested Kelas 6 Bab 1 Pecahan dan Desimal (A.1, A.2, B.1, B.2, C.1, C.2). Implemented on branch feat/grade-six-fractions-decimals as a draft PR: 6 labs, 24 practice questions (4 per subtopic), 24 evaluation questions derived from Latihan 1.1-1.3 because no Uji Kompetensi pages were supplied. Local checks: dataset verify, lint on changed files, production build, browser smoke at 320/390/768/1280, plus regression smoke for Grade 4 data display/fractions/geometry and Cambridge fractions. Owner feedback (same day): questions approved; lessons should be BeSmartKids' own Grade-4-style version rather than following the PDF stories. Labs were rebuilt (src/components/learn/GradeSixLabs.tsx) with generic models, learner-driven steps and "Coba sendiri" checks; questions unchanged. Re-ran verify, lint, build and smoke at 320/390/768/1280. Owner then asked to merge and publish to the main website (10 Nov 2026). This line was written before the merge; verify the merge commit and production route on master rather than trusting it. Details: docs/GRADE_SIX_CHAPTER_ONE.md.
 Several older PRs remain open; they may overlap delivered code. Inspect their diffs against master before deciding they are unfinished. Do not merge or close them automatically:
 - #32: Pisahkan satuan baku dan tidak baku di Bab 4 (draft).
 - #26: Lengkapi demonstrasi operasi hitung Bab 6 (draft).
