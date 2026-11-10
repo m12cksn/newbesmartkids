@@ -1,7 +1,7 @@
 # BeSmartKids project handoff
 
 Last reviewed: 10 November 2026 (Asia/Jakarta).
-Code baseline inspected: `ba42c52f77cbecdbcbd913a0a346856f26a2bab3` on master.
+Code baseline inspected: `72af2db0904c703ba6ab016633da36cf921d4837` on master.
 This is a snapshot. Check master and open PRs before acting.
 
 ## Start here
@@ -34,7 +34,7 @@ Presence below is verified against src/data/materials.ts and component paths; it
 | Grade 1 | Bab 1 counting to 10; Bab 2 addition to 10; Bab 3 subtraction to 10; Bab 4 shapes; Bab 5 counting to 20; Bab 6 addition/subtraction to 20; Bab 7 object length; Bab 8 diagrams |
 | Grade 4 | Bab 1 whole numbers to 10,000; Bab 2 fractions; Bab 3 picture/number patterns; Bab 4 area/volume; Bab 5 plane shapes; Bab 6 pictograms/bar charts |
 | Grade 5 | KPK and FPB entry and dedicated experience |
-| Grade 6 | Bab 1 Pecahan dan Desimal (PR #43; owner approved merge 10 Nov 2026, see note below) |
+| Grade 6 | Bab 1 Pecahan dan Desimal (PR #43, merged 60af854); Bab 2 Rasio (PR #44, live) |
 | Cambridge Grade 6 | Calculation with Fractions (chapter 10); Ratio and Proportion (chapter 11) |
 
 Important corrections: Grade 1 Bab 1 in current code is counting to 10, not 20. Grade 4 Piktogram dan Diagram Batang is Bab 6, because Bab 5 is Bangun Datar and source PDFs label the data chapter Bab 6. Do not renumber from an old chat typo.
@@ -96,7 +96,7 @@ Local Turbopack previously failed with a persistence database error; `npx next b
 
 ## Open work and uncertainty
 
-10 Nov 2026 — Kelas 6 Bab 2 Rasio: user supplied four scanned PDFs and explicitly authorized merge/publish after checks pass. Implemented six subtopics (A.1 comparing objects, A.2 ratio meaning, B.1 equivalent ratios, B.2 unit ratios, C.1 part/part and part/whole, C.2 duration). Each has a learner-controlled studio and four practices; final evaluation has 24 interleaved questions mapped to all five source evaluation groups. New code: src/components/learn/GradeSixRatio.tsx, src/data/grade-six-ratio.ts; route /kelas/konsep-inti-matematika-kelas-6/materi/rasio, discovered through the Grade 6 catalog. Source/coverage: docs/GRADE_SIX_CHAPTER_TWO.md. Dataset verification and changed-file ESLint passed locally; webpack production build passed before final visual refinements and is being rechecked. Local Chromium download failed; CI browser QA is pending. Do not call this chapter live until PR checks, screenshots, merge and production route are verified. Tests: scripts/verify-grade-six-ratio.mjs, scripts/smoke-grade-six-ratio.mjs and .github/workflows/grade-six-ratio-qa.yml.
+10 Nov 2026 — Kelas 6 Bab 2 Rasio delivered via PR #44, merged as 72af2db0904c703ba6ab016633da36cf921d4837. User explicitly authorized merge/publish after successful checks. Six studios, four practices per subtopic (24 total) and 24 interleaved evaluations mapped to the four supplied scanned PDFs. Route: /kelas/konsep-inti-matematika-kelas-6/materi/rasio; discovered through Grade 6 catalog. Code: src/components/learn/GradeSixRatio.tsx and src/data/grade-six-ratio.ts. Source/coverage: docs/GRADE_SIX_CHAPTER_TWO.md. Local dataset checks, changed-file ESLint and webpack production build passed. CI Grade 6 Ratio QA run 42790290619 passed (build, six lab interactions, all practices/evaluations, answer gating, scoring/review at 320/390/768/1280). Broad regression run 42790290452 also passed. Screenshot artifact 13749973841 reviewed for six labs, practice representatives, all 24 evaluations and results at desktop/mobile; no clipping or count mismatch found. Vercel production deployment succeeded; both chapter route and Grade 6 catalog returned HTTP 200, production HTML contains the new lab and the catalog contains its entry link. Tests: scripts/verify-grade-six-ratio.mjs and scripts/smoke-grade-six-ratio.mjs; workflow .github/workflows/grade-six-ratio-qa.yml. Video remains a clearly labeled placeholder until a source is supplied.
 
 10 Nov 2026: Mr Iwan requested Kelas 6 Bab 1 Pecahan dan Desimal (A.1, A.2, B.1, B.2, C.1, C.2). Implemented on branch feat/grade-six-fractions-decimals as a draft PR: 6 labs, 24 practice questions (4 per subtopic), 24 evaluation questions derived from Latihan 1.1-1.3 because no Uji Kompetensi pages were supplied. Local checks: dataset verify, lint on changed files, production build, browser smoke at 320/390/768/1280, plus regression smoke for Grade 4 data display/fractions/geometry and Cambridge fractions. Owner feedback (same day): questions approved; lessons should be BeSmartKids' own Grade-4-style version rather than following the PDF stories. Labs were rebuilt (src/components/learn/GradeSixLabs.tsx) with generic models, learner-driven steps and "Coba sendiri" checks; questions unchanged. Re-ran verify, lint, build and smoke at 320/390/768/1280. Owner then asked to merge and publish to the main website (10 Nov 2026). This line was written before the merge; verify the merge commit and production route on master rather than trusting it. Details: docs/GRADE_SIX_CHAPTER_ONE.md.
 Several older PRs remain open; they may overlap delivered code. Inspect their diffs against master before deciding they are unfinished. Do not merge or close them automatically:
