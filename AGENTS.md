@@ -31,3 +31,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Include a pre-merge review checklist: objective coverage matrix; nonrepetitive question stems and visual scenes; balanced challenge; distractor plausibility; answer-key accuracy; and automated plus human review of the entire assessment.
 
 - For visual geometry chapters, include genuine learner actions in a substantial share of assessment items: match by drawing/connecting a line, tap objects to sort them into a destination box, and insert/select pieces to complete a shape. A decorative SVG next to a standard multiple-choice question does not count as a new interaction type. Test the interaction itself and its answer scoring.
+
+## Project continuity (mandatory)
+- At the start of a new session, read docs/PROJECT_HANDOFF.md, then verify current master, working-tree changes, open PRs and the user's latest request. The handoff is a dated snapshot, not a substitute for checking code.
+- Repository: m12cksn/newbesmartkids. Main branch: master. Production: https://newbesmartkids.vercel.app/. Do not confuse this repository with older BeSmartKids repositories.
+- After each material change, update docs/PROJECT_HANDOFF.md in the same PR: scope, relevant paths, validation evidence, remaining issues and deployment state. After merge, record the PR/commit when available; never invent a future merge SHA.
+- Keep durable rules here and changing status in the handoff. Preserve the generated Next.js instruction block.
+- Respect existing user authorization: an explicit instruction to merge/publish is approval for that scoped change once checks pass; do not ask again solely because it is a new turn. Otherwise use a draft PR and report the preview before merge.
+- For Grade 4 and Cambridge subtopics, target 3–5 varied practice questions unless the user specifies otherwise. Exactly 24 questions applies to chapter evaluations, not the daily mastering feature (7 questions).
+- Source PDFs may live in the user's ChatGPT files rather than this repo. Obtain the actual files; do not assume a previous session's scratch paths still exist. Match the PDF language, objectives and question/answer formats while changing numbers and imagery as requested.
+- Lessons should be complete enough for teacher video narration, concise, and learner-controlled. Require an answer before evaluation progression; final results show correct, wrong, score and incorrect-answer review.
+- Daily mastering: preserve 3 levels, 7 questions, missing-term variety, deterministic daily packets at 00:00 Asia/Jakarta, separate local storage per mode/level, retries and old-day progress handling.
+- New routes must be discoverable from the relevant homepage/class navigation. Check the click path as well as the direct URL. A deployment success alone does not prove the production route and entry link work.
+- Test proportionately: documentation-only changes need content/path/link review, not a full chapter browser suite. Functional changes require relevant dataset/build/browser checks. If local browser/build tooling fails, use CI and state which checks actually ran.
