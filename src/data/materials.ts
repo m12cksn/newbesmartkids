@@ -14,6 +14,12 @@ export type MaterialItem = {
 
 export const materials: MaterialItem[] = [
   {
+    id: "kelas-6-pecahan-desimal", classId: 6, chapter: 1, slug: "pecahan-dan-desimal",
+    title: "Pecahan dan Desimal", topic: "Bilangan",
+    description: "Kalikan dan bagi pecahan dengan bilangan asli, ubah pecahan menjadi desimal, lalu bandingkan dan urutkan desimal.",
+    videoStatus: "coming_soon", summary: "Perkalian dan pembagian pecahan dengan bilangan asli, pecahan desimal, serta membandingkan dan mengurutkan bilangan desimal.", questionIds: [],
+  },
+  {
     id: "kelas-4-piktogram-diagram-batang", classId: 4, chapter: 6, slug: "piktogram-dan-diagram-batang",
     title: "Piktogram dan Diagram Batang", topic: "Penyajian Data",
     description: "Susun piktogram, buat diagram batang tegak dan mendatar, lalu baca informasi datanya.",
