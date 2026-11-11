@@ -39,6 +39,7 @@ jobs:
           node --experimental-strip-types scripts/smoke-grade-four-geometry.mjs
           node --experimental-strip-types scripts/smoke-daily-addition.mjs
           node --experimental-strip-types scripts/smoke-daily-arithmetic.mjs
+          CHAPTER_SCREENSHOTS=/tmp/homepage-screenshots node scripts/smoke-homepage.mjs
           node scripts/smoke-grade-one-addition.mjs
           node scripts/smoke-grade-one-subtraction.mjs
           node scripts/smoke-grade-one-shapes.mjs
@@ -54,6 +55,13 @@ jobs:
           node --experimental-strip-types scripts/smoke-grade-one-chapters-one-to-three.mjs
           CHAPTER_SCREENSHOTS=/tmp/data-display-screenshots node --experimental-strip-types scripts/smoke-grade-four-data-display.mjs
           CHAPTER_SCREENSHOTS=/tmp/grade-six-fractions-screenshots node --experimental-strip-types scripts/smoke-grade-six-fractions-decimals.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: homepage-screenshots
+          path: /tmp/homepage-screenshots
+          if-no-files-found: ignore
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -127,3 +127,48 @@ h4 {
 @media (prefers-reduced-motion: reduce) {
   .bsk-multiple-dot, .bsk-meeting-line, .bsk-factor-branch, .bsk-factor-node, .bsk-group-enter { animation: none !important; }
 }
+
+/* ===== Beranda: efek matematika ringan (hanya transform/opacity, tanpa JavaScript) ===== */
+@keyframes bsk-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  50% { transform: translate3d(var(--dx, 6px), var(--dy, -14px), 0) rotate(calc(var(--r, 0deg) + 8deg)); }
+}
+@keyframes bsk-spin { to { transform: rotate(360deg); } }
+@keyframes bsk-draw { from { stroke-dashoffset: var(--len, 300); } to { stroke-dashoffset: 0; } }
+@keyframes bsk-dash-flow { to { stroke-dashoffset: -24; } }
+@keyframes bsk-ticker {
+  0%, 16% { transform: translateY(0); }
+  20%, 36% { transform: translateY(-1.5em); }
+  40%, 56% { transform: translateY(-3em); }
+  60%, 76% { transform: translateY(-4.5em); }
+  80%, 96% { transform: translateY(-6em); }
+  100% { transform: translateY(-7.5em); }
+}
+@keyframes bsk-marquee { to { transform: translate3d(-50%, 0, 0); } }
+@keyframes bsk-pop-in { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes bsk-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+.bsk-drift { animation: bsk-drift var(--t, 11s) ease-in-out infinite; animation-delay: var(--d, 0s); will-change: transform; }
+.bsk-spin-slow { animation: bsk-spin 40s linear infinite; transform-origin: center; transform-box: fill-box; }
+.bsk-draw { stroke-dasharray: var(--len, 300); animation: bsk-draw 1.4s .4s ease-out both; }
+.bsk-dash-flow { stroke-dasharray: 6 6; animation: bsk-dash-flow 1.6s linear infinite; }
+.bsk-ticker { animation: bsk-ticker 12.5s cubic-bezier(.7,0,.3,1) infinite; }
+.bsk-marquee { animation: bsk-marquee 38s linear infinite; }
+.bsk-pop-in { animation: bsk-pop-in .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
+.bsk-bob { animation: bsk-bob 2.6s ease-in-out infinite; }
+.group:hover .bsk-bob-hover { animation: bsk-bob 1s ease-in-out infinite; }
+
+/* Muncul saat discroll (browser yang mendukung scroll-driven animation); lainnya langsung terlihat. */
+@supports (animation-timeline: view()) {
+  .bsk-reveal { animation: bsk-pop-in linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
+}
+
+.bsk-graph-paper {
+  background-image: linear-gradient(rgb(32 143 109 / .07) 1px, transparent 1px), linear-gradient(90deg, rgb(32 143 109 / .07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bsk-drift, .bsk-spin-slow, .bsk-draw, .bsk-dash-flow, .bsk-ticker, .bsk-marquee, .bsk-pop-in, .bsk-bob, .group:hover .bsk-bob-hover, .bsk-reveal { animation: none !important; }
+  .bsk-draw { stroke-dashoffset: 0; }
+}
