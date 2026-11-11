@@ -47,11 +47,11 @@ export const parse=(a:string|undefined):string[]=>{try{const v=JSON.parse(a??'[]
 export function num(s:string){return /^(?:\d+|\d{1,3}(?:\.\d{3})+)$/.test(s.trim())?Number(s.replaceAll('.','')):NaN;}
 const norm=(s:string)=>s.toLowerCase().trim().replace(/[.,]/g,'').replace(/\s+/g,' ').replace(/ (rupiah|jiwa|km)$/,'');
 const normPlace=(s:string)=>norm(s).replace(/puluhan ribuan?|puluh ribuan?/g,'puluh ribu').replace(/ratusan ribuan?|ratus ribuan?/g,'ratus ribu');
-export const ready=(q:Q,a:string)=>{const v=parse(a);return q.fields.every((f,i)=>Boolean(v[i]?.trim())&&(f.type!=='text'||v[i].trim().split(/\s+/).length>=3));};
+export const ready=(q:Q,a:string)=>{const v=parse(a);return q.fields.every((f,i)=>Boolean(v[i]?.trim()));};
 export function correct(q:Q,a:string|undefined){if(!ready(q,a??''))return false;const v=parse(a),key=parse(q.answer);
  if(q.kind==='money'){const ns=v.map(num);return ns.every(n=>Number.isInteger(n)&&n>=0)&&Array.from({length:q.ways!},(_,r)=>ns.slice(r*q.denoms!.length,(r+1)*q.denoms!.length)).every((row,r,all)=>row.every((n,i)=>n<=q.inventory![i])&&row.reduce((s,n,i)=>s+n*q.denoms![i],0)===q.target&&all.findIndex(x=>x.join(',')===row.join(','))===r);}
  if(q.kind==='construct'){const n=num(v[0]);return Number.isInteger(n)&&n>=10000&&n<=99999&&digits(n).every((d,i)=>q.positions!.includes(i)?d===7:d!==7)&&norm(v[1])===words(n);}
- return q.fields.every((f,i)=>f.type==='number'?num(v[i])===num(key[i]):f.type==='words'?norm(v[i])===norm(key[i]):f.type==='place'?normPlace(v[i])===normPlace(key[i]):f.type==='package'?['A','B'].includes(v[i]):f.type==='text'?v[i].trim().split(/\s+/).length>=3:v[i]===key[i]);
+ return q.fields.every((f,i)=>f.type==='number'?num(v[i])===num(key[i]):f.type==='words'?norm(v[i])===norm(key[i]):f.type==='place'?normPlace(v[i])===normPlace(key[i]):f.type==='package'?['A','B'].includes(v[i]):f.type==='text'?Boolean(v[i].trim()):v[i]===key[i]);
 }
 export function formatAnswer(q:Q,a:string){const v=parse(a);return q.fields.map((f,i)=>`${f.label}: ${q.kind==='match'&&q.right?q.right[num(v[i])]:q.kind==='market'&&i>=5?q.right?.[num(v[i])]:v[i]??'belum dijawab'}`).join('; ');}
 
