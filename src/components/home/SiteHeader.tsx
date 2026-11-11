@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "./BrandMark";
 
@@ -7,7 +8,7 @@ export function SiteHeader() {
       <div className="border-b border-base-200 bg-base-100 px-5 py-2 text-center text-xs text-base-content/60 sm:px-8">
         Belajar sedikit demi sedikit, paham lebih lama.{" "}
         <Link href="/#kelas" className="font-bold text-success hover:underline">
-          Pilih kelasmu -&gt;
+          Pilih kelasmu <ArrowRight className="inline size-3.5" aria-hidden="true" />
         </Link>
       </div>
       <header className="sticky top-0 z-40 border-b border-base-200 bg-base-100 px-5 sm:px-8">

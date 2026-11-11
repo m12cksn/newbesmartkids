@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 const practices = [
-  { title: "Mastering Penjumlahan & Pengurangan", symbols: ["+", "−"], sample: "48 + ? = 75", href: "/mastering-penjumlahan-pengurangan/level-1", button: "Latihan penjumlahan & pengurangan →" },
-  { title: "Mastering Perkalian & Pembagian", symbols: ["×", "÷"], sample: "? × 6 = 42", href: "/mastering-perkalian-pembagian/level-1", button: "Mulai latihan harian →" },
+  { title: "Mastering Penjumlahan & Pengurangan", symbols: ["+", "−"], sample: "48 + ? = 75", href: "/mastering-penjumlahan-pengurangan/level-1", button: "Latihan penjumlahan & pengurangan" },
+  { title: "Mastering Perkalian & Pembagian", symbols: ["×", "÷"], sample: "? × 6 = 42", href: "/mastering-perkalian-pembagian/level-1", button: "Mulai latihan harian" },
 ];
 
 export function DailyPracticeCard() {

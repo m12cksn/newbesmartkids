@@ -32,6 +32,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - For visual geometry chapters, include genuine learner actions in a substantial share of assessment items: match by drawing/connecting a line, tap objects to sort them into a destination box, and insert/select pieces to complete a shape. A decorative SVG next to a standard multiple-choice question does not count as a new interaction type. Test the interaction itself and its answer scoring.
 
+## Natural design, not AI-looking (mandatory for every UI change)
+- Icons: use `lucide-react` (pinned) for interface icons, stroke 1.5–2, in brand colours. No emoji as interface icons, no hand-drawn generic icon doodles, and no icon placed in a coloured rounded tile purely as decoration. Lesson objects that a question counts or names still need purpose-built, faithful SVG illustrations (see Assessment variety rules).
+- Avoid the common generated-page tells: small tracked uppercase labels stacked above headings, middle-dot chains (`A · B · C`) as decoration, text arrows glued to every button (`->`, `→`; use the Lucide `ArrowRight`/`ArrowLeft` icon where an arrow helps), decorative status dots before labels, one coloured word inside a headline, purple-to-blue gradients, glow blobs, cards inside cards, and three identical icon-heading-text tiles.
+- Copy: say what the page does in plain Indonesian for children and parents. No buzzwords or filler ("solusi terbaik", "tingkatkan potensimu", "seamless"), no invented numbers, testimonials or statistics.
+- Layout: one main idea per screen, short text, headings that name their content, varied section spacing, 16px phone gutter, no horizontal scroll from 320px, visible keyboard focus, sufficient contrast, reduced-motion fallbacks.
+- Keep the BeSmartKids brand (DaisyUI `besmartkids` theme, primary #208f6d, Poppins). Existing chapter pages keep their approved layout; apply these rules to new work and remove existing tells only when a change touches that area or the user asks.
+
 ## Project continuity (mandatory)
 - At the start of a new session, read docs/PROJECT_HANDOFF.md, then verify current master, working-tree changes, open PRs and the user's latest request. The handoff is a dated snapshot, not a substitute for checking code.
 - Repository: m12cksn/newbesmartkids. Main branch: master. Production: https://newbesmartkids.vercel.app/. Do not confuse this repository with older BeSmartKids repositories.

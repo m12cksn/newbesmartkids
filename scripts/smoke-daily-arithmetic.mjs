@@ -12,7 +12,7 @@ try{
   await page.clock.install({time:new Date('2026-11-09T16:50:00Z')});
   const button=name=>page.getByRole('button',{name,exact:true});
   const fit=async()=>assert.ok(await page.evaluate(()=>[...document.querySelectorAll('main input,main button,main nav a')].filter(el=>el.getClientRects().length>0).every(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1})),`Controls overflow ${width}`);
-  await page.goto(origin);await page.getByRole('link',{name:'Mulai latihan harian →',exact:true}).click();await page.getByRole('textbox').first().waitFor();
+  await page.goto(origin);await page.getByRole('link',{name:'Mulai latihan harian',exact:true}).click();await page.getByRole('textbox').first().waitFor();
   assert.ok((await page.url()).endsWith('/level-1'));
   for(const level of [1,2,3]){
    if(level>1)await page.getByRole('link',{name:new RegExp(`Level ${level}`)}).click();
