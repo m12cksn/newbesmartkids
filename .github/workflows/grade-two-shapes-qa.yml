@@ -1,0 +1,37 @@
+name: Grade 2 Shapes QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  shapes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-two-shapes.mjs
+      - run: npx eslint src/data/grade-two-shapes.ts src/components/learn/GradeTwoShapes.tsx src/components/learn/ShapeVisuals.tsx
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-shapes.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-two-shapes.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-two-shapes-screenshots
+          path: /tmp/grade-two-shapes-screenshots
+          if-no-files-found: ignore
