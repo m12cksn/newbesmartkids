@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import GradeFourGeometry from "@/components/learn/GradeFourGeometry";
+import GradeFiveWholeNumbers from "@/components/learn/GradeFiveWholeNumbers";
 import GradeTwoArithmetic from "@/components/learn/GradeTwoArithmetic";
 import GradeThreePlaneElements from "@/components/learn/GradeThreePlaneElements";
 import GradeTwoCounting from "@/components/learn/GradeTwoCounting";
@@ -55,6 +56,9 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
 
   if (material.id === "kelas-2-penjumlahan-pengurangan") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 2</Link></div><GradeTwoArithmetic /><SiteFooter /></main>;
+  }
+  if (material.id === "kelas-5-bilangan-cacah-100000") {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">Kembali ke kelas 5</Link></div><GradeFiveWholeNumbers /><SiteFooter /></main>;
   }
   if (material.id === "kelas-3-penyajian-data") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreeData /><SiteFooter /></main>;
