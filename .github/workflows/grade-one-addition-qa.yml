@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   test-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,7 +28,7 @@ jobs:
       - run: node --experimental-strip-types scripts/verify-grade-six-fractions-decimals.mjs
       - run: npm run build
       - run: npm install --no-save playwright
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Browser smoke test
         run: |
           npm run start -- --hostname 127.0.0.1 > /tmp/next.log 2>&1 &
