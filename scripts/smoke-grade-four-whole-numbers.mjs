@@ -12,7 +12,7 @@ for (const q of [...assessment, ...practice.flat()]) {
   if (q.options) {
     assert.equal(new Set(q.options).size, q.options.length);
     for (const answer of q.answer.split("|")) assert.ok(q.options.includes(answer));
-  } else assert.match(q.answer, /^\d+$/);
+  } else assert.match(q.answer, q.wholeFields ? /^\d+(\|\d+)+$/ : /^\d+$/);
 }
 
 const screenshots = process.env.CHAPTER_SCREENSHOTS;
@@ -29,7 +29,8 @@ try {
     const noOverflow = async () => { const overflow = await page.evaluate(() => [...document.querySelectorAll("body *")].filter(e => e.getBoundingClientRect().right > innerWidth + 1).slice(0, 8).map(e => [e.tagName,e.className,e.textContent.slice(0,40)])); assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), JSON.stringify(overflow)); };
     const solve = async (q, answer = q.answer) => {
       if (q.options) for (const option of answer.split("|")) await button(option).click();
-      else await page.getByRole("textbox", {name:"Jawaban"}).fill(answer);
+      else if(q.wholeFields)for(const [i,f] of q.wholeFields.entries())await page.getByRole('textbox',{name:f,exact:true}).fill(answer.split('|')[i]);
+      else await page.getByRole("textbox", {name:"Jawaban",exact:true}).fill(answer);
       await noOverflow();
     };
     await page.goto(base);
@@ -65,11 +66,16 @@ try {
           await button(n === steps.length-1 ? "Lihat hasil peraga" : "Langkah berikutnya").click();
         }
         await page.getByRole("status").getByText(new RegExp(`= ${["4\\.433","2\\.216","48","21"][i-3]}\\.$`)).waitFor();
+        await button('Contoh lain').click();
+        const alternate=[[15,1,10,1,9,5],[15,8,4,12,4,4],[600,120,48,768],[2,1,3,1,4,0]][i-3];
+        for(const [n,value] of alternate.entries()){await entry.fill(String(value));await button('Periksa langkah').click();await page.getByRole('status').getByText(/Tepat!/).waitFor();await button(n===alternate.length-1?'Lihat hasil peraga':'Langkah berikutnya').click();}
       } else {
         await button("Kelipatan").click();
         await page.getByText("18 × 6 = 108",{exact:true}).waitFor();
       }
       await noOverflow();
+      if(i>=3){const lab=page.getByTestId('whole-exploration');if(i===3||i===4){await lab.getByRole('button',{name:'Tukar 1 puluhan',exact:true}).click();await lab.getByText('1 puluhan + 13 satuan = 23',{exact:true}).waitFor();await lab.getByRole('button',{name:'Gabungkan 10 satuan',exact:true}).click();}else{if(i===5){await lab.getByRole('button',{name:'Buka hasil tiap bagian'}).click();await lab.getByRole('textbox',{name:'Jawaban eksplorasi'}).fill('48');}else{await lab.getByRole('button',{name:'Bagikan merata'}).click();await lab.getByRole('textbox',{name:'Jawaban eksplorasi'}).fill(i===6?'21':'6');}await lab.getByRole('button',{name:'Cek eksplorasi'}).click();await lab.getByRole('status').getByText(/Tepat!/).waitFor();}await noOverflow();}
+      if(screenshots&&[390,1280].includes(width))await page.screenshot({path:`${screenshots}/${width}-lesson-${i}.png`,fullPage:true});
       await button("Latihan submateri →").click();
       for (const [index,q] of practice[i].entries()) {
         await solve(q);
@@ -83,6 +89,7 @@ try {
     await button("Evaluasi Bab 1 →").click();
     for (const [i,q] of assessment.entries()) {
       await page.getByRole("heading",{name:q.prompt,exact:true}).waitFor();
+      if(q.wholeVisual?.kind==='operation'){const s=q.wholeVisual;const expected=s.values.map((_,j)=>j===0?'':j===2&&s.labels?.[1]==='?'?'=':s.labels?.[j-1]??s.labels?.[0]);assert.deepEqual(await page.locator('.font-mono > p > span').allTextContents(),expected);}
       const advance = button(i === 23 ? "Lihat hasil" : "Lanjut →");
       assert.equal(await advance.count(),0);
       await solve(q,i === 0 ? "1" : q.answer);

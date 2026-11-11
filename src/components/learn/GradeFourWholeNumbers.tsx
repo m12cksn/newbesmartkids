@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
-import { assessment, number, practice, topics, type Question } from "@/data/grade-four-whole-numbers";
+import WholeNumberStudio, {teacherNotes, misconceptions} from './WholeNumberStudio';
+import {WholeVisual, WholeAnswer, wholeCorrect, wholeReady} from './WholeNumberQuestion';
+import { assessment, number, practice, topics } from "@/data/grade-four-whole-numbers";
 
 const places = ["Puluh ribu", "Ribuan", "Ratusan", "Puluhan", "Satuan"];
 const digits = (value: number) => String(value).padStart(5, "0").split("").map(Number);
@@ -66,7 +68,7 @@ function PlaceLab({ topic, onExampleChange }: {
   </div>;
 }
 
-type GuidedStep = { prompt: string; answer: number; hint: string; column?: number; top?: number[]; bottom?: number[]; digit?: number };
+type GuidedStep = { prompt: string; answer: number; hint: string; column?: number; top?: number[]; bottom?: number[]; digit?: number; carryTo?: number };
 
 function columnSteps(a: number, b: number, subtract: boolean): GuidedStep[] {
   const left = digits(a);
@@ -98,7 +100,7 @@ function columnSteps(a: number, b: number, subtract: boolean): GuidedStep[] {
       carry = Math.floor(sum / 10);
       if (carry) steps.push({ prompt: `Tulis ${sum % 10} di kolom ${place}. Berapa yang disimpan ke kolom kiri?`,
         answer: carry, hint: `Pisahkan ${sum} menjadi ${sum % 10} yang ditulis dan satu kelompok sepuluh yang disimpan.`,
-        column: i, top: left, bottom: right });
+        column: i, top: left, bottom: right, carryTo: i-1 });
     }
   }
   return steps;
@@ -154,12 +156,14 @@ function GuidedOperation({ topic, example, onExample }: { topic: number; example
   const completedSteps = steps.slice(0, step + Number(feedback === "correct"));
   const solvedDigits = new Map(completedSteps
     .flatMap(item => item.digit === undefined ? [] : [[item.column, item.digit]] as const));
+  const carries=new Map(completedSteps.filter(item=>item.carryTo!==undefined).map(item=>[item.carryTo,item.answer]));
   const move = (next: number) => { setStep(next); setAnswer(""); setFeedback(null); };
 
   return <div className="space-y-3">
     <p className="text-2xl font-extrabold tabular-nums">{number(a)} {sign} {number(b)}</p>
     {shown.top && shown.bottom && <table className="w-full table-fixed text-center text-sm" aria-label="Hitung bersusun">
       <thead><tr>{places.map(label => <th key={label} scope="col" className="py-1 text-[10px] sm:text-sm">{label}</th>)}</tr></thead>
+      {operation===0&&<tbody><tr aria-label="Simpanan yang sudah ditemukan">{places.map((_,i)=><td key={i} className="p-1 text-xs font-bold text-success">{carries.has(i)?`+${carries.get(i)} simpan`:''}</td>)}</tr></tbody>}
       <tbody>{[shown.top, shown.bottom, places.map((_, i) => solvedDigits.get(i) ?? "—")].map((row, index) => <tr key={index}>
         {row.map((digit, i) => <td key={i} className={`border border-base-300 p-2 font-bold ${shown.column === i && current ? "bg-warning/25" : "bg-base-100"}`}>{digit}</td>)}
       </tr>)}</tbody>
@@ -259,12 +263,14 @@ export default function GradeFourWholeNumbers() {
         <div className="grid overflow-hidden rounded-xl border border-base-300 bg-base-100 lg:grid-cols-2">
           <div className="min-w-0 bg-info/5 p-4 sm:p-6">
             {index < 3 ? <PlaceLab key={index} topic={index} onExampleChange={(value, position) => setPlaceExample({ value, position })}/> : index < 7 ? <OperationLab key={index} topic={index}/> : <FactorLab/>}
+            <WholeNumberStudio key={`explore-${index}`} topic={index}/>
           </div>
           <div className="p-5 sm:p-6">
             <h2 className="text-2xl font-extrabold">{topic.title}</h2>
             <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">{topic.steps.map((step, i) => <li key={step}>{index === 0 && i === 1
               ? `Bedakan angka, tempatnya, dan nilainya. Pada ${number(placeExample.value)}, angka ${exampleDigit} menempati ${places[placeExample.position].toLowerCase()} dan bernilai ${number(exampleDigit * 10 ** (4 - placeExample.position))}.`
-              : step}</li>)}</ol>
+              : step}</li>)}{teacherNotes[index].map(note=><li key={note}>{note}</li>)}</ol>
+            <p className="mt-4 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm"><strong>Perhatikan. </strong>{misconceptions[index]}</p>
             <p className="mt-4 rounded-lg bg-info/10 p-3 text-sm"><strong>Coba bersama. </strong>{topic.demo}</p>
           </div>
         </div>
@@ -275,10 +281,9 @@ export default function GradeFourWholeNumbers() {
             : <button className="btn btn-success" onClick={() => setMode("assessment")}>Evaluasi Bab 1 →</button>}
         </div>
       </> : <GradeFourQuiz key={`${index}-${mode}`} title={mode === "practice" ? `Latihan · ${topic.title}` : "Evaluasi Bab 1"}
-        questions={mode === "practice" ? practice[index] : assessment} practiceMode={mode === "practice"} renderVisual={question => question.diagram && <div className="rounded-lg bg-info/10 p-2">
-          <p className="mb-2 text-center font-bold tabular-nums">{number(question.diagram.value)}</p>
-          <PlaceTable value={question.diagram.value} missing={question.diagram.missing}/>
-        </div>} close={() => changeTopic(index)}/>}
+        questions={mode === "practice" ? practice[index] : assessment} practiceMode={mode === "practice"} renderVisual={question => <div className="space-y-3 rounded-lg bg-info/5 p-3">
+          {question.diagram?<><p className="mb-2 text-center font-bold tabular-nums">{number(question.diagram.value)}</p><PlaceTable value={question.diagram.value} missing={question.diagram.missing}/></>:<WholeVisual question={question}/>}
+        </div>} renderAnswer={(q,value,record,checked)=>q.wholeFields?<WholeAnswer q={q} value={value} record={record} checked={checked}/>:<label className="flex flex-wrap items-center gap-2 font-bold">Jawaban<input aria-label="Jawaban" className="input input-bordered w-36" inputMode="numeric" value={value} disabled={checked} onChange={e=>record(e.target.value.replace(/[^\d.]/g,''))}/></label>} checkAnswer={wholeCorrect} isReady={wholeReady} renderMeta={q=>q.wholeLevel&&<p className="text-xs font-bold text-success">{q.wholeLevel}</p>} formatAnswer={(q,a)=>q.wholeFields?a.split('|').map((v,i)=>`${q.wholeFields![i]}: ${v}`).join(' · '):a.replaceAll('|',', ')} close={() => changeTopic(index)}/>}
     </div>
   </section>;
 }
