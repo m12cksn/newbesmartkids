@@ -83,39 +83,13 @@ export const practice: Question[][] = [
   ],
 ];
 
-export const legacyAssessment: Question[] = [
-  fill("Pada tabel nilai tempat, isi angka ratusan untuk 7.064.", 0, "7.064 memiliki 7 ribuan, 0 ratusan, 6 puluhan, dan 4 satuan.", { value: 7064, missing: 2 }),
-  fill("Hitung 2.347 + 1.586.", 3933, "Jumlahkan per kolom mulai dari satuan."),
-  fill("Hitung 3.142 − 768.", 2374, "Tukar nilai tempat jika diperlukan, lalu periksa 2.374 + 768 = 3.142."),
-  fill("Hitung 27 × 4.", 108, "20 × 4 + 7 × 4 = 108."),
-  fill("Hitung 84 ÷ 7.", 12, "7 × 12 = 84."),
-  multiple("Pilih semua faktor 28.", [1,2,4,7,14,28], [1,2,3,4,6,7,14,28], "Pasangan faktor: 1 × 28, 2 × 14, dan 4 × 7."),
-  fill("Tulis lambang bilangan delapan ribu sembilan puluh satu.", 8091, "8.000 + 90 + 1 = 8.091."),
-  fill("Peserta lomba ada 468 orang. Sebanyak 257 peserta laki-laki. Berapa peserta perempuan?", 211, "468 − 257 = 211 peserta."),
-  fill("Hitung 5.604 − 2.786.", 2818, "Kurangi per kolom. Cek dengan 2.818 + 2.786."),
-  fill("Isi angka puluhan pada tabel untuk 6.804.", 0, "Angka puluhan pada 6.804 adalah 0.", { value: 6804, missing: 3 }),
-  fill("Hitung 3.086 + 1.279 + 648.", 5013, "3.086 + 1.279 = 4.365. Tambahkan 648."),
-  fill("Hitung 136 × 8.", 1088, "800 + 240 + 48 = 1.088."),
-  multiple("Pilih kelipatan positif 6 yang kurang dari 32.", [6,12,18,24,30], [0,6,12,16,18,24,30,36], "Kelipatan yang memenuhi batas adalah 6 × 1 sampai 6 × 5."),
-  fill("Hitung 936 ÷ 9.", 104, "9 × 104 = 936."),
-  choice("Di bilangan 4.724, angka 7 menempati posisi apa?", "Ratusan", ["Ribuan", "Puluhan", "Ratusan", "Satuan"], "Nilai angka 7 adalah 700."),
-  fill("Rani punya 218 kelereng. Ia mendapat 67 lagi, lalu memberikan 89. Berapa sisanya?", 196, "218 + 67 − 89 = 196."),
-  fill("Ada 28 botol per kardus. Berapa botol dalam 36 kardus?", 1008, "28 × 30 + 28 × 6 = 1.008."),
-  fill("Bayu mendapat 156 dan 114 gantungan kunci. Ia membaginya sama rata kepada lima teman dan dirinya. Berapa bagian tiap orang?", 45, "(156 + 114) ÷ 6 = 45."),
-  fill("Susun bilangan dari 8 ribuan, 13 ratusan, 4 puluhan, dan 2 satuan.", 9342, "8.000 + 1.300 + 40 + 2 = 9.342."),
-  multiple("Pilih semua faktor dari 72.", [1,2,3,4,6,8,9,12,18,24,36,72], [1,2,3,4,5,6,8,9,12,16,18,24,36,72], "Pasangkan 1 dengan 72, 2 dengan 36, 3 dengan 24, 4 dengan 18, 6 dengan 12, dan 8 dengan 9."),
-  fill("Ada 8 kotak dengan 135 permen per kotak. Semua permen dibagi merata kepada 12 anak. Berapa permen per anak?", 90, "(8 × 135) ÷ 12 = 90."),
-  multiple("Pilih semua kelipatan 5 yang lebih dari 12 dan kurang dari 37.", [15,20,25,30,35], [10,15,20,25,30,35,40], "Mulai dari 5 × 3 sampai 5 × 7."),
-  fill("Lampu berkedip setiap 7 menit dan baru berkedip pukul 18.10. Berapa angka menit pada jam ketika lampu berkedip kelima kali setelah itu?", 45, "5 × 7 = 35 menit. Pukul 18.10 ditambah 35 menit menjadi 18.45."),
-  fill("Hitung 10.000 − 4.586 − 1.274.", 4140, "4.586 + 1.274 = 5.860, lalu kurangi dari 10.000."),
-];
-
 const visual=(question:Question,kind:NonNullable<Question['wholeVisual']>['kind'],values:number[],labels?:string[]):Question=>({...question,wholeVisual:{kind,values,labels}});
 const fields=(prompt:string,answer:string,names:string[],explanation:string,values:number[]):Question=>({...fill(prompt,answer,explanation),wholeFields:names,wholeVisual:{kind:'parts',values}});
 // Keep four practices per topic, with decomposition, partial products and quotient/remainder as multi-field tasks.
 practice[2][2]=fields('Lengkapi bentuk panjang 6.951. Isi nilai puluhan dan satuan.','50|1',['Nilai puluhan','Nilai satuan'],'6.951 = 6.000 + 900 + 50 + 1.',[6951]);
 practice[5][1]=fields('Uraikan 234 × 7. Isi hasil 200 × 7, 30 × 7, lalu 4 × 7.','1400|210|28',['200 × 7','30 × 7','4 × 7'],'1.400 + 210 + 28 = 1.638.',[200,30,4]);
 practice[6][0]=fields('96 manik-manik dibagi kepada 8 kelompok. Isi hasil bagi dan sisa.','12|0',['Isi tiap kelompok','Sisa'],'96 = 8 × 12 + 0.',[96,8]);
+practice[0][1].diagram={value:5704,missing:2};
 const practiceVisuals:Question['wholeVisual'][][]=[
  [{kind:'parts',values:[3062]},undefined,undefined,{kind:'parts',values:[9018]}],
  [{kind:'compare',values:[6089,6098]},{kind:'compare',values:[2971,2871,2817,2917]},{kind:'compare',values:[9889,10000,9898,9988]},{kind:'compare',values:[3078,3087],labels:['Rak A','Rak B']}],
