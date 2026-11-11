@@ -1,4 +1,5 @@
 "use client";
+import {ObjectArt} from "@/components/illustrations/ObjectArt";
 import {useState} from "react";
 type Strategy="compare"|"count"|"make10"|"place"|"back";
 const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
@@ -15,7 +16,7 @@ export function StrategyLab({strategy,a,b}:{strategy:Strategy;a:number;b:number}
  return <div className="w-full max-w-lg space-y-3 rounded-2xl bg-emerald-50 p-3 text-slate-900 sm:p-4">
  {strategy==="compare"?<>
   <p className="text-sm font-bold">Pasangkan benda satu per satu</p>
-  <div className="grid grid-cols-2 gap-3">{[a,b].map((n,k)=><div key={k} className="rounded-xl bg-white p-2"><p className="mb-2 text-center text-xs font-bold">Kelompok {k?"B":"A"} ({n})</p><div className="grid grid-cols-5 gap-1">{Array.from({length:n},(_,i)=><span key={i} className={`grid aspect-square place-items-center rounded-md text-base ${i<matched?"bg-emerald-200 opacity-50":"bg-slate-100"}`}>{k?"🔵":"🔴"}</span>)}</div></div>)}</div>
+  <div className="grid grid-cols-2 gap-3">{[a,b].map((n,k)=><div key={k} className="rounded-xl bg-white p-2"><p className="mb-2 text-center text-xs font-bold">Kelompok {k?"B":"A"} ({n})</p><div className="grid grid-cols-5 gap-1">{Array.from({length:n},(_,i)=><span key={i} className={`grid aspect-square place-items-center rounded-md text-base ${i<matched?"bg-emerald-200 opacity-50":"bg-slate-100"}`}><ObjectArt name={k?"marble-blue":"marble-red"} className="size-full p-0.5"/></span>)}</div></div>)}</div>
   <p className="text-center text-sm">Pasangan ditemukan: <strong>{matched}</strong></p>
   <button type="button" className="btn btn-success btn-sm w-full" disabled={matched>=Math.min(a,b)} onClick={()=>setMatched(v=>v+1)}>Pasangkan 1 benda</button>
   {matched===Math.min(a,b)?<p role="status" className="text-center font-bold">Selisih = {Math.abs(a-b)} benda</p>:null}
