@@ -13,6 +13,7 @@ export type MaterialItem = {
 };
 
 export const materials: MaterialItem[] = [
+  { id: "kelas-6-peluang", classId: 6, chapter: 4, slug: "peluang", title: "Peluang", topic: "Peluang", description: "Jelajahi skala peluang, permainan yang adil, dan perbandingan peluang dalam kehidupan sehari-hari.", videoStatus: "coming_soon", summary: "Prediksi, coba percobaan acak, susun dadu, dan warnai roda untuk memahami peluang.", questionIds: [] },
   { id: "kelas-6-kubus-balok", classId: 6, chapter: 3, slug: "kubus-dan-balok", title: "Kubus dan Balok", topic: "Geometri dan Lokasi", description: "Bangun dan urai susunan kubus, gambar tampak dari berbagai arah, serta telusuri koordinat dan jalur.", videoStatus: "coming_soon", summary: "Mengonstruksi dan mengurai, visualisasi spasial, serta lokasi melalui peraga dan latihan interaktif.", questionIds: [] },
   { id: "kelas-6-rasio", classId: 6, chapter: 2, slug: "rasio", title: "Rasio", topic: "Perbandingan", description: "Jelajahi konsep rasio, rasio senilai, rasio satuan, bagian terhadap keseluruhan, dan durasi waktu.", videoStatus: "coming_soon", summary: "Bandingkan besaran melalui enam studio interaktif, latihan bervariasi, dan evaluasi rasio.", questionIds: [] },
   {
