@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   measurement:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       - run: npx eslint src/data/grade-three-measurement.ts src/components/learn/GradeThreeMeasurement.tsx src/components/learn/MeasurementVisuals.tsx
       - run: npm run build
       - run: npm install --no-save playwright
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Browser QA
         run: |
           npm run start -- --hostname 127.0.0.1 > /tmp/next-measurement.log 2>&1 &
