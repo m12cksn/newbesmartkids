@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { materials } from "@/data/materials";
 import { HeroPlayground } from "./HeroPlayground";
 import { MathOrnaments } from "./MathOrnaments";
@@ -36,7 +37,7 @@ export function HeroSection() {
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a href="#kelas" className="btn btn-success btn-lg shadow-lg shadow-success/20">
-              Lihat semua kelas <span aria-hidden="true" className="bsk-bob-hover">-&gt;</span>
+              Lihat semua kelas <ArrowRight aria-hidden="true" className="bsk-bob-hover size-4" />
             </a>
             <a href="#latihan-harian" className="btn btn-outline btn-success btn-lg">Latihan harian</a>
           </div>

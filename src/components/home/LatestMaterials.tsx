@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { materials } from "@/data/materials";
 import { classes } from "./home-data";
+import { ArrowRight } from "lucide-react";
 import { TopicIcon } from "./TopicIcon";
 
 /** Materi terbaru: daftar materi di materials.ts sudah tersusun dari yang terbaru. */
@@ -15,7 +16,7 @@ export function LatestMaterials() {
           <h2 id="materi-terbaru-title" className="mt-3 text-4xl font-extrabold sm:text-5xl">Materi terbaru</h2>
           <p className="mt-3 max-w-lg text-base-content/60">Setiap materi berisi peraga interaktif, latihan per subtopik, dan evaluasi dengan pembahasan.</p>
         </div>
-        <a href="#kelas" className="link link-success font-bold no-underline hover:underline">Lihat semua kelas →</a>
+        <a href="#kelas" className="link link-success inline-flex items-center gap-1.5 font-bold no-underline hover:underline">Lihat semua kelas <ArrowRight className="size-4" aria-hidden="true" /></a>
       </div>
       <div className="-mx-5 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3" aria-label="Daftar materi terbaru, geser ke samping di layar kecil">
         {latest.map((m, i) => {
@@ -27,15 +28,15 @@ export function LatestMaterials() {
               style={{ "--d": `${i * 0.06}s` } as CSSProperties}>
               <span aria-hidden="true" className="absolute -right-4 -top-6 text-8xl font-extrabold text-base-content/[0.04] transition duration-500 group-hover:-translate-y-1 group-hover:text-success/10">{m.chapter}</span>
               <div className="flex items-center gap-3">
-                <span className="grid size-14 place-items-center rounded-2xl bg-success/10 text-success transition duration-300 group-hover:rotate-6 group-hover:scale-105"><TopicIcon topic={m.topic} /></span>
+                <TopicIcon topic={m.topic} className="size-7 shrink-0 text-success" />
                 <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-wide text-success">Kelas {m.classId} · Bab {m.chapter}</p>
-                  <p className="truncate text-xs text-base-content/50">{m.topic}</p>
+                  <p className="text-sm font-bold text-success">Kelas {m.classId}, Bab {m.chapter}</p>
+                  <p className="truncate text-xs text-base-content/60">{m.topic}</p>
                 </div>
               </div>
               <h3 className="mt-5 text-xl font-extrabold">{m.title}</h3>
               <p className="mt-2 line-clamp-3 text-sm leading-6 text-base-content/60">{m.description}</p>
-              <span className="mt-auto pt-5 text-sm font-bold text-success">Buka materi <span aria-hidden="true" className="inline-block transition group-hover:translate-x-1">→</span></span>
+              <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-bold text-success">Buka materi <ArrowRight aria-hidden="true" className="inline-block size-4 transition group-hover:translate-x-1" /></span>
             </Link>
           );
         })}

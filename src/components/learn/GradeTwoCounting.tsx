@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { TrainFront } from "lucide-react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { assessment, correct, formatAnswer, numberWords, practice, ready, SEP, splitParts, topics, type CQuestion, type Part, type Scene, type Thing } from "@/data/grade-two-counting-50";
 
@@ -183,7 +184,7 @@ function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: st
     case "bond": { let k = -1; const slot = (v: number | null, name: string) => v !== null ? <Circle>{v}</Circle> : (k++, <Box key={name} label={`Pasangan ${name}`} value={vals[k] ?? ""} onChange={(kk => (x: string) => setAt(kk, p.answer.length, x))(k)} disabled={checked} />);
       return <div className="flex items-center gap-3"><div className="flex flex-col items-center gap-2">{slot(p.tens, "puluhan")}{slot(p.ones, "satuan")}</div><span className="text-2xl text-base-content/40" aria-hidden="true">→</span>{slot(p.total, "jumlah")}</div>; }
     case "seq": { let k = -1; return <div className="flex flex-wrap items-end gap-1.5" aria-label={p.label}>
-      {p.style === "train" && <span className="grid h-14 w-12 place-items-center rounded-l-2xl rounded-tr-lg bg-sky-500 text-xl" aria-hidden="true">🚂</span>}
+      {p.style === "train" && <span className="grid h-14 w-12 place-items-center rounded-l-2xl rounded-tr-lg bg-sky-500 text-white" aria-hidden="true"><TrainFront className="size-7" strokeWidth={1.75} /></span>}
       {p.items.map((v, j) => { if (v === null) k++; const kk = k; return <span key={j} className={`grid place-items-center p-1.5 ${p.style === "train" ? "rounded-md bg-purple-600" : "rounded-b-xl rounded-t-sm bg-pink-200"}`}>
         {v !== null ? <span className="grid h-11 w-12 place-items-center rounded-lg bg-white text-xl font-extrabold">{v}</span> : <Box label={`${p.label} ${j + 1}`} value={vals[kk] ?? ""} onChange={x => setAt(kk, p.answer.length, x)} disabled={checked} w="w-12" />}
       </span>; })}</div>; }

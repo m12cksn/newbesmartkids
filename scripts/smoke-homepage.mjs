@@ -35,7 +35,7 @@ try{
    const latest=page.locator("#materi-terbaru a[href*='/materi/']").first();
    const href=await latest.getAttribute("href");await latest.click();await page.waitForURL(`**${href}`);await page.getByRole("heading",{level:1}).waitFor();
    await page.goto(origin+"/");await page.locator('#kelas a[href="/kelas/konsep-inti-matematika-kelas-6"]').click();await page.waitForURL("**/kelas/konsep-inti-matematika-kelas-6");
-   await page.goto(origin+"/");await page.getByRole("link",{name:"Mulai latihan harian →",exact:true}).click();await page.waitForURL("**/mastering-perkalian-pembagian/level-1");
+   await page.goto(origin+"/");await page.getByRole("link",{name:"Mulai latihan harian",exact:true}).click();await page.waitForURL("**/mastering-perkalian-pembagian/level-1");
    assert.deepEqual(errors,[]);await page.close();
   }
   console.log(`PASS beranda ${width}px: hero, peraga pecahan, jumlah materi, tab kelas, jalur klik, tanpa overflow, reduced motion`);
