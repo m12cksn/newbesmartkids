@@ -1,4 +1,5 @@
 import GradeFourGeometry from "@/components/learn/GradeFourGeometry";
+import GradeThreeMathSentences from "@/components/learn/GradeThreeMathSentences";
 import GradeSixCubes from "@/components/learn/GradeSixCubes";
 import GradeSixRatio from "@/components/learn/GradeSixRatio";
 import GradeSixFractionsDecimals from "@/components/learn/GradeSixFractionsDecimals";
@@ -40,6 +41,10 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   const classItem = classes.find((item) => item.slug === slug);
   const material = getMaterialBySlug(materiSlug);
   if (!classItem || !material || material.classId !== classItem.id) notFound();
+
+  if (material.id === "kelas-3-kalimat-matematika") {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreeMathSentences /><SiteFooter /></main>;
+  }
 
   if (material.id === "kelas-6-peluang") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 6</Link></div><GradeSixProbability /><SiteFooter /></main>;
