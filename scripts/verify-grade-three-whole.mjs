@@ -20,5 +20,6 @@ for(const q of all){assert.ok(correct(q,q.answer),q.id);assert.ok(ready(q,q.answ
 }
 assert.equal(words(0),'nol');assert.equal(words(1000),'seribu');assert.equal(words(708),'tujuh ratus delapan');assert.equal(words(426),'empat ratus dua puluh enam');assert.equal(new Set(Array.from({length:1001},(_,i)=>words(i))).size,1001);
 assert.ok(correct(assessment[14],'1.000| SERIBU '));assert.ok(!ready(assessment[14],'1.00|seribu'));assert.ok(!ready(assessment[0],'7|0|4|'));assert.ok(!correct(assessment[0],'7|1|4|tujuh ratus empat'));
+assert.ok(correct(practice[2][3],'2|3|1'));assert.ok(!correct(practice[2][3],'3|0|3'));assert.ok(!correct(practice[2][3],'3|1|0'));
 for(let a=2;a<=1000;a++)for(let b=2;b<=9;b++)if(a>=b&&a%b===0){const s=divisionSteps(a,b);assert.equal(Number(s.map(x=>x.quotient).join('')),a/b);assert.equal(s.at(-1).remainder,0);}
 console.log('Grade 3: 52 book-format questions; independently checked algorithms, story keys, range, coverage, text normalization and zero quotient digits.');

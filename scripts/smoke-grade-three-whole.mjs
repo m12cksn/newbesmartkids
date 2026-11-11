@@ -9,8 +9,8 @@ try{for(const width of [320,390,768,1280]){
  const button=name=>page.getByRole('button',{name,exact:true});
  const fit=async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`overflow ${width}`);
  const shot=async name=>{await fit();if(width===390||width===1280)await page.screenshot({path:`${folder}/${width}-${name}.png`,fullPage:true});};
- const answer=async(q,wrong=false)=>{if(q.kind==='match'){for(const [i,v] of q.answer.split('|').entries()){await page.getByRole('button',{name:`Operasi ${i+1}: ${q.pairs[i]}`,exact:true}).click();await button(`Hasil ${q.choices[Number(v)]}`).click();}}else for(const [i,f] of q.fields.entries())await page.getByRole('textbox',{name:f,exact:true}).fill(wrong&&i===0?'8':q.answer.split('|')[i]);};
- await page.goto(origin+'/');await page.locator('a[href="/kelas/dasar-matematika-kelas-3"]').first().click();await page.getByRole('link',{name:/Bilangan Cacah sampai 1\.000/}).first().click();await page.getByRole('heading',{name:'Bilangan Cacah sampai 1.000',exact:true}).waitFor();
+ const answer=async(q,wrong=false)=>{if(q.kind==='match'){for(const [i,v] of q.answer.split('|').entries()){await page.getByRole('button',{name:`Operasi ${i+1}: ${q.pairs[i]}`,exact:true}).click();await button(`Hasil ${q.choices[Number(v)]}`).click();}}else for(const [i,f] of q.fields.entries())await page.getByRole('textbox',{name:f,exact:true}).fill(wrong&&i===0?'8':(q.id==='p12'?'2|3|1':q.answer).split('|')[i]);};
+ await page.goto(origin+'/');await page.locator('a[href="/kelas/dasar-matematika-kelas-3"]').filter({visible:true}).first().click();await page.waitForURL('**/kelas/dasar-matematika-kelas-3');await page.getByRole('heading',{name:'Kelas 3',exact:true}).waitFor();await page.getByRole('link',{name:/Bilangan Cacah sampai 1\.000/}).filter({visible:true}).first().click();await page.getByRole('heading',{name:'Bilangan Cacah sampai 1.000',exact:true}).waitFor();
  assert.equal(await page.getByRole('button',{name:/Faktor dan kelipatan/}).count(),0);
  for(let t=0;t<7;t++){
   await button(`${String.fromCharCode(65+t)}. ${topics[t].title}`).click();
