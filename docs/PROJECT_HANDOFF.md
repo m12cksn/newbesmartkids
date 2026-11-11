@@ -32,7 +32,7 @@ Presence below is verified against src/data/materials.ts and component paths; it
 | Course | Content |
 | --- | --- |
 | Grade 1 | Bab 1 counting to 10; Bab 2 addition to 10; Bab 3 subtraction to 10; Bab 4 shapes; Bab 5 counting to 20; Bab 6 addition/subtraction to 20; Bab 7 object length; Bab 8 diagrams |
-| Grade 3 | Bab 1 Bilangan Cacah sampai 1.000 (PR #57, live); Bab 2 Kalimat Matematika (PR #56, existing experience preserved) |
+| Grade 3 | Bab 1 Bilangan Cacah sampai 1.000 (PR #57, live); Bab 2 Kalimat Matematika (PR #56, existing experience preserved); Bab 3 Pengukuran Panjang dan Berat (branch feat/grade-three-measurement; owner authorized merge after CI) |
 | Grade 4 | Bab 1 whole numbers to 10,000; Bab 2 fractions; Bab 3 picture/number patterns; Bab 4 area/volume; Bab 5 plane shapes; Bab 6 pictograms/bar charts |
 | Grade 5 | KPK and FPB entry and dedicated experience |
 | Grade 6 | Bab 1 Pecahan dan Desimal (PR #43, merged 60af854); Bab 2 Rasio (PR #44, live); Bab 3 Kubus dan Balok (PR #46, live) |
