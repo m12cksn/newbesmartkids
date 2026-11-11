@@ -1,0 +1,37 @@
+name: Grade 2 Fractions QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  fractions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-two-fractions.mjs
+      - run: npx eslint src/data/grade-two-fractions.ts src/components/learn/GradeTwoFractions.tsx src/components/learn/FractionVisuals.tsx
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-fractions.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-two-fractions.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-two-fractions-screenshots
+          path: /tmp/grade-two-fractions-screenshots
+          if-no-files-found: ignore
