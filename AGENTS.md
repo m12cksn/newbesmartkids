@@ -39,6 +39,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Layout: one main idea per screen, short text, headings that name their content, varied section spacing, 16px phone gutter, no horizontal scroll from 320px, visible keyboard focus, sufficient contrast, reduced-motion fallbacks.
 - Keep the BeSmartKids brand (DaisyUI `besmartkids` theme, primary #208f6d, Poppins). Existing chapter pages keep their approved layout; apply these rules to new work and remove existing tells only when a change touches that area or the user asks.
 
+## Parallel sessions (Claude, ChatGPT/Codex, people)
+- Several agents may work on this repository at the same time. Never edit shared registries for a new chapter: add `src/chapters/<material-id>/meta.ts` and `Chapter.tsx` (see `src/chapters/README.md`). Do not add entries to `src/data/materials.ts` or new `if` branches to `src/app/kelas/[slug]/materi/[materiSlug]/page.tsx`.
+- Name every new file after the chapter (data, components, `scripts/verify-*.mjs`, `scripts/smoke-*.mjs`, `.github/workflows/<chapter>-qa.yml`, docs). Do not reformat or reorder shared files.
+- Write per-PR handoff notes as new files in `docs/handoff/YYYY-MM-DD-<branch>.md` instead of inserting lines into `docs/PROJECT_HANDOFF.md`.
+- Branch from the latest `origin/master`. Before opening a PR and again right before merging, merge the latest `origin/master` into the branch and rerun the relevant checks. If a conflict appears, keep both sides; never drop another session's work.
+- Merge only with the exact head SHA that passed CI. CI workflows run on `ubuntu-24.04` and install Chromium with `npx playwright install chromium` (no `--with-deps`, no apt).
+
 ## Project continuity (mandatory)
 - At the start of a new session, read docs/PROJECT_HANDOFF.md, then verify current master, working-tree changes, open PRs and the user's latest request. The handoff is a dated snapshot, not a substitute for checking code.
 - Repository: m12cksn/newbesmartkids. Main branch: master. Production: https://newbesmartkids.vercel.app/. Do not confuse this repository with older BeSmartKids repositories.

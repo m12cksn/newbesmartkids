@@ -40,6 +40,7 @@ import { getMaterialBySlug, materials } from "@/data/materials";
 import { getQuestionsByMaterial } from "@/data/questions";
 import { SiteFooter } from "@/components/home/SiteFooter";
 import { SiteHeader } from "@/components/home/SiteHeader";
+import { chapterComponents } from "@/chapters/registry/components.generated";
 
 export function generateStaticParams() {
   return materials.flatMap((material) => {
@@ -166,6 +167,11 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 5</Link></div><KpkFpbExperience/><SiteFooter/></main>;
   }
 
+  // Bab dari src/chapters/<id>/ dirender otomatis; tidak perlu menambah cabang if baru di file ini.
+  const Chapter = chapterComponents[material.id];
+  if (Chapter) {
+    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover inline-flex items-center gap-1 text-sm text-success"><ArrowLeft className="size-4" aria-hidden="true" />Kembali ke kelas {classItem.id}</Link></div><Chapter /><SiteFooter /></main>;
+  }
   return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12"><Link href={`/kelas/${classItem.slug}`} className="btn btn-ghost btn-sm mb-6 px-0 text-base-content/60 hover:bg-transparent hover:text-success">&lt;- Kembali ke materi kelas {classItem.id}</Link><LearnExperience steps={getLearnSteps(material.slug)} materialTitle={material.title} questions={getQuestionsByMaterial(material.id)} /></div><SiteFooter /></main>;
 }
 
