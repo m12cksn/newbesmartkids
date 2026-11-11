@@ -26,6 +26,6 @@ try{for(const width of [320,390,768,1280]){
   await page.getByText('Benar 5 · Salah 0 · Skor 100/100',{exact:true}).waitFor();await page.getByRole('button',{name:'Kembali ke materi'}).click();
  }
  await page.getByRole('button',{name:'Evaluasi · 24 soal'}).click();
- for(const [i,q] of assessment.entries()){assert.ok(!(await page.getByRole('button',{name:/^(Lanjut →|Lihat hasil)$/}).count()));await answer(q,i===0);await shot(q.id);await page.getByRole('button',{name:i===23?'Lihat hasil':'Lanjut →',exact:true}).click();}
+ for(const [i,q] of assessment.entries()){assert.ok(!(await page.getByRole('button',{name:/^(Lanjut →|Lihat hasil)$/}).count()));await answer(q,i===0);if(q.scene.kind==='pair'){const cells=await page.locator('.grid-cols-7 > span').allTextContents();assert.equal(cells[2],'1,2');assert.equal(cells[7],'2,1');}await shot(q.id);await page.getByRole('button',{name:i===23?'Lihat hasil':'Lanjut →',exact:true}).click();}
  await page.getByText('Benar 23 · Salah 1 · Skor 96/100',{exact:true}).waitFor();await page.getByText('Bahas jawaban yang salah',{exact:true}).click();await page.getByText(/Jawaban benar/).waitFor();await shot('results');assert.deepEqual(errors,[]);await page.close();console.log(`Probability browser ${width} passed`);
 }}finally{await browser.close();}
