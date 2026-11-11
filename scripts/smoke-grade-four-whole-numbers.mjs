@@ -89,6 +89,7 @@ try {
     await button("Evaluasi Bab 1 →").click();
     for (const [i,q] of assessment.entries()) {
       await page.getByRole("heading",{name:q.prompt,exact:true}).waitFor();
+      if(q.wholeVisual?.kind==='operation'){const s=q.wholeVisual;const expected=s.values.map((_,j)=>j===0?'':j===2&&s.labels?.[1]==='?'?'=':s.labels?.[j-1]??s.labels?.[0]);assert.deepEqual(await page.locator('.font-mono > p > span').allTextContents(),expected);}
       const advance = button(i === 23 ? "Lihat hasil" : "Lanjut →");
       assert.equal(await advance.count(),0);
       await solve(q,i === 0 ? "1" : q.answer);
