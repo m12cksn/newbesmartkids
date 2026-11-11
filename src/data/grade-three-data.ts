@@ -34,7 +34,7 @@ const table=(s:Scene,label:string,tally=true)=>({label,rows:sceneRows(s),tally})
 const sortedValues=(s:Scene):Field=>({label:'Semua nilai dari terkecil',value:s.kind==='raw'?[...s.values].map(Number).sort((a,b)=>a-b).join(', '):'',type:'text'});
 export const practice:DQuestion[]=[
  make('p1',0,family,'Urutkan nama anak dari anggota keluarga paling sedikit.',[ordered(family,'Urutan nama')],'199'),
- make('p2',0,family,'Tuliskan semua nama dengan anggota keluarga terbanyak dan semua nama yang berjumlah 7.',[set('Terbanyak',extreme(family,true)),set('Berjumlah 7',equal(family,7))],'199'),
+ make('p2',0,family,'Tuliskan semua nama dengan anggota keluarga terbanyak dan nama dengan anggota keluarga paling sedikit.',[set('Terbanyak',extreme(family,true)),set('Paling sedikit',extreme(family,false))],'199'),
  make('p3',0,scores1,'Urutkan seluruh nilai dari terkecil. Tuliskan jangkauannya.',[sortedValues(scores1),num('Jangkauan',scoreRange(scores1))],'200,207','menantang'),
  make('p4',0,objects2,'Hitung gambar. Urutkan nama benda dari yang paling sedikit dan tuliskan semua benda yang berjumlah 2.',[ordered(objects2,'Urutan benda'),set('Berjumlah 2',equal(objects2,2))],'210','menantang'),
  make('p5',0,story,'Siapa yang membutuhkan buku terbanyak? Siapa saja yang membutuhkan buku sama banyak (9 buku)?',[set('Terbanyak',extreme(story,true)),set('Sama banyak',equal(story,9))],'209','menantang'),
@@ -72,7 +72,7 @@ export const assessment:DQuestion[]=[
 ];
 export const parse=(answer:string|undefined):string[]=>{try{const a=JSON.parse(answer??'[]');return Array.isArray(a)?a.map(String):[];}catch{return [];}};
 const tokens=(s:string)=>s.trim().toLocaleLowerCase('id').split(/[\s,;|→]+/).filter(Boolean);
-export const ready=(q:DQuestion,a:string)=>{const v=parse(a);return q.fields.every((f,i)=>Boolean(v[i]?.trim())&&(f.type!=='order'||tokens(v[i]).length===Object.keys(f.counts??{}).length));};
+export const ready=(q:DQuestion,a:string)=>{const v=parse(a);return q.fields.every((f,i)=>Boolean(v[i]?.trim())&&(f.type!=='order'||tokens(v[i]).length===Object.keys(f.counts??{}).length)&&(f.type!=='text'||tokens(v[i]).length===tokens(f.value).length));};
 export function correct(q:DQuestion,a:string|undefined){if(!ready(q,a??''))return false;const v=parse(a);return q.fields.every((f,i)=>{
  if(f.type==='number')return /^\d+$/.test(v[i])&&Number(v[i])===Number(f.value);
  const given=tokens(v[i]),expected=tokens(f.value);
