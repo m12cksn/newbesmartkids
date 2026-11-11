@@ -1,10 +1,9 @@
+import { CirclePlay, LayoutGrid, ListChecks } from "lucide-react";
+
 const steps = [
-  { n: "01", title: "Pilih kelas", text: "Mulai dari jenjang yang sedang dipelajari anak.",
-    icon: <g><rect x="8" y="26" width="12" height="12" rx="2" className="fill-success/25" /><rect x="22" y="18" width="12" height="20" rx="2" /><rect x="36" y="10" width="12" height="28" rx="2" className="fill-warning/40" /><text x="28" y="31" fontSize="8" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="800">6</text></g> },
-  { n: "02", title: "Pahami konsep", text: "Tonton penjelasan, lalu geser dan ketuk peraga sampai konsepnya terlihat.",
-    icon: <g><circle cx="22" cy="24" r="14" /><path d="M22 24V10a14 14 0 0 1 14 14z" className="fill-success/30" /><path d="M42 16l8 5-8 5z" className="fill-warning/60" /></g> },
-  { n: "03", title: "Latihan dan evaluasi", text: "Coba soal bertahap, lihat skor, dan pelajari pembahasan jawaban yang salah.",
-    icon: <g><rect x="10" y="8" width="36" height="32" rx="4" /><path className="bsk-draw" style={{ ["--len" as string]: 40 }} d="M18 24l7 7 14-15" strokeWidth="3.5" /></g> },
+  { n: "01", title: "Pilih kelas", text: "Mulai dari jenjang yang sedang dipelajari anak.", Icon: LayoutGrid },
+  { n: "02", title: "Pahami konsep", text: "Tonton penjelasan, lalu geser dan ketuk peraga sampai konsepnya terlihat.", Icon: CirclePlay },
+  { n: "03", title: "Latihan dan evaluasi", text: "Coba soal bertahap, lihat skor, dan pelajari pembahasan jawaban yang salah.", Icon: ListChecks },
 ];
 
 export function HowItWorks() {
@@ -18,8 +17,8 @@ export function HowItWorks() {
           </svg>
           {steps.map((s) => (
             <div key={s.n} className="bsk-reveal relative text-center">
-              <div className="mx-auto grid size-[4.5rem] place-items-center rounded-2xl border border-base-300 bg-base-100 text-success shadow-sm">
-                <svg viewBox="0 0 56 48" className="size-12" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{s.icon}</svg>
+              <div className="mx-auto grid size-[4.5rem] place-items-center rounded-full border border-base-300 bg-base-100 text-success">
+                <s.Icon className="size-8" strokeWidth={1.5} aria-hidden="true" />
               </div>
               <span className="mt-4 block text-sm font-extrabold text-warning">{s.n}</span>
               <h3 className="mt-1 text-xl font-extrabold">{s.title}</h3>

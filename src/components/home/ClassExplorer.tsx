@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight } from "lucide-react";
 
 import Link from "next/link";
 import { useMemo, useState, type CSSProperties } from "react";
@@ -65,10 +66,10 @@ export function ClassExplorer({ counts }: { counts: Record<number, number> }) {
                 <p className="text-sm font-extrabold leading-snug sm:text-base">{tag}</p>
                 <div className="mt-auto flex items-center justify-between gap-2">
                   {count
-                    ? <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-bold text-success sm:text-xs"><span className="size-1.5 rounded-full bg-success" aria-hidden="true" />{count} materi</span>
+                    ? <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-bold text-success sm:text-xs">{count} materi</span>
                     : <span className="rounded-full bg-base-200 px-2.5 py-1 text-[11px] font-bold text-base-content/45 sm:text-xs">Segera hadir</span>}
                   <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-neutral text-neutral transition duration-300 group-hover:bg-neutral group-hover:text-white sm:size-9">
-                    <svg viewBox="0 0 16 16" className="size-4 transition duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
+                    <ArrowRight className="size-4 transition duration-300 group-hover:translate-x-0.5" strokeWidth={2.25} />
                   </span>
                 </div>
               </div>
