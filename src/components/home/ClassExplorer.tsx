@@ -27,8 +27,7 @@ export function ClassExplorer({ counts }: { counts: Record<number, number> }) {
     <section id="kelas" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-24">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-success">Ruang belajar</p>
-          <h2 className="mt-3 text-4xl font-extrabold tracking-normal sm:text-5xl">Mulai dari kelasmu</h2>
+          <h2 className="text-4xl font-extrabold tracking-normal sm:text-5xl">Mulai dari kelasmu</h2>
           <p className="mt-4 max-w-lg text-base text-base-content/60">Setiap kelas memiliki materi yang disusun sesuai tahap belajar anak.</p>
         </div>
         <div role="tablist" aria-label="Fase belajar" className="flex w-fit max-w-full flex-wrap gap-1 rounded-2xl bg-base-200 p-1">
