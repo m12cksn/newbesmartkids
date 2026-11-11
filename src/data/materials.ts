@@ -1,3 +1,4 @@
+import { chapterMetas } from "@/chapters/registry/metas.generated";
 export type MaterialItem = {
   id: string;
   classId: number;
@@ -10,6 +11,8 @@ export type MaterialItem = {
   videoStatus: "available" | "coming_soon";
   summary: string;
   questionIds: string[];
+  /** Tanggal bab ditambahkan (YYYY-MM-DD), untuk urutan "Materi terbaru". Wajib untuk bab di src/chapters. */
+  addedAt?: string;
 };
 
 export const materials: MaterialItem[] = [
@@ -210,4 +213,15 @@ export function getMaterialsByClass(classId: number) {
 
 export function getMaterialBySlug(slug: string) {
   return materials.find((material) => material.slug === slug);
+}
+
+/* Bab baru ditambahkan lewat folder src/chapters/<id>/ (lihat src/chapters/README.md), bukan dengan mengedit daftar di atas.
+   Bab dari registri ditaruh paling depan, yang terbaru lebih dulu. */
+materials.unshift(...[...chapterMetas].sort((a, b) => (b.addedAt ?? "").localeCompare(a.addedAt ?? "")));
+{
+  const seen = new Map<string, string>();
+  for (const m of materials) for (const key of [`id:${m.id}`, `slug:${m.slug}`]) {
+    if (seen.has(key)) throw new Error(`Materi ganda (${key}) di ${m.title} dan ${seen.get(key)}`);
+    seen.set(key, m.title);
+  }
 }

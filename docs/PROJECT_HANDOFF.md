@@ -1,5 +1,7 @@
 # BeSmartKids project handoff
 
+> Mulai 11 Nov 2026, catatan per perubahan ditulis sebagai file baru di `docs/handoff/` dan bab baru dibuat di `src/chapters/<id>/` agar sesi paralel tidak bentrok. Lihat `AGENTS.md` bagian Parallel sessions.
+
 Last reviewed: 11 November 2026 (Asia/Jakarta).
 Code baseline inspected: `f6c6cf602bba9206f6a20103e3b39b652f0f4c80` on master.
 This is a snapshot. Check master and open PRs before acting.
