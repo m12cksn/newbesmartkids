@@ -11,3 +11,5 @@ Perubahan:
 - Bab lama tidak dipindahkan (tetap di daftar dan cabang `if` yang ada) agar PR ini tidak bentrok dengan pekerjaan yang sedang berjalan.
 
 Validasi: tsc, ESLint, build; bab percobaan sementara `kelas-9-uji-registri` muncul di rute, halaman kelas, dan beranda lalu dihapus; smoke beranda dan Kelas 2 Bab 5 lulus. Website tidak berubah tampilannya.
+
+Rilis: PR #81, merged as 67d05efcd61adb8fc8f595ed0295511f45c3555d setelah persetujuan pemilik. Ke-17 cek CI lulus (termasuk Grade 5 Whole QA dan Grade 2 Measurement QA); deploy produksi Vercel sukses.
