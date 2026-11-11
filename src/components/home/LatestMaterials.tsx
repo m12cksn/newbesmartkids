@@ -12,8 +12,7 @@ export function LatestMaterials() {
     <section id="materi-terbaru" aria-labelledby="materi-terbaru-title" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-20">
       <div className="bsk-reveal flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-success">Baru ditambahkan</p>
-          <h2 id="materi-terbaru-title" className="mt-3 text-4xl font-extrabold sm:text-5xl">Materi terbaru</h2>
+          <h2 id="materi-terbaru-title" className="text-4xl font-extrabold sm:text-5xl">Materi terbaru</h2>
           <p className="mt-3 max-w-lg text-base-content/60">Setiap materi berisi peraga interaktif, latihan per subtopik, dan evaluasi dengan pembahasan.</p>
         </div>
         <a href="#kelas" className="link link-success inline-flex items-center gap-1.5 font-bold no-underline hover:underline">Lihat semua kelas <ArrowRight className="size-4" aria-hidden="true" /></a>
