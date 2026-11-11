@@ -17,4 +17,5 @@ assert.ok(correct(assessment[6],'7|5'));assert.ok(correct(assessment[6],'11|1'))
 assert.ok(correct(assessment[3],'1|2|4|2|2|6'));assert.ok(!correct(assessment[3],'2|2|2|2|1|1'));
 for(let n=0;n<=12;n++)assert.equal(correct(assessment[6],`${n}|${12-n}`),n>6&&n<12);
 assert.ok(!ready(paint,'0|0|0|0|0|0|1|1|1|'));
+assert.equal(Array.from({length:36},(_,i)=>[Math.floor(i/6)+1,i%6+1]).filter(([x,y])=>x===2||y===2).length,11);assert.ok(11/36>1/6);assert.equal(assessment[22].answer,'B lebih mungkin; kurang adil');
 console.log('39 questions, 24 interleaved evaluation keys, boundaries and alternate constructions passed');

@@ -1,7 +1,7 @@
 import type {Question} from './grade-four-whole-numbers';
 export const scale=['Tidak mungkin','Kurang mungkin','Mungkin','Sangat mungkin','Pasti'];
 export const category=(n:number,total:number)=>n===0?0:n===total?4:n*2<total?1:n*2===total?2:3;
-export type Scene={kind:'bag'|'dice'|'wheel'|'boxes'|'rules'|'record';labels:string[];values:number[][]};
+export type Scene={kind:'bag'|'dice'|'wheel'|'boxes'|'rules'|'record'|'pair';labels:string[];values:number[][]};
 export type ProbabilityQuestion=Question & {id:string;topic:number;level:string;scene:Scene;task?:'paint'|'dice'|'counts';constraint?:number[];fields?:string[]};
 const scene=(kind:Scene['kind'],labels:string[],...values:number[][]):Scene=>({kind,labels,values});
 const q=(id:string,topic:number,prompt:string,answer:string,options:string[]|undefined,explanation:string,s:Scene,extra:Partial<ProbabilityQuestion>={}):ProbabilityQuestion=>({id,topic,prompt,answer,options,explanation,scene:s,mode:options?'choice':undefined,level:'Menantang',...extra});
@@ -52,7 +52,7 @@ const a:ProbabilityQuestion[]=[
  q('e20',1,'A menang pada 2; B pada 3 atau 5. Tambahkan satu angka menang untuk A agar adil. Pilih semua tambahan yang mungkin.','1|4|6',['1','2','4','6'],'Tambahan harus berbeda dari2 agar A mempunyai dua hasil. Semua pilihan1,4,6 memenuhi.',scene('rules',['A menang','B menang'],[2],[3,5]),{mode:'multiple'}),
  q('e21',2,'A mempunyai 2 merah dari 5. B mempunyai 5 merah dari 10. Mengapa memilih B?','Bagian merah B lebih besar',['Karena semua bola B merah','Bagian merah B lebih besar','Karena B pasti merah'],'A=4/10, B=5/10. Lebih besar bukan pasti.',scene('boxes',['A','B'],[2,3],[5,5])),
  q('e22',0,'Prediksi peluang merah pada isi kantong ini.',scale[2],scale,'4 dari8 tepat setengah: seimbang.',scene('bag',['Merah','Biru'],[4,4])),
- q('e23',1,'Dua pemain menggunakan roda yang sama. Mana kesimpulan benar?','Kurang adil: merah 6 dari 8, biru 2 dari 8',['Adil karena ada dua warna','Kurang adil: merah 6 dari 8, biru 2 dari 8','Biru pasti kalah'],'Jumlah sektor sama luas untuk kedua warna berbeda; biru masih mungkin menang.',scene('wheel',['Merah','Biru'],[0,0,0,0,0,0,1,1])),
+ q('e23',1,'A melempar satu dadu; B dua dadu seimbang. Menang jika sedikitnya satu dadu menunjukkan 2. Pilih kesimpulan yang benar.','B lebih mungkin; kurang adil',['Adil karena target sama','B lebih mungkin; kurang adil','A lebih mungkin; kurang adil'],'Pada petak pasangan, B menang pada 11 dari 36 hasil. A menang 1 dari 6, setara 6 dari 36. Jadi B lebih mungkin; dua kesempatan tidak berarti pasti menang.',scene('pair',['A · satu dadu','B · dua dadu'],[2])),
  q('e24',2,'Mira memilih A karena 6 bola merah lebih banyak dari B. Perbaiki alasannya.','B lebih baik: 4/6 lebih besar dari 6/12',['A lebih baik karena 6 > 4','B lebih baik: 4/6 lebih besar dari 6/12','Keduanya pasti merah'],'Bandingkan terhadap total: A setengah, B dua pertiga.',scene('boxes',['A','B'],[6,6],[4,2]))
 ];
 export const assessment=a.map((x,i)=>({...x,level:i<8?'Sedang':i<17?'Menantang':'Sangat menantang'}));
