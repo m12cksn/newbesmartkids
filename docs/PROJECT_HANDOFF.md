@@ -1,7 +1,7 @@
 # BeSmartKids project handoff
 
 Last reviewed: 11 November 2026 (Asia/Jakarta).
-Code baseline inspected: `09ddb6924440a99223dd458cb2668749d6a18722` on master.
+Code baseline inspected: `6707176af7dd0764c0027c52fc46b8892a8e9df3` on master.
 This is a snapshot. Check master and open PRs before acting.
 
 ## Start here
@@ -32,7 +32,7 @@ Presence below is verified against src/data/materials.ts and component paths; it
 | Course | Content |
 | --- | --- |
 | Grade 1 | Bab 1 counting to 10; Bab 2 addition to 10; Bab 3 subtraction to 10; Bab 4 shapes; Bab 5 counting to 20; Bab 6 addition/subtraction to 20; Bab 7 object length; Bab 8 diagrams |
-| Grade 2 | Bab 1 Ayo Membilang sampai 50 (PR #63, merged 26edcba; see docs/GRADE_TWO_CHAPTER_ONE.md) |
+| Grade 2 | Bab 1 Ayo Membilang sampai 50 (PR #63); Bab 2 Penjumlahan dan Pengurangan (PR #65). Both entries confirmed in production catalog on 11 Nov 2026. |
 | Grade 3 | Bab 1 Bilangan Cacah sampai 1.000 (PR #57); Bab 2 Kalimat Matematika (PR #56); Bab 3 Pengukuran Panjang dan Berat (PR #59); Bab 4 Unsur-Unsur Bangun Datar (PR #60); Bab 5 Penyajian Data dalam Tabel (PR #61). All five entries confirmed in production catalog on 11 Nov 2026. |
 | Grade 4 | Bab 1 whole numbers to 10,000; Bab 2 fractions; Bab 3 picture/number patterns; Bab 4 area/volume; Bab 5 plane shapes; Bab 6 pictograms/bar charts |
 | Grade 5 | KPK and FPB entry and dedicated experience |
@@ -110,6 +110,8 @@ Request: homepage felt too plain; add math effects and animation while keeping i
 - Follow-up 11 Nov 2026 (branch feat/class-cards-contrast): class cards redesigned for higher contrast: coloured panel per phase from the brand palette (Fondasi green, Akselerasi dark green #17352a, Mahir yellow, Terapan deep green #14674f), large class number, drifting phase symbols, material-count pill, neutral offset shadow on hover; phase tabs restyled. Homepage smoke updated and passing at 320/390/768/1280.
 
 ## Open work and uncertainty
+
+11 Nov 2026 — Kelas 2 Bab 2 Penjumlahan dan Pengurangan delivered via PR #65, merged as 6707176af7dd0764c0027c52fc46b8892a8e9df3. Source: supplied 28-page PDF, book 37–64; mapping docs/GRADE_TWO_ARITHMETIC.md. Three studios with forward/backward steps, guided vertical carry/borrow, number bonds and dynamic story relations. Five practices per topic (15) and 24 interleaved evaluations (8 per topic; difficulty 8/9/7). Source formats retained: numeric line answers, vertical columns, number-bond trees, Diketahui/Ditanya/Solusi/Jadi story sheets and three source-style MC items (plants, equal equation, abacus); weighted shapes use written answers. Story addition accepts reversed operands. Every field must be completed before progression; final results include correct/wrong/score and review. SVG object and visual-choice counts checked; unknown groups remain hidden. Code: GradeTwoArithmetic.tsx, GradeTwoArithmeticVisuals.tsx, grade-two-arithmetic.ts. Independent verification, ESLint and webpack production build passed locally; local Chromium blocked by host socket permissions. Final integrated head dcd88911f8899356fca6dd26b70e40f9a1b779b4 passed all 12 PR workflows, including Arithmetic QA 43009650015 and broad regression 43009650078. Browser CI covers all 39 questions and three studios at 320/390/768/1280, both guided examples per operation, actual carry/borrow changes, image counts, commutative answers, complete-field gating, 23 correct/1 wrong=96/100 and review. Final screenshot artifact 13848904825 reviewed, including all assessment scenes and intermediate guided steps; no text/image/key mismatch found. Tests: scripts/verify-grade-two-arithmetic.mjs, smoke-grade-two-arithmetic.mjs; workflow grade-two-arithmetic-qa.yml. Vercel production deployment succeeded. Chapter /kelas/bermain-angka-kelas-2/materi/penjumlahan-dan-pengurangan, class catalog and homepage returned HTTP 200; confirmed live title, interactive controls, video placeholder, 24-evaluation entry and chapter links in catalog/home. Bab 1 remains present. Concurrent master 3d1f70e (homepage/Lucide/design rules) preserved; only handoff conflict, both records retained. User explicitly authorized automatic merge/publication after checks. Video remains a labeled placeholder.
 
 11 Nov 2026 — Homepage and class-page label cleanup (branch fix/homepage-labels). Removed eyebrow labels ("Ruang belajar", "Baru ditambahkan", "Setiap hari pukul 00.00 WIB" moved into a sentence under the heading, "Latihan harian · 3 level", hero pill with bobbing dot), "Coba sekarang" now sentence case. Class page: eyebrow "Materi kelas N" became the h2 in place of a figurative heading, phase badge folded into the description, back link uses Lucide ArrowLeft. MaterialCard: topic icon plus "Bab N, Topik" instead of an uppercase topic label and "Materi 0N"; video badge now "Video segera hadir"; Lucide ArrowRight. Local build, smoke-homepage, smoke-grade-two-counting-50 and smoke-daily-arithmetic passed at 320/390/768/1280. Hero headline coloured phrase kept (brand signature) pending owner decision.
 
