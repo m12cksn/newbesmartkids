@@ -11,9 +11,6 @@ export function HeroSection() {
       <MathOrnaments />
       <div className="relative mx-auto grid w-full max-w-7xl items-center gap-14 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24">
         <div className="bsk-pop-in min-w-0">
-          <div className="badge badge-success badge-outline mb-6 gap-2 px-3 py-3">
-            <span className="size-2 rounded-full bg-success bsk-bob" aria-hidden="true" /> Untuk perjalanan belajar anak
-          </div>
           <h1 className="max-w-2xl text-5xl font-extrabold leading-[1.05] sm:text-7xl lg:text-6xl">
             Matematika yang{" "}
             <span className="relative inline-block text-success">

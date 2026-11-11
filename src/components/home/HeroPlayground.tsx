@@ -23,7 +23,7 @@ export function HeroPlayground() {
         <div className="bsk-graph-paper pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-base-content/50">Coba sekarang</span>
+            <span className="text-sm font-semibold text-base-content/60">Coba geser sendiri</span>
             <span className="badge badge-warning badge-outline">Peraga pecahan</span>
           </div>
           <div className="mt-4 grid items-center gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
