@@ -13,7 +13,7 @@ export type ArtName =
 const ink = "#17352a";
 const o = { stroke: ink, strokeWidth: 1.6, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
-const art: Record<ArtName, ReactNode> = {
+export const objectArtNodes: Record<ArtName, ReactNode> = {
   apple: <><path d="M24 15c-6-4-15-1-15 9 0 10 7 18 15 15 8 3 15-5 15-15 0-10-9-13-15-9z" fill="#e5484d" {...o} /><path d="M24 15c0-4 1-7 4-9" fill="none" {...o} /><path d="M26 11c4-4 9-3 10-1-3 3-7 3-10 1z" fill="#3fa16b" {...o} /><path d="M15 21c1-2 3-3 5-3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".7" /></>,
   orange: <><circle cx="24" cy="26" r="15" fill="#f59f00" {...o} /><path d="M24 11c0-2 1-4 3-5" fill="none" {...o} /><path d="M25 10c3-3 8-3 9-1-2 3-6 3-9 1z" fill="#3fa16b" {...o} />{[[18, 22], [29, 20], [21, 32], [31, 30], [25, 26]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r=".9" fill="#c77700" />)}</>,
   egg: <><path d="M24 6c-8 0-13 13-13 22 0 8 6 14 13 14s13-6 13-14c0-9-5-22-13-22z" fill="#fdf6e3" {...o} /><path d="M18 18c1-3 3-5 5-6" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></>,
@@ -50,7 +50,7 @@ const art: Record<ArtName, ReactNode> = {
 };
 
 export function ObjectArt({ name, className = "size-8", label }: { name: ArtName; className?: string; label?: string }) {
-  return <svg viewBox="0 0 48 48" className={className} {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}>{art[name]}</svg>;
+  return <svg viewBox="0 0 48 48" className={className} {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}>{objectArtNodes[name]}</svg>;
 }
 
-export const artNames = Object.keys(art) as ArtName[];
+export const artNames = Object.keys(objectArtNodes) as ArtName[];
