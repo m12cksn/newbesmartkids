@@ -104,7 +104,8 @@ Request: homepage felt too plain; add math effects and animation while keeping i
 - Animations are CSS only (transform/opacity, scroll-driven reveal where supported) and disabled under prefers-reduced-motion. No new dependencies.
 - Local measurement (Playwright, production build, not real-user data): homepage transfer 260 KB → 228 KB at 1280 px, JS 145 → 146 KB, mobile CLS 0.273 → 0.051.
 - Tests: scripts/smoke-homepage.mjs (320/390/768/1280, with and without reduced motion, playground, tabs, click paths) added to CI; daily arithmetic/addition and Grade 6 Bab 1 smoke re-run locally and passed.
-- Status: draft PR awaiting owner review; not merged, not live.
+- Status: merged as PR #52 (merge commit dbb102e); Vercel production deployment reported success. Production page not opened from the agent sandbox (network blocked).
+- Follow-up 11 Nov 2026 (branch feat/class-cards-contrast): class cards redesigned for higher contrast: coloured panel per phase from the brand palette (Fondasi green, Akselerasi dark green #17352a, Mahir yellow, Terapan deep green #14674f), large class number, drifting phase symbols, material-count pill, neutral offset shadow on hover; phase tabs restyled. Homepage smoke updated and passing at 320/390/768/1280.
 
 ## Open work and uncertainty
 

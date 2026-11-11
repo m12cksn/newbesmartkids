@@ -20,7 +20,7 @@ try{
    await page.getByRole("img",{name:"Lingkaran dibagi 8 bagian, 2 bagian diarsir"}).waitFor();
    await page.locator("p[aria-live=polite]").filter({hasText:"25%"}).first().waitFor();
    // Kartu kelas menampilkan jumlah materi nyata, dan tab fase tetap berfungsi.
-   await page.getByText(/materi tersedia/).first().waitFor({state:"attached"});
+   await page.locator("#kelas").getByText(/^\d+ materi$/).first().waitFor({state:"attached"});
    await page.getByRole("tab",{name:"Mahir"}).click();
    assert.equal(await page.locator('#kelas a[href^="/kelas/"]').count(),3);
    await page.getByRole("tab",{name:"Semua kelas"}).click();
