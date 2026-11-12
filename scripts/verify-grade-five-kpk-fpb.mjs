@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
 import { assessment, practice, topics, correct, ready, formatAnswer, SEP, fields, factorsOf, isPrime, gcd, lcm, gcdAll, lcmAll, primeFactors, ladderOk, ladderRows, months } from "../src/data/grade-five-kpk-fpb.ts";
 
-assert.equal(topics.length, 5);
-assert.deepEqual(practice.map(p => p.length), [4, 4, 4, 4, 4]);
+assert.equal(topics.length, 6);
+assert.deepEqual(practice.map(p => p.length), [4, 4, 4, 4, 4, 4]);
 practice.forEach((list, t) => list.forEach(q => assert.equal(q.topic, t, q.prompt)));
 assert.equal(assessment.length, 24);
 const tally = (list, key) => list.reduce((a, q) => (a[key(q)] = (a[key(q)] ?? 0) + 1, a), {});
 const perTopic = tally(assessment, q => q.topic);
-assert.equal(Object.keys(perTopic).length, 5); Object.values(perTopic).forEach(c => assert.ok(c >= 4 && c <= 6, JSON.stringify(perTopic)));
+assert.equal(Object.keys(perTopic).length, 6); Object.values(perTopic).forEach(c => assert.ok(c >= 2 && c <= 6, JSON.stringify(perTopic)));
+// Subtopik F memakai pembagian berulang, dan semua soal pembagian berulang ada di F.
+for (const q of [...practice.flat(), ...assessment]) if (q.parts.some(p => p.kind === "ladder")) assert.equal(q.topic, 5, q.prompt);
+assert.ok(assessment.filter(q => q.topic === 5).length >= 2);
 assert.deepEqual(tally(assessment, q => q.level), { Sedang: 8, Menantang: 9, "Sangat menantang": 7 });
 const order = { Sedang: 0, Menantang: 1, "Sangat menantang": 2 };
 for (let i = 1; i < 24; i++) {

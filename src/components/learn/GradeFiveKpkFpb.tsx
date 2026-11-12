@@ -171,7 +171,42 @@ function TreeLab() {
     <output data-testid="lab-result" data-value={done ? [...ps, ...(rest > 1 ? [rest] : [])].join(",") : ""} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-sm">{done ? `Semua ujung pohon sudah bilangan prima.` : `Ketuk bilangan prima yang habis membagi ${rest}.`}</output>
   </div>;
 }
-const labs = [MultLab, CommonLab, CutLab, CongklakLab, TreeLab];
+/** Alur ringkas pembagian berulang. */
+function LadderSteps() {
+  return <ol className="grid gap-1.5 text-sm sm:grid-cols-3">
+    {[["Tulis", "bilangan-bilangannya berdampingan."], ["Bagi", "dengan prima terkecil yang bisa. Yang tidak habis, tulis lagi."], ["Ulangi", "sampai semua menjadi 1."]].map(([a, b], i) =>
+      <li key={a} className="flex gap-2 rounded-lg border border-sky-200 bg-white p-2"><span className="grid size-6 shrink-0 place-items-center rounded-full bg-sky-700 text-xs font-bold text-white">{i + 1}</span><span><strong>{a}</strong> {b}</span></li>)}
+  </ol>;
+}
+const ladderSets = [[12, 18], [24, 36], [42, 60], [72, 150], [8, 12, 20], [12, 18, 30]];
+function LadderLab() {
+  const [set, setSet] = useState(0), [ds, setDs] = useState<number[]>([]), [msg, setMsg] = useState("");
+  const nums = ladderSets[set];
+  const rows = ds.reduce<{ d: number; before: number[]; after: number[] }[]>((acc, d) => { const before = acc.at(-1)?.after ?? nums; return [...acc, { d, before, after: before.map(x => (x % d === 0 ? x / d : x)) }]; }, []);
+  const cur = rows.at(-1)?.after ?? nums, done = cur.every(x => x === 1);
+  const allDiv = (r: { d: number; before: number[] }) => r.before.every(x => x % r.d === 0);
+  const kpk = ds.reduce((a, b) => a * b, 1), fpbList = rows.filter(allDiv).map(r => r.d), fpb = fpbList.reduce((a, b) => a * b, 1);
+  const tap = (p: number) => { if (!cur.some(x => x % p === 0)) { setMsg(`Tidak ada bilangan yang habis dibagi ${p}. Coba prima lain.`); return; } setMsg(""); setDs([...ds, p]); };
+  return <div className="space-y-3">
+    <LadderSteps />
+    <div role="group" aria-label="Pilih bilangan" className="flex flex-wrap gap-1">{ladderSets.map((x, k) => <button key={k} type="button" aria-pressed={k === set} className={`btn btn-xs ${k === set ? "btn-success" : "btn-outline"}`} onClick={() => { setSet(k); setDs([]); setMsg(""); }}>{x.join(", ")}</button>)}</div>
+    <div className="overflow-x-auto rounded-xl bg-base-100 p-2"><table className="w-full border-collapse text-center text-sm">
+      <thead><tr className="bg-sky-700 text-white"><th className="px-2 py-1 text-xs">Pembagi</th>{nums.map((n, i) => <th key={i} className="px-2 py-1">{n}</th>)}<th className="px-1 py-1 text-xs">FPB?</th></tr></thead>
+      <tbody>{rows.map((r, i) => <tr key={i} className={i % 2 ? "bg-orange-50" : "bg-orange-100"}><td className="py-1 font-extrabold text-sky-800">{r.d}</td>
+        {r.after.map((x, j) => <td key={j} className={r.before[j] % r.d === 0 ? "font-bold" : "text-base-content/40"}>{x}</td>)}
+        <td>{allDiv(r) && <span className="badge badge-success badge-sm">semua</span>}</td></tr>)}</tbody>
+    </table></div>
+    {!done ? <div role="group" aria-label="Bagi dengan" className="flex flex-wrap items-center gap-1.5"><span className="text-sm">Bagi {cur.join(", ")} dengan:</span>
+      {[2, 3, 5, 7].map(p => <button key={p} type="button" aria-label={`Bagi dengan ${p}`} className="btn btn-sm btn-outline w-10" onClick={() => tap(p)}>{p}</button>)}
+      {ds.length > 0 && <button type="button" className="btn btn-sm btn-ghost gap-1" onClick={() => { setDs(ds.slice(0, -1)); setMsg(""); }}><Undo2 className="size-4" aria-hidden="true" />Batalkan</button>}</div>
+      : <button type="button" className="btn btn-sm btn-ghost gap-1" onClick={() => setDs([])}><RotateCcw className="size-4" aria-hidden="true" />Ulangi</button>}
+    {msg && <p className="text-sm text-warning-content">{msg}</p>}
+    <output data-testid="lab-result" data-value={done ? `${kpk}|${fpb}` : ""} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-sm leading-6">
+      {done ? <>Semua sudah 1.<br />KPK = kalikan semua pembagi = {ds.join(" × ")} = <strong>{kpk}</strong>.<br />FPB = kalikan pembagi bertanda &quot;semua&quot; = {fpbList.length ? `${fpbList.join(" × ")} = ` : ""}<strong>{fpb}</strong>{fpbList.length ? "" : " (tidak ada pembagi bersama)"}.</> : "Ketuk bilangan prima terkecil yang dapat membagi salah satu bilangan."}
+    </output>
+  </div>;
+}
+const labs = [MultLab, CommonLab, CutLab, CongklakLab, TreeLab, LadderLab];
 
 /* ====================================================================== */
 /* Gambar soal                                                             */
@@ -242,13 +277,14 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
     </div>;
     case "ladder": {
       const k = x.length - 2, cols = p.nums.length + 1;
-      return <div className="space-y-2"><div className="overflow-x-auto"><table className="border-collapse text-center text-sm">
-        <thead><tr className="bg-sky-700 text-white"><th className="px-2 py-1 text-xs">Pembagi prima</th>{p.nums.map(n => <th key={n} className="px-2 py-1">{n}</th>)}</tr></thead>
+      return <div className="space-y-2"><LadderSteps /><div className="overflow-x-auto"><table className="border-collapse text-center text-sm">
+        <thead><tr className="bg-sky-700 text-white"><th className="px-2 py-1 text-xs">Pembagi prima</th>{p.nums.map(n => <th key={n} className="px-2 py-1">{n}</th>)}<th className="px-1 py-1 text-xs">FPB?</th></tr></thead>
         <tbody>{Array.from({ length: k }, (_, r) => { const row = (x[r] || "").split(","); const setCell = (c: number, v: string) => { const a = Array.from({ length: cols }, (_, j) => row[j] ?? ""); a[c] = v; put(r, a.join(",")); };
           return <tr key={r} className={r % 2 ? "bg-orange-50" : "bg-orange-100"}><td className="p-1"><Box label={`Baris ${r + 1} pembagi`} value={row[0] ?? ""} onChange={v => setCell(0, v)} disabled={checked} w="w-12" /></td>
-            {p.nums.map((n, c) => <td key={n} className="p-1"><Box label={`Baris ${r + 1} hasil ${n}`} value={row[c + 1] ?? ""} onChange={v => setCell(c + 1, v)} disabled={checked} w="w-14" /></td>)}</tr>; })}</tbody>
+            {p.nums.map((n, c) => <td key={n} className="p-1"><Box label={`Baris ${r + 1} hasil ${n}`} value={row[c + 1] ?? ""} onChange={v => setCell(c + 1, v)} disabled={checked} w="w-14" /></td>)}
+            <td className="px-1">{(() => { const d = Number(row[0]), prev = r === 0 ? p.nums : (x[r - 1] || "").split(",").slice(1).map(Number); return d > 1 && prev.length === p.nums.length && prev.every(y => y > 0 && y % d === 0) ? <span className="badge badge-success badge-sm">semua</span> : null; })()}</td></tr>; })}</tbody>
       </table></div>
-        <p className="text-xs text-base-content/60">Bagi dengan bilangan prima. Bilangan yang tidak habis dibagi ditulis lagi. Berhenti saat semua menjadi 1.</p>
+        <p className="text-xs text-base-content/60">KPK = kalikan semua pembagi. FPB = kalikan pembagi bertanda &quot;semua&quot;.</p>
         <div className="flex flex-wrap gap-4 font-bold"><label className="flex items-center gap-2">KPK = <Box label="KPK" value={x[k]} onChange={y => put(k, y)} disabled={checked} w="w-20" /></label><label className="flex items-center gap-2">FPB = <Box label="FPB" value={x[k + 1]} onChange={y => put(k + 1, y)} disabled={checked} w="w-20" /></label></div>
       </div>;
     }
@@ -281,7 +317,7 @@ export default function GradeFiveKpkFpb() {
       </div>
       <div className="flex flex-col justify-center p-6">
         <h2 className="text-xl font-bold">Latihan renang Nisa dan Yohana</h2>
-        <p className="mt-2 text-sm text-base-content/60">5 peraga, {practice.flat().length} latihan, dan {assessment.length} soal evaluasi.</p>
+        <p className="mt-2 text-sm text-base-content/60">{topics.length} peraga, {practice.flat().length} latihan, dan {assessment.length} soal evaluasi.</p>
         <a className="btn btn-success mt-4 self-start" href="#materi-kpk">Mulai belajar</a>
       </div>
     </div>

@@ -68,6 +68,12 @@ try {
         assert.equal(await result(), "4"); await page.getByTestId("lab-result").filter({ hasText: "FPB dari 12 dan 18 adalah 6" }).waitFor();
       }
       if (t === 4) { await button("Bagi dengan 7").click(); await page.getByText("300 tidak habis dibagi 7. Coba bilangan prima lain.").waitFor(); for (const p of [2, 2, 3, 5]) await button(`Bagi dengan ${p}`).click(); assert.equal(await result(), primeFactors(300).join(",")); }
+      if (t === 5) {
+        assert.equal(await result(), ""); await button("Bagi dengan 5").click(); await page.getByText("Tidak ada bilangan yang habis dibagi 5. Coba prima lain.").waitFor();
+        for (const p of [2, 2, 3, 3]) await button(`Bagi dengan ${p}`).click();
+        assert.equal(await result(), "36|6"); await page.getByTestId("lab-result").filter({ hasText: "2 × 3 = 6" }).waitFor();
+        await button("8, 12, 20").click(); for (const p of [2, 2, 2, 3, 5]) await button(`Bagi dengan ${p}`).click(); assert.equal(await result(), "120|4");
+      }
       await fit(`lab ${t}`); await shot(`lab-${topics[t].code}`);
       await button("Latihan materi").click();
       let wrong = 0;
@@ -96,6 +102,6 @@ try {
     await page.getByText(/Jawaban benar Kelipatan 7: 7, 14, 21/).waitFor();
     await fit("hasil"); await shot("result");
     assert.deepEqual(errors, []); await page.close();
-    console.log(`PASS kelas 5 bab 2 at ${width}px: 5 lab, 20 latihan (1 salah disengaja), 24 evaluasi (tabel, potong kertas, congklak, kalender, pohon faktor, pembagian berulang), skor dan pembahasan`);
+    console.log(`PASS kelas 5 bab 2 at ${width}px: 6 lab, 24 latihan (1 salah disengaja), 24 evaluasi (tabel, potong kertas, congklak, kalender, pohon faktor, pembagian berulang), skor dan pembahasan`);
   }
 } finally { await browser.close(); }

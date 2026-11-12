@@ -61,7 +61,7 @@ export type Part =
   | { kind: "tf"; statements: { text: string; answer: boolean }[] }
   | { kind: "choice"; label: string; options: string[]; answer: string };
 
-export type KQuestion = Question & { topic: 0 | 1 | 2 | 3 | 4; level?: Level; scene?: Scene; parts: Part[] };
+export type KQuestion = Question & { topic: 0 | 1 | 2 | 3 | 4 | 5; level?: Level; scene?: Scene; parts: Part[] };
 
 /* ---------- Isian ---------- */
 export const fieldCount = (p: Part) => {
@@ -229,9 +229,19 @@ export const topics = [
       "Bilangan prima hanya dapat dibagi oleh 1 dan bilangan itu sendiri. 1 bukan bilangan prima. Saringan Eratosthenes membantu menemukannya.",
       "Pohon faktor: pecah bilangan menjadi dua faktor sampai semua ujungnya bilangan prima. 300 = 2 × 2 × 3 × 5 × 5.",
       "KPK: kalikan semua faktor prima, yang berpasangan cukup ditulis sekali. FPB: kalikan faktor prima yang berpasangan saja.",
-      "Pembagian berulang: bagi semua bilangan dengan bilangan prima sampai semuanya 1. KPK = hasil kali semua pembagi; FPB = hasil kali pembagi yang membagi semua bilangan.",
+      "Jika tidak ada faktor prima yang berpasangan, FPB-nya 1. Contoh: 15 = 3 × 5 dan 28 = 2 × 2 × 7, jadi FPB dari 15 dan 28 adalah 1.",
     ],
     demo: "Pilih bilangan, lalu ketuk bilangan prima untuk memecahnya pada pohon faktor sampai semua ujungnya prima.",
+  },
+  {
+    code: "F", title: "Menentukan KPK dan FPB dengan Pembagian Berulang", short: "Pembagian berulang",
+    steps: [
+      "Tulis bilangan-bilangannya berdampingan dalam satu baris.",
+      "Bagi dengan bilangan prima terkecil yang dapat membagi, mulai dari 2. Bilangan yang tidak habis dibagi ditulis lagi apa adanya.",
+      "Ulangi di baris berikutnya sampai semua bilangan menjadi 1.",
+      "KPK = kalikan semua pembagi. FPB = kalikan pembagi yang membagi semua bilangan sekaligus. Kalau tidak ada, FPB-nya 1.",
+    ],
+    demo: "Ketuk bilangan prima untuk membagi. Baris yang membagi semua bilangan diberi tanda FPB. KPK dan FPB terbentuk dari pembagi yang kamu pilih.",
   },
 ] as const;
 
@@ -267,9 +277,15 @@ export const practice: KQuestion[][] = [
   [
     q(4, "Gunakan saringan Eratosthenes. Ketuk semua bilangan prima dari 1 sampai 30.", [grid("Bilangan prima", 30, primesTo(30))], "Hapus 1, lalu hapus kelipatan 2, 3, dan 5 setelah bilangan itu. Tersisa 2, 3, 5, 7, 11, 13, 17, 19, 23, 29."),
     q(4, "Tentukan faktorisasi prima dari 60 dengan menggunakan pohon faktor.", [{ kind: "tree", n: 60 }], "60 = 2 × 30 = 2 × 2 × 15 = 2 × 2 × 3 × 5."),
-    q(4, "Tentukan KPK dan FPB dari 24 dan 36 dengan pembagian berulang.", [{ kind: "ladder", nums: [24, 36] }], "Pembaginya 2, 2, 2, 3, 3. KPK = 2 × 2 × 2 × 3 × 3 = 72. Pembagi yang membagi keduanya: 2, 2, 3, jadi FPB = 12."),
+    q(4, "Tentukan KPK dan FPB dari 18 dan 45 dengan faktorisasi prima.", [{ kind: "factorize", nums: [18, 45] }], "18 = 2 × 3 × 3 dan 45 = 3 × 3 × 5. KPK = 2 × 3 × 3 × 5 = 90. Berpasangan: 3 dan 3, jadi FPB = 9."),
     q(4, "Tentukan KPK dan FPB dari 27 dan 81 dengan faktorisasi prima.", [{ kind: "factorize", nums: [27, 81] }], "27 = 3 × 3 × 3 dan 81 = 3 × 3 × 3 × 3. KPK = 3 × 3 × 3 × 3 = 81. FPB = 3 × 3 × 3 = 27."),
   ],
+  [
+    q(5, "Tentukan KPK dan FPB dari 12 dan 18 dengan pembagian berulang.", [{ kind: "ladder", nums: [12, 18] }], "Bagi 2: 6, 9. Bagi 2: 3, 9. Bagi 3: 1, 3. Bagi 3: 1, 1. KPK = 2 × 2 × 3 × 3 = 36. Pembagi yang membagi keduanya: 2 (baris 1) dan 3 (baris 3), jadi FPB = 6."),
+    q(5, "Tentukan KPK dan FPB dari 24 dan 36 dengan pembagian berulang.", [{ kind: "ladder", nums: [24, 36] }], "Pembaginya 2, 2, 2, 3, 3. KPK = 2 × 2 × 2 × 3 × 3 = 72. Pembagi yang membagi keduanya: 2, 2, 3, jadi FPB = 12."),
+    q(5, "Tentukan KPK dan FPB dari 8, 12, dan 20 dengan pembagian berulang.", [{ kind: "ladder", nums: [8, 12, 20] }], "Bagi 2: 4, 6, 10. Bagi 2: 2, 3, 5. Bagi 2: 1, 3, 5. Bagi 3: 1, 1, 5. Bagi 5: 1, 1, 1. KPK = 2 × 2 × 2 × 3 × 5 = 120. Dua baris pertama membagi ketiganya, jadi FPB = 2 × 2 = 4."),
+    q(5, "Tentukan KPK dan FPB dari 45 dan 60 dengan pembagian berulang.", [{ kind: "ladder", nums: [45, 60] }], "Bagi 2: 45, 30. Bagi 2: 45, 15. Bagi 3: 15, 5. Bagi 3: 5, 5. Bagi 5: 1, 1. KPK = 2 × 2 × 3 × 3 × 5 = 180. Pembagi yang membagi keduanya: 3 dan 5, jadi FPB = 15."),
+  ]
 ];
 
 /* ---------- Evaluasi: 24 soal ---------- */
@@ -282,8 +298,8 @@ export const assessment: KQuestion[] = [
   q(4, "Gunakan saringan Eratosthenes. Ketuk semua bilangan prima dari 1 sampai 50.", [grid("Bilangan prima", 50, primesTo(50))], "Hapus 1 dan kelipatan 2, 3, 5, 7 setelah bilangan itu. Bilangan prima sampai 50 ada 15: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47.", { level: "Sedang" }),
   q(0, "Tuliskan semua bilangan kelipatan 9 yang kurang dari 50.", [{ kind: "list", label: "Kelipatan 9", answer: [9, 18, 27, 36, 45] }], "9, 18, 27, 36, 45. Kelipatan berikutnya 54 sudah lebih dari 50.", { level: "Sedang" }),
   q(2, "Lengkapi lingkaran berikut dengan faktor dari 20. Urutkan dari yang paling kecil.", [{ kind: "rainbow", n: 20 }], "Pasangan faktor 20: 1 × 20, 2 × 10, 4 × 5. Urutannya 1, 2, 4, 5, 10, 20.", { level: "Sedang" }),
-  q(1, "Asep berlatih renang setiap 3 hari dan Lukas setiap 5 hari. Tanggal 2 Agustus mereka berlatih bersama. Ketuk tanggal paling dekat mereka berlatih bersama lagi.", [{ kind: "calendar", month: "agustus", start: 2, who: ["Asep", "Lukas"], every: [3, 5] }],
-    "KPK dari 3 dan 5 adalah 15. 2 Agustus + 15 hari = 17 Agustus.", { level: "Sedang" }),
+  q(5, "Tentukan KPK dan FPB dari 20 dan 30 dengan pembagian berulang.", [{ kind: "ladder", nums: [20, 30] }],
+    "Bagi 2: 10, 15. Bagi 2: 5, 15. Bagi 3: 5, 5. Bagi 5: 1, 1. KPK = 2 × 2 × 3 × 5 = 60. Pembagi yang membagi keduanya: 2 dan 5, jadi FPB = 10.", { level: "Sedang" }),
   // Menantang
   q(4, "Tentukan faktorisasi prima dari 84 dengan menggunakan pohon faktor.", [{ kind: "tree", n: 84 }], "84 = 2 × 42 = 2 × 2 × 21 = 2 × 2 × 3 × 7.", { level: "Menantang" }),
   q(3, "Ibu membeli 30 tangkai mawar merah dan 20 tangkai mawar putih. Setiap vas berisi mawar merah sama banyak dan mawar putih sama banyak. Bunga dibagi ke vas sebanyak-banyaknya.", [
@@ -294,7 +310,7 @@ export const assessment: KQuestion[] = [
   q(2, "Tentukan faktor-faktor dari 36. Urutkan dari yang paling kecil.", [{ kind: "rainbow", n: 36 }], "Pasangan faktor 36: 1 × 36, 2 × 18, 3 × 12, 4 × 9, 6 × 6. 6 ditulis sekali. Faktornya 1, 2, 3, 4, 6, 9, 12, 18, 36.", { level: "Menantang" }),
   q(3, "Temukan FPB dari 12 dan 42. Tuliskan faktor-faktornya lebih dulu.", [{ kind: "rainbow", n: 12 }, { kind: "rainbow", n: 42 }, { kind: "list", label: "Faktor persekutuan 12 dan 42", answer: [1, 2, 3, 6] }, { kind: "number", label: "FPB dari 12 dan 42 =", answer: 6 }],
     "Faktor 12: 1, 2, 3, 4, 6, 12. Faktor 42: 1, 2, 3, 6, 7, 14, 21, 42. Faktor persekutuan 1, 2, 3, 6. FPB-nya 6.", { level: "Menantang" }),
-  q(4, "Tentukan KPK dan FPB dari 42 dan 60 dengan pembagian berulang.", [{ kind: "ladder", nums: [42, 60] }], "Pembagi prima: 2, 2, 3, 5, 7. KPK = 2 × 2 × 3 × 5 × 7 = 420. Pembagi yang membagi keduanya: 2 dan 3, jadi FPB = 6.", { level: "Menantang" }),
+  q(5, "Tentukan KPK dan FPB dari 42 dan 60 dengan pembagian berulang.", [{ kind: "ladder", nums: [42, 60] }], "Pembagi prima: 2, 2, 3, 5, 7. KPK = 2 × 2 × 3 × 5 × 7 = 420. Pembagi yang membagi keduanya: 2 dan 3, jadi FPB = 6.", { level: "Menantang" }),
   q(1, "Dinda les piano setiap 4 hari dan Amelia setiap 6 hari. Tanggal 5 Juli mereka les bersama. Ketuk tanggal paling dekat mereka les bersama lagi.", [{ kind: "calendar", month: "juli", start: 5, who: ["Dinda", "Amelia"], every: [4, 6] }],
     "KPK dari 4 dan 6 adalah 12. 5 Juli + 12 hari = 17 Juli.", { level: "Menantang" }),
   q(0, "Ketuklah semua bilangan kelipatan 12 pada tabel berikut.", [grid("Kelipatan 12", 100, multiples(12, 100))], "12, 24, 36, 48, 60, 72, 84, 96. Kelipatan berikutnya 108 sudah lebih dari 100.", { level: "Menantang" }),
