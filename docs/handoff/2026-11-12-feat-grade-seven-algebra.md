@@ -1,0 +1,23 @@
+# Kelas 7 Bab 4 Bentuk Aljabar (feat/grade-seven-algebra)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VII (Kurikulum Merdeka 2022) hlm. 123–158. Subtopik A Unsur-Unsur Bentuk Aljabar, B Sifat-Sifat dan Operasi Aljabar, C Pemodelan dengan Bentuk Aljabar.
+- Chapter number: the user's message said "Bab 3", but the PDF is Bab 4 and Kelas 7 Bab 3 is already Rasio. The chapter follows the PDF (chapter 4), and Rasio is untouched.
+- New chapter via the registry: `src/chapters/kelas-7-bentuk-aljabar/` (slug `bentuk-aljabar`), shown on the Kelas 7 class page. No shared-file edits.
+- SMP depth (user emphasised): 9 sections with steps, examples and their own lab:
+  - A.1 Dari pola ke variabel (matchstick squares); A.2 Suku, koefisien, variabel, konstanta (colour-coded terms); A.3 Substitusi (bags and cubes).
+  - B.1 Bentuk ekuivalen (pool tiles counted four ways); B.2 Distributif (area model for a(x + b) and (x + b)(x + c)); B.3 Suku sejenis, komutatif, asosiatif (algebra tiles with + and −).
+  - C.1 Satu variabel (distance and time); C.2 Beberapa hubungan (fruit weights and sense checks); C.3 Membandingkan model (ojek tariffs).
+- Files: `src/data/grade-seven-algebra.ts`, `src/components/learn/GradeSevenAlgebra.tsx`, `src/components/learn/GradeSevenAlgebraArt.tsx`, `scripts/verify-grade-seven-algebra.mjs`, `scripts/smoke-grade-seven-algebra.mjs`, `.github/workflows/grade-seven-algebra-qa.yml`.
+  - Answer kinds: coefficient boxes for polynomials (□x² + □x + □, multi-variable), factor form k(px + q) requiring the greatest common factor, binomial factors in any order, signed numbers, value tables, order, select, classify, true/false and choice.
+  - Art: purpose-built SVG paper bags and cubes, matchsticks, tile frames, pool tiles, X-shaped dot patterns, algebra tiles and area models.
+- Practice: 4 per subtopic (12).
+- Evaluation: 24 questions (A/B/C alternating; levels 8/9/7) following the book:
+  - Elements of an expression; expanding; factoring (common factor and trinomial); evaluating; equivalence by properties and by value tables.
+  - Matching bags to expressions; tile and dot patterns; naming the property used at each step.
+  - Ticket, shop, distance, fruit, height, bus-money, ojek, number-trick and sponsor models.
+- Validation:
+  - Verify re-expands 25 expressions with a small evaluator at several x values, checks factor forms and binomials, and recomputes context keys from source data.
+  - tsc, eslint and build pass.
+  - Playwright at 320/390/768/1280: all 9 labs, 12 practice (1 intentional wrong) and 24 evaluation questions (1 intentional wrong), ending at score 96/100 with the review shown.
+  - Screenshots reviewed; value tables became row cards so phones show every expression.
+- Kelas 7 Bab 3 Rasio record: delivered via PR #98, merged as 320a2b4b38a107dc44613c87321f76a4636b9984; Vercel production deployment success.
