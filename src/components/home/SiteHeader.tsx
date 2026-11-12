@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { AccountLink } from "@/components/auth/AccountLink";
 import { BrandMark } from "./BrandMark";
 
 export function SiteHeader() {
@@ -20,7 +21,10 @@ export function SiteHeader() {
             <li><Link href="/#latihan-harian">Latihan harian</Link></li>
             <li><Link href="/#cara-belajar">Cara belajar</Link></li>
           </ul>
-          <Link href="/#kelas" className="btn btn-success btn-sm sm:btn-md">Mulai belajar</Link>
+          <div className="flex items-center gap-1">
+            <AccountLink />
+            <Link href="/#kelas" className="btn btn-success btn-sm sm:btn-md" aria-label="Mulai belajar"><span className="max-[379px]:hidden">Mulai belajar</span><span className="min-[380px]:hidden">Mulai</span></Link>
+          </div>
         </nav>
       </header>
     </>

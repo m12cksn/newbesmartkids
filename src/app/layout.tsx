@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AccessProvider } from "@/components/auth/AccessProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return <html lang="id" className="h-full antialiased"><body className="min-h-full flex flex-col">{children}</body></html>;
+  return <html lang="id" className="h-full antialiased"><body className="min-h-full flex flex-col"><AccessProvider>{children}</AccessProvider></body></html>;
 }
