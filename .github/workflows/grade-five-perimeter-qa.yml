@@ -1,0 +1,37 @@
+name: Grade 5 Perimeter QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  perimeter5:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-five-perimeter.mjs
+      - run: npx eslint src/data/grade-five-perimeter.ts src/components/learn/GradeFivePerimeter.tsx src/components/learn/GradeFivePerimeterArt.tsx src/chapters/kelas-5-keliling-bangun-datar/meta.ts src/chapters/kelas-5-keliling-bangun-datar/Chapter.tsx
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-perimeter5.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-five-perimeter.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-five-perimeter-screenshots
+          path: /tmp/grade-five-perimeter-screenshots
+          if-no-files-found: ignore
