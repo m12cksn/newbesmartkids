@@ -1,0 +1,25 @@
+# Kelas 7 Bab 3 Rasio (feat/grade-seven-ratio)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VII (Kurikulum Merdeka 2022) hlm. 83–122. Subtopik A Konsep Rasio, B Skala, C Laju Perubahan Satuan.
+- New chapter via the registry: `src/chapters/kelas-7-rasio/`. Slug `rasio-kelas-7` because `rasio` already belongs to Kelas 6. Shown on the Kelas 7 class page. No shared-file edits.
+- SMP depth (user emphasised): 9 sections, each with steps, an example where useful, and its own lab:
+  - A.1 Rasio, pecahan, dan selisih (glasses and tape diagram); A.2 Rasio dalam persen (pie and composition bar); A.3 Membandingkan kepekatan.
+  - B.1 Rasio ekuivalen dan gambar proporsional (photo resize); B.2 Menyelesaikan proporsi (two methods); B.3 Skala peta dan denah (ruler and scale).
+  - C.1 Laju satuan (milk per spoon); C.2 Harga satuan (price per gram ranking); C.3 Kepadatan, efisiensi, dan kecepatan.
+- Files: `src/data/grade-seven-ratio.ts`, `src/components/learn/GradeSevenRatio.tsx`, `src/components/learn/GradeSevenRatioArt.tsx`, `scripts/verify-grade-seven-ratio.mjs`, `scripts/smoke-grade-seven-ratio.mjs`, `.github/workflows/grade-seven-ratio-qa.yml`.
+  - Data: ratio checking accepts equivalent ratios unless the simplest form is requested; decimals and thousands follow Indonesian notation, so "." is a thousands separator and "," is the decimal mark.
+  - Art: purpose-built SVG glasses of milk and chocolate, tape diagram, composition bar, sector pie, resizable picture, map scale bar, floor plan, cuboid samples, and bottles. Stacked fractions reuse `MathText` from the Bab 2 art file.
+- Practice: 4 per subtopic (12).
+- Evaluation: 24 questions (8 per subtopic, alternating A/B/C; levels 8/9/7) following the book's formats:
+  - Ratio and fraction from glasses; percent composition.
+  - Proportional pictures; resizing and proportions; map scale and floor-plan scale; matching scales to uses.
+  - Bottle unit rates; chocolate price-per-gram ordering; mango price per kg; alcohol solutions with pie shading.
+  - Car efficiency; komodo density; density of samples.
+  - Recipe and eco-enzyme limiting ingredient; grinder speeds; possible length:width ratios for a fixed rope; A-series paper; syrup sweetness.
+  - Misconception true/false (difference vs ratio).
+- Validation:
+  - Verify recomputes every key from the source tables and prompt numbers, checks unique maxima/minima, and rejects reversed, off-by-one and non-simplified ratios where the simplest form is required.
+  - tsc, eslint and build pass.
+  - Playwright at 320/390/768/1280: all 9 labs, 12 practice (1 intentional wrong), and 24 evaluation questions (1 intentional wrong), ending at score 96/100 with the review shown.
+  - Screenshots reviewed; the map ruler was rescaled to show the full 12 cm.
+- Kelas 7 Bab 2 Bilangan Rasional record: delivered via PR #97, merged as 985b79dbce6a1c444f30eecae39c93b375ea9d8c; Vercel production deployment success.
