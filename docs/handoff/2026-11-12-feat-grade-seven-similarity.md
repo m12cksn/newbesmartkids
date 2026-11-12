@@ -1,0 +1,23 @@
+# Kelas 7 Bab 5 Kesebangunan (feat/grade-seven-similarity)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VII (Kurikulum Merdeka 2022) hlm. 159–184. Subtopik A Hubungan Antar Sudut, B Arti Kesebangunan, C Kesebangunan pada Segitiga.
+- New chapter via the registry: `src/chapters/kelas-7-kesebangunan/` (slug `kesebangunan`), shown on the Kelas 7 class page. No shared-file edits.
+- SMP depth (user emphasised): 9 sections, each with steps, examples and its own lab:
+  - A.1 Penyiku dan pelurus (rotating ray); A.2 Garis sejajar dan garis potong (8 angles, six relation names highlighted); A.3 Jumlah sudut segitiga dan segi empat (adjustable triangle with a parallel line).
+  - B.1 Memperbesar dan memperkecil (house with scale factor, sides, perimeter ×k, area ×k², angles fixed); B.2 Syarat sebangun (picture resize); B.3 Mengenali bangun sebangun (rotate, mirror, enlarge, stretch).
+  - C.1 Penamaan dan pasangan bersesuaian (tap a vertex or side to see its partner); C.2 Syarat segitiga sebangun (two-angle test); C.3 Menghitung panjang sisi (DE ∥ BC slider).
+- Files: `src/data/grade-seven-similarity.ts`, `src/components/learn/GradeSevenSimilarity.tsx`, `src/components/learn/GradeSevenSimilarityArt.tsx`, `scripts/verify-grade-seven-similarity.mjs`, `scripts/smoke-grade-seven-similarity.mjs`, `.github/workflows/grade-seven-similarity-qa.yml`.
+  - Data: angle relations on parallel lines; triangles built from side lengths or angles, so figures match the given numbers.
+  - Art: polygon figures with vertex, side and angle labels, right-angle marks and extra segments; transversal diagram with tappable angles; Sierpinski fractal; house. Pictures reuse `Picture` from the Bab 3 art.
+- Practice: 4 per subtopic (12).
+- Evaluation: 24 questions (A/B/C alternating; levels 8/9/7) following the book:
+  - Penyiku/pelurus; angles on parallel lines (computed, tapped on the diagram, and relation names); triangle and parallelogram angles; the algebraic dalam-sepihak pair; angle ratio 1 : 2 : 3.
+  - Similar pairs of figures; resized pictures; pas foto sizes; scale factor with perimeter and area; true/false on which shapes are always similar; maket scale; fractal count and scale.
+  - Corresponding parts; missing sides; DE ∥ BC; shadows; triangle pairs by angles; the right-triangle altitude; angle bisector ratio.
+- Validation:
+  - Verify checks the relation table for several slopes. It measures every labelled angle and side directly from the figure coordinates; this caught a parallelogram drawn with an acute ∠A and a mislabelled bisector triangle, both fixed.
+  - It also checks that the paired triangles in figures are similar and recomputes all keys from the prompts.
+  - tsc, eslint and build pass.
+  - Playwright at 320/390/768/1280: all 9 labs, 12 practice (1 intentional wrong) and 24 evaluation questions (1 intentional wrong) including tapping angles, ending at score 96/100 with the review shown.
+  - Screenshots reviewed; transversal labels were spaced out and the house perimeter corrected to 21.
+- Kelas 7 Bab 4 Bentuk Aljabar record: delivered via PR #99, merged as 208ff77b914fe07cf7f66cb139e0ee3c091070fa; Vercel production deployment success.
