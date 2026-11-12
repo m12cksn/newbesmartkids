@@ -16,7 +16,7 @@ try {
     const button = name => page.getByRole("button", { name, exact: true });
     const fit = async label => { const s = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth })); assert.ok(s.scroll <= s.inner, `overflow ${width} ${label}`); };
     const shot = name => page.screenshot({ path: `${folder}/${width}-${name}.png`, fullPage: true });
-    const login = async (u, p) => { await page.getByLabel("Username").fill(u); await page.getByLabel("PIN").fill(p); await button("Masuk").click(); };
+    const login = async (u, p) => { await page.getByLabel("Username").fill(u); await page.getByLabel("PIN").fill(p); await button("Masuk Sekarang").click(); };
 
     // 1. Tanpa akun: bab pertama terbuka, evaluasinya terkunci; bab lain dialihkan ke halaman masuk.
     await page.goto(`${origin}${K7}/bilangan-bulat`);
@@ -29,7 +29,7 @@ try {
     await button("Kembali ke materi").click();
     await page.goto(`${origin}${K7}/rasio-kelas-7`);
     await page.waitForURL(/\/masuk\?/); assert.match(page.url(), /lanjut=%2Fkelas%2Flogika-dan-aljabar-kelas-7%2Fmateri%2Frasio-kelas-7/);
-    await page.getByText("Bab ini termasuk paket Kelas 7").waitFor();
+    await page.getByText("Bab ini termasuk paket Kelas 7").first().waitFor();
     await page.goto(`${origin}/mastering-perkalian-pembagian/level-1`); await page.waitForURL(/\/masuk\?/);
     await page.goto(`${origin}/admin`); await page.waitForURL(/\/masuk\?/);
 
@@ -59,7 +59,7 @@ try {
     await page.goto(`${origin}${K7}/bilangan-bulat`); await button("Evaluasi 24 soal").click();
     await page.getByText("Soal 1/24").waitFor();
     await page.goto(`${origin}${K5}/data`); await page.waitForURL(/alasan=paket/);
-    await page.getByText("Akun Anda belum memiliki paket Kelas 5").waitFor();
+    await page.getByText("Akun Anda belum memiliki paket Kelas 5").first().waitFor();
     await page.goto(`${origin}/mastering-perkalian-pembagian/level-1`); await page.waitForURL(/mastering-perkalian-pembagian\/level-1$/);
     await page.goto(`${origin}/admin`); await page.waitForURL(/alasan=admin/);
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 7", { exact: true }).waitFor();

@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SiteFooter } from "@/components/home/SiteFooter";
-import { SiteHeader } from "@/components/home/SiteHeader";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export const metadata: Metadata = { title: "Masuk" };
@@ -16,9 +14,7 @@ async function Form({ searchParams }: { searchParams: SP }) {
 }
 
 export default function Page({ searchParams }: { searchParams: SP }) {
-  return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content">
-    <SiteHeader />
-    <Suspense fallback={<section className="mx-auto min-h-96 max-w-md px-4 py-16" />}><Form searchParams={searchParams} /></Suspense>
-    <SiteFooter />
+  return <main data-theme="besmartkids" className="flex min-h-screen items-center justify-center bg-base-200 px-4 py-10 text-base-content">
+    <Suspense fallback={<section className="min-h-[28rem] w-full max-w-md rounded-3xl border border-base-300 bg-base-100" />}><Form searchParams={searchParams} /></Suspense>
   </main>;
 }

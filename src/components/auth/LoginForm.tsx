@@ -1,8 +1,8 @@
 "use client";
 
-import { LogIn } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { BrandMark } from "@/components/home/BrandMark";
 import { useAccess } from "./AccessProvider";
 
 const messages: Record<string, string> = {
@@ -30,20 +30,30 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
       window.location.assign(next);
     } catch { setError(messages.server); setBusy(false); }
   }
-  return <section className="mx-auto max-w-md px-4 py-10 sm:py-16">
-    <h1 className="text-3xl font-extrabold">Masuk ke BeSmartKids</h1>
-    <p className="mt-2 text-sm leading-6 text-base-content/70">Gunakan username dan PIN 6 angka yang Anda terima setelah membeli paket.</p>
-    {reason === "paket" && <p role="alert" className="mt-4 rounded-lg bg-warning/15 p-3 text-sm">Akun Anda belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. Hubungi admin tempat Anda membeli untuk menambah paket, atau masuk dengan akun lain.</p>}
-    {reason === "admin" && <p role="alert" className="mt-4 rounded-lg bg-warning/15 p-3 text-sm">Halaman ini hanya untuk admin.</p>}
-    {reason === null && classId && <p className="mt-4 rounded-lg bg-info/10 p-3 text-sm">Bab ini termasuk paket Kelas {classId}. Bab pertama setiap kelas dapat dicoba tanpa akun.</p>}
-    <form onSubmit={submit} className="mt-6 space-y-4 rounded-xl border border-base-300 bg-base-100 p-5">
-      <label className="block"><span className="mb-1 block text-sm font-bold">Username</span>
-        <input name="username" autoComplete="username" autoCapitalize="none" spellCheck={false} required value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/\s/g, ""))} className="input input-bordered w-full" /></label>
-      <label className="block"><span className="mb-1 block text-sm font-bold">PIN</span>
-        <input name="pin" type="password" inputMode="numeric" autoComplete="current-password" maxLength={6} required value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))} className="input input-bordered w-full tracking-[0.4em]" /></label>
+  const field = "h-12 w-full rounded-xl border border-transparent bg-[#e8f0fe] px-4 text-base text-neutral outline-none focus:border-success focus:ring-2 focus:ring-success/30";
+  return <section className="w-full max-w-md rounded-3xl border border-base-300 bg-base-100 px-6 py-8 shadow-lg shadow-success/5 sm:px-8">
+    <div className="flex flex-col items-center text-center">
+      <Link href="/" aria-label="Beranda BeSmartKids"><BrandMark /></Link>
+      <p className="mt-4 rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">BIMBEL KIDS ONLINE</p>
+      <h1 className="mt-4 text-2xl font-extrabold sm:text-3xl">Halo, Ayo Belajar!</h1>
+      <p className="mt-2 text-sm text-base-content/70">Masuk dengan username dan PIN dari admin.</p>
+    </div>
+    {reason === "paket" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Akun Anda belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. Hubungi admin untuk menambah paket, atau masuk dengan akun lain.</p>}
+    {reason === "admin" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Halaman ini hanya untuk admin.</p>}
+    {reason === null && classId && <p className="mt-5 rounded-xl bg-info/10 p-3 text-sm">Bab ini termasuk paket Kelas {classId}. Bab pertama setiap kelas dapat dicoba tanpa akun.</p>}
+    <form onSubmit={submit} className="mt-6 space-y-4">
+      <div>
+        <label htmlFor="login-username" className="mb-1.5 block text-sm font-semibold">Username</label>
+        <input id="login-username" name="username" autoComplete="username" autoCapitalize="none" spellCheck={false} required value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/\s/g, ""))} aria-describedby="login-username-help" className={field} />
+        <p id="login-username-help" className="mt-1.5 text-xs text-base-content/60">Username dan PIN ada di pesan WhatsApp dari admin.</p>
+      </div>
+      <div>
+        <label htmlFor="login-pin" className="mb-1.5 block text-sm font-semibold">PIN</label>
+        <input id="login-pin" name="pin" type="password" inputMode="numeric" autoComplete="current-password" maxLength={6} required value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))} className={`${field} tracking-[0.3em]`} />
+      </div>
       {error && <p role="alert" className="text-sm font-semibold text-error">{error}</p>}
-      <button type="submit" className="btn btn-success w-full gap-1" disabled={busy}><LogIn className="size-4" aria-hidden="true" />{busy ? "Memeriksa…" : "Masuk"}</button>
+      <button type="submit" className="btn btn-success h-12 w-full rounded-xl text-base" disabled={busy}>{busy ? "Memeriksa…" : "Masuk Sekarang"}</button>
     </form>
-    <p className="mt-4 text-sm text-base-content/70">Belum punya akun? Bab pertama setiap kelas bisa dicoba gratis. <Link href="/#kelas" className="link text-success">Lihat kelas</Link></p>
+    <p className="mt-6 text-center text-sm text-base-content/70">Belum punya akun? Hubungi admin untuk mendapatkan username dan PIN. Bab pertama setiap kelas bisa <Link href="/#kelas" className="link text-success">dicoba gratis</Link>.</p>
   </section>;
 }
