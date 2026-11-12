@@ -1,0 +1,24 @@
+# Kelas 7 Bab 6 Data dan Diagram (feat/grade-seven-data)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VII (Kurikulum Merdeka 2022) hlm. 185–228. Subtopik A Investigasi Statistika, B Macam-Macam Data, C Diagram dalam Statistika, D Diagram Batang, E Diagram Lingkaran, F Memilih Diagram yang Tepat.
+- New chapter via the registry: `src/chapters/kelas-7-data-diagram/` (slug `data-dan-diagram`), shown on the Kelas 7 class page. No shared-file edits.
+- SMP depth: 12 sections (2 per subtopic), each with steps, an example and its own lab:
+  - A.1 Alur investigasi statistika (order the four steps; sort statistical vs non-statistical questions); A.2 Line plot (record name-length data one by one, mode and range).
+  - B.1 Data kategorik dan numerik (sort cards, incl. nomor absen); B.2 Tabel frekuensi (tally raw data into a table and bar chart).
+  - C.1 Membaca diagram dengan teliti (Olympic medals, pick a country); C.2 Diagram yang menyesatkan (move the axis start, compare bar ratio with true ratio).
+  - D.1 Menggambar diagram batang (set bar heights from a table); D.2 Kenaikan dan persentase perubahan (CO₂ by country).
+  - E.1 Sudut pusat dan persentase (adjust counts, fraction/angle/percent table and pie); E.2 Membaca diagram lingkaran (total and angle → amount).
+  - F.1 Batang, garis, atau lingkaran? (situations → chart choice with feedback); F.2 Diagram garis (toggle bar/line for the same data).
+- Files: `src/data/grade-seven-data.ts`, `src/components/learn/GradeSevenData.tsx`, `src/components/learn/GradeSevenDataArt.tsx` (line plot, pie, line chart, axis-start bars, four mini charts), `scripts/verify-grade-seven-data.mjs`, `scripts/smoke-grade-seven-data.mjs`, `.github/workflows/grade-seven-data-qa.yml`. Bar charts reuse `BarChart` from the Kelas 5 data art.
+- Practice: 4 per subtopic (24).
+- Evaluation: 24 questions (A–F alternating; levels 8/9/7) following the book's formats:
+  - Reading line plots and building one by tapping; ordering an investigation; categorical/numerical classification and true/false.
+  - Reading single, double and horizontal bar charts; misleading axis; building a bar chart; visitor trend; CO₂ change and percent decrease; YouTube users percent increase.
+  - Pie: complement and angle; completing a percent/angle table; OSIS votes; algebraic angles 9x/6x/2x/3x.
+  - Chart choice for situations; matching four mini charts to purposes; why interest rates do not suit a pie chart.
+- Validation:
+  - Verify recomputes every key from the source data (counts, modes, ranges, sums, increases, percents, angles, selections) and checks that wrong values are rejected for every field.
+  - tsc, eslint and build pass.
+  - Playwright at 320/390/768/1280: all 12 labs, 24 practice (1 intentional wrong) and 24 evaluation questions (1 intentional wrong) including tapping a line plot and setting bars, ending at score 96/100 with the review shown.
+  - Screenshots reviewed. Fixes: overlapping stepper cards on 320px, long bar labels (now horizontal bars), rounded pie angles, and the line plot now fits the phone width.
+- Kelas 7 Bab 5 Kesebangunan record: delivered via PR #100, merged as 0f2298a595c14c4b005a532606ab17ce7a7af5c5; Vercel production deployment success.
