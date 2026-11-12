@@ -12,7 +12,7 @@ try {
   for (const width of [320, 1280]) {
     const ctx = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await ctx.newPage(); page.setDefaultTimeout(10000);
-    const errors = []; page.on("pageerror", e => errors.push(e.message));
+    const errors = []; page.on("pageerror", e => errors.push(`${page.url()}: ${e.message}`));
     const button = name => page.getByRole("button", { name, exact: true });
     const fit = async label => { const s = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth })); assert.ok(s.scroll <= s.inner, `overflow ${width} ${label}`); };
     const shot = name => page.screenshot({ path: `${folder}/${width}-${name}.png`, fullPage: true });
@@ -59,7 +59,7 @@ try {
     await page.goto(`${origin}${K7}/bilangan-bulat`); await button("Evaluasi 24 soal").click();
     await page.getByText("Soal 1/24").waitFor();
     await page.goto(`${origin}${K5}/data`); await page.waitForURL(/alasan=paket/);
-    await page.getByText(`Akun ${user} belum memiliki paket Kelas 5`).waitFor();
+    await page.getByText("Akun Anda belum memiliki paket Kelas 5").waitFor();
     await page.goto(`${origin}/mastering-perkalian-pembagian/level-1`); await page.waitForURL(/mastering-perkalian-pembagian\/level-1$/);
     await page.goto(`${origin}/admin`); await page.waitForURL(/alasan=admin/);
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 7", { exact: true }).waitFor();

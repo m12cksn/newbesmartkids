@@ -13,7 +13,7 @@ const messages: Record<string, string> = {
 };
 
 export function LoginForm({ next, reason, classId }: { next: string; reason: "paket" | "admin" | null; classId: number | null }) {
-  const { session, refresh } = useAccess();
+  const { refresh } = useAccess();
   const [username, setUsername] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
   return <section className="mx-auto max-w-md px-4 py-10 sm:py-16">
     <h1 className="text-3xl font-extrabold">Masuk ke BeSmartKids</h1>
     <p className="mt-2 text-sm leading-6 text-base-content/70">Gunakan username dan PIN 6 angka yang Anda terima setelah membeli paket.</p>
-    {reason === "paket" && <p role="alert" className="mt-4 rounded-lg bg-warning/15 p-3 text-sm">Akun {session?.username ? <strong>{session.username}</strong> : "ini"} belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. Hubungi admin tempat Anda membeli untuk menambah paket, atau masuk dengan akun lain.</p>}
+    {reason === "paket" && <p role="alert" className="mt-4 rounded-lg bg-warning/15 p-3 text-sm">Akun Anda belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. Hubungi admin tempat Anda membeli untuk menambah paket, atau masuk dengan akun lain.</p>}
     {reason === "admin" && <p role="alert" className="mt-4 rounded-lg bg-warning/15 p-3 text-sm">Halaman ini hanya untuk admin.</p>}
     {reason === null && classId && <p className="mt-4 rounded-lg bg-info/10 p-3 text-sm">Bab ini termasuk paket Kelas {classId}. Bab pertama setiap kelas dapat dicoba tanpa akun.</p>}
     <form onSubmit={submit} className="mt-6 space-y-4 rounded-xl border border-base-300 bg-base-100 p-5">
