@@ -1,0 +1,9 @@
+# Kelas 5 Bab 5: bangun gabungan dengan garis bantu (feat/grade-five-area-compose)
+
+- Owner asked that composite-area items start as one combined figure, with a "Tampilkan garis bantu" button; only then are the pieces shown and their areas entered, followed by the sum. Helper lines come in several versions and every composite has more than two pieces.
+- New answer type `compose` in `src/data/grade-five-area.ts`: outline + versions (≥2) of pieces (≥3 each, rect/tri/para/trap/kite). Inputs for each piece and the total appear only after the helper lines are shown; any version is accepted when its piece areas and total are right; switching version clears inputs. Composite builders: huruf T, rumah dengan teras, roket, jajargenjang + persegi panjang + segitiga, bentuk U miring, layang-layang + dua segitiga (Cara Yohana / Cara Komang).
+- Subtopik C lab replaced: choose rumah dengan teras or roket, show helper lines, pick a version, tap "Hitung luas A/B/C" per piece, total appears; the other version gives the same total.
+- All 4 practice C items and all 6 evaluation C items now use this flow (evaluation still 24, levels unchanged).
+- Files: `src/data/grade-five-area.ts`, `src/components/learn/GradeFiveArea.tsx`, `src/components/learn/GradeFiveAreaArt.tsx`, `scripts/verify-grade-five-area.mjs`, `scripts/smoke-grade-five-area.mjs`.
+- Validation: verify checks each piece drawing matches its dimensions (shoelace), each version sums to the outline area, ≥3 pieces per version, both versions accepted, wrong piece/total and unshown helper lines rejected; build; Playwright 320/390/768/1280 including both versions in the lab and alternate-version answers in practice and evaluation. Screenshots reviewed; moved labels that overlapped piece letters.
+- Kelas 5 Bab 5 record: delivered via PR #90, merged as 20388a44b61e3ecbce57ab44b243e7f9a451dbc6; Vercel production deployment success.
