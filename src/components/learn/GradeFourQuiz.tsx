@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Question } from "@/data/grade-four-whole-numbers";
+import { EvaluationGate } from "@/components/auth/EvaluationGate";
 
 function isCorrect(question: Question, answer: string | undefined) {
   if (!answer) return false;
@@ -12,7 +13,15 @@ function isCorrect(question: Question, answer: string | undefined) {
   return answer === question.answer;
 }
 
-export default function GradeFourQuiz<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false }: {
+type QuizProps<Q extends Question> = Parameters<typeof QuizBody<Q>>[0];
+
+/** Evaluasi (bukan latihan) diperiksa aksesnya; latihan selalu terbuka. */
+export default function GradeFourQuiz<Q extends Question>(props: QuizProps<Q>) {
+  if (props.practiceMode) return <QuizBody {...props} />;
+  return <EvaluationGate close={props.close}><QuizBody {...props} /></EvaluationGate>;
+}
+
+function QuizBody<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false }: {
   english?: boolean;
   questions: Q[]; title: string; practiceMode: boolean; close: () => void;
   renderVisual?: (question: Q) => ReactNode;

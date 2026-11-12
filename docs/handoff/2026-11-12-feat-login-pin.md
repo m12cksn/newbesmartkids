@@ -1,0 +1,21 @@
+# Login username + PIN (feat/login-pin)
+
+- Scope: akun berbayar untuk penjualan lewat Meta Ads, Scalev dan Lynk.id. Akun dibuat manual oleh admin di `/admin`.
+- Aturan akses (`src/lib/access-rules.ts`):
+  - Gratis tanpa login: halaman depan, halaman kelas, serta materi dan latihan bab pertama setiap kelas (bab dengan nomor terkecil per kelas, dihitung dari `materials`).
+  - Perlu paket kelas itu: bab lain dan semua evaluasi (termasuk evaluasi bab pertama).
+  - Perlu paket apa pun: mastering harian. `/admin` hanya untuk role admin.
+  - Paket: "kelas" (1 kelas, 12 bulan) dan "semua" (semua kelas, 24 bulan). Perpanjangan disambung dari tanggal akhir paket yang sama.
+- Database: project Supabase "bimbel online" (`tdpjqgvhmzsgcrpklmxq`), schema terpisah `bsk` (accounts, entitlements, sessions) yang tidak dibuka ke API. Aplikasi hanya memanggil fungsi `public.bsk_*` (security definer) dengan kunci publishable. Migrasi: `supabase/migrations/20261112120000_bsk_auth.sql` (sudah diterapkan).
+  - PIN 6 angka disimpan sebagai bcrypt; 5 kali salah mengunci akun 15 menit.
+  - Token sesi acak 32 byte, disimpan sebagai SHA-256, cookie httpOnly `bsk_sesi` 30 hari; maksimal 2 perangkat (sesi terlama dihapus).
+  - Akun admin awal: username `admin` (PIN diberikan langsung ke pemilik, tidak dicatat di repo).
+- Next.js:
+  - `src/proxy.ts` mengalihkan halaman terkunci ke `/masuk?lanjut=…` (dengan `alasan=paket` bila sudah masuk tetapi paketnya tidak cocok). Cache sesi 60 detik per instance.
+  - API: `/api/masuk`, `/api/keluar`, `/api/sesi`, `/api/admin`.
+  - Halaman: `/masuk`, `/akun`, `/admin`. Header menampilkan tombol Masuk/akun.
+  - Evaluasi dikunci di `GradeFourQuiz` (mode non-latihan) dan `GradeOneCounting` lewat `EvaluationGate`.
+  - Tanpa `SUPABASE_URL`/`SUPABASE_PUBLISHABLE_KEY` (misalnya di CI chapter), login tidak aktif dan semua halaman terbuka.
+- Batasan yang diketahui: kunci berlaku di level halaman; berkas JavaScript statis bab tetap dapat diunduh oleh orang yang tahu alamat berkasnya. Pembuatan akun otomatis lewat webhook Scalev/Lynk.id belum dibuat.
+- Validasi: fungsi database diuji langsung lewat SQL (login, sesi, PIN salah, hak admin, logout). tsc, eslint dan build lulus. Playwright `scripts/smoke-login.mjs` dengan `scripts/mock-supabase-auth.mjs` pada 320 dan 1280 px.
+- Kelas 7 Bab 6 Data dan Diagram record: PR #101, merged as 92252b94b066bdd37031c98be3b379128af7fe8e; Vercel production deployment success.
