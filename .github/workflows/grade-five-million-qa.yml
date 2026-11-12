@@ -1,0 +1,37 @@
+name: Grade 5 Million QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  million5:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-five-million.mjs
+      - run: npx eslint src/data/grade-five-million.ts src/components/learn/GradeFiveMillion.tsx src/components/learn/GradeFiveMillionArt.tsx src/chapters/kelas-5-sejuta/meta.ts src/chapters/kelas-5-sejuta/Chapter.tsx
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-million5.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-five-million.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-five-million-screenshots
+          path: /tmp/grade-five-million-screenshots
+          if-no-files-found: ignore
