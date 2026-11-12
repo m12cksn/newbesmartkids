@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assessment, practice, topics, correct, ready, formatAnswer, SEP, fields, shoelace, areaOf } from "../src/data/grade-five-area.ts";
+import { assessment, practice, topics, correct, ready, formatAnswer, SEP, fields, shoelace, areaOf, fieldCount } from "../src/data/grade-five-area.ts";
 
 assert.equal(topics.length, 4);
 assert.deepEqual(practice.map(p => p.length), [4, 4, 4, 4]);
@@ -16,7 +16,7 @@ for (let i = 1; i < 24; i++) {
 const all = [...practice.flat(), ...assessment];
 assert.equal(new Set(all.map(q => q.prompt + JSON.stringify(q.parts))).size, all.length, "soal ganda");
 const kinds = tally(assessment.flatMap(q => q.parts), p => p.kind);
-assert.ok(Object.keys(kinds).length >= 6, JSON.stringify(kinds));
+assert.ok(Object.keys(kinds).length >= 6 && kinds.compose >= 6, JSON.stringify(kinds));
 const nums = s => (s.match(/\d+/g) ?? []).map(Number);
 
 for (const q of all) {
@@ -39,6 +39,23 @@ for (const q of all) {
     if (p.kind === "items" && /^Lebar/.test(p.items[0].label)) { const [K, pj] = nums(q.prompt); assert.equal(2 * (pj + p.items[0].answer), K); assert.equal(p.items[1].answer, pj * p.items[0].answer); }
     if (p.kind === "items" && /^Sisi/.test(p.items[0].label)) { const [K] = nums(q.prompt); assert.equal(p.items[0].answer * 4, K); assert.equal(p.items[1].answer, p.items[0].answer ** 2); }
     if (p.kind === "items" && sc && sc.polys.some(x => x.label)) p.items.forEach(it => { const room = sc.polys.find(x => x.label && it.label.startsWith(x.label.replace("K. ", "Kamar ").split(" ")[0])); if (room) assert.equal(shoelace(room.pts), it.answer, it.label); });
+    if (p.kind === "compose") {
+      assert.ok(p.versions.length >= 2, "minimal dua versi garis bantu");
+      const out = shoelace(p.outline);
+      p.versions.forEach((ver, vi) => {
+        assert.ok(ver.pieces.length >= 3, `versi ${ver.name} minimal tiga bangun: ${q.prompt}`);
+        ver.pieces.forEach(pc => { assert.ok(Math.abs(shoelace(pc.pts) - areaOf(pc.shape, pc.vals)) < 1e-9, `${ver.name} ${pc.label} gambar sesuai ukuran`); assert.ok(Number.isInteger(areaOf(pc.shape, pc.vals))); });
+        const areas = ver.pieces.map(pc => areaOf(pc.shape, pc.vals)), tot = areas.reduce((a, x) => a + x, 0);
+        assert.equal(tot, out, `${ver.name} jumlah = luas bangun: ${q.prompt}`);
+        const n = fieldCount(p) - 2, g = [String(vi), ...Array.from({ length: n }, (_, k) => (k < areas.length ? String(areas[k]) : "")), String(tot)];
+        assert.ok(correct(q, swap(g.join("|"))), `${ver.name} diterima`);
+        const w1 = [...g]; w1[1] = String(areas[0] + 1); assert.ok(!correct(q, swap(w1.join("|"))));
+        const w2 = [...g]; w2[g.length - 1] = String(tot + 1); assert.ok(!correct(q, swap(w2.join("|"))));
+      });
+      const a0 = p.versions[0].pieces.map(pc => areaOf(pc.shape, pc.vals)), a1 = p.versions[1].pieces.map(pc => areaOf(pc.shape, pc.vals));
+      if (a0.join() !== a1.slice(0, a0.length).join()) { const n = fieldCount(p) - 2; const g = ["1", ...Array.from({ length: n }, (_, k) => (k < a0.length ? String(a0[k]) : "")), String(out)]; assert.ok(!correct(q, swap(g.join("|"))), "isian versi lain ditolak"); }
+      assert.ok(!ready(q, swap("")), "harus menampilkan garis bantu");
+    }
     if (p.kind === "pairs") {
       assert.equal(2 * (p.example[0] + p.example[1]), p.K);
       wrongPairs: { const g = [...f]; g[0] = String(p.example[0]); g[1] = String(p.example[1]); g[3] = String(p.example[0] * p.example[1]); assert.ok(!correct(q, swap(g.join("|"))), "sama dengan contoh ditolak"); }

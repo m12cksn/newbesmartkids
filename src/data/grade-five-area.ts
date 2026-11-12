@@ -8,7 +8,7 @@ export type Level = "Sedang" | "Menantang" | "Sangat menantang";
 export type Pt = [number, number];
 
 /* ---------- Gambar: bangun pada kertas berpetak atau bangun berlabel ---------- */
-export type Poly = { pts: Pt[]; label?: string; fill?: string };
+export type Poly = { pts: Pt[]; label?: string; fill?: string; dashed?: boolean; noFill?: boolean };
 export type Scene = {
   type: "grid";
   /** Ukuran kertas berpetak dalam satuan; plain berarti tanpa garis petak. */
@@ -32,10 +32,13 @@ export type Part =
   /** Beberapa isian berlabel, misalnya luas setiap bagian dan luas gabungan. */
   | { kind: "items"; items: { label: string; answer: number }[]; unit: string }
   /** Tabel ukuran persegi panjang yang kelilingnya K. */
+  /** Bangun gabungan: tampilkan garis bantu (beberapa versi), hitung luas tiap bangun, lalu jumlahkan. */
+  | { kind: "compose"; outline: Pt[]; texts: NonNullable<Scene["texts"]>; unit: string; versions: { name: string; pieces: Piece[] }[] }
   | { kind: "pairs"; K: number; rows: number; example: [number, number]; key: [number, number][] }
   | { kind: "tf"; statements: { text: string; answer: boolean }[] }
   | { kind: "choice"; label: string; options: string[]; answer: string };
 
+export type Piece = { label: string; shape: Shape; vals: number[]; pts: Pt[] };
 export type AQuestion = Question & { topic: 0 | 1 | 2 | 3; level?: Level; scene?: Scene; parts: Part[] };
 
 /* ---------- Isian ---------- */
@@ -44,6 +47,7 @@ export const fieldCount = (p: Part) => {
     case "formula": return (p.shape === "square" ? 2 : p.vals.length) + 1;
     case "items": return p.items.length;
     case "pairs": return p.rows * 4;
+    case "compose": return 2 + Math.max(...p.versions.map(v => v.pieces.length));
     case "tf": return p.statements.length;
     default: return 1;
   }
@@ -53,6 +57,7 @@ export function fields(p: Part): string[] {
     case "number": return [String(p.answer)];
     case "formula": { const v = p.shape === "square" ? [p.vals[0], p.vals[0]] : p.vals; return [...v.map(String), String(areaOf(p.shape, p.vals))]; }
     case "items": return p.items.map(it => String(it.answer));
+    case "compose": { const ps = p.versions[0].pieces, n = fieldCount(p) - 2; return ["0", ...Array.from({ length: n }, (_, k) => (ps[k] ? String(areaOf(ps[k].shape, ps[k].vals)) : "")), String(ps.reduce((a, x) => a + areaOf(x.shape, x.vals), 0))]; }
     case "pairs": return p.key.flatMap(([a, b]) => [String(a), String(b), String(p.K), String(a * b)]);
     case "tf": return p.statements.map(s => (s.answer ? "B" : "S"));
     case "choice": return [p.answer];
@@ -74,6 +79,11 @@ function partCorrect(p: Part, v: string): boolean {
       if (p.shape === "trap") return same(x.slice(0, 2), p.vals.slice(0, 2)) && x[2] === p.vals[2];
       return same(x.slice(0, k), fields(p).slice(0, k).map(Number));
     }
+    case "compose": {
+      const vi = x[0], ver = p.versions[vi]; if (!ver) return false;
+      const n = raw.length - 2, areas = ver.pieces.map(pc => areaOf(pc.shape, pc.vals));
+      return areas.every((a, k) => x[1 + k] === a) && raw.slice(1 + areas.length, 1 + n).every(c => c === "") && x[n + 1] === areas.reduce((a, b) => a + b, 0);
+    }
     case "pairs": {
       const seen = new Set<string>([[...p.example].sort().join()]);
       for (let r = 0; r < p.rows; r++) {
@@ -87,7 +97,7 @@ function partCorrect(p: Part, v: string): boolean {
     default: return fields(p).every((w, i) => x[i] === Number(w));
   }
 }
-const partReady = (p: Part, v: string) => (p.kind === "choice" ? Boolean(v) : p.kind === "tf" ? cells(p, v).every(Boolean) : cells(p, v).every(y => !Number.isNaN(int(y))));
+const partReady = (p: Part, v: string) => p.kind === "compose" ? (() => { const x = cells(p, v), ver = p.versions[int(x[0])]; return Boolean(ver) && ver.pieces.every((_, k) => !Number.isNaN(int(x[1 + k]))) && !Number.isNaN(int(x[x.length - 1])); })() : (p.kind === "choice" ? Boolean(v) : p.kind === "tf" ? cells(p, v).every(Boolean) : cells(p, v).every(y => !Number.isNaN(int(y))));
 export const correct = (q: AQuestion, raw: string | undefined) => { const v = splitParts(raw ?? "", q.parts.length); return q.parts.every((p, i) => partCorrect(p, v[i])); };
 export const ready = (q: AQuestion, raw: string) => { const v = splitParts(raw, q.parts.length); return q.parts.every((p, i) => partReady(p, v[i])); };
 export function formulaText(p: Extract<Part, { kind: "formula" }>, x: string[]) {
@@ -104,6 +114,7 @@ export function formatAnswer(q: AQuestion, raw: string): string {
       case "number": return `${p.label} ${d(x[0])}${p.unit ? ` ${p.unit}` : ""}`;
       case "formula": return formulaText(p, x);
       case "items": return p.items.map((it, k) => `${it.label} = ${d(x[k])} ${p.unit}`).join(", ");
+      case "compose": { const ver = p.versions[int(x[0])]; if (!ver) return "garis bantu belum ditampilkan"; return `${ver.name}: ${ver.pieces.map((pc, k) => `${pc.label} = ${d(x[1 + k])}`).join(", ")}; luas gabungan = ${d(x[x.length - 1])} ${p.unit}`; }
       case "pairs": return Array.from({ length: p.rows }, (_, r) => `${d(x[4 * r])} × ${d(x[4 * r + 1])}: keliling ${d(x[4 * r + 2])}, luas ${d(x[4 * r + 3])}`).join("; ");
       case "tf": return p.statements.map((_, k) => (x[k] === "B" ? "Benar" : x[k] === "S" ? "Salah" : "…")).join(", ");
       default: return d(v[i]);
@@ -179,13 +190,56 @@ export const topics = [
 
 /* ---------- Bangun gabungan ---------- */
 const plus: Pt[] = [[2, 0], [4, 0], [4, 2], [6, 2], [6, 4], [4, 4], [4, 6], [2, 6], [2, 4], [0, 4], [0, 2], [2, 2]];
-const house: Pt[] = [[0, 3], [4, 0], [8, 3], [8, 8], [0, 8]];
-const lShape: Pt[] = [[0, 0], [6, 0], [6, 4], [3, 4], [3, 6], [0, 6]];
-const kiteTri: Pt[] = [[2, 0], [6, 0], [6, 2], [2, 4], [0, 2]];
-const paraTri: Pt[] = [[4, 0], [18, 0], [14, 6], [14, 16], [0, 6]];
-const uSlant: Pt[] = [[0, 0], [2, 0], [2, 2], [5, 2], [5, 0], [6, 0], [7, 4], [0, 4]];
 const pent: Pt[] = [[2, 0], [6, 2], [6, 6], [2, 6], [2, 4], [0, 2]];
-const sqTrap: Pt[] = [[2, 0], [8, 0], [8, 6], [10, 10], [0, 10], [2, 6]];
+
+/* ---------- Bangun gabungan dengan beberapa versi garis bantu ---------- */
+const rp = (x0: number, y0: number, x1: number, y1: number, label: string): Piece => ({ label, shape: "rect", vals: [x1 - x0, y1 - y0], pts: R(x0, y0, x1, y1) });
+const tp = (pts: Pt[], a: number, t: number, label: string): Piece => ({ label, shape: "tri", vals: [a, t], pts });
+const comp = (outline: Pt[], texts: NonNullable<Scene["texts"]>, v1: Piece[], v2: Piece[], names: [string, string] = ["Garis bantu 1", "Garis bantu 2"]): Part => ({ kind: "compose", outline, texts, unit: "cm²", versions: [{ name: names[0], pieces: v1 }, { name: names[1], pieces: v2 }] });
+const compose = (p: Part) => p;
+/** Huruf T: lebar atas W, tinggi atas h, batang lebar s, tinggi batang t (batang di tengah). */
+function tShape(W: number, h: number, sw: number, t: number): Part {
+  const a = (W - sw) / 2, b = a + sw;
+  return comp([[0, 0], [W, 0], [W, h], [b, h], [b, h + t], [a, h + t], [a, h], [0, h]],
+    [{ at: [W / 2, -0.9], text: `${W} cm` }, { at: [W + 0.4, h / 2], text: `${h} cm` }, { at: [W / 2, h + t + 1], text: `${sw} cm` }, { at: [b + 0.4, h + t / 2], text: `${t} cm`, anchor: "start" }],
+    [rp(0, 0, a, h, "A"), rp(a, 0, b, h + t, "B"), rp(b, 0, W, h, "C")],
+    [rp(0, 0, b, h, "A"), rp(b, 0, W, h, "B"), rp(a, h, b, h + t, "C")]);
+}
+/** Rumah dengan teras: badan W × H, atap setinggi r, teras pw × ph di kanan bawah. */
+function housePorch(W: number, H: number, r: number, pw: number, ph: number): Part {
+  const y0 = r, y1 = r + H, yp = y1 - ph;
+  return comp([[0, y0], [W / 2, 0], [W, y0], [W, yp], [W + pw, yp], [W + pw, y1], [0, y1]],
+    [{ at: [(W + pw) / 2, y1 + 1], text: `${W + pw} cm` }, { at: [-0.4, (y0 + y1) / 2], text: `${H} cm`, anchor: "end" }, { at: [W + pw + 0.4, (yp + y1) / 2], text: `${ph} cm` }, { at: [W + pw / 2, yp - 0.9], text: `${pw} cm` }],
+    [tp([[0, y0], [W / 2, 0], [W, y0]], W, r, "A"), rp(0, y0, W, y1, "B"), rp(W, yp, W + pw, y1, "C")],
+    [tp([[0, y0], [W / 2, 0], [W, y0]], W, r, "A"), rp(0, y0, W, yp, "B"), rp(0, yp, W + pw, y1, "C")]);
+}
+/** Roket: ujung segitiga setinggi n, badan W × B, kaki trapesium melebar e di tiap sisi setinggi f. */
+function rocket(W: number, n: number, B: number, e: number, f: number): Part {
+  const L = e, Rr = e + W, y1 = n + B, y2 = y1 + f;
+  const trap: Piece = { label: "C", shape: "trap", vals: [W, W + 2 * e, f], pts: [[L, y1], [Rr, y1], [Rr + e, y2], [0, y2]] };
+  return comp([[L + W / 2, 0], [Rr, n], [Rr, y1], [Rr + e, y2], [0, y2], [L, y1], [L, n]],
+    [{ at: [L + W / 2, y2 + 1], text: `${W + 2 * e} cm` }, { at: [Rr + 0.4, n + B / 2], text: `${B} cm`, anchor: "start" }, { at: [L + W / 2, n - 0.5 + 1.6], text: `${W} cm` }, { at: [Rr + e + 0.4, y1 + f / 2], text: `${f} cm` }],
+    [tp([[L, n], [L + W / 2, 0], [Rr, n]], W, n, "A"), rp(L, n, Rr, y1, "B"), trap],
+    [tp([[L, n], [L + W / 2, 0], [Rr, n]], W, n, "A"), rp(L, n, Rr, y2, "B"), tp([[0, y2], [L, y1], [L, y2]], e, f, "C"), tp([[Rr, y1], [Rr + e, y2], [Rr, y2]], e, f, "D")]);
+}
+/** Jajargenjang (alas a, tinggi t, geser g) di atas persegi panjang a × h dengan segitiga siku-siku (alas c) di kanan. */
+function paraRectTri(a: number, t: number, g: number, h: number, c: number): Part {
+  const y2 = t + h;
+  return comp([[g, 0], [a + g, 0], [a, t], [a + c, y2], [0, y2], [0, t]],
+    [{ at: [g + a / 2, -0.9], text: `${a} cm` }, { at: [-0.4, t / 2], text: `${t} cm`, anchor: "end" }, { at: [-0.4, t + h / 2], text: `${h} cm`, anchor: "end" }, { at: [(a + c) / 2, y2 + 1], text: `${a + c} cm` }],
+    [{ label: "A", shape: "para", vals: [a, t], pts: [[g, 0], [a + g, 0], [a, t], [0, t]] }, rp(0, t, a, y2, "B"), tp([[a, t], [a + c, y2], [a, y2]], c, h, "C")],
+    [tp([[0, t], [g, 0], [g, t]], t, g, "A"), rp(g, 0, a, t, "B"), tp([[a, 0], [a + g, 0], [a, t]], g, t, "C"), { label: "D", shape: "trap", vals: [a, a + c, h], pts: [[0, t], [a, t], [a + c, y2], [0, y2]] }]);
+}
+const uSlantC = comp([[0, 0], [3, 0], [3, 3], [7, 3], [7, 0], [9, 0], [11, 6], [0, 6]],
+  [{ at: [5.5, 7], text: "11 cm" }, { at: [-0.4, 3], text: "6 cm", anchor: "end" }, { at: [1.5, -0.9], text: "3 cm" }, { at: [5, 2.4], text: "4 cm" }, { at: [8, -0.9], text: "2 cm" }, { at: [3.4, 0.9], text: "3 cm", anchor: "start" }],
+  [rp(0, 0, 3, 6, "A"), rp(3, 3, 7, 6, "B"), rp(7, 0, 9, 6, "C"), tp([[9, 0], [11, 6], [9, 6]], 2, 6, "D")],
+  [rp(0, 3, 9, 6, "A"), rp(0, 0, 3, 3, "B"), rp(7, 0, 9, 3, "C"), tp([[9, 0], [11, 6], [9, 6]], 2, 6, "D")]);
+const kiteC = comp([[4, 0], [12, 0], [10, 4], [12, 10], [4, 10], [0, 4]],
+  [{ at: [8, -0.9], text: "8 cm" }, { at: [8, 11], text: "8 cm" }, { at: [12.4, 7], text: "6 cm" }, { at: [10.6, 2], text: "4 cm", anchor: "start" }],
+  [{ label: "A", shape: "kite", vals: [10, 10], pts: [[4, 0], [10, 4], [4, 10], [0, 4]] }, tp([[4, 0], [12, 0], [10, 4]], 8, 4, "B"), tp([[10, 4], [12, 10], [4, 10]], 8, 6, "C")],
+  [tp([[0, 4], [4, 0], [4, 10]], 10, 4, "A"), { label: "B", shape: "trap", vals: [8, 6, 4], pts: [[4, 0], [12, 0], [10, 4], [4, 4]] }, { label: "C", shape: "trap", vals: [6, 8, 6], pts: [[4, 4], [10, 4], [12, 10], [4, 10]] }],
+  ["Cara Yohana", "Cara Komang"]);
+
 const rooms = { tidur: R(0, 0, 3, 3), dapur: R(3, 0, 6, 2), mandi: R(3, 2, 5, 3), tamu: R(0, 3, 4, 6) };
 const roomFill = ["#fde2c8", "#d6ecfa", "#e3f2d8", "#f6dbe8"];
 
@@ -209,18 +263,10 @@ export const practice: AQuestion[][] = [
     q(1, "Hitunglah luas belah ketupat dengan diagonal 6 cm dan 10 cm.", [formula("kite", [6, 10])], "Luas = ½ × diagonal 1 × diagonal 2 = ½ × 6 × 10 = 30 cm².", { scene: shapeScene("kite", [6, 10]) }),
   ],
   [
-    q(2, "Bangun berbentuk rumah tersusun dari persegi panjang dan segitiga. Hitunglah luas setiap bagian dan luas gabungannya.", [{ kind: "items", unit: "cm²", items: [{ label: "Luas persegi panjang", answer: 24 }, { label: "Luas segitiga", answer: 6 }, { label: "Luas gabungan", answer: 30 }] }],
-      "Persegi panjang 6 × 4 = 24 cm². Segitiga ½ × 6 × 2 = 6 cm². Gabungan 24 + 6 = 30 cm².",
-      { scene: plain(6, 6, [{ pts: [[0, 2], [3, 0], [6, 2], [6, 6], [0, 6]] }], [{ at: [3, 6.9], text: "6 cm" }, { at: [6.6, 4], text: "4 cm" }, { at: [3.3, 1.2], text: "2 cm" }], [dash([0, 2], [6, 2]), dash([3, 0], [3, 2])]) }),
-    q(2, "Hitunglah luas bangun berbentuk huruf L berikut dengan membaginya menjadi dua persegi panjang.", [{ kind: "items", unit: "cm²", items: [{ label: "Persegi panjang atas", answer: 20 }, { label: "Persegi panjang bawah", answer: 6 }, { label: "Luas gabungan", answer: 26 }] }],
-      "Atas 5 × 4 = 20 cm². Bawah 2 × 3 = 6 cm². Gabungan 26 cm².",
-      { scene: plain(5, 7, [{ pts: [[0, 0], [5, 0], [5, 4], [2, 4], [2, 7], [0, 7]] }], [{ at: [2.5, -0.9], text: "5 cm" }, { at: [5.6, 2], text: "4 cm" }, { at: [1, 7.9], text: "2 cm" }, { at: [2.3, 5.7], text: "3 cm", anchor: "start" }], [dash([0, 4], [2, 4])]) }),
-    q(2, "Hitunglah luas bangun gabungan pada kertas berpetak berikut. Bagilah menjadi layang-layang dan segitiga seperti cara Yohana.", [{ kind: "items", unit: "satuan luas", items: [{ label: "Luas layang-layang", answer: 12 }, { label: "Luas segitiga", answer: 4 }, { label: "Luas gabungan", answer: 16 }] }],
-      "Layang-layang ½ × 6 × 4 = 12. Segitiga di kanan atas ½ × 4 × 2 = 4. Gabungan 12 + 4 = 16 satuan luas.",
-      { scene: { type: "grid", w: 8, h: 6, polys: [{ pts: shift(kiteTri, 1, 1) }], lines: [dash([3, 1], [3, 5]), dash([1, 3], [7, 3], "#d6336c"), dash([3, 1], [7, 3], "#2f86d6")] } }),
-    q(2, "Hitunglah luas bangun berikut. Bangun tersusun dari persegi bersisi 5 cm dan segitiga dengan alas 5 cm dan tinggi 4 cm.", [{ kind: "number", label: "Luas gabungan =", answer: 35, unit: "cm²" }],
-      "Persegi 5 × 5 = 25 cm². Segitiga ½ × 5 × 4 = 10 cm². Gabungan 35 cm².",
-      { scene: plain(9, 5, [{ pts: [[0, 0], [5, 0], [9, 5], [0, 5]] }], [{ at: [2.5, -0.9], text: "5 cm" }, { at: [-0.9, 2.5], text: "5 cm" }, { at: [7, 6.1], text: "4 cm" }], [dash([5, 0], [5, 5])]) }),
+    q(2, "Hitunglah luas bangun berbentuk huruf T berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(tShape(9, 3, 3, 5))], "Cara 1: 9 + 24 + 9 = 42 cm². Cara 2: 18 + 9 + 15 = 42 cm². Hasilnya sama."),
+    q(2, "Hitunglah luas bangun rumah dengan teras berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(housePorch(8, 5, 3, 3, 2))], "Cara 1: segitiga 12 + persegi panjang 40 + teras 6 = 58 cm². Cara 2: 12 + 24 + 22 = 58 cm²."),
+    q(2, "Hitunglah luas bangun berbentuk roket berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(rocket(6, 4, 8, 2, 3))], "Cara 1: segitiga 12 + persegi panjang 48 + trapesium 24 = 84 cm². Cara 2: 12 + 66 + 3 + 3 = 84 cm²."),
+    q(2, "Hitunglah luas bangun berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(paraRectTri(8, 4, 2, 4, 4))], "Cara 1: jajargenjang 32 + persegi panjang 32 + segitiga 8 = 72 cm². Cara 2: 4 + 24 + 4 + trapesium 40 = 72 cm²."),
   ],
   [
     q(3, "Bapak memiliki kawat 24 cm untuk membuat kerangka persegi panjang. Contoh: 8 cm × 4 cm. Tuliskan tiga ukuran lain yang mungkin, lengkap dengan keliling dan luasnya.", [{ kind: "pairs", K: 24, rows: 3, example: [8, 4], key: [[10, 2], [9, 3], [6, 6]] }],
@@ -242,35 +288,27 @@ export const assessment: AQuestion[] = [
   q(0, "Lantai teras berukuran 5 m × 3 m akan dipasang ubin 1 m × 1 m. Berapa banyak ubin yang dibutuhkan?", [{ kind: "number", label: "Banyak ubin =", answer: 15, unit: "buah" }],
     "5 ubin setiap baris dan 3 baris: 15 ubin. Luas teras 15 m².", { level: "Sedang", scene: gridScene(7, 5, shift(R(0, 0, 5, 3), 1, 1)) }),
   q(1, "Hitunglah luas persegi panjang berikut.", [formula("rect", [9, 6])], "Luas = 9 × 6 = 54 cm².", { level: "Sedang", scene: shapeScene("rect", [9, 6]) }),
-  q(2, "Bangun berbentuk rumah berikut tersusun dari persegi panjang dan segitiga. Hitunglah luasnya.", [{ kind: "items", unit: "cm²", items: [{ label: "Luas persegi panjang", answer: 40 }, { label: "Luas segitiga", answer: 12 }, { label: "Luas gabungan", answer: 52 }] }],
-    "Persegi panjang 8 × 5 = 40 cm². Segitiga ½ × 8 × 3 = 12 cm². Gabungan 52 cm².",
-    { level: "Sedang", scene: plain(8, 8, [{ pts: house }], [{ at: [4, 8.9], text: "8 cm" }, { at: [8.6, 5.5], text: "5 cm" }, { at: [4.4, 1.7], text: "3 cm" }], [dash([0, 3], [8, 3]), dash([4, 0], [4, 3])]) }),
+  q(2, "Hitunglah luas bangun rumah dengan teras berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(housePorch(10, 6, 4, 4, 3))], "Cara 1: segitiga 20 + persegi panjang 60 + teras 12 = 92 cm². Cara 2: 20 + 30 + 42 = 92 cm².", { level: "Sedang" }),
   q(3, "Bapak memiliki kawat 60 cm untuk kerangka persegi panjang. Contoh: 20 cm × 10 cm. Tuliskan tiga ukuran lain yang mungkin, lengkap dengan keliling dan luasnya.", [{ kind: "pairs", K: 60, rows: 3, example: [20, 10], key: [[25, 5], [18, 12], [15, 15]] }],
     "Panjang + lebar = 60 : 2 = 30 cm, misalnya 25 × 5 (125 cm²), 18 × 12 (216 cm²), atau 15 × 15 (225 cm²). Keliling semuanya 60 cm.", { level: "Sedang" }),
   q(0, "Perhatikan denah rumah berikut. Setiap petak mewakili ubin 1 m × 1 m. Ruangan manakah yang membutuhkan ubin paling banyak? Berapa ubinnya?", [{ kind: "choice", label: "Ruangan", options: ["R. Tidur", "Dapur", "K. Mandi", "R. Tamu"], answer: "R. Tamu" }, { kind: "number", label: "Banyak ubin =", answer: 12, unit: "buah" }],
     "R. Tidur 3 × 3 = 9, Dapur 3 × 2 = 6, Kamar mandi 2 × 1 = 2, R. Tamu 4 × 3 = 12. Ruang tamu paling luas, 12 ubin.",
     { level: "Sedang", scene: { type: "grid", w: 6, h: 6, polys: [{ pts: rooms.tidur, label: "R. Tidur", fill: roomFill[0] }, { pts: rooms.dapur, label: "Dapur", fill: roomFill[1] }, { pts: rooms.mandi, label: "K. Mandi", fill: roomFill[2] }, { pts: rooms.tamu, label: "R. Tamu", fill: roomFill[3] }] } }),
   q(1, "Hitunglah luas persegi berikut.", [formula("square", [7])], "Luas = sisi × sisi = 7 × 7 = 49 cm².", { level: "Sedang", scene: shapeScene("square", [7]) }),
-  q(2, "Hitunglah luas bangun huruf L berikut dengan membaginya menjadi dua persegi panjang.", [{ kind: "items", unit: "cm²", items: [{ label: "Persegi panjang atas", answer: 24 }, { label: "Persegi panjang bawah", answer: 6 }, { label: "Luas gabungan", answer: 30 }] }],
-    "Atas 6 × 4 = 24 cm². Bawah 3 × 2 = 6 cm². Gabungan 30 cm².",
-    { level: "Sedang", scene: plain(6, 6, [{ pts: lShape }], [{ at: [3, -0.9], text: "6 cm" }, { at: [6.6, 2], text: "4 cm" }, { at: [1.5, 6.9], text: "3 cm" }, { at: [3.3, 5.2], text: "2 cm", anchor: "start" }], [dash([0, 4], [3, 4])]) }),
+  q(2, "Hitunglah luas bangun berbentuk huruf T berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(tShape(12, 3, 4, 6))], "Cara 1: 12 + 36 + 12 = 60 cm². Cara 2: 24 + 12 + 24 = 60 cm².", { level: "Sedang" }),
   q(3, "Keliling persegi panjang 36 cm dan panjangnya 10 cm. Tentukan lebar dan luasnya.", [{ kind: "items", unit: "", items: [{ label: "Lebar (cm)", answer: 8 }, { label: "Luas (cm²)", answer: 80 }] }],
     "Panjang + lebar = 36 : 2 = 18, jadi lebar = 8 cm. Luas = 10 × 8 = 80 cm².", { level: "Sedang" }),
   // Menantang (9-17)
   q(0, "Hitunglah luas daerah bangun berikut dengan membilang petak satuan.", [{ kind: "number", label: "Luas =", answer: 20, unit: "satuan luas" }],
     "Kotak 6 × 6 = 36 petak dikurangi 4 pojok yang masing-masing 2 × 2 = 4 petak: 36 − 16 = 20 satuan luas.", { level: "Menantang", scene: gridScene(8, 8, shift(plus, 1, 1)) }),
   q(1, "Hitunglah luas segitiga berikut.", [formula("tri", [12, 7])], "Luas = ½ × 12 × 7 = 42 cm².", { level: "Menantang", scene: shapeScene("tri", [12, 7]) }),
-  q(2, "Hitunglah luas bangun gabungan pada kertas berpetak berikut dengan cara Yohana: bagi menjadi layang-layang dan segitiga.", [{ kind: "items", unit: "satuan luas", items: [{ label: "Luas layang-layang", answer: 12 }, { label: "Luas segitiga", answer: 4 }, { label: "Luas gabungan", answer: 16 }] }],
-    "Layang-layang dengan diagonal 6 dan 4: ½ × 6 × 4 = 12. Segitiga dengan alas 4 dan tinggi 2: ½ × 4 × 2 = 4. Gabungan 16 satuan luas.",
-    { level: "Menantang", scene: { type: "grid", w: 9, h: 6, polys: [{ pts: shift(kiteTri, 1, 1) }], lines: [dash([3, 1], [3, 5]), dash([1, 3], [7, 3], "#d6336c"), dash([3, 1], [7, 3], "#2f86d6")] } }),
+  q(2, "Hitunglah luas bangun berbentuk roket berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(rocket(8, 3, 7, 2, 3))], "Cara 1: segitiga 12 + persegi panjang 56 + trapesium 30 = 98 cm². Cara 2: 12 + 80 + 3 + 3 = 98 cm².", { level: "Menantang" }),
   q(3, "Kawat 40 cm dibentuk menjadi kerangka persegi panjang. Ukuran manakah yang menghasilkan kerangka paling luas?", [{ kind: "choice", label: "Ukuran terluas", options: ["12 cm × 8 cm", "15 cm × 5 cm", "10 cm × 10 cm", "18 cm × 2 cm"], answer: "10 cm × 10 cm" }],
     "Semua kelilingnya 40 cm. Luasnya 96, 75, 100, dan 36 cm². Persegi 10 × 10 paling luas.", { level: "Menantang" }),
   q(0, "Hitunglah luas segitiga pada kertas berpetak berikut dengan cara Yohana.", [{ kind: "number", label: "Luas =", answer: 16, unit: "satuan luas" }],
     "Pasangkan petak setengah menjadi petak utuh. Luasnya 16 satuan luas, sama dengan ½ × 8 × 4.", { level: "Menantang", scene: gridScene(10, 6, shift([[0, 4], [8, 4], [0, 0]], 1, 1)) }),
   q(1, "Hitunglah luas jajargenjang berikut.", [formula("para", [11, 6])], "Luas = alas × tinggi = 11 × 6 = 66 cm². Sisi miring tidak dipakai.", { level: "Menantang", scene: shapeScene("para", [11, 6]) }),
-  q(2, "Bangun berikut tersusun dari jajargenjang dan segitiga siku-siku. Hitunglah luasnya.", [{ kind: "items", unit: "cm²", items: [{ label: "Luas jajargenjang", answer: 84 }, { label: "Luas segitiga", answer: 70 }, { label: "Luas gabungan", answer: 154 }] }],
-    "Jajargenjang alas 14 cm dan tinggi 6 cm: 14 × 6 = 84 cm². Segitiga alas 14 cm dan tinggi 10 cm: ½ × 14 × 10 = 70 cm². Gabungan 154 cm².",
-    { level: "Menantang", scene: plain(18, 16, [{ pts: paraTri }], [{ at: [7, 5.3], text: "14 cm" }, { at: [16.6, 3.3], text: "6 cm", anchor: "start" }, { at: [14.5, 11.3], text: "10 cm", anchor: "start" }], [dash([0, 6], [14, 6]), dash([14, 0], [14, 6], "#2f86d6")]) }),
+  q(2, "Bangun berikut tersusun dari jajargenjang, persegi panjang, dan segitiga. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(paraRectTri(10, 5, 2, 5, 4))], "Cara 1: jajargenjang 50 + persegi panjang 50 + segitiga 10 = 110 cm². Cara 2: 5 + 40 + 5 + trapesium 60 = 110 cm².", { level: "Menantang" }),
   q(3, "Tentukan benar atau salah pernyataan berikut.", [{ kind: "tf", statements: [
     { text: "Persegi panjang 9 cm × 3 cm dan 7 cm × 5 cm memiliki keliling yang sama.", answer: true },
     { text: "Luas kedua persegi panjang itu juga sama.", answer: false },
@@ -283,16 +321,34 @@ export const assessment: AQuestion[] = [
   ] }], "4 × 5 = 20 ubin. Luas sama berarti ubinnya sama banyak. 6 × 2 = 12 m² lebih dari 3 × 3 = 9 m².", { level: "Menantang" }),
   // Sangat menantang (18-24)
   q(1, "Hitunglah luas trapesium berikut.", [formula("trap", [6, 10, 7])], "Luas = ½ × (6 + 10) × 7 = ½ × 16 × 7 = 56 cm².", { level: "Sangat menantang", scene: shapeScene("trap", [6, 10, 7]) }),
-  q(2, "Hitunglah luas bangun pada kertas berpetak berikut.", [{ kind: "number", label: "Luas =", answer: 20, unit: "satuan luas" }],
-    "Persegi panjang 6 × 4 = 24 dikurangi lekukan 3 × 2 = 6 menjadi 18, ditambah segitiga di kanan ½ × 1 × 4 = 2. Luas 20 satuan luas.", { level: "Sangat menantang", scene: gridScene(9, 6, shift(uSlant, 1, 1)) }),
+  q(2, "Hitunglah luas bangun berikut. Tampilkan garis bantu, hitung luas setiap bangun, lalu jumlahkan.", [compose(uSlantC)], "Cara 1: 18 + 12 + 12 + segitiga 6 = 48 cm². Cara 2: 27 + 9 + 6 + 6 = 48 cm².", { level: "Sangat menantang" }),
   q(3, "Keliling sebuah persegi 48 cm. Berapa panjang sisi dan luasnya?", [{ kind: "items", unit: "", items: [{ label: "Sisi (cm)", answer: 12 }, { label: "Luas (cm²)", answer: 144 }] }],
     "Sisi = 48 : 4 = 12 cm. Luas = 12 × 12 = 144 cm².", { level: "Sangat menantang" }),
   q(0, "Hitunglah luas daerah bangun A pada kertas berpetak berikut.", [{ kind: "number", label: "Luas =", answer: 24, unit: "satuan luas" }],
     "Petak utuh di bagian persegi 4 × 4 = 16. Bagian atas dan kiri yang miring dapat dipasangkan menjadi 8 petak utuh. Seluruhnya 24 satuan luas.", { level: "Sangat menantang", scene: gridScene(8, 8, shift(pent, 1, 1)) }),
   q(1, "Hitunglah luas layang-layang dengan diagonal 18 cm dan 26 cm.", [formula("kite", [18, 26])], "Luas = ½ × 18 × 26 = 234 cm².", { level: "Sangat menantang", scene: shapeScene("kite", [18, 26]) }),
-  q(2, "Bangun berikut tersusun dari persegi bersisi 6 cm dan trapesium dengan sisi atas 6 cm, sisi alas 10 cm, dan tinggi 4 cm. Hitunglah luasnya.", [{ kind: "number", label: "Luas gabungan =", answer: 68, unit: "cm²" }],
-    "Persegi 6 × 6 = 36 cm². Trapesium ½ × (6 + 10) × 4 = 32 cm². Gabungan 68 cm².",
-    { level: "Sangat menantang", scene: plain(10, 10, [{ pts: sqTrap }], [{ at: [5, -0.9], text: "6 cm" }, { at: [5, 10.9], text: "10 cm" }, { at: [8.4, 3.2], text: "6 cm", anchor: "start" }, { at: [9.6, 8.2], text: "4 cm", anchor: "start" }], [dash([2, 6], [8, 6])]) }),
+  q(2, "Hitunglah luas bangun berikut. Cara Yohana membagi menjadi layang-layang dan dua segitiga. Cara Komang membagi menjadi segitiga dan dua trapesium.", [compose(kiteC)], "Cara Yohana: 50 + 16 + 24 = 90 cm². Cara Komang: 20 + 28 + 42 = 90 cm². Hasilnya sama.", { level: "Sangat menantang" }),
   q(3, "Sebuah kebun berbentuk persegi panjang luasnya 48 m². Ukuran manakah yang membutuhkan pagar paling pendek?", [{ kind: "choice", label: "Ukuran kebun", options: ["2 m × 24 m", "3 m × 16 m", "4 m × 12 m", "6 m × 8 m"], answer: "6 m × 8 m" }],
     "Semua luasnya 48 m². Kelilingnya 52 m, 38 m, 32 m, dan 28 m. Ukuran 6 m × 8 m paling mendekati persegi, kelilingnya paling kecil.", { level: "Sangat menantang" }),
 ];
+
+/** Keterangan ukuran setiap bangun penyusun. */
+export function pieceDims(pc: Piece, u = "cm") {
+  const v = pc.vals;
+  switch (pc.shape) {
+    case "rect": return `persegi panjang, panjang ${v[0]} ${u}, lebar ${v[1]} ${u}`;
+    case "square": return `persegi, sisi ${v[0]} ${u}`;
+    case "tri": return `segitiga, alas ${v[0]} ${u}, tinggi ${v[1]} ${u}`;
+    case "para": return `jajargenjang, alas ${v[0]} ${u}, tinggi ${v[1]} ${u}`;
+    case "trap": return `trapesium, sisi sejajar ${v[0]} ${u} dan ${v[1]} ${u}, tinggi ${v[2]} ${u}`;
+    case "kite": return `layang-layang, diagonal ${v[0]} ${u} dan ${v[1]} ${u}`;
+  }
+}
+export const pieceColors = ["#fde2c8", "#d6ecfa", "#e3f2d8", "#f6dbe8", "#fff3b0"];
+/** Gambar bangun gabungan; jika versi dipilih, bangun penyusun diwarnai dan diberi huruf. */
+export function composeScene(p: Extract<Part, { kind: "compose" }>, version: number | null): Scene {
+  const ver = version === null ? null : p.versions[version];
+  const W = Math.max(...p.outline.map(q => q[0])), H = Math.max(...p.outline.map(q => q[1]));
+  return { type: "grid", w: W, h: H, plain: true, texts: p.texts,
+    polys: [...(ver ? ver.pieces.map((pc, k) => ({ pts: pc.pts, fill: pieceColors[k % pieceColors.length], dashed: true, label: pc.label })) : []), { pts: p.outline, noFill: Boolean(ver) }] };
+}

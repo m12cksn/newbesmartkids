@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, Minus, Plus, RotateCcw, Scissors } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Minus, PenLine, Plus, RotateCcw, Scissors } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { GridFig } from "./GradeFiveAreaArt";
 import {
-  areaOf, assessment, cells, correct, formatAnswer, practice, ready, SEP, shapeName, shapeScene, splitParts, topics,
+  areaOf, assessment, cells, composeScene, correct, formatAnswer, pieceColors, pieceDims, practice, ready, SEP, shapeName, shapeScene, splitParts, topics,
   type AQuestion, type Part, type Scene, type Shape,
 } from "@/data/grade-five-area";
 
@@ -72,17 +72,44 @@ function FormulaLab() {
 }
 
 /* ====================================================================== */
-/* Lab C: bangun gabungan rumah                                            */
+/* Bangun gabungan dengan garis bantu                                      */
 /* ====================================================================== */
-function HouseLab() {
-  const [w, setW] = useState(8), [h, setH] = useState(5), [r, setR] = useState(3);
-  const a1 = w * h, a2 = (w * r) / 2;
-  const scene: Scene = { type: "grid", w, h: h + r, plain: true, polys: [{ pts: [[0, r], [w, r], [w, r + h], [0, r + h]], fill: "#d6ecfa" }, { pts: [[0, r], [w / 2, 0], [w, r]], fill: "#fde2c8" }],
-    texts: [{ at: [w / 2, r + h + 0.9], text: `${w} cm` }, { at: [w + 0.7, r + h / 2], text: `${h} cm` }, { at: [w / 2 + 0.7, r * 0.65], text: `${r} cm` }], lines: [{ a: [w / 2, 0], b: [w / 2, r] }] };
+type ComposePart = Extract<Part, { kind: "compose" }>;
+function ComposeView({ p, version, setVersion, disabled, children }: { p: ComposePart; version: number | null; setVersion: (v: number | null) => void; disabled?: boolean; children?: (k: number) => ReactNode }) {
+  const ver = version === null ? null : p.versions[version];
+  return <div className="w-full space-y-3">
+    <div className="rounded-xl bg-base-100 p-2"><GridFig s={composeScene(p, version)} className="w-full max-w-80" /></div>
+    <div className="flex flex-wrap items-center gap-2">
+      <button type="button" aria-pressed={version !== null} disabled={disabled} className={`btn btn-sm gap-1 ${version !== null ? on : "btn-outline"}`} onClick={() => setVersion(version === null ? 0 : null)}><PenLine className="size-4" aria-hidden="true" />{version === null ? "Tampilkan garis bantu" : "Sembunyikan garis bantu"}</button>
+      {version !== null && <span role="radiogroup" aria-label="Versi garis bantu" className="join">{p.versions.map((v, k) => <button key={v.name} type="button" role="radio" aria-checked={version === k} disabled={disabled} onClick={() => setVersion(k)} className={`btn join-item btn-sm ${version === k ? on : "btn-outline"}`}>{v.name}</button>)}</span>}
+    </div>
+    {ver ? <ul className="space-y-2">{ver.pieces.map((pc, k) => <li key={pc.label} className="rounded-lg border border-base-300 p-2 text-sm"><span className="flex items-start gap-2"><span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded font-extrabold" style={{ background: pieceColors[k % pieceColors.length] }}>{pc.label}</span><span>Bangun {pc.label}: {pieceDims(pc)}</span></span>{children?.(k)}</li>)}</ul>
+      : <p className="text-sm text-base-content/60">Ketuk Tampilkan garis bantu untuk membagi bangun gabungan menjadi beberapa bangun yang sudah kamu kenal.</p>}
+  </div>;
+}
+const composeLabs: ComposePart[] = [
+  { kind: "compose", unit: "cm²", outline: [[0, 3], [4, 0], [8, 3], [8, 5], [11, 5], [11, 8], [0, 8]], texts: [{ at: [5.5, 9], text: "11 cm" }, { at: [-0.4, 5.5], text: "5 cm", anchor: "end" }, { at: [11.4, 6.5], text: "3 cm" }, { at: [9.5, 4.1], text: "3 cm" }],
+    versions: [
+      { name: "Garis bantu 1", pieces: [{ label: "A", shape: "tri", vals: [8, 3], pts: [[0, 3], [4, 0], [8, 3]] }, { label: "B", shape: "rect", vals: [8, 5], pts: [[0, 3], [8, 3], [8, 8], [0, 8]] }, { label: "C", shape: "rect", vals: [3, 3], pts: [[8, 5], [11, 5], [11, 8], [8, 8]] }] },
+      { name: "Garis bantu 2", pieces: [{ label: "A", shape: "tri", vals: [8, 3], pts: [[0, 3], [4, 0], [8, 3]] }, { label: "B", shape: "rect", vals: [8, 2], pts: [[0, 3], [8, 3], [8, 5], [0, 5]] }, { label: "C", shape: "rect", vals: [11, 3], pts: [[0, 5], [11, 5], [11, 8], [0, 8]] }] },
+    ] },
+  { kind: "compose", unit: "cm²", outline: [[5, 0], [8, 4], [8, 12], [10, 15], [0, 15], [2, 12], [2, 4]], texts: [{ at: [5, 16], text: "10 cm" }, { at: [8.4, 8], text: "8 cm", anchor: "start" }, { at: [10.4, 13.5], text: "3 cm" }],
+    versions: [
+      { name: "Garis bantu 1", pieces: [{ label: "A", shape: "tri", vals: [6, 4], pts: [[2, 4], [5, 0], [8, 4]] }, { label: "B", shape: "rect", vals: [6, 8], pts: [[2, 4], [8, 4], [8, 12], [2, 12]] }, { label: "C", shape: "trap", vals: [6, 10, 3], pts: [[2, 12], [8, 12], [10, 15], [0, 15]] }] },
+      { name: "Garis bantu 2", pieces: [{ label: "A", shape: "tri", vals: [6, 4], pts: [[2, 4], [5, 0], [8, 4]] }, { label: "B", shape: "rect", vals: [6, 11], pts: [[2, 4], [8, 4], [8, 15], [2, 15]] }, { label: "C", shape: "tri", vals: [2, 3], pts: [[0, 15], [2, 12], [2, 15]] }, { label: "D", shape: "tri", vals: [2, 3], pts: [[8, 12], [10, 15], [8, 15]] }] },
+    ] },
+];
+function ComposeLab() {
+  const [f, setF] = useState(0), [version, setVersion] = useState<number | null>(null), [shown, setShown] = useState<number[]>([]);
+  const p = composeLabs[f], ver = version === null ? null : p.versions[version];
+  const areas = ver ? ver.pieces.map(pc => areaOf(pc.shape, pc.vals)) : [], all = ver !== null && shown.length === areas.length, sum = shown.reduce((a, k) => a + areas[k], 0);
+  const formula = (k: number) => { const pc = ver!.pieces[k], v = pc.vals; return pc.shape === "rect" ? `${v[0]} × ${v[1]}` : pc.shape === "trap" ? `½ × (${v[0]} + ${v[1]}) × ${v[2]}` : pc.shape === "para" ? `${v[0]} × ${v[1]}` : `½ × ${v[0]} × ${v[1]}`; };
   return <div className="space-y-3">
-    <div className="flex flex-wrap gap-3"><Stepper label="Lebar" value={w} set={setW} min={4} max={12} step={2} /><Stepper label="Tinggi dinding" value={h} set={setH} min={2} max={8} /><Stepper label="Tinggi atap" value={r} set={setR} min={1} max={6} /></div>
-    <div className="rounded-xl bg-base-100 p-2"><GridFig s={scene} className="w-full max-w-64" /></div>
-    <Result value={String(a1 + a2)}>Persegi panjang (biru) = {w} × {h} = {a1} cm². Segitiga (jingga) = ½ × {w} × {r} = {a2} cm². Luas gabungan = {a1} + {a2} = <strong>{a1 + a2} cm²</strong>.</Result>
+    <div role="radiogroup" aria-label="Bangun gabungan" className="flex flex-wrap gap-1.5">{["Rumah dengan teras", "Roket"].map((n, k) => <button key={n} type="button" role="radio" aria-checked={f === k} onClick={() => { setF(k); setVersion(null); setShown([]); }} className={`btn btn-xs ${f === k ? "btn-success" : "btn-outline"}`}>{n}</button>)}</div>
+    <ComposeView p={p} version={version} setVersion={v => { setVersion(v); setShown([]); }}>
+      {k => shown.includes(k) ? <p className="mt-1 ps-8 font-bold">Luas {ver!.pieces[k].label} = {formula(k)} = {areas[k]} cm²</p> : <button type="button" className="btn btn-xs btn-outline mt-1 ms-8" onClick={() => setShown([...shown, k])}>Hitung luas {ver!.pieces[k].label}</button>}
+    </ComposeView>
+    <Result value={all ? String(sum) : ""}>{ver === null ? "Bangun gabungan belum dibagi." : all ? <>Luas gabungan = {areas.join(" + ")} = <strong>{sum} cm²</strong>. Coba versi garis bantu yang lain: hasilnya tetap sama.</> : `Hitung luas setiap bangun dulu. Sudah ${shown.length} dari ${areas.length}.`}</Result>
   </div>;
 }
 
@@ -103,7 +130,7 @@ function WireLab() {
     <Result value={String(P * l)}>Panjang + lebar = {K} : 2 = {half}, jadi lebar = {l} cm. Keliling = 2 × ({P} + {l}) = {K} cm. Luas = {P} × {l} = <strong>{P * l} cm²</strong>.{P === l && " Ini persegi, luasnya paling besar untuk keliling ini."}</Result>
   </div>;
 }
-const labs = [TileLab, FormulaLab, HouseLab, WireLab];
+const labs = [TileLab, FormulaLab, ComposeLab, WireLab];
 
 /* ====================================================================== */
 /* Cara menjawab                                                           */
@@ -121,6 +148,13 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
       return <Eq>Luas = {b(0, "Bilangan pertama", "w-12")} × {b(1, "Bilangan kedua", "w-12")} {res}</Eq>;
     }
     case "items": return <div className="space-y-2">{p.items.map((it, k) => <Eq key={it.label}><span className="text-base">{it.label} =</span>{b(k, it.label, "w-20")} {p.unit}</Eq>)}</div>;
+    case "compose": {
+      const vi = x[0] === "" ? null : Number(x[0]), ver = vi === null ? null : p.versions[vi];
+      return <div className="w-full space-y-3"><ComposeView p={p} version={vi} disabled={checked} setVersion={v => set(v === null ? "" : [String(v), ...x.slice(1).map(() => "")].join("|"))}>
+        {k => <div className="mt-1"><Eq><span className="text-base">Luas {ver!.pieces[k].label} =</span>{b(1 + k, `Luas ${ver!.pieces[k].label}`, "w-20")} {p.unit}</Eq></div>}
+      </ComposeView>
+        {ver && <Eq><span className="text-base">Luas gabungan = {ver.pieces.map(pc => pc.label).join(" + ")} =</span>{b(x.length - 1, "Luas gabungan", "w-20")} {p.unit}</Eq>}</div>;
+    }
     case "pairs": return <div className="overflow-x-auto"><table className="w-full border-collapse text-center text-sm"><thead><tr className="bg-sky-700 text-white"><th className="p-1.5">Bentuk</th><th>Panjang (cm)</th><th>Lebar (cm)</th><th>Keliling (cm)</th><th>Luas (cm²)</th></tr></thead>
       <tbody><tr className="bg-orange-50"><td className="p-1.5">1</td><td>{p.example[0]}</td><td>{p.example[1]}</td><td>{p.K}</td><td>{p.example[0] * p.example[1]}</td></tr>
         {Array.from({ length: p.rows }, (_, r) => <tr key={r} className="border-b border-base-300"><td className="p-1.5">{r + 2}</td>{["Panjang", "Lebar", "Keliling", "Luas"].map((c, j) => <td key={c} className="p-1">{b(4 * r + j, `Bentuk ${r + 2} ${c}`, "w-14")}</td>)}</tr>)}</tbody></table>

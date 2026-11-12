@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
-import { assessment, practice, topics, SEP, cells } from "../src/data/grade-five-area.ts";
+import { assessment, practice, topics, SEP, cells, areaOf, fieldCount } from "../src/data/grade-five-area.ts";
+/** Jawaban memakai versi garis bantu kedua. */
+const alt = q => q.parts.map(p => { if (p.kind !== "compose") return q.answer.split(SEP)[q.parts.indexOf(p)]; const a = p.versions[1].pieces.map(pc => areaOf(pc.shape, pc.vals)), n = fieldCount(p) - 2; return ["1", ...Array.from({ length: n }, (_, k) => (k < a.length ? String(a[k]) : "")), String(a.reduce((x, y) => x + y, 0))].join("|"); }).join(SEP);
 
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
 const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/grade-five-area-screenshots";
@@ -30,7 +32,13 @@ try {
           const names = p.shape === "trap" ? ["Sisi pertama", "Sisi kedua", "Tinggi"] : ["Bilangan pertama", "Bilangan kedua"];
           for (const [j, n] of names.entries()) await fill(n, x[j]); await fill("Luas", x[k]);
         } else if (p.kind === "items") { for (const [k, it] of p.items.entries()) await fill(it.label, x[k]); }
-        else if (p.kind === "pairs") { for (let r = 0; r < p.rows; r++) for (const [j, c] of ["Panjang", "Lebar", "Keliling", "Luas"].entries()) await fill(`Bentuk ${r + 2} ${c}`, x[4 * r + j]); }
+        else if (p.kind === "compose") {
+          assert.equal(await page.getByRole("textbox", { name: "Luas gabungan" }).count(), 0, "isian muncul setelah garis bantu");
+          await button("Tampilkan garis bantu").click();
+          const vi = Number(x[0]); if (vi > 0) await page.getByRole("radio", { name: p.versions[vi].name, exact: true }).click();
+          for (const [k, pc] of p.versions[vi].pieces.entries()) await fill(`Luas ${pc.label}`, x[1 + k]);
+          await fill("Luas gabungan", x[x.length - 1]);
+        } else if (p.kind === "pairs") { for (let r = 0; r < p.rows; r++) for (const [j, c] of ["Panjang", "Lebar", "Keliling", "Luas"].entries()) await fill(`Bentuk ${r + 2} ${c}`, x[4 * r + j]); }
         else if (p.kind === "tf") { for (const [k, c] of x.entries()) await page.getByRole("group", { name: `Pernyataan ${k + 1}`, exact: true }).getByRole("button", { name: c === "B" ? "Benar" : "Salah", exact: true }).click(); }
         else if (p.kind === "choice") await page.getByRole("group", { name: `Pilihan bagian ${i + 1}`, exact: true }).getByRole("button", { name: v[i], exact: true }).click();
       }
@@ -44,7 +52,13 @@ try {
       if (t > 0) await button(`${topics[t].code}. ${topics[t].title}`).click();
       if (t === 0) { assert.equal(await result(), "0"); await button("Petak 2, 2").click(); assert.equal(await result(), "1"); await button("Petak 1, 1").click(); assert.equal(await result(), "1", "di luar ruangan tidak dihitung"); await clicks("Pasang ubin sebaris", 3); assert.equal(await result(), "12"); await page.getByTestId("lab-result").filter({ hasText: "12 m²" }).waitFor(); }
       if (t === 1) { assert.equal(await result(), "16"); await button("Potong dan pindahkan").click(); await page.getByTestId("lab-result").filter({ hasText: "8 × 2 = 16" }).waitFor(); await radio("Trapesium").click(); assert.equal(await result(), "24"); await radio("Persegi").click(); assert.equal(await result(), "25"); }
-      if (t === 2) { assert.equal(await result(), "52"); await button("Tinggi atap tambah").click(); assert.equal(await result(), "56"); }
+      if (t === 2) {
+        assert.equal(await result(), ""); await button("Tampilkan garis bantu").click();
+        for (const l of ["A", "B", "C"]) await button(`Hitung luas ${l}`).click(); assert.equal(await result(), "61");
+        await page.getByRole("radio", { name: "Garis bantu 2", exact: true }).click(); assert.equal(await result(), "");
+        for (const l of ["A", "B", "C"]) await button(`Hitung luas ${l}`).click(); assert.equal(await result(), "61", "versi lain hasil sama");
+        await page.getByRole("radio", { name: "Roket", exact: true }).click(); await button("Tampilkan garis bantu").click(); for (const l of ["A", "B", "C"]) await button(`Hitung luas ${l}`).click(); assert.equal(await result(), "84");
+      }
       if (t === 3) { assert.equal(await result(), "32"); await button("Catat ukuran").click(); await button("Panjang kurangi").click(); await clicks("Panjang kurangi", 1); assert.equal(await result(), "36"); await page.getByTestId("lab-result").filter({ hasText: "Ini persegi" }).waitFor(); }
       await fit(`lab ${t}`); await shot(`lab-${topics[t].code}`);
       await button("Latihan materi").click();
@@ -52,7 +66,7 @@ try {
       for (const [k, q] of set.entries()) {
         assert.ok(await button("Periksa jawaban").isDisabled(), `gating ${t}-${k}`);
         const miss = t === 1 && k === 0;
-        await answer(q, miss ? "7|4|11" : q.answer); if (miss) wrong++;
+        await answer(q, miss ? "7|4|11" : t === 2 && k % 2 ? alt(q) : q.answer); if (miss) wrong++;
         await button("Periksa jawaban").click(); await page.getByText(miss ? "Belum tepat." : "Tepat!", { exact: true }).waitFor();
         await fit(`latihan ${t}-${k}`); await shot(`practice-${topics[t].code}-${k + 1}`);
         await button(k === set.length - 1 ? "Lihat hasil" : "Lanjut →").click();
@@ -65,7 +79,7 @@ try {
     for (const [i, q] of assessment.entries()) {
       await page.getByText(`Soal ${i + 1}/24`).waitFor();
       assert.equal(await button("Lanjut →").count(), 0, `gating evaluasi ${i + 1}`);
-      await answer(q, i === 0 ? "8" : q.answer);
+      await answer(q, i === 0 ? "8" : q.topic === 2 && i % 8 === 6 ? alt(q) : q.answer);
       await fit(`evaluasi ${i + 1}`); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
       await button(i === 23 ? "Lihat hasil" : "Lanjut →").click();
     }
