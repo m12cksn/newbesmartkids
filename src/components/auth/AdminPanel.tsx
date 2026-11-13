@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy, KeyRound, LogOut, MessageCircle, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
+import { Copy, FileText, KeyRound, LogOut, MessageCircle, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fmtDate } from "./AccountPanel";
 
@@ -109,6 +110,7 @@ export function AdminPanel() {
                 <p className="text-xs text-base-content/60">{[a.phone, a.note, `${a.devices} perangkat aktif`].filter(Boolean).join(", ")}</p>
                 <p className="mt-1 text-sm">{act1.length ? act1.map(e => `${e.package === "semua" ? "Semua kelas" : `Kelas ${e.classId}`} s.d. ${fmtDate(e.expiresAt)}`).join("; ") : a.role === "admin" ? "Akses penuh" : "Tidak ada paket aktif"}</p></div>
               {a.role !== "admin" && <div className="flex flex-wrap gap-1">
+                <Link href={`/admin/laporan/${a.id}`} className="btn btn-xs btn-outline gap-1"><FileText className="size-3.5" aria-hidden="true" />Laporan</Link>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => { setExtendFor(extendFor === a.id ? null : a.id); setExtPkg(act1[0] ? { package: act1[0].package, classId: act1[0].classId ?? 1 } : { package: "kelas", classId: 1 }); }}><CalendarPlus className="size-3.5" aria-hidden="true" />Tambah paket</button>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => act(async () => { if (!confirm(`Buat PIN baru untuk ${a.username}? PIN lama tidak berlaku dan semua perangkat keluar.`)) return; const r = await call<{ username: string; pin: string }>({ action: "reset", account: a.id }); setCreds({ username: r.username, pin: r.pin, name: a.displayName, phone: a.phone, paket: act1.map(e => `${e.package === "semua" ? "Semua kelas" : `Kelas ${e.classId}`} sampai ${fmtDate(e.expiresAt)}`).join("; ") || "-" }); window.scrollTo({ top: 0, behavior: "smooth" }); upsert({ ...a, devices: 0 }); })}><KeyRound className="size-3.5" aria-hidden="true" />Reset PIN</button>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy || !a.devices} onClick={() => act(async () => upsert(await call<Account>({ action: "logout", account: a.id })))}><LogOut className="size-3.5" aria-hidden="true" />Keluarkan perangkat</button>

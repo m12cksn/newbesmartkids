@@ -78,6 +78,21 @@ try {
     await page.getByRole("link", { name: "Bilangan Bulat" }).waitFor(); await page.getByText("88/100").first().waitFor(); await page.getByText("75/100").first().waitFor();
     await page.getByText("21/24 benar, skor 88").waitFor(); const hist = page.getByRole("region", { name: "Riwayat belajar" }); await hist.getByText("Latihan harian", { exact: true }).first().waitFor(); await hist.getByText("Mastering Perkalian & Pembagian").first().waitFor(); await page.getByText("6/7 benar, skor 86").waitFor();
     await fit("akun"); await shot("akun");
+    // Laporan orang tua: ringkasan bab, tautan baca-saja tanpa login, lalu tautan dicabut.
+    await page.getByRole("link", { name: "Laporan belajar" }).click(); await page.waitForURL(/\/akun\/laporan$/);
+    await page.getByRole("heading", { name: `Siswa ${width}` }).waitFor(); await page.getByRole("heading", { name: "Per bab" }).waitFor();
+    await page.getByText("Sudah kuat", { exact: true }).filter({ visible: true }).first().waitFor();
+    await fit("laporan"); await shot("laporan");
+    await button("Buat tautan untuk orang tua").click(); const url = (await page.getByTestId("report-url").textContent()).trim(); assert.match(url, /\/laporan\/[0-9a-f]{24}$/);
+    const guest = await browser.newContext({ viewport: { width, height: 900 } }); const gp = await guest.newPage();
+    await gp.goto(url); await gp.getByRole("heading", { name: `Siswa ${width}` }).waitFor(); await gp.getByText("Bilangan Bulat", { exact: true }).filter({ visible: true }).first().waitFor();
+    assert.equal(await gp.getByRole("link", { name: "Bilangan Bulat" }).count(), 0);
+    assert.equal(await gp.evaluate(() => document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? ""), "noindex, nofollow");
+    if (width === 1280) await gp.screenshot({ path: `${folder}/${width}-laporan-ortu.png`, fullPage: true });
+    await button("Nonaktifkan tautan").click(); await page.getByRole("button", { name: "Buat tautan untuk orang tua" }).waitFor();
+    await gp.reload(); await gp.getByRole("heading", { name: "Laporan tidak ditemukan" }).waitFor(); await guest.close();
+    await page.goto(`${origin}/laporan/zz`); await page.getByRole("heading", { name: "Laporan tidak ditemukan" }).waitFor();
+    await page.goto(`${origin}/akun`);
     // Ganti PIN sendiri: PIN lama salah ditolak, lalu PIN baru dipakai untuk masuk lagi.
     const newPin = pin === "246802" ? "135791" : "246802";
     await button("Ganti PIN").click();
@@ -89,6 +104,12 @@ try {
     await page.goto(`${origin}/masuk`); await login(user, pin); await page.getByText("Username atau PIN tidak cocok").waitFor();
     await login(user, newPin); await page.waitForURL(`${origin}/`);
 
+    // Admin membuka laporan siswa dari kelola akun.
+    await page.goto(`${origin}/masuk`); await login("admin", "111111"); await page.waitForURL(`${origin}/`);
+    await page.goto(`${origin}/admin`); await page.getByRole("heading", { name: "Kelola akun" }).waitFor();
+    await page.getByRole("listitem").filter({ hasText: `@${user}` }).getByRole("link", { name: "Laporan" }).click();
+    await page.waitForURL(/\/admin\/laporan\//); await page.getByRole("heading", { name: `Siswa ${width}` }).waitFor(); await page.getByText("21/24 benar, skor 88").waitFor();
+    await fit("laporan admin");
     // 4. Admin menambah paket Kelas 5, siswa langsung bisa membuka setelah cache habis (sesi baru).
     assert.deepEqual(errors, []); await ctx.close();
     console.log(`PASS login at ${width}px: bab gratis + evaluasi terkunci, pengalihan, PIN salah, admin buat akun, akses per kelas, mastering, akun`);

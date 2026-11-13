@@ -14,6 +14,8 @@ const who = t => { const s = sessions.get(t); const a = s && accounts.get(s.user
 const admin = t => { const a = who(t); if (!a || a.role !== "admin") { const e = new Error("not_admin"); e.code = 403; throw e; } return a; };
 const pin = () => String(Math.floor(Math.random() * 1e6)).padStart(6, "0");
 
+const links = new Map(); // code -> { id, expiresAt }
+const report = a => ({ name: a.displayName || a.username, generatedAt: new Date().toISOString(), results: (a.results ?? []).slice(0, 300) });
 const fns = {
   bsk_login: ({ p_username, p_pin }) => {
     const a = accounts.get(p_username); if (!a || a.disabled) return { error: "invalid" };
@@ -30,6 +32,13 @@ const fns = {
     if (!["latihan", "evaluasi", "harian"].includes(p_kind) || !(p_total >= 1 && p_total <= 100) || !(p_correct >= 0 && p_correct <= p_total) || !/^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian)\/level-[1-3]$/.test(p_path)) return { error: "invalid" };
     (a.results ??= []).unshift({ path: p_path, title: p_title ?? "", kind: p_kind, part: p_part ?? "", correct: p_correct, total: p_total, score: Math.round(p_correct * 100 / p_total), at: new Date().toISOString() }); return { ok: true }; },
   bsk_my_results: ({ p_token }) => { const a = who(p_token); return a ? (a.results ?? []).slice(0, 300) : null; },
+  bsk_my_report: ({ p_token }) => { const a = who(p_token); return a ? report(a) : null; },
+  bsk_report_link: ({ p_token }) => { const a = who(p_token); if (!a) return { error: "session" }; for (const [c, l] of links) if (l.id === a.id) links.delete(c);
+    const code = randomBytes(12).toString("hex"), expiresAt = months(1); links.set(code, { id: a.id, expiresAt }); return { code, expiresAt }; },
+  bsk_report_status: ({ p_token }) => { const a = who(p_token); const l = a && [...links.values()].find(x => x.id === a.id); return l ? { expiresAt: l.expiresAt } : null; },
+  bsk_report_revoke: ({ p_token }) => { const a = who(p_token); if (!a) return { error: "session" }; for (const [c, l] of links) if (l.id === a.id) links.delete(c); return { ok: true }; },
+  bsk_report_public: ({ p_code }) => { const l = links.get(p_code); const a = l && byId(l.id); return a && !a.disabled ? { ...report(a), expiresAt: l.expiresAt } : null; },
+  bsk_admin_report: ({ p_token, p_account }) => { admin(p_token); const a = byId(p_account); return a ? report(a) : null; },
   bsk_change_pin: ({ p_token, p_old, p_new }) => { const a = who(p_token); if (!a) return { error: "session" }; if (!/^\d{6}$/.test(p_new)) return { error: "format" };
     if (a.pin !== p_old) return { error: "wrong" }; if (p_new === p_old) return { error: "same" }; a.pin = p_new;
     for (const [t, s] of sessions) if (s.username === a.username && t !== p_token) sessions.delete(t); return { ok: true }; },

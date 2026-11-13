@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       case "extend": return NextResponse.json(await rpc("bsk_admin_extend", { p_token: token, p_account: id, p_package: pkg(b.package), p_class: pkg(b.package) === "kelas" ? cls(b.classId) : null }));
       case "reset": return NextResponse.json(await rpc("bsk_admin_reset_pin", { p_token: token, p_account: id }));
       case "disable": return NextResponse.json(await rpc("bsk_admin_set_disabled", { p_token: token, p_account: id, p_disabled: b.disabled === true }));
+      case "report": return NextResponse.json(await rpc("bsk_admin_report", { p_token: token, p_account: id }));
       case "logout": return NextResponse.json(await rpc("bsk_admin_logout_devices", { p_token: token, p_account: id }));
       default: return NextResponse.json({ error: "bad_action" }, { status: 400 });
     }
