@@ -99,18 +99,6 @@ export const materials: MaterialItem[] = [
 
 
   {
-    id: "kelas-1-membilang-10",
-    classId: 1,
-    chapter: 1,
-    slug: "membilang-sampai-dengan-10",
-    title: "Ayo Membilang sampai dengan 10",
-    topic: "Bilangan",
-    description: "Belajar menghitung, membaca, menulis, membandingkan, dan mengurutkan bilangan sampai 10.",
-    videoStatus: "coming_soon",
-    summary: "Bilangan dapat digunakan untuk menyatakan banyak benda. Kita dapat menghitung benda satu per satu, membaca lambang bilangan, menulisnya, lalu membandingkan mana yang lebih banyak atau lebih sedikit.",
-    questionIds: ["kelas1-bilangan-01", "kelas1-bilangan-02", "kelas1-bilangan-03", "kelas1-bilangan-04", "kelas1-bilangan-05"],
-  },
-  {
     id: "kelas-1-penjumlahan-10",
     classId: 1,
     chapter: 2,

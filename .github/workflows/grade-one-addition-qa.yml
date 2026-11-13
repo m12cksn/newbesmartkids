@@ -16,7 +16,6 @@ jobs:
           cache: npm
       - run: npm install --no-audit --no-fund
       - run: node --test scripts/verify-grade-one-addition.mjs
-      - run: node --experimental-strip-types --test scripts/verify-grade-one-counting.mjs
       - run: node --test scripts/verify-grade-one-subtraction.mjs
       - run: node --test scripts/verify-grade-one-shapes.mjs
       - run: node --experimental-strip-types scripts/verify-grade-four-patterns.mjs
