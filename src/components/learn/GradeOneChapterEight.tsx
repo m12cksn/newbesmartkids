@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SaveResult } from "@/components/auth/SaveResult";
 import { balls, diagramAssessment, diagramPractice, type Datum, type DiagramQuestion } from "@/data/grade-one-diagrams";
 
 const topics = [
@@ -251,7 +252,7 @@ function Quiz({ questions, title, practice, close }: {
       </div>
     </> : <>
       <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practice ? "Latihan selesai!" : "Hasil Evaluasi Bab 8"}</h2>
-      <p className="font-bold">Benar {score} · Salah {questions.length - score} · Skor {Math.round(score / questions.length * 100)}/100</p>
+      <p className="font-bold">Benar {score} · Salah {questions.length - score} · Skor {Math.round(score / questions.length * 100)}/100</p><SaveResult kind={practice ? "latihan" : "evaluasi"} part={practice ? "Latihan Bab 8" : "Evaluasi Bab 8"} correct={score} total={questions.length} />
       {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
         <summary className="cursor-pointer font-bold">Bahas jawaban yang salah</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((item, i) => !isCorrect(item, answers[i]) &&

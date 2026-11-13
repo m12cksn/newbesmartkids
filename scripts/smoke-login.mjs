@@ -61,18 +61,22 @@ try {
     await page.goto(`${origin}${K5}/data`); await page.waitForURL(/alasan=paket/);
     await page.getByText("Akun Anda belum memiliki paket Kelas 5").first().waitFor();
     await page.goto(`${origin}/mastering-perkalian-pembagian/level-1`); await page.waitForURL(/mastering-perkalian-pembagian\/level-1$/);
+    // Latihan harian: setelah diperiksa, nilainya tersimpan ke akun (sekali per paket hari itu).
+    for (let i = 0; i < 7; i++) await page.locator(`[data-testid="question-${i}"] input`).fill("1");
+    await button("Periksa jawaban →").or(page.getByRole("button", { name: /Periksa jawaban/ })).first().click();
+    await page.getByText("Nilai tersimpan di riwayat akunmu.").waitFor();
     await page.goto(`${origin}/admin`); await page.waitForURL(/alasan=admin/);
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 7", { exact: true }).waitFor();
     // Riwayat nilai: kosong dulu, lalu dua hasil disimpan lewat API dan tampil per bab.
-    await page.getByText("Belum ada nilai tersimpan.", { exact: false }).waitFor();
     for (const body of [{ kind: "latihan", part: "Latihan A. Bilangan bulat", correct: 3, total: 4 }, { kind: "evaluasi", part: "Evaluasi Bab 1", correct: 21, total: 24 }]) {
       const r = await page.evaluate(b => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/kelas/logika-dan-aljabar-kelas-7/materi/bilangan-bulat", title: "Bilangan Bulat", ...b }) }).then(x => x.status), body);
       assert.equal(r, 200);
     }
     assert.equal(await page.evaluate(() => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/admin", kind: "latihan", correct: 1, total: 1 }) }).then(x => x.status)), 400);
+    assert.equal(await page.evaluate(() => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/mastering-perkalian-pembagian/level-2", title: "Mastering Perkalian & Pembagian", kind: "harian", part: "Level 2", correct: 6, total: 7 }) }).then(x => x.status)), 200);
     await page.reload(); await page.getByRole("heading", { name: "Riwayat belajar" }).waitFor();
     await page.getByRole("link", { name: "Bilangan Bulat" }).waitFor(); await page.getByText("88/100").first().waitFor(); await page.getByText("75/100").first().waitFor();
-    await page.getByText("21/24 benar, skor 88").waitFor();
+    await page.getByText("21/24 benar, skor 88").waitFor(); const hist = page.getByRole("region", { name: "Riwayat belajar" }); await hist.getByText("Latihan harian", { exact: true }).first().waitFor(); await hist.getByText("Mastering Perkalian & Pembagian").first().waitFor(); await page.getByText("6/7 benar, skor 86").waitFor();
     await fit("akun"); await shot("akun");
     // Ganti PIN sendiri: PIN lama salah ditolak, lalu PIN baru dipakai untuk masuk lagi.
     const newPin = pin === "246802" ? "135791" : "246802";

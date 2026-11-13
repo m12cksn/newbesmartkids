@@ -2,7 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/access-rules";
 import { authEnabled, rpc } from "@/lib/supabase-rpc";
 
-export type SavedResult = { path: string; title: string; kind: "latihan" | "evaluasi"; part: string; correct: number; total: number; score: number; at: string };
+export type SavedResult = { path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string };
+/** Halaman yang boleh menyimpan nilai: bab materi dan latihan harian. */
+export const RESULT_PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian)\/level-[1-3]$/;
 const noStore = { "Cache-Control": "no-store" };
 
 /** Riwayat nilai akun yang sedang masuk. */
@@ -22,9 +24,9 @@ export async function POST(request: NextRequest) {
   const b = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const str = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : "");
   const int = (v: unknown) => (typeof v === "number" && Number.isInteger(v) ? v : -1);
-  const kind = b.kind === "evaluasi" ? "evaluasi" : b.kind === "latihan" ? "latihan" : "";
+  const kind = b.kind === "evaluasi" || b.kind === "latihan" || b.kind === "harian" ? b.kind : "";
   const path = str(b.path, 200), correct = int(b.correct), total = int(b.total);
-  if (!kind || !/^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+/.test(path) || total < 1 || total > 100 || correct < 0 || correct > total) return NextResponse.json({ error: "invalid" }, { status: 400 });
+  if (!kind || !RESULT_PATH.test(path) || total < 1 || total > 100 || correct < 0 || correct > total) return NextResponse.json({ error: "invalid" }, { status: 400 });
   try {
     const r = await rpc<{ ok?: boolean; error?: string }>("bsk_save_result", { p_token: token, p_path: path, p_title: str(b.title, 160), p_kind: kind, p_part: str(b.part, 120), p_correct: correct, p_total: total });
     return NextResponse.json(r, { status: r.ok ? 200 : r.error === "session" ? 401 : r.error === "limit" ? 429 : 400 });

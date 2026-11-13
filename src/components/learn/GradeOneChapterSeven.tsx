@@ -1,5 +1,6 @@
 "use client";
 import {useState} from "react";
+import { SaveResult } from "@/components/auth/SaveResult";
 import {ObjectArt,type ArtName} from "@/components/illustrations/ObjectArt";
 type Item={name:string;length:number;art?:ArtName};
 type Task={id:string;title:string;kind:"compare"|"order"|"height"|"measure"|"grid"|"method"|"story";items:Item[];questions:{label:string;answer:string;options:string[];why:string}[];unit?:string};
@@ -183,7 +184,7 @@ function Quiz({ tasks, title, evaluation = false, onBack }: {
           <div role="status" className="space-y-3 text-center">
             <h2 className="text-2xl font-extrabold">{evaluation ? "Hasil Evaluasi Bab 7" : "Latihan selesai!"}</h2>
             <p className="font-semibold">Benar {right} · Salah {wrong}</p>
-            <p className="text-3xl font-extrabold text-success">Skor {Math.round(right / total * 100)} dari 100</p>
+            <p className="text-3xl font-extrabold text-success">Skor {Math.round(right / total * 100)} dari 100</p><SaveResult kind={evaluation ? "evaluasi" : "latihan"} part={title} correct={right} total={total} />
           </div>
           {wrong > 0 && (
             <details className="rounded-lg bg-base-200 p-3">
