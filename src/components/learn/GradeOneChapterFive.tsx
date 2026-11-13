@@ -1,5 +1,6 @@
 "use client";
 import {useState} from "react";
+import { SaveResult } from "@/components/auth/SaveResult";
 import {ObjectCounter,TenFrame,NumberSequence,PlaceValue,NumberComparison} from "@/components/math-visual";
 type Topic="A"|"B"|"C"|"D"|"E";
 type Item={topic:Topic;prompt:string;answer:string;count?:number;sequence?:string;choices?:string[];hint:string};
@@ -69,7 +70,7 @@ export default function GradeOneChapterFive(){
      {checked?<p role="status" className={`rounded-lg p-2 text-xs sm:text-sm ${answer===q.answer?"bg-success/10":"bg-warning/20"}`}>{answer===q.answer?"Benar!":`Jawaban benar: ${q.answer}.`} {q.hint}</p>:null}
      <button className="btn btn-success h-11 min-h-11 w-full" disabled={!checked&&!answer} onClick={()=>{if(checked)next();else{setChecked(true);if(answer===q.answer)setScore(v=>v+1)}}}>{checked?(step+1===qs.length?"Lihat hasil":"Soal berikutnya →"):"Periksa jawaban"}</button>
     </div>
-   </div>:mode==="result"?<div className="rounded-xl border border-base-300 bg-base-100 p-8 text-center"><p className="text-xs font-bold uppercase tracking-widest text-success">{quizTopic==="E"?"Evaluasi selesai":"Latihan selesai"}</p><p className="mt-4 text-5xl font-extrabold">{score}/{qs.length}</p><p className="mb-4 font-semibold">Benar {score} · Salah {qs.length-score} · Skor {Math.round(score/qs.length*100)}/100</p><p className="mt-3 text-sm text-base-content/60">Skor belum disimpan ke akun siswa.</p><div className="mt-6 flex flex-wrap justify-center gap-3"><button className="btn btn-outline" onClick={()=>start(quizTopic)}>Ulangi</button><button className="btn btn-success" onClick={()=>setMode("learn")}>Kembali ke materi</button>{quizTopic!=="E"?<button className="btn btn-success" onClick={()=>start("E")}>Evaluasi 24 soal</button>:null}</div></div>:null}
+   </div>:mode==="result"?<div className="rounded-xl border border-base-300 bg-base-100 p-8 text-center"><p className="text-xs font-bold uppercase tracking-widest text-success">{quizTopic==="E"?"Evaluasi selesai":"Latihan selesai"}</p><p className="mt-4 text-5xl font-extrabold">{score}/{qs.length}</p><p className="mb-4 font-semibold">Benar {score} · Salah {qs.length-score} · Skor {Math.round(score/qs.length*100)}/100</p><SaveResult kind={quizTopic==="E"?"evaluasi":"latihan"} part={quizTopic==="E"?"Evaluasi Bab 5":`Latihan ${quizTopic}`} correct={score} total={qs.length}/><div className="mt-6 flex flex-wrap justify-center gap-3"><button className="btn btn-outline" onClick={()=>start(quizTopic)}>Ulangi</button><button className="btn btn-success" onClick={()=>setMode("learn")}>Kembali ke materi</button>{quizTopic!=="E"?<button className="btn btn-success" onClick={()=>start("E")}>Evaluasi 24 soal</button>:null}</div></div>:null}
   </div>
  </section>;
 }
