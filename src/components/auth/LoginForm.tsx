@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/home/BrandMark";
-import { useAccess } from "./AccessProvider";
 
 const messages: Record<string, string> = {
   invalid: "Username atau PIN tidak cocok. Periksa lagi pesan yang Anda terima.",
@@ -13,7 +12,8 @@ const messages: Record<string, string> = {
 };
 
 export function LoginForm({ next, reason, classId }: { next: string; reason: "paket" | "admin" | null; classId: number | null }) {
-  const { refresh } = useAccess();
+  // Bangunkan server login selagi pengguna mengetik, agar tombol Masuk tidak menunggu server menyala.
+  useEffect(() => { fetch("/api/masuk", { method: "GET", cache: "no-store" }).catch(() => {}); }, []);
   const [username, setUsername] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
       const r = await fetch("/api/masuk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, pin }) });
       const j = (await r.json()) as { ok?: boolean; error?: string };
       if (!j.ok) { setError(messages[j.error ?? "invalid"] ?? messages.invalid); setBusy(false); return; }
-      await refresh();
+      // Halaman tujuan dimuat ulang penuh, jadi data sesi diambil di sana; tidak perlu menunggu permintaan tambahan.
       window.location.assign(next);
     } catch { setError(messages.server); setBusy(false); }
   }
