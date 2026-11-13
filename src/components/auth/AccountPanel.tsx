@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { classes } from "@/components/home/home-data";
 import { useAccess } from "./AccessProvider";
+import { ResultHistory } from "./ResultHistory";
 
 export const fmtDate = (s: string | null) => (s ? new Date(s).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-");
 
@@ -17,7 +18,7 @@ export function AccountPanel() {
   if (loading) return <section className="mx-auto max-w-md px-4 py-16 text-center"><span className="loading loading-spinner text-success" aria-label="Memuat" /></section>;
   if (!session) return <section className="mx-auto max-w-md px-4 py-16"><h1 className="text-2xl font-extrabold">Anda belum masuk</h1><Link href="/masuk?lanjut=/akun" className="btn btn-success mt-4">Masuk</Link></section>;
   const opened = session.all || session.role === "admin" ? "Semua kelas" : session.classes.length ? classes.filter(c => session.classes.includes(c.id)).map(c => `Kelas ${c.id}`).join(", ") : "Belum ada paket aktif";
-  return <section className="mx-auto max-w-md px-4 py-10 sm:py-16">
+  return <section className="mx-auto max-w-3xl px-4 py-10 sm:py-16"><div className="max-w-md">
     <h1 className="text-3xl font-extrabold">Akun saya</h1>
     <dl className="mt-6 space-y-3 rounded-xl border border-base-300 bg-base-100 p-5 text-sm">
       <div><dt className="text-base-content/60">Nama</dt><dd className="font-bold">{session.displayName || "-"}</dd></div>
@@ -30,7 +31,8 @@ export function AccountPanel() {
     <div className="mt-5 flex flex-wrap gap-2">
       {session.role === "admin" && <Link href="/admin" className="btn btn-outline gap-1"><Settings className="size-4" aria-hidden="true" />Kelola akun</Link>}
       <button type="button" className="btn btn-ghost gap-1" disabled={busy} onClick={logout}><LogOut className="size-4" aria-hidden="true" />Keluar</button>
-    </div>
+    </div></div>
+    <ResultHistory />
   </section>;
 }
 

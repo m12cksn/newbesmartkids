@@ -63,6 +63,16 @@ try {
     await page.goto(`${origin}/mastering-perkalian-pembagian/level-1`); await page.waitForURL(/mastering-perkalian-pembagian\/level-1$/);
     await page.goto(`${origin}/admin`); await page.waitForURL(/alasan=admin/);
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 7", { exact: true }).waitFor();
+    // Riwayat nilai: kosong dulu, lalu dua hasil disimpan lewat API dan tampil per bab.
+    await page.getByText("Belum ada nilai tersimpan.", { exact: false }).waitFor();
+    for (const body of [{ kind: "latihan", part: "Latihan A. Bilangan bulat", correct: 3, total: 4 }, { kind: "evaluasi", part: "Evaluasi Bab 1", correct: 21, total: 24 }]) {
+      const r = await page.evaluate(b => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/kelas/logika-dan-aljabar-kelas-7/materi/bilangan-bulat", title: "Bilangan Bulat", ...b }) }).then(x => x.status), body);
+      assert.equal(r, 200);
+    }
+    assert.equal(await page.evaluate(() => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/admin", kind: "latihan", correct: 1, total: 1 }) }).then(x => x.status)), 400);
+    await page.reload(); await page.getByRole("heading", { name: "Riwayat belajar" }).waitFor();
+    await page.getByRole("link", { name: "Bilangan Bulat" }).waitFor(); await page.getByText("88/100").first().waitFor(); await page.getByText("75/100").first().waitFor();
+    await page.getByText("21/24 benar, skor 88").waitFor();
     await fit("akun"); await shot("akun");
     // Ganti PIN sendiri: PIN lama salah ditolak, lalu PIN baru dipakai untuk masuk lagi.
     const newPin = pin === "246802" ? "135791" : "246802";
