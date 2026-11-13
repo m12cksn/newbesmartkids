@@ -4,7 +4,7 @@ import { chromium } from "playwright";
 
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
 const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/legal-pages-screenshots";
-const wa = process.env.EXPECT_ADMIN_WA ?? "";
+const wa = process.env.EXPECT_ADMIN_WA ?? "6285726321786";
 await mkdir(folder, { recursive: true });
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_EXECUTABLE });
 try {
