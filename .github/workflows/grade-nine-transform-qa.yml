@@ -1,0 +1,37 @@
+name: Grade 9 Transform QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  transform9:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-nine-transform.mjs
+      - run: npx eslint src/data/grade-nine-transform.ts src/components/learn/GradeNineTransform.tsx src/components/learn/GradeNineTransformArt.tsx src/chapters/kelas-9-transformasi/meta.ts src/chapters/kelas-9-transformasi/Chapter.tsx
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-transform9.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-nine-transform.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-nine-transform-screenshots
+          path: /tmp/grade-nine-transform-screenshots
+          if-no-files-found: ignore
