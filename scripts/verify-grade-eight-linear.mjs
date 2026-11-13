@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assessment, practice, topics, correct, ready, formatAnswer, SEP, fields, num, builtText } from "../src/data/grade-eight-linear.ts";
+import { assessment, practice, topics, correct, ready, formatAnswer, SEP, fields, num } from "../src/data/grade-eight-linear.ts";
 
 assert.equal(topics.length, 4); assert.deepEqual(topics.map(t => t.sections.length), [3, 3, 2, 3]);
 assert.equal(new Set(topics.flatMap(t => t.sections.map(s => s.lab))).size, 11, "peraga berbeda di setiap bagian");
