@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Question } from "@/data/grade-four-whole-numbers";
 import { EvaluationGate } from "@/components/auth/EvaluationGate";
+import { SaveResult } from "@/components/auth/SaveResult";
 
 function isCorrect(question: Question, answer: string | undefined) {
   if (!answer) return false;
@@ -85,6 +86,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     </> : <>
       <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? label("Latihan selesai", "Practice complete") : label("Hasil evaluasi", "Assessment results")}</h2>
       <p className="font-bold">{label("Benar", "Correct")} {score} · {label("Salah", "Incorrect")} {questions.length - score} · {label("Skor", "Score")} {Math.round(score / questions.length * 100)}/100</p>
+      <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} />
       {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
         <summary className="cursor-pointer font-bold">{label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((q, i) => !checkAnswer(q, answers[i]) &&
