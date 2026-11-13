@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/home/BrandMark";
+import { adminWaLink } from "@/lib/contact";
 
 const messages: Record<string, string> = {
   invalid: "Username atau PIN tidak cocok. Periksa lagi pesan yang Anda terima.",
@@ -54,6 +55,6 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
       {error && <p role="alert" className="text-sm font-semibold text-error">{error}</p>}
       <button type="submit" className="btn btn-success h-12 w-full rounded-xl text-base" disabled={busy}>{busy ? "Memeriksa…" : "Masuk Sekarang"}</button>
     </form>
-    <p className="mt-6 text-center text-sm text-base-content/70">Belum punya akun? Hubungi admin untuk mendapatkan username dan PIN. Bab pertama setiap kelas bisa <Link href="/#kelas" className="link text-success">dicoba gratis</Link>.</p>
+    <p className="mt-6 text-center text-sm text-base-content/70">Belum punya akun? {adminWaLink() ? <a href={adminWaLink("Halo admin BeSmartKids, saya ingin membeli paket dan mendapatkan username serta PIN.")} target="_blank" rel="noopener noreferrer" className="link text-success">Hubungi admin</a> : "Hubungi admin"} untuk mendapatkan username dan PIN. Bab pertama setiap kelas bisa <Link href="/#kelas" className="link text-success">dicoba gratis</Link>.</p>
   </section>;
 }
