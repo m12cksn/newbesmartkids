@@ -1,0 +1,21 @@
+# Kelas 8 Bab 4 Relasi dan Fungsi (feat/grade-eight-relations)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VIII (Kurikulum Merdeka 2022) hlm. 138–206. Subtopik A Memahami Relasi, B Memahami Fungsi, C Korespondensi Satu-satu (Pengayaan).
+- New chapter via the registry: `src/chapters/kelas-8-relasi-fungsi/` (slug `relasi-dan-fungsi`), shown on `/kelas/hubungan-geometri-kelas-8`. No shared-file edits. Not a free sample chapter.
+- SMP depth and everyday examples: 10 sections, each with 4 steps, a "Dalam kehidupan sehari-hari" box, a worked example, and its own lab.
+  - A.1 Himpunan dan penyajiannya (class duty list, family tree; lab: set-builder bounds and number type → description, enumeration, n(A)).
+  - A.2 Relasi, domain, kodomain, range (restaurant orders; lab: choose each child's order, arrow diagram and range update).
+  - A.3 Tiga cara menyajikan relasi (favourite subjects; lab: rule → arrow diagram + Cartesian diagram + ordered pairs together).
+  - B.1 Ciri fungsi (secret code, seats; lab: draw/remove arrows by tapping, checks function).
+  - B.2 Banyak fungsi (choosing clubs; lab: n(A), n(B) → n(B)^n(A) with listed functions).
+  - B.3 Lima cara menyajikan fungsi (taxi fare; lab: fare formula, table, graph).
+  - B.4 Nilai fungsi dan daerah hasil (phone credit; lab: f(x) = ax + b table, range, graph).
+  - B.5 Rumus fungsi linier (bath tub filling; lab: two known values → elimination steps → a and b).
+  - C.1 Korespondensi satu-satu (house numbers, NISN; lab: connect students to student numbers, checks one-to-one).
+  - C.2 Banyak korespondensi (seating; lab: n → n! with all arrangements for n ≤ 3).
+- Files: `src/data/grade-eight-relations.ts`, `src/components/learn/GradeEightRelations.tsx`, `src/components/learn/GradeEightRelationsArt.tsx` (interactive arrow diagram and Cartesian grid, orchard with apple and pine trees, bath tubs, taxi; its own text renderer that keeps set braces and only formats ^{…}), `scripts/verify-grade-eight-relations.mjs`, `scripts/smoke-grade-eight-relations.mjs`, `.github/workflows/grade-eight-relations-qa.yml`.
+- Answer types as in the book: tap set members (enumeration, domain, range), draw arrows between the two sets (diagram panah), tap points on the Cartesian grid, fungsi/bukan fungsi and korespondensi/bukan tables, fill a function table, write f(x) = ax + b, numeric values and counts, true/false, and multiple choice with arrow-diagram options (Uji Kompetensi A).
+- Practice 4 per subtopic (12). Evaluation 24 (A B C repeating, 8 each; 8 Sedang, 9 Menantang, 7 Sangat menantang): book items with new numbers (hobbies, which pair sets are functions, f(x) = 5 − 3x table, "kurang dari" arrows, "faktor dari" Cartesian, f(−2)/f(4) linear formula, family "ayah dari", taxi formula, factory date code, water tank, orchard n² vs 8n, n!) plus own items (prime/odd "dua lebihnya dari", f(x) = 2x² − 5x + 1, function vs one-to-one counts 27 and 6). 9 evaluation items need drawing/tapping/table actions.
+- Validation: verify recomputes every key from set-builder bounds, relation rules (arrows and Cartesian points regenerated from the rule), function/bijection checks on parsed ordered pairs, formulas, tables, code mapping and story data (66 checks); wrong values rejected per answer type; choice positions 2,1,1,1,0,0,1,3. tsc, eslint, build; Playwright at 320/390/768/1280: class-page link, all 10 labs (including drawing arrows), 12 practice (1 intentional wrong), 24 evaluation (1 intentional wrong) with real arrow/point/table input, score and review. Screenshots reviewed; fixed braces being stripped from set notation, power text in the counting lab, "−1a" and "+ 0" in the formula lab, table input width.
+- Previous record: Kelas 8 Bab 3 PR #108 merged as 15d8257f810c0c66b7e6ecd416e778cc34c68393; Vercel production deployment success.
+- Untested: real video (placeholder); production login gate for this chapter (covered by the shared login QA).
