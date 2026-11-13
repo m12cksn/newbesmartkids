@@ -1,0 +1,22 @@
+# Kelas 8 Bab 3 Persamaan dan Pertidaksamaan Linier Satu Variabel (feat/grade-eight-linear)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VIII (Kurikulum Merdeka 2022) hlm. 98–136. Subtopik A Memahami Konsep PLSV, B Menyelesaikan PLSV, C Menemukan Konsep PtLSV, D Menyelesaikan Masalah terkait PtLSV.
+- New chapter via the registry: `src/chapters/kelas-8-persamaan-linier/` (slug `persamaan-pertidaksamaan-linier`), shown on `/kelas/hubungan-geometri-kelas-8`. No shared-file edits. Not a free sample chapter (needs a Kelas 8 or all-class package).
+- SMP depth and everyday examples: 11 sections, each with 4 steps, a "Dalam kehidupan sehari-hari" box, a worked example, and its own lab.
+  - A.1 Kalimat terbuka/tertutup (class announcement; lab: substitute a value, open → closed true/false).
+  - A.2 Himpunan penyelesaian (sharing 12 cakes; lab: tap natural numbers 1–24 that satisfy a sentence, checks complete/wrong).
+  - A.3 Bentuk umum dan model (pocket money, canteen; lab: variable/coefficient/constant/highest power and type PLSV/PLDV/kuadrat/PtLSV).
+  - B.1 Timbangan (market scale; lab: balance with boxes and marbles, remove from both pans, split into groups).
+  - B.2 Kali, bagi, pecahan, kurung (temperature conversion; lab: step-by-step solver for four book-style equations).
+  - B.3 Soal cerita (guava rujak, shoes and sandals; lab: shoes/sandals price equation).
+  - C.1 Tanda dan garis bilangan (Aceh–Lampung trip, Pramuka age, ride height; lab: sign + boundary → number line, interval, set-builder, words).
+  - C.2 Memodelkan situasi (lift capacity, grade average; lab: toll-road speed sign 60 ≤ v ≤ 100).
+  - D.1 Sifat pertidaksamaan (debts as negative balances; lab: multiply 4 > 2 by −5…5, sign flip on a number line).
+  - D.2 Menyelesaikan (stationery budget; lab: ax + b ? c with sign flip and number line).
+  - D.3 Masalah sehari-hari (pick-up load; lab: capacity, crew, box weight, number of boxes → max per trip and trips).
+- Files: `src/data/grade-eight-linear.ts`, `src/components/learn/GradeEightLinear.tsx`, `src/components/learn/GradeEightLinearArt.tsx` (two-pan balance with boxes/marbles/iron bars/gram weights and tilt, number line, triangle with angle/side labels, pool, pick-up truck, shoes and sandals), `scripts/verify-grade-eight-linear.mjs`, `scripts/smoke-grade-eight-linear.mjs`, `.github/workflows/grade-eight-linear-qa.yml`.
+- Answer types as in the book: open/closed table (Contoh 3.1), true/false (Soal 3.1, 3.2, 3.3 no. 4), tap the solution set (Soal 3.1 no. 2), build the equation/inequality from tiles (Contoh 3.3, 3.5, Soal 3.1 no. 3–5), value of the variable, inequality answer (choose sign + boundary), multiple choice with number lines or balances (Uji Kompetensi A), match each sentence to its type (Ayo Bereksplorasi).
+- Practice 4 per subtopic (16). Evaluation 24 (A B C D repeating, 6 each; 8 Sedang, 9 Menantang, 7 Sangat menantang): book items with new numbers (closed/open table, HP, Rina–Sinta money, breaths per minute, balance n + 3 = 7, (2x + 5)/3 = −1, shoes/sandals, triangle angles, brackets + Celsius/Fahrenheit, number lines, Nadia's average, pool volume, Doni's iron bars, −5(x + 2) ≤ 15, isosceles triangle 5×) plus own items (competition age, kelipatan 2 dan 3).
+- Validation: verify recomputes keys by substituting into the stored equation/inequality (uniqueness for equations, truth over a range around the boundary for inequalities), checks every accepted tile model is equivalent, recomputes solution sets, number-line and balance options, and story data (61 checks); wrong values rejected per answer type; choice positions 1,0,3,2,3. tsc, eslint, build; Playwright at 320/390/768/1280: class-page link, all 11 labs, 16 practice (1 intentional wrong), 24 evaluation (1 intentional wrong), score and review. Screenshots reviewed; fixed lab number range (1–24), overlapping triangle angle labels, clipped pool label, small speed-scale text.
+- Previous record: Kelas 8 Bab 2 PR #107 merged as 65562d2e8520e668ad9dcf6d2dc6e436a35680b4; Vercel production deployment success.
+- Untested: real video (placeholder); production login gate for this chapter (covered by the shared login QA).
