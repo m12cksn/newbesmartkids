@@ -14,4 +14,4 @@ Sebelumnya: PR #115 (simpan nilai semua bab) di-merge sebagai 24fcd57 dan sudah 
 - `scripts/smoke-login.mjs` dengan mock (320 dan 1280): laporan tampil, tautan dibuat dan dibuka tanpa login, robots noindex, tautan dicabut lalu tidak ditemukan, kode salah, admin membuka laporan siswa.
 
 ## Status
-- Migrasi BELUM diterapkan ke Supabase (menunggu persetujuan pengguna). Jangan merge sebelum migrasi diterapkan.
+- Migrasi sudah diterapkan ke Supabase (bsk_reports); kode palsu, kode salah format dan token palsu diperiksa mengembalikan null atau error session.
