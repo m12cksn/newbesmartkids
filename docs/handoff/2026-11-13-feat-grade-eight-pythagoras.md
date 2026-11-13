@@ -1,0 +1,21 @@
+# Kelas 8 Bab 2 Teorema Pythagoras (feat/grade-eight-pythagoras)
+
+- Scope: Buku Siswa Matematika SMP/MTs Kelas VIII (Kurikulum Merdeka 2022) hlm. 45–96. Subtopik A Menemukan Konsep Pythagoras, B Tripel Pythagoras, C Segitiga Istimewa, D Penerapan Teorema Pythagoras, E Rumus Jarak (Pengayaan).
+- New chapter via the registry: `src/chapters/kelas-8-teorema-pythagoras/` (slug `teorema-pythagoras`), shown on `/kelas/hubungan-geometri-kelas-8`. No shared-file edits. As the second Kelas 8 chapter it is not part of the free sample: lessons, practice and evaluation need a Kelas 8 or all-class package.
+- SMP depth and everyday examples: 10 sections, each with 4 steps, a "Dalam kehidupan sehari-hari" box, a worked example, and its own lab.
+  - A.1 Kuadrat dan akar kuadrat (floor and tile area; lab: n × n grid square).
+  - A.2 Luas persegi pada sisi segitiga (bouwplank 60-80-100; lab: squares on all three sides with areas).
+  - A.3 Menghitung panjang sisi (ladder; lab: find hypotenuse or leg, steps written out, simplest root).
+  - B.1 Kebalikan teorema dan jenis segitiga (Putri's 4-5-6 garden; lab: three sides drawn to scale, c² vs a² + b²).
+  - B.2 Membuat tripel (tangram; lab: p, q generator).
+  - C.1 45°-45°-90° (tile cut on the diagonal; lab: half square).
+  - C.2 30°-60°-90° (wall decoration; lab: halved equilateral triangle).
+  - D.1 Masalah sehari-hari (bentengan game, antenna wire; lab: ladder against a wall).
+  - D.2 Gabungan segitiga (radar and two planes; lab: radar with AB, AC, AD).
+  - E.1 Jarak dua titik (city map; lab: two movable points on a coordinate grid).
+- Files: `src/data/grade-eight-pythagoras.ts`, `src/components/learn/GradeEightPythagoras.tsx`, `src/components/learn/GradeEightPythagorasArt.tsx` (coordinate grid, ladder, river crossing, boats, radar, antenna with wall; reuses `FigView` from Kelas 7 and the `M` math renderer from Kelas 8 Bab 1), `scripts/verify-grade-eight-pythagoras.mjs`, `scripts/smoke-grade-eight-pythagoras.mjs`, `.github/workflows/grade-eight-pythagoras-qa.yml`.
+- Answer types as in the book: length (number), a√b in simplest form (front box may be left empty for 1), multiple choice (Uji Kompetensi A), match each triple to siku-siku/lancip/tumpul (Soal Latihan 2.2), true/false.
+- Practice 4 per subtopic (20). Evaluation 24 (A B C D E repeating: 5/5/5/5/4; 8 Sedang, 9 Menantang, 7 Sangat menantang; 19 with a picture): book items with new numbers (ladder 250/70 cm, river 8 and 17 m, boats 24 and 18 km with travel-time difference, radar 12/13/20 km, helicopter 400 m with 45° and 30°, antenna and wall, coordinate triangle, Aldo–Arjuna duel, (p − q), p, (p + q), √42/2x/5x, trapezoid 12/20/29) plus own items (window frame diagonal 61 cm, diver rope 25 m with circle area).
+- Validation: verify recomputes every key from labels, figure data (drawn right triangles satisfy Pythagoras and written lengths are to scale), coordinates and story data (69 checks); wrong values rejected per answer type; answer positions not all the same. tsc, eslint, build; Playwright at 320/390/768/1280: class-page link, all 10 labs, 20 practice (1 intentional wrong), 24 evaluation (1 intentional wrong), score and review. Screenshots reviewed; fixed clipped side labels, redundant "√n = √n", missing wall picture, grid label clipping.
+- Previous record: Kelas 8 Bab 1 PR #106 merged as 9aa776bf9878bf796073f083e32c72ef4737a8f4; Vercel production deployment success.
+- Untested: real video (placeholder), production login gate for this chapter (covered by the shared login QA).
