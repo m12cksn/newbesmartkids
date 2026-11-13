@@ -26,6 +26,9 @@ const fns = {
   bsk_session: ({ p_token }) => { const a = who(p_token); if (!a) return null; const live = a.entitlements.filter(e => new Date(e.expiresAt) > new Date());
     return { username: a.username, displayName: a.displayName, role: a.role, all: a.role === "admin" || live.some(e => e.package === "semua"), classes: [...new Set(live.filter(e => e.package === "kelas").map(e => e.classId))], expiresAt: live.map(e => e.expiresAt).sort().at(-1) ?? null }; },
   bsk_logout: ({ p_token }) => { sessions.delete(p_token); return null; },
+  bsk_change_pin: ({ p_token, p_old, p_new }) => { const a = who(p_token); if (!a) return { error: "session" }; if (!/^\d{6}$/.test(p_new)) return { error: "format" };
+    if (a.pin !== p_old) return { error: "wrong" }; if (p_new === p_old) return { error: "same" }; a.pin = p_new;
+    for (const [t, s] of sessions) if (s.username === a.username && t !== p_token) sessions.delete(t); return { ok: true }; },
   bsk_admin_list: ({ p_token }) => { admin(p_token); return [...accounts.values()].map(pub).reverse(); },
   bsk_admin_create: ({ p_token, p_username, p_display_name, p_phone, p_note, p_package, p_class }) => { admin(p_token);
     if (!/^[a-z0-9._-]{3,32}$/.test(p_username)) return { error: "bad_username" }; if (accounts.has(p_username)) return { error: "taken" };

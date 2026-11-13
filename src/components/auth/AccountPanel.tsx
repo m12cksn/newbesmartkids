@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Settings } from "lucide-react";
+import { KeyRound, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,9 +26,45 @@ export function AccountPanel() {
       <div><dt className="text-base-content/60">Berlaku sampai</dt><dd className="font-bold">{session.role === "admin" ? "Admin" : fmtDate(session.expiresAt)}</dd></div>
     </dl>
     <p className="mt-3 text-xs text-base-content/60">Satu akun dapat dipakai di 2 perangkat. Jika masuk di perangkat ketiga, perangkat yang paling lama otomatis keluar.</p>
+    <ChangePin />
     <div className="mt-5 flex flex-wrap gap-2">
       {session.role === "admin" && <Link href="/admin" className="btn btn-outline gap-1"><Settings className="size-4" aria-hidden="true" />Kelola akun</Link>}
       <button type="button" className="btn btn-ghost gap-1" disabled={busy} onClick={logout}><LogOut className="size-4" aria-hidden="true" />Keluar</button>
     </div>
   </section>;
+}
+
+const pinMessages: Record<string, string> = {
+  wrong: "PIN lama tidak cocok.", same: "PIN baru harus berbeda dari PIN lama.", format: "PIN terdiri dari 6 angka.",
+  locked: "Terlalu banyak percobaan. Coba lagi 15 menit lagi.", session: "Sesi berakhir. Silakan masuk lagi.", server: "Sedang ada gangguan. Coba beberapa saat lagi.",
+};
+function ChangePin() {
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ old: "", pin: "", again: "" });
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const field = (k: "old" | "pin" | "again", label: string, auto: string) => <label className="block"><span className="mb-1 block text-sm font-semibold">{label}</span>
+    <input type="password" inputMode="numeric" autoComplete={auto} maxLength={6} required value={f[k]} onChange={e => setF(x => ({ ...x, [k]: e.target.value.replace(/\D/g, "").slice(0, 6) }))} className="input input-bordered w-full tracking-[0.3em]" /></label>;
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (![f.old, f.pin].every(v => /^\d{6}$/.test(v))) return setMsg({ ok: false, text: pinMessages.format });
+    if (f.pin !== f.again) return setMsg({ ok: false, text: "Ulangi PIN baru belum sama." });
+    setBusy(true);
+    try {
+      const r = await fetch("/api/pin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ old: f.old, pin: f.pin }) });
+      const j = (await r.json()) as { ok?: boolean; error?: string };
+      setMsg(j.ok ? { ok: true, text: "PIN berhasil diganti. Perangkat lain yang memakai akun ini sudah dikeluarkan." } : { ok: false, text: pinMessages[j.error ?? "server"] ?? pinMessages.server });
+      if (j.ok) { setF({ old: "", pin: "", again: "" }); setOpen(false); }
+    } catch { setMsg({ ok: false, text: pinMessages.server }); }
+    setBusy(false);
+  }
+  return <div className="mt-5">
+    {!open ? <button type="button" className="btn btn-outline gap-1" onClick={() => { setOpen(true); setMsg(null); }}><KeyRound className="size-4" aria-hidden="true" />Ganti PIN</button>
+      : <form onSubmit={submit} aria-labelledby="ganti-pin" className="space-y-3 rounded-xl border border-base-300 bg-base-100 p-5">
+        <h2 id="ganti-pin" className="text-lg font-bold">Ganti PIN</h2>
+        {field("old", "PIN lama", "current-password")}{field("pin", "PIN baru", "new-password")}{field("again", "Ulangi PIN baru", "new-password")}
+        <div className="flex gap-2"><button type="submit" className="btn btn-success" disabled={busy}>{busy ? "Menyimpan…" : "Simpan PIN baru"}</button><button type="button" className="btn btn-ghost" onClick={() => setOpen(false)}>Batal</button></div>
+      </form>}
+    {msg && <p role={msg.ok ? "status" : "alert"} className={`mt-3 text-sm font-semibold ${msg.ok ? "text-success" : "text-error"}`}>{msg.text}</p>}
+  </div>;
 }

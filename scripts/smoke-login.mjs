@@ -64,6 +64,16 @@ try {
     await page.goto(`${origin}/admin`); await page.waitForURL(/alasan=admin/);
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 7", { exact: true }).waitFor();
     await fit("akun"); await shot("akun");
+    // Ganti PIN sendiri: PIN lama salah ditolak, lalu PIN baru dipakai untuk masuk lagi.
+    const newPin = pin === "246802" ? "135791" : "246802";
+    await button("Ganti PIN").click();
+    await page.getByLabel("PIN lama").fill("000000"); await page.getByLabel("PIN baru", { exact: true }).fill(newPin); await page.getByLabel("Ulangi PIN baru").fill(newPin);
+    await button("Simpan PIN baru").click(); await page.getByText("PIN lama tidak cocok.").waitFor();
+    await page.getByLabel("PIN lama").fill(pin); await button("Simpan PIN baru").click(); await page.getByText("PIN berhasil diganti.", { exact: false }).waitFor();
+    await fit("ganti pin"); await shot("ganti-pin");
+    await button("Keluar").click(); await page.waitForURL(`${origin}/`);
+    await page.goto(`${origin}/masuk`); await login(user, pin); await page.getByText("Username atau PIN tidak cocok").waitFor();
+    await login(user, newPin); await page.waitForURL(`${origin}/`);
 
     // 4. Admin menambah paket Kelas 5, siswa langsung bisa membuka setelah cache habis (sesi baru).
     assert.deepEqual(errors, []); await ctx.close();
