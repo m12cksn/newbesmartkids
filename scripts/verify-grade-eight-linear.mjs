@@ -41,7 +41,7 @@ for (const q of all) {
     if (p.kind === "ineq") { const other = { "<": "≤", "≤": "<", ">": "≥", "≥": ">" }[p.sign]; wrong(`${other}|${f[1]}`); wrong(`${p.sign}|${String(p.value + 1)}`);
       for (let t = p.value - 4; t <= p.value + 4; t += 0.25) assert.equal(evalAt(p.check, t), holds(p.sign, p.value, t), `${p.check} di ${t}`); rechecked++; }
     if (p.kind === "set") { wrong(f[0].split(",").slice(1).join(",")); wrong(`${f[0]},${p.max}`); }
-    if (p.kind === "build") { const ids = f[0].split(","); wrong(ids.slice(0, -1).join(",")); const sgn = ids.findIndex(k => /[=<>≤≥]/.test(p.tiles[k])), alt = p.tiles.findIndex((t, k) => /[=<>≤≥]/.test(t) && t !== p.tiles[ids[sgn]]); if (alt >= 0) wrong(ids.map((k, j) => (j === sgn ? alt : k)).join(","));
+    if (p.kind === "build") { const ids = f[0].split(","); wrong(ids.slice(0, -1).join(",")); const sgn = ids.findIndex(k => /[=<>≤≥]/.test(p.tiles[k])), alt = p.tiles.findIndex(t => /[=<>≤≥]/.test(t) && t !== p.tiles[ids[sgn]]); if (alt >= 0) wrong(ids.map((k, j) => (j === sgn ? alt : k)).join(","));
       // semua bentuk yang diterima setara: kebenarannya sama di banyak titik, termasuk penyelesaiannya
       const js = p.accept.map(toJs), base = js[0], vName = (base.match(/\b[a-z]\b/) ?? [])[0];
       const fn = s => t => Function(vName, `"use strict"; return (${s});`)(t);
