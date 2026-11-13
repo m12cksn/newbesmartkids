@@ -2,6 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/access-rules";
 import { authEnabled, rpc } from "@/lib/supabase-rpc";
 
+/** Pemanasan: dipanggil saat halaman masuk dibuka agar fungsi dan koneksi ke database sudah siap. */
+export async function GET() {
+  if (authEnabled) await rpc("bsk_session", { p_token: "warmup" }).catch(() => null);
+  return new NextResponse(null, { status: 204, headers: { "Cache-Control": "no-store" } });
+}
+
 export async function POST(request: NextRequest) {
   if (!authEnabled) return NextResponse.json({ error: "disabled" }, { status: 503 });
   const body = (await request.json().catch(() => ({}))) as { username?: unknown; pin?: unknown };
