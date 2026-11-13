@@ -20,6 +20,7 @@ export function SiteHeader() {
             <li><Link href="/#materi-terbaru">Materi terbaru</Link></li>
             <li><Link href="/#latihan-harian">Latihan harian</Link></li>
             <li><Link href="/#cara-belajar">Cara belajar</Link></li>
+            <li><Link href="/#paket">Paket</Link></li>
           </ul>
           <div className="flex items-center gap-1">
             <AccountLink />

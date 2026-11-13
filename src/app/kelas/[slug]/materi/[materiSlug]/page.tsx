@@ -1,4 +1,5 @@
 import { ArrowLeft } from "lucide-react";
+import type { Metadata } from "next";
 import GradeFourGeometry from "@/components/learn/GradeFourGeometry";
 import GradeFiveWholeNumbers from "@/components/learn/GradeFiveWholeNumbers";
 import GradeThreePlaneElements from "@/components/learn/GradeThreePlaneElements";
@@ -44,6 +45,14 @@ export function generateStaticParams() {
     const classItem = classes.find((item) => item.id === material.classId);
     return classItem ? [{ slug: classItem.slug, materiSlug: material.slug }] : [];
   });
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; materiSlug: string }> }): Promise<Metadata> {
+  const { slug, materiSlug } = await params;
+  const c = classes.find(item => item.slug === slug), m = getMaterialBySlug(materiSlug);
+  if (!c || !m || m.classId !== c.id) return {};
+  const title = `${m.title} Kelas ${c.id}`, description = `${m.description} Latihan dan evaluasi interaktif Kurikulum Merdeka di BeSmartKids.`, url = `/kelas/${c.slug}/materi/${m.slug}`;
+  return { title, description, alternates: { canonical: url }, openGraph: { title: `${title} | BeSmartKids`, description, url, type: "article" } };
 }
 
 async function MaterialPageContent({ params }: { params: Promise<{ slug: string; materiSlug: string }> }) {

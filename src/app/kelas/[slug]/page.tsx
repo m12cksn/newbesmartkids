@@ -1,4 +1,5 @@
 import { ArrowLeft } from "lucide-react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -11,6 +12,16 @@ import { getMaterialsByClass } from "@/data/materials";
 
 export function generateStaticParams() {
   return classes.map(({ slug }) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const c = classes.find(item => item.slug === slug);
+  if (!c) return {};
+  const list = getMaterialsByClass(c.id).map(m => m.title);
+  const title = `Matematika Kelas ${c.id}`;
+  const description = `Materi matematika Kelas ${c.id} Kurikulum Merdeka dengan peraga interaktif, latihan, dan evaluasi${list.length ? `: ${list.slice(0, 4).join(", ")}${list.length > 4 ? ", dan lainnya" : ""}` : ""}.`;
+  return { title, description, alternates: { canonical: `/kelas/${c.slug}` }, openGraph: { title: `${title} | BeSmartKids`, description, url: `/kelas/${c.slug}` } };
 }
 
 async function ClassPageContent({ params }: { params: Promise<{ slug: string }> }) {
