@@ -1,0 +1,9 @@
+# Kebijakan Privasi dan Syarat Layanan (feat/legal-pages)
+
+- Poin 3 dari daftar fitur bisnis: halaman `/kebijakan-privasi` dan `/syarat-layanan` atas nama BeSmartKids, ditautkan dari footer semua halaman.
+- Isi disusun dari yang benar-benar dilakukan sistem: data akun (username, nama tampilan, PIN hash, nomor WA orang tua, catatan admin, paket), hasil belajar, sesi maksimal 2 perangkat, kuki `bsk_sesi` 30 hari, tautan laporan 30 hari, kunci 15 menit setelah 5 PIN salah, paket kelas 12 bulan dan semua kelas 24 bulan, Vercel + Supabase (Mumbai), tanpa iklan dan pelacak. Janji layanan baru yang ditulis di halaman (perlu dijalankan admin): penghapusan data dalam 14 hari kerja, aktivasi 1 × 24 jam, pengembalian dana 7 hari jika materi tidak dapat dibuka karena masalah dari pihak kami. Pengguna perlu meninjau angka-angka ini.
+- Nomor WhatsApp admin diatur lewat env `NEXT_PUBLIC_ADMIN_WA` (`src/lib/contact.ts`). Jika diisi, muncul tombol WhatsApp di footer, halaman kebijakan, dan halaman masuk; jika kosong, teks menyebut kontak yang diterima saat membeli paket. Nomor belum diberikan pengguna, jadi di produksi belum diisi.
+- File: `src/lib/contact.ts`, `src/components/legal/LegalPage.tsx`, `src/app/kebijakan-privasi/page.tsx`, `src/app/syarat-layanan/page.tsx`, `src/components/home/SiteFooter.tsx` (tautan footer), `src/components/auth/LoginForm.tsx` (tautan "Hubungi admin"), `scripts/smoke-legal-pages.mjs`, `.github/workflows/legal-pages-qa.yml`.
+- Validasi: tsc, eslint, build tanpa dan dengan `NEXT_PUBLIC_ADMIN_WA`; Playwright 320/390/768/1280 untuk kedua kondisi: tautan footer, daftar isi, judul bagian, tautan wa.me berformat 62…, tanpa scroll mendatar.
+- Catatan sebelumnya: PR #120 (Kelas 9 Bab 4 Peluang) di-merge sebagai e545d19; deploy Vercel produksi sukses.
+- Berikutnya: poin 1 (pembayaran Scalev dengan pendaftaran mandiri), lalu poin 2 (pengingat perpanjangan).

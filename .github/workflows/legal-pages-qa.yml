@@ -1,0 +1,34 @@
+name: Legal Pages QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  legal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npx eslint src/lib/contact.ts src/components/legal src/app/kebijakan-privasi src/app/syarat-layanan src/components/home/SiteFooter.tsx src/components/auth/LoginForm.tsx
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_ADMIN_WA: '081234567890'
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        env:
+          EXPECT_ADMIN_WA: '6281234567890'
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-legal.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node scripts/smoke-legal-pages.mjs
