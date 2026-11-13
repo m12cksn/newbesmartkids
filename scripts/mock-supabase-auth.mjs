@@ -8,6 +8,12 @@ const add = (username, pin, extra = {}) => accounts.set(username, { id: randomUU
 add("admin", "111111", { role: "admin", displayName: "Admin" });
 const months = n => new Date(Date.now() + n * 30 * 864e5).toISOString();
 const ent = (pkg, classId) => ({ id: randomUUID(), package: pkg, classId: pkg === "kelas" ? classId : null, startsAt: new Date().toISOString(), expiresAt: months(pkg === "semua" ? 24 : 12) });
+// Akun contoh untuk pengingat perpanjangan: satu paket hampir habis, satu sudah habis, satu masih lama.
+const days = n => new Date(Date.now() + n * 864e5).toISOString();
+add("hampirhabis", "222222", { displayName: "Rara", entitlements: [{ id: randomUUID(), package: "kelas", classId: 3, startsAt: days(-360), expiresAt: days(5) }] });
+add("sudahhabis", "333333", { displayName: "Bimo", entitlements: [{ id: randomUUID(), package: "kelas", classId: 4, startsAt: days(-375), expiresAt: days(-10) }] });
+add("masihlama", "444444", { displayName: "Citra", entitlements: [{ id: randomUUID(), package: "kelas", classId: 6, startsAt: days(-10), expiresAt: days(200) }] });
+accounts.get("hampirhabis").phone = "081234567890"; accounts.get("sudahhabis").phone = "081298765432";
 const byId = id => [...accounts.values()].find(a => a.id === id);
 const pub = a => ({ id: a.id, username: a.username, displayName: a.displayName, phone: a.phone, note: a.note, role: a.role, disabled: a.disabled, createdAt: a.createdAt, entitlements: a.entitlements, devices: [...sessions.values()].filter(s => s.username === a.username).length });
 const who = t => { const s = sessions.get(t); const a = s && accounts.get(s.username); return a && !a.disabled ? a : null; };
