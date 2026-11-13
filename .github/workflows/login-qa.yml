@@ -20,6 +20,7 @@ jobs:
           cache: npm
       - run: npm install --no-audit --no-fund
       - run: npx eslint src/proxy.ts src/lib src/components/auth src/app/api src/app/masuk src/app/akun src/app/admin
+      - run: node --experimental-strip-types scripts/verify-renewal.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install chromium
@@ -32,6 +33,7 @@ jobs:
             sleep 2
           done
           node scripts/smoke-login.mjs
+          node scripts/smoke-renewal.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

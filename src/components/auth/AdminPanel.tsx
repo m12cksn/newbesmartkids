@@ -1,9 +1,10 @@
 "use client";
 
-import { Copy, FileText, KeyRound, LogOut, MessageCircle, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
+import { BellRing, Copy, FileText, KeyRound, LogOut, MessageCircle, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fmtDate } from "./AccountPanel";
+import { reminderMessage, reminders, renewDate, whenText } from "@/lib/renewal";
 
 type Ent = { id: string; package: "kelas" | "semua"; classId: number | null; startsAt: string; expiresAt: string };
 type Account = { id: string; username: string; displayName: string; phone: string; note: string; role: string; disabled: boolean; createdAt: string; entitlements: Ent[]; devices: number };
@@ -45,6 +46,22 @@ function Credentials({ c, close }: { c: { username: string; pin: string; name: s
     </div>
     <p className="text-xs text-base-content/60">PIN hanya tampil sekali. Jika hilang, gunakan Reset PIN.</p>
   </div>;
+}
+
+
+function Reminders({ list, onExtend }: { list: Account[]; onExtend: (a: Account) => void }) {
+  const items = useMemo(() => reminders(list), [list]);
+  return <section aria-labelledby="pengingat" className="space-y-3 rounded-xl border border-warning/50 bg-warning/5 p-5">
+    <h2 id="pengingat" className="flex items-center gap-2 text-xl font-bold"><BellRing className="size-5 text-warning" aria-hidden="true" />Pengingat perpanjangan <span className="text-base font-normal text-base-content/60">({items.length})</span></h2>
+    <p className="text-sm text-base-content/70">Paket yang berakhir dalam 14 hari atau sudah berakhir dalam 30 hari terakhir. Kirim pengingat lewat WhatsApp, lalu tambah paket setelah pembayaran diterima.</p>
+    {items.length === 0 ? <p className="text-sm">Tidak ada paket yang perlu diingatkan.</p> : <ul className="space-y-2">{items.map(r => { const a = list.find(x => x.id === r.account.id)!;
+      return <li key={`${r.account.id}-${r.label}`} data-testid="reminder" className="flex flex-col gap-2 rounded-lg bg-base-100 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div><p className="font-bold">{r.account.displayName || r.account.username} <span className="font-normal text-base-content/60">@{r.account.username}</span></p>
+          <p className="text-sm"><span className={`me-1 rounded px-1.5 py-0.5 text-xs font-bold ${r.status === "segera" ? "bg-warning/30" : "bg-error/15 text-error"}`}>{r.status === "segera" ? "Segera berakhir" : "Sudah berakhir"}</span>{r.label}, {r.status === "segera" ? "berakhir" : "berakhir"} {whenText(r.days)} ({renewDate(r.expiresAt)})</p></div>
+        <div className="flex flex-wrap gap-1">{r.account.phone ? <a className="btn btn-xs btn-success gap-1" target="_blank" rel="noreferrer" href={`https://wa.me/${waPhone(r.account.phone)}?text=${encodeURIComponent(reminderMessage(r))}`}><MessageCircle className="size-3.5" aria-hidden="true" />Kirim pengingat</a>
+          : <span className="text-xs text-base-content/60">Nomor WA belum diisi</span>}
+          <button type="button" className="btn btn-xs btn-outline gap-1" onClick={() => onExtend(a)}><CalendarPlus className="size-3.5" aria-hidden="true" />Tambah paket</button></div></li>; })}</ul>}
+  </section>;
 }
 
 export function AdminPanel() {
@@ -97,6 +114,8 @@ export function AdminPanel() {
       <button type="submit" className="btn btn-success gap-1" disabled={busy}><Plus className="size-4" aria-hidden="true" />Buat akun dan PIN</button>
     </form>
     {creds && <Credentials c={creds} close={() => setCreds(null)} />}
+
+    {list && <Reminders list={list} onExtend={a => { setQ(a.username); setExtendFor(a.id); const e = a.entitlements[0]; setExtPkg(e ? { package: e.package, classId: e.classId ?? 1 } : { package: "kelas", classId: 1 }); }} />}
 
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold">Daftar akun {list && <span className="text-base font-normal text-base-content/60">({list.length})</span>}</h2>
