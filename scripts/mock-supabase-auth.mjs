@@ -22,7 +22,43 @@ const pin = () => String(Math.floor(Math.random() * 1e6)).padStart(6, "0");
 
 const links = new Map(); // code -> { id, expiresAt }
 const report = a => ({ name: a.displayName || a.username, generatedAt: new Date().toISOString(), results: (a.results ?? []).slice(0, 300) });
+// Paket sekolah: kelas sekolah (rombel), guru, dan rekap nilai.
+const groups = []; // { id, name, classId, teacherId, createdAt, members: string[] }
+const teacher = t => { const a = who(t); if (!a || !["teacher", "admin"].includes(a.role)) { const e = new Error("not_teacher"); e.code = 403; throw e; } return a; };
+const chapterOf = p => /^(\/kelas\/[^/]+\/materi\/[^/?#]+)/.exec(p)?.[1];
+const summary = a => { const by = new Map(); for (const r of [...(a.results ?? [])].reverse()) { const c = chapterOf(r.path); if (!c || r.kind === "harian") continue;
+    const x = by.get(c) ?? { path: c, title: r.title, best: null, last: null, evals: 0, practice: 0, lastAt: r.at }; x.title = r.title; x.lastAt = r.at;
+    if (r.kind === "evaluasi") { x.evals++; x.last = r.score; x.best = Math.max(x.best ?? 0, r.score); } else x.practice++; by.set(c, x); }
+  return [...by.values()].sort((x, y) => x.path.localeCompare(y.path)); };
+const groupJson = (g, detail) => { const t = byId(g.teacherId);
+  return { id: g.id, name: g.name, classId: g.classId, createdAt: g.createdAt, teacher: t ? { id: t.id, username: t.username, displayName: t.displayName } : null,
+    members: g.members.map(byId).filter(Boolean).sort((x, y) => (x.displayName || x.username).toLowerCase().localeCompare((y.displayName || y.username).toLowerCase())).map(a => ({ id: a.id, username: a.username, displayName: a.displayName, disabled: a.disabled,
+      ...(detail ? { lastAt: a.results?.[0]?.at ?? null, week: (a.results ?? []).filter(r => Date.now() - new Date(r.at) < 7 * 864e5).length, chapters: summary(a) } : {}) })) }; };
+const groupOf = id => groups.find(g => g.id === id);
 const fns = {
+  bsk_admin_set_role: ({ p_token, p_account, p_role }) => { const me = admin(p_token); if (!["student", "teacher"].includes(p_role)) return { error: "bad_role" }; if (me.id === p_account) return { error: "self" };
+    const a = byId(p_account); if (a.role !== "admin") a.role = p_role; if (p_role === "student") groups.forEach(g => { if (g.teacherId === a.id) g.teacherId = null; }); return pub(a); },
+  bsk_admin_groups: ({ p_token }) => { admin(p_token); return groups.map(g => groupJson(g, false)); },
+  bsk_admin_group_save: ({ p_token, p_group, p_name, p_teacher, p_class }) => { admin(p_token); const name = (p_name ?? "").trim().slice(0, 80); if (!name) return { error: "bad_name" };
+    if (p_teacher && byId(p_teacher)?.role !== "teacher") return { error: "bad_teacher" };
+    let g = p_group ? groupOf(p_group) : null; if (p_group && !g) return { error: "not_found" };
+    if (!g) { g = { id: randomUUID(), name, classId: p_class, teacherId: p_teacher, createdAt: new Date().toISOString(), members: [] }; groups.unshift(g); } else Object.assign(g, { name, classId: p_class, teacherId: p_teacher });
+    return groupJson(g, false); },
+  bsk_admin_group_delete: ({ p_token, p_group }) => { admin(p_token); const i = groups.findIndex(g => g.id === p_group); if (i >= 0) groups.splice(i, 1); return { ok: true }; },
+  bsk_admin_group_add: ({ p_token, p_group, p_usernames }) => { admin(p_token); const g = groupOf(p_group); if (!g) return { error: "not_found" }; if (p_usernames.length > 200) return { error: "too_many" };
+    const missing = []; for (const u of new Set(p_usernames.map(x => x.trim().toLowerCase()).filter(Boolean))) { const a = accounts.get(u); if (!a || a.role !== "student") missing.push(u); else if (!g.members.includes(a.id)) g.members.push(a.id); }
+    return { missing, group: groupJson(g, false) }; },
+  bsk_admin_group_remove: ({ p_token, p_group, p_account }) => { admin(p_token); const g = groupOf(p_group); if (!g) return { error: "not_found" }; g.members = g.members.filter(x => x !== p_account); return groupJson(g, false); },
+  bsk_admin_bulk_create: ({ p_token, p_group, p_prefix, p_names, p_package, p_class }) => { admin(p_token); const g = groupOf(p_group); if (!g) return { error: "not_found" };
+    if (!/^[a-z0-9._-]{2,24}$/.test(p_prefix)) return { error: "bad_prefix" }; if (!(p_names.length >= 1 && p_names.length <= 60)) return { error: "bad_count" };
+    let n = 0; const created = [];
+    for (const raw of p_names) { const name = raw.trim(); if (!name) continue; let u; do { n++; u = p_prefix + String(n).padStart(2, "0"); } while (accounts.has(u));
+      const p = pin(); add(u, p, { displayName: name, entitlements: [ent(p_package, p_class)] }); accounts.get(u).note = `Sekolah: ${g.name}`; g.members.push(accounts.get(u).id); created.push({ username: u, pin: p, displayName: name }); }
+    return { created, group: groupJson(g, false) }; },
+  bsk_teacher_overview: ({ p_token }) => { const me = teacher(p_token);
+    return { name: me.displayName || me.username, role: me.role, groups: groups.filter(g => me.role === "admin" || g.teacherId === me.id).sort((x, y) => x.name.localeCompare(y.name)).map(g => groupJson(g, true)) }; },
+  bsk_teacher_report: ({ p_token, p_account }) => { const me = teacher(p_token); if (me.role !== "admin" && !groups.some(g => g.teacherId === me.id && g.members.includes(p_account))) return null; const a = byId(p_account); return a ? report(a) : null; },
+
   bsk_login: ({ p_username, p_pin }) => {
     const a = accounts.get(p_username); if (!a || a.disabled) return { error: "invalid" };
     if (a.pin !== p_pin) { a.fails++; return a.fails >= 5 ? { error: "locked" } : { error: "invalid" }; }

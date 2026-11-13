@@ -12,7 +12,7 @@ const messages: Record<string, string> = {
   disabled: "Login belum aktif di server ini.",
 };
 
-export function LoginForm({ next, reason, classId }: { next: string; reason: "paket" | "admin" | null; classId: number | null }) {
+export function LoginForm({ next, reason, classId }: { next: string; reason: "paket" | "admin" | "guru" | null; classId: number | null }) {
   // Bangunkan server login selagi pengguna mengetik, agar tombol Masuk tidak menunggu server menyala.
   useEffect(() => { fetch("/api/masuk", { method: "GET", cache: "no-store" }).catch(() => {}); }, []);
   const [username, setUsername] = useState("");
@@ -41,6 +41,7 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
     </div>
     {reason === "paket" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Akun Anda belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. Hubungi admin untuk menambah paket, atau masuk dengan akun lain.</p>}
     {reason === "admin" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Halaman ini hanya untuk admin.</p>}
+    {reason === "guru" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Halaman ini untuk akun guru. Masuk dengan akun guru dari sekolah Anda.</p>}
     {reason === null && classId && <p className="mt-5 rounded-xl bg-info/10 p-3 text-sm">Bab ini termasuk paket Kelas {classId}. Bab pertama setiap kelas dapat dicoba tanpa akun.</p>}
     <form onSubmit={submit} className="mt-6 space-y-4">
       <div>

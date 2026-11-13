@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, FileText, KeyRound, LogOut, MessageCircle, Settings } from "lucide-react";
+import { BellRing, FileText, KeyRound, LogOut, MessageCircle, School, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -34,6 +34,7 @@ export function AccountPanel() {
     <div className="mt-5 flex flex-wrap gap-2">
       <Link href="/akun/laporan" className="btn btn-success gap-1"><FileText className="size-4" aria-hidden="true" />Laporan belajar</Link>
       {session.role === "admin" && <Link href="/admin" className="btn btn-outline gap-1"><Settings className="size-4" aria-hidden="true" />Kelola akun</Link>}
+      {(session.role === "teacher" || session.role === "admin") && <Link href="/guru" className="btn btn-outline gap-1"><School className="size-4" aria-hidden="true" />Rekap kelas</Link>}
       <button type="button" className="btn btn-ghost gap-1" disabled={busy} onClick={logout}><LogOut className="size-4" aria-hidden="true" />Keluar</button>
     </div></div>
     <ResultHistory />

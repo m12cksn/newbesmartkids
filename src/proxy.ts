@@ -13,11 +13,11 @@ export async function proxy(request: NextRequest) {
   if (canOpen(req, session)) return NextResponse.next();
   const to = new URL("/masuk", request.url);
   to.searchParams.set("lanjut", pathname + search);
-  if (session) to.searchParams.set("alasan", req.kind === "admin" ? "admin" : "paket");
+  if (session) to.searchParams.set("alasan", req.kind === "admin" ? "admin" : req.kind === "teacher" ? "guru" : "paket");
   if (req.kind === "class") to.searchParams.set("kelas", String(req.classId));
   return NextResponse.redirect(to);
 }
 
 export const config = {
-  matcher: ["/kelas/:slug/:path+", "/mastering-penjumlahan-pengurangan/:path*", "/mastering-perkalian-pembagian/:path*", "/admin/:path*"],
+  matcher: ["/kelas/:slug/:path+", "/mastering-penjumlahan-pengurangan/:path*", "/mastering-perkalian-pembagian/:path*", "/admin/:path*", "/guru/:path*"],
 };

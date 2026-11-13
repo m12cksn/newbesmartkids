@@ -1,10 +1,11 @@
 "use client";
 
-import { BellRing, Copy, FileText, KeyRound, LogOut, MessageCircle, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
+import { BellRing, Copy, FileText, GraduationCap, KeyRound, LogOut, MessageCircle, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fmtDate } from "./AccountPanel";
 import { reminderMessage, reminders, renewDate, whenText } from "@/lib/renewal";
+import { SchoolGroups } from "@/components/teacher/SchoolGroups";
 
 type Ent = { id: string; package: "kelas" | "semua"; classId: number | null; startsAt: string; expiresAt: string };
 type Account = { id: string; username: string; displayName: string; phone: string; note: string; role: string; disabled: boolean; createdAt: string; entitlements: Ent[]; devices: number };
@@ -117,6 +118,8 @@ export function AdminPanel() {
 
     {list && <Reminders list={list} onExtend={a => { setQ(a.username); setExtendFor(a.id); const e = a.entitlements[0]; setExtPkg(e ? { package: e.package, classId: e.classId ?? 1 } : { package: "kelas", classId: 1 }); }} />}
 
+    {list && <SchoolGroups teachers={list.filter(a => a.role === "teacher" && !a.disabled)} />}
+
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold">Daftar akun {list && <span className="text-base font-normal text-base-content/60">({list.length})</span>}</h2>
         <div className="flex items-center gap-2"><label className="input input-bordered input-sm flex items-center gap-1"><Search className="size-4 opacity-60" aria-hidden="true" /><input aria-label="Cari akun" placeholder="Cari nama, username, nomor" value={q} onChange={e => setQ(e.target.value)} /></label>
@@ -125,13 +128,14 @@ export function AdminPanel() {
         <ul className="space-y-2">{shown.map(a => { const act1 = activeEnts(a);
           return <li key={a.id} className={`rounded-xl border border-base-300 bg-base-100 p-4 ${a.disabled ? "opacity-60" : ""}`}>
             <div className="flex flex-wrap items-start justify-between gap-2">
-              <div><p className="font-bold">{a.displayName || a.username} <span className="font-normal text-base-content/60">@{a.username}</span>{a.role === "admin" && <span className="badge badge-sm badge-info ms-2">admin</span>}{a.disabled && <span className="badge badge-sm ms-2">nonaktif</span>}</p>
+              <div><p className="font-bold">{a.displayName || a.username} <span className="font-normal text-base-content/60">@{a.username}</span>{a.role === "admin" && <span className="badge badge-sm badge-info ms-2">admin</span>}{a.role === "teacher" && <span className="badge badge-sm badge-success ms-2">guru</span>}{a.disabled && <span className="badge badge-sm ms-2">nonaktif</span>}</p>
                 <p className="text-xs text-base-content/60">{[a.phone, a.note, `${a.devices} perangkat aktif`].filter(Boolean).join(", ")}</p>
                 <p className="mt-1 text-sm">{act1.length ? act1.map(e => `${e.package === "semua" ? "Semua kelas" : `Kelas ${e.classId}`} s.d. ${fmtDate(e.expiresAt)}`).join("; ") : a.role === "admin" ? "Akses penuh" : "Tidak ada paket aktif"}</p></div>
               {a.role !== "admin" && <div className="flex flex-wrap gap-1">
                 <Link href={`/admin/laporan/${a.id}`} className="btn btn-xs btn-outline gap-1"><FileText className="size-3.5" aria-hidden="true" />Laporan</Link>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => { setExtendFor(extendFor === a.id ? null : a.id); setExtPkg(act1[0] ? { package: act1[0].package, classId: act1[0].classId ?? 1 } : { package: "kelas", classId: 1 }); }}><CalendarPlus className="size-3.5" aria-hidden="true" />Tambah paket</button>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => act(async () => { if (!confirm(`Buat PIN baru untuk ${a.username}? PIN lama tidak berlaku dan semua perangkat keluar.`)) return; const r = await call<{ username: string; pin: string }>({ action: "reset", account: a.id }); setCreds({ username: r.username, pin: r.pin, name: a.displayName, phone: a.phone, paket: act1.map(e => `${e.package === "semua" ? "Semua kelas" : `Kelas ${e.classId}`} sampai ${fmtDate(e.expiresAt)}`).join("; ") || "-" }); window.scrollTo({ top: 0, behavior: "smooth" }); upsert({ ...a, devices: 0 }); })}><KeyRound className="size-3.5" aria-hidden="true" />Reset PIN</button>
+                <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => act(async () => { const to = a.role === "teacher" ? "student" : "teacher"; if (!confirm(to === "teacher" ? `Jadikan ${a.username} akun guru? Guru dapat melihat nilai siswa di kelas sekolahnya.` : `Kembalikan ${a.username} menjadi akun siswa? Akun ini dilepas dari kelas sekolah yang diajarnya.`)) return; upsert(await call<Account>({ action: "role", account: a.id, role: to })); })}><GraduationCap className="size-3.5" aria-hidden="true" />{a.role === "teacher" ? "Jadikan siswa" : "Jadikan guru"}</button>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy || !a.devices} onClick={() => act(async () => upsert(await call<Account>({ action: "logout", account: a.id })))}><LogOut className="size-3.5" aria-hidden="true" />Keluarkan perangkat</button>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => act(async () => upsert(await call<Account>({ action: "disable", account: a.id, disabled: !a.disabled })))}>{a.disabled ? <><UserCheck className="size-3.5" aria-hidden="true" />Aktifkan</> : <><UserX className="size-3.5" aria-hidden="true" />Nonaktifkan</>}</button>
               </div>}

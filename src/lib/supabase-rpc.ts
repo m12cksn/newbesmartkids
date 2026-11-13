@@ -21,7 +21,7 @@ export async function rpc<T>(name: string, args: Record<string, unknown>): Promi
   const text = await res.text();
   if (!res.ok) {
     const msg = (() => { try { return (JSON.parse(text) as { message?: string }).message ?? text; } catch { return text; } })();
-    throw new RpcError(msg, res.status === 403 || msg.includes("not_admin") ? 403 : 502);
+    throw new RpcError(msg, res.status === 403 || msg.includes("not_admin") || msg.includes("not_teacher") ? 403 : 502);
   }
   return (text ? JSON.parse(text) : null) as T;
 }

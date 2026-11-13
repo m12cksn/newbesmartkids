@@ -5,7 +5,7 @@ import { materials } from "@/data/materials";
 export type SessionInfo = {
   username: string;
   displayName: string;
-  role: "student" | "admin";
+  role: "student" | "teacher" | "admin";
   all: boolean;
   classes: number[];
   expiresAt: string | null;
@@ -23,6 +23,7 @@ export const classIdBySlug = (slug: string) => classes.find(c => c.slug === slug
 export type Requirement =
   | { kind: "public" }
   | { kind: "admin" }
+  | { kind: "teacher" }
   | { kind: "any" }
   | { kind: "class"; classId: number; free: boolean };
 
@@ -30,6 +31,7 @@ export type Requirement =
 export function requirementFor(pathname: string): Requirement {
   const parts = pathname.split("/").filter(Boolean);
   if (parts[0] === "admin") return { kind: "admin" };
+  if (parts[0] === "guru") return { kind: "teacher" };
   if (parts[0]?.startsWith("mastering-")) return { kind: "any" };
   if (parts[0] === "kelas" && parts.length >= 3) {
     const classId = classIdBySlug(parts[1]);
@@ -47,6 +49,7 @@ export const hasAny = (s: SessionInfo | null) => Boolean(s && (s.all || s.role =
 export function canOpen(req: Requirement, s: SessionInfo | null) {
   if (req.kind === "public") return true;
   if (req.kind === "admin") return s?.role === "admin";
+  if (req.kind === "teacher") return s?.role === "teacher" || s?.role === "admin";
   if (req.kind === "any") return hasAny(s);
   return req.free || hasClass(s, req.classId);
 }

@@ -10,7 +10,7 @@ const safeNext = (v: unknown) => (typeof v === "string" && v.startsWith("/") && 
 async function Form({ searchParams }: { searchParams: SP }) {
   const sp = await searchParams;
   const kelas = Number(sp.kelas);
-  return <LoginForm next={safeNext(sp.lanjut)} reason={sp.alasan === "paket" || sp.alasan === "admin" ? sp.alasan : null} classId={Number.isInteger(kelas) && kelas > 0 ? kelas : null} />;
+  return <LoginForm next={safeNext(sp.lanjut)} reason={sp.alasan === "paket" || sp.alasan === "admin" || sp.alasan === "guru" ? sp.alasan : null} classId={Number.isInteger(kelas) && kelas > 0 ? kelas : null} />;
 }
 
 export default function Page({ searchParams }: { searchParams: SP }) {
