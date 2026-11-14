@@ -1,3 +1,4 @@
+import { adminWaLink } from "./contact";
 /** Paket yang dijual lewat Scalev. Harga dan isi di sini dipakai halaman depan dan panel admin. */
 export type OfferId = "sd" | "smp" | "sma" | "semua";
 export type Offer = { id: OfferId; name: string; short: string; price: number; accounts: number; months: number; classes: number[] | "all"; onSale: boolean };
@@ -13,6 +14,8 @@ export const offers: Offer[] = [
 export const offerById = (id: unknown) => offers.find(o => o.id === id) ?? null;
 export const rupiah = (n: number) => `Rp${n.toLocaleString("id-ID")}`;
 
-/** Tautan halaman produk Scalev, diisi lewat variabel lingkungan Vercel. Kosong berarti tombol beli diarahkan ke WhatsApp admin. */
-export const scalevUrl = (kind: "jenjang" | "semua") =>
-  (kind === "jenjang" ? process.env.NEXT_PUBLIC_SCALEV_JENJANG_URL : process.env.NEXT_PUBLIC_SCALEV_SEMUA_URL) || "";
+/** Halaman penjualan di Scalev (NEXT_PUBLIC_SCALEV_URL di Vercel). Website hanya untuk belajar; semua pembelian lewat halaman ini.
+ *  Selama belum diisi, tombol "Dapatkan akses" membuka WhatsApp admin. */
+export function accessUrl(text = "Halo admin BeSmartKids, saya ingin mendapatkan akses BeSmartKids.") {
+  return process.env.NEXT_PUBLIC_SCALEV_URL || adminWaLink(text);
+}

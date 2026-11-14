@@ -4,7 +4,6 @@ import { DailyPracticeCard } from "@/components/home/DailyPracticeCard";
 import { HeroSection } from "@/components/home/HeroSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { LatestMaterials } from "@/components/home/LatestMaterials";
-import { ParentInfo } from "@/components/home/ParentInfo";
 import { SiteFooter } from "@/components/home/SiteFooter";
 import { SiteHeader } from "@/components/home/SiteHeader";
 import { materials } from "@/data/materials";
@@ -19,7 +18,6 @@ export default function Home() {
       <LatestMaterials />
       <ClassExplorer counts={counts} />
       <DailyPracticeCard />
-      <ParentInfo />
       <CallToAction />
       <SiteFooter />
     </main>

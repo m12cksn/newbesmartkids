@@ -16,7 +16,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm install --no-audit --no-fund
-      - run: npx eslint src/lib/site.ts src/app/robots.ts src/app/sitemap.ts src/app/layout.tsx src/app/page.tsx "src/app/kelas/[slug]/page.tsx" "src/app/kelas/[slug]/materi/[materiSlug]/page.tsx" src/components/home/ParentInfo.tsx src/components/home/SiteHeader.tsx
+      - run: npx eslint src/lib/site.ts src/app/robots.ts src/app/sitemap.ts src/app/layout.tsx src/app/page.tsx "src/app/kelas/[slug]/page.tsx" "src/app/kelas/[slug]/materi/[materiSlug]/page.tsx" src/components/home/SiteHeader.tsx
       - run: npm run build
       - run: npx tsc --noEmit
       - run: npm install --no-save playwright

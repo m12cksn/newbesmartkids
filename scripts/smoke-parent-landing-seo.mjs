@@ -28,22 +28,13 @@ console.log("metadata ok");
 for (const w of [320, 390, 768, 1280]) {
   await page.setViewportSize({ width: w, height: 900 });
   await page.goto(`${BASE}/`);
-  const sec = page.locator("#paket");
-  ok(await sec.getByRole("heading", { name: "Untuk orang tua" }).isVisible(), `judul paket ${w}`);
-  const wa = sec.getByRole("link", { name: /Tanya admin lewat WhatsApp/ });
-  const plans = sec.getByTestId("plan"); ok(await plans.count() === 2, "dua paket");
-  ok(/Rp79\.000/.test(await plans.nth(0).innerText()) && /2 akun/.test(await plans.nth(0).innerText()), "paket jenjang");
-  ok(/Rp129\.000/.test(await plans.nth(1).innerText()) && /3 akun/.test(await plans.nth(1).innerText()), "paket semua kelas");
-  for (let i = 0; i < 2; i++) { const h = await plans.nth(i).getByRole("link").getAttribute("href"); ok(/^https:\/\//.test(h), `tombol beli ${i}: ${h}`); }
-  ok(/^https:\/\/wa\.me\/62\d+\?text=/.test(await wa.getAttribute("href")), "tautan WA");
-  ok(!/SMA \(/.test(await sec.innerText()), "paket SMA tidak dijual");
-  const q = sec.locator("details").first();
-  ok(!(await q.evaluate(d => d.open)), "FAQ tertutup");
-  await q.locator("summary").click(); ok(await q.evaluate(d => d.open), "FAQ terbuka");
+  // Beranda hanya untuk belajar: tanpa bagian harga dan tanpa menu Paket.
+  ok(await page.locator("#paket").count() === 0, "bagian paket masih ada");
+  ok(await page.getByRole("navigation").getByRole("link", { name: "Paket" }).count() === 0, "menu Paket masih ada");
+  ok(!/Rp\s?\d/.test(await page.locator("main").innerText()), "harga tampil di beranda");
+  ok(await page.locator("#kelas").count() === 1, "daftar kelas");
   const sw = await page.evaluate(() => document.documentElement.scrollWidth);
   ok(sw <= w, `overflow ${sw} > ${w}`);
-  if (w === 1280) { await page.getByRole("navigation").getByRole("link", { name: "Paket" }).first().click(); await page.waitForTimeout(400); ok(await sec.evaluate(e => Math.abs(e.getBoundingClientRect().top) < 120), "tautan Paket"); }
-  await sec.screenshot({ path: `${process.env.SHOT_DIR || "/tmp"}/parent-${w}.png` });
   console.log(`homepage ${w}px ok`);
 }
 await b.close();
