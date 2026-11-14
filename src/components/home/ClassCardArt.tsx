@@ -17,7 +17,7 @@ export const cardTones: { bg: string; line: string }[] = [
 ];
 
 /** Pola latar: kisi segi enam, kertas berpetak, titik, dan garis kontur, bergantian per kelas. */
-function Pattern({ kind, color, id }: { kind: number; color: string; id: string }) {
+export function Pattern({ kind, color, id }: { kind: number; color: string; id: string }) {
   const pid = `bsk-card-pat-${id}`;
   const tile: ReactNode[] = [
     <path key="h" d="M10 0l10 6v12l-10 6l-10 -6v-12zM10 24v12M0 18l-10 6M20 18l10 6" fill="none" stroke={color} strokeWidth="1" />,
@@ -43,7 +43,7 @@ function Floaters({ items }: { items: string[] }) {
 const S = { fill: paper, stroke: ink, strokeWidth: 2, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
 /** Ilustrasi garis per kelas, digambar pada kanvas 120 × 90. */
-function Drawing({ id }: { id: number }) {
+export function Drawing({ id }: { id: number }) {
   switch (id) {
     case 1: return <g>{/* manik-manik sempoa */}
       <rect x="18" y="16" width="84" height="60" rx="3" {...S} />
@@ -108,7 +108,7 @@ function Drawing({ id }: { id: number }) {
   }
 }
 
-const motifs = [["1", "2", "3"], ["+", "−", "="], ["×", "÷", "="], ["½", "¼", "¾"], ["∠", "°", "△"], ["%", "0,5", "∶"], ["x", "y", "="], ["a²", "√", "c²"], ["x²", "π", "√"], ["sin", "θ", "∞"], ["Σ", "x̄", "%"], ["∫", "dx", "lim"]];
+export const motifs = [["1", "2", "3"], ["+", "−", "="], ["×", "÷", "="], ["½", "¼", "¾"], ["∠", "°", "△"], ["%", "0,5", "∶"], ["x", "y", "="], ["a²", "√", "c²"], ["x²", "π", "√"], ["sin", "θ", "∞"], ["Σ", "x̄", "%"], ["∫", "dx", "lim"]];
 
 /** Panel atas kartu kelas. */
 export function ClassCardArt({ id }: { id: number }) {

@@ -1,0 +1,36 @@
+name: Class Page QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  class-page:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npx eslint src/components/class src/components/home/ClassCardArt.tsx "src/app/kelas/[slug]/page.tsx" scripts/smoke-class-page.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-class.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node scripts/smoke-class-page.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: class-page-screenshots
+          path: /tmp/class-page-screenshots
+          if-no-files-found: ignore
