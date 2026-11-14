@@ -61,7 +61,7 @@ export function ChapterPath({ list }: { list: MaterialItem[] }) {
     <ol className="relative flex min-w-max gap-0">
       {list.map((m, i) => <li key={m.id} className="relative w-28 shrink-0 sm:w-36">
         {i < list.length - 1 && <span aria-hidden="true" className="absolute left-1/2 top-5 h-0 w-full border-t-2 border-dashed border-success/40" />}
-        <a href={`#bab-${m.chapter}`} className="group relative flex flex-col items-center gap-2 rounded-md px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-success/40">
+        <a href={`#bab-${m.chapter}`} aria-label={`Lompat ke kartu bab nomor ${m.chapter}`} title={m.title} className="group relative flex flex-col items-center gap-2 rounded-md px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-success/40">
           <span className="grid size-10 place-items-center rounded-full border-2 border-success bg-base-100 text-base font-extrabold text-success transition group-hover:bg-success group-hover:text-success-content">{m.chapter}</span>
           <span className="line-clamp-2 text-xs font-semibold leading-snug text-base-content/70 group-hover:text-base-content">{m.title}</span>
         </a>
