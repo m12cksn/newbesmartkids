@@ -9,6 +9,13 @@ const DAY = 864e5;
 export const daysLeft = (iso: string, now = Date.now()) => Math.ceil((new Date(iso).getTime() - now) / DAY);
 export const pkgLabel = (e: { package: string; classId: number | null }) => (e.package === "semua" ? "Semua kelas" : `Kelas ${e.classId}`);
 
+/** "Kelas 3", "Kelas 1–6", atau "Kelas 2, 5". */
+export function classesLabel(ids: number[]) {
+  const c = [...new Set(ids)].sort((x, y) => x - y);
+  if (c.length === 1) return `Kelas ${c[0]}`;
+  return c.every((v, i) => i === 0 || v === c[i - 1] + 1) ? `Kelas ${c[0]}–${c[c.length - 1]}` : `Kelas ${c.join(", ")}`;
+}
+
 /** Satu pengingat per paket (per kelas atau semua kelas), memakai tanggal berakhir terakhir untuk paket itu. */
 export function reminders(accounts: RenewAccount[], now = Date.now()): Reminder[] {
   const out: Reminder[] = [];
@@ -17,10 +24,16 @@ export function reminders(accounts: RenewAccount[], now = Date.now()): Reminder[
     const latest = new Map<string, RenewEnt>();
     for (const e of a.entitlements) { const k = pkgLabel(e), cur = latest.get(k); if (!cur || e.expiresAt > cur.expiresAt) latest.set(k, e); }
     const hasSemua = [...latest.values()].some(e => e.package === "semua" && daysLeft(e.expiresAt, now) > SOON_DAYS);
-    for (const [label, e] of latest) {
+    // Paket jenjang tercatat sebagai beberapa kelas yang berakhir bersamaan: gabungkan menjadi satu pengingat.
+    const groups = new Map<string, RenewEnt[]>();
+    for (const e of latest.values()) {
       if (hasSemua && e.package === "kelas") continue;
-      const d = daysLeft(e.expiresAt, now);
-      if (d <= SOON_DAYS && d >= -GRACE_DAYS) out.push({ account: a, label, expiresAt: e.expiresAt, days: d, status: d >= 0 ? "segera" : "berakhir" });
+      const k = e.package === "semua" ? "semua" : `kelas-${e.expiresAt.slice(0, 10)}`;
+      groups.set(k, [...(groups.get(k) ?? []), e]);
+    }
+    for (const es of groups.values()) {
+      const e = es[0], d = daysLeft(e.expiresAt, now);
+      if (d <= SOON_DAYS && d >= -GRACE_DAYS) out.push({ account: a, label: e.package === "semua" ? "Semua kelas" : classesLabel(es.map(x => x.classId!)), expiresAt: e.expiresAt, days: d, status: d >= 0 ? "segera" : "berakhir" });
     }
   }
   return out.sort((x, y) => x.days - y.days);

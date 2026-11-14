@@ -34,6 +34,7 @@ jobs:
           done
           node scripts/smoke-login.mjs
           node scripts/smoke-renewal.mjs
+          node scripts/smoke-paket-jenjang.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
