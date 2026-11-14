@@ -1,13 +1,13 @@
 "use client";
 
-import { BellRing, FileText, KeyRound, LogOut, MessageCircle, Settings } from "lucide-react";
+import { BellRing, FileText, KeyRound, LogOut, RefreshCw, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { classes } from "@/components/home/home-data";
 import { useAccess } from "./AccessProvider";
 import { ResultHistory } from "./ResultHistory";
-import { adminWaLink } from "@/lib/contact";
+import { accessUrl } from "@/lib/packages";
 import { daysLeft, SOON_DAYS, whenText } from "@/lib/renewal";
 
 export const fmtDate = (s: string | null) => (s ? new Date(s).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-");
@@ -45,11 +45,12 @@ function RenewNotice({ expiresAt, username }: { expiresAt: string | null | undef
   if (expiresAt === undefined) return null;
   const d = expiresAt ? daysLeft(expiresAt) : null;
   if (d !== null && d > SOON_DAYS) return null;
-  const wa = adminWaLink(`Halo admin BeSmartKids, saya ingin memperpanjang paket untuk akun ${username}.`);
+  const url = accessUrl(`Halo admin BeSmartKids, saya ingin memperpanjang paket untuk akun ${username}.`);
   return <div role="status" data-testid="renew-notice" className="mt-4 rounded-xl border-s-4 border-warning bg-warning/10 p-4 text-sm leading-6">
     <p className="flex items-center gap-2 font-bold"><BellRing className="size-4 text-warning" aria-hidden="true" />{d === null ? "Belum ada paket aktif" : `Paket berakhir ${whenText(d)}`}</p>
     <p className="mt-1">{d === null ? "Bab pertama setiap kelas tetap bisa dibuka, dan riwayat belajar tetap tersimpan. Perpanjang paket untuk membuka semua bab lagi." : "Perpanjang sebelum berakhir agar belajar tidak terputus. Masa aktif baru dihitung setelah paket lama habis."}</p>
-    {wa ? <a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn-success btn-sm mt-2 gap-1"><MessageCircle className="size-4" aria-hidden="true" />Perpanjang lewat WhatsApp</a> : <p className="mt-1 text-base-content/70">Hubungi admin tempat Anda membeli paket.</p>}
+    {url ? <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-success btn-sm mt-2 gap-1"><RefreshCw className="size-4" aria-hidden="true" />Perpanjang paket</a> : <p className="mt-1 text-base-content/70">Hubungi admin tempat Anda membeli paket.</p>}
+    <p className="mt-2 text-xs text-base-content/60">Saat membayar, tulis username <strong>{username}</strong> agar paket ditambahkan ke akun ini.</p>
   </div>;
 }
 

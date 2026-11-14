@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/home/BrandMark";
-import { adminWaLink } from "@/lib/contact";
+import { accessUrl } from "@/lib/packages";
 
 const messages: Record<string, string> = {
   invalid: "Username atau PIN tidak cocok. Periksa lagi pesan yang Anda terima.",
@@ -39,7 +39,7 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
       <h1 className="mt-4 text-2xl font-extrabold sm:text-3xl">Halo, Ayo Belajar!</h1>
       <p className="mt-2 text-sm text-base-content/70">Masuk dengan username dan PIN dari admin.</p>
     </div>
-    {reason === "paket" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Akun Anda belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. Hubungi admin untuk menambah paket, atau masuk dengan akun lain.</p>}
+    {reason === "paket" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Akun Anda belum memiliki paket {classId ? `Kelas ${classId}` : "untuk halaman ini"}. <a href={accessUrl()} target="_blank" rel="noopener noreferrer" className="link font-semibold">Dapatkan akses</a> untuk kelas ini, atau masuk dengan akun lain.</p>}
     {reason === "admin" && <p role="alert" className="mt-5 rounded-xl bg-warning/15 p-3 text-sm">Halaman ini hanya untuk admin.</p>}
     {reason === null && classId && <p className="mt-5 rounded-xl bg-info/10 p-3 text-sm">Bab ini termasuk paket Kelas {classId}. Bab pertama setiap kelas dapat dicoba tanpa akun.</p>}
     <form onSubmit={submit} className="mt-6 space-y-4">
@@ -55,6 +55,6 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
       {error && <p role="alert" className="text-sm font-semibold text-error">{error}</p>}
       <button type="submit" className="btn btn-success h-12 w-full rounded-xl text-base" disabled={busy}>{busy ? "Memeriksa…" : "Masuk Sekarang"}</button>
     </form>
-    <p className="mt-6 text-center text-sm text-base-content/70">Belum punya akun? {adminWaLink() ? <a href={adminWaLink("Halo admin BeSmartKids, saya ingin membeli paket dan mendapatkan username serta PIN.")} target="_blank" rel="noopener noreferrer" className="link text-success">Hubungi admin</a> : "Hubungi admin"} untuk mendapatkan username dan PIN. Bab pertama setiap kelas bisa <Link href="/#kelas" className="link text-success">dicoba gratis</Link>.</p>
+    <p className="mt-6 text-center text-sm text-base-content/70">Belum punya akun? <a href={accessUrl()} target="_blank" rel="noopener noreferrer" className="link text-success">Dapatkan akses</a>, lalu username dan PIN dikirim lewat WhatsApp. Bab pertama setiap kelas bisa <Link href="/#kelas" className="link text-success">dicoba gratis</Link>.</p>
   </section>;
 }

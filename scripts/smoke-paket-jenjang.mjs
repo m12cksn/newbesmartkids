@@ -47,13 +47,11 @@ try {
     await login(all[2][0], all[2][1]);
     await page.goto(`${origin}${K9}`); assert.ok(page.url().endsWith(K9), "semua kelas membuka kelas 9");
     await logout();
-    // Halaman depan: dua paket dengan harga, tanpa paket SMA.
-    await page.goto(`${origin}/#paket`);
-    const plans = page.locator("#paket").getByTestId("plan"); assert.equal(await plans.count(), 2);
-    assert.match(await plans.nth(0).innerText(), /Rp79\.000[\s\S]*2 akun, aktif 12 bulan/);
-    assert.match(await plans.nth(1).innerText(), /Rp129\.000[\s\S]*3 akun, aktif 24 bulan/);
-    await fit("paket"); await page.locator("#paket").screenshot({ path: `${folder}/${width}-paket.png` });
+    // Tombol "Dapatkan akses" muncul di halaman Masuk dan saat kelas belum dibeli.
+    await page.goto(`${origin}/masuk`);
+    assert.ok(/^https:\/\//.test(await page.getByRole("link", { name: "Dapatkan akses" }).getAttribute("href")));
+    await fit("masuk");
     assert.deepEqual(errors, []); await ctx.close();
-    console.log(`PASS paket ${width}px: pesanan SD 2 akun dan semua kelas 3 akun, akses per jenjang, pesan WhatsApp, harga di beranda`);
+    console.log(`PASS paket ${width}px: pesanan SD 2 akun dan semua kelas 3 akun, akses per jenjang, pesan WhatsApp, tombol Dapatkan akses`);
   }
 } finally { await browser.close(); }
