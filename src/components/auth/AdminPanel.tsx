@@ -4,7 +4,8 @@ import { BellRing, Copy, FileText, KeyRound, LogOut, MessageCircle, Plus, Refres
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fmtDate } from "./AccountPanel";
-import { reminderMessage, reminders, renewDate, whenText } from "@/lib/renewal";
+import { classesLabel, reminderMessage, reminders, renewDate, whenText } from "@/lib/renewal";
+import { OrderForm } from "./OrderForm";
 
 type Ent = { id: string; package: "kelas" | "semua"; classId: number | null; startsAt: string; expiresAt: string };
 type Account = { id: string; username: string; displayName: string; phone: string; note: string; role: string; disabled: boolean; createdAt: string; entitlements: Ent[]; devices: number };
@@ -12,6 +13,9 @@ type Pkg = { package: "kelas" | "semua"; classId: number };
 const CLASSES = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const pkgName = (p: { package: string; classId: number | null }) => (p.package === "semua" ? "Semua kelas (2 tahun)" : `Kelas ${p.classId} (1 tahun)`);
+/** Kelas yang berakhir pada tanggal sama digabung, misalnya "Kelas 1–6 s.d. 14 November 2027". */
+const groupEnts = (es: Ent[]) => { const g = new Map<string, Ent[]>(); for (const e of es) { const k = `${e.package}-${e.expiresAt.slice(0, 10)}`; g.set(k, [...(g.get(k) ?? []), e]); }
+  return [...g.values()].map(x => `${x[0].package === "semua" ? "Semua kelas" : classesLabel(x.map(e => e.classId!))} s.d. ${fmtDate(x[0].expiresAt)}`); };
 const activeEnts = (a: Account) => a.entitlements.filter(e => new Date(e.expiresAt) > new Date());
 const suggest = (name: string) => { const base = name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "").slice(0, 12) || "siswa"; return `${base.length < 3 ? base + "bsk" : base}${Math.floor(100 + Math.random() * 900)}`; };
 const waPhone = (p: string) => { const d = p.replace(/\D/g, ""); return d.startsWith("0") ? `62${d.slice(1)}` : d; };
@@ -99,11 +103,15 @@ export function AdminPanel() {
   const shown = useMemo(() => (list ?? []).filter(a => !q || `${a.username} ${a.displayName} ${a.phone} ${a.note}`.toLowerCase().includes(q.toLowerCase())), [list, q]);
 
   return <section className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
-    <div><h1 className="text-3xl font-extrabold">Kelola akun</h1><p className="mt-1 text-sm text-base-content/70">Buat akun setelah pembayaran di Scalev atau Lynk.id masuk, lalu kirim username dan PIN ke pembeli.</p></div>
+    <div><h1 className="text-3xl font-extrabold">Kelola akun</h1><p className="mt-1 text-sm text-base-content/70">Buat akun setelah pembayaran di Scalev masuk, lalu kirim username dan PIN ke pembeli.</p></div>
     {error && <p role="alert" className="rounded-lg bg-error/10 p-3 text-sm font-semibold text-error">{error}</p>}
 
-    <form onSubmit={create} className="space-y-4 rounded-xl border border-base-300 bg-base-100 p-5" aria-labelledby="buat-akun">
-      <h2 id="buat-akun" className="text-xl font-bold">Buat akun baru</h2>
+    <OrderForm onCreated={() => void load()} />
+
+    <details className="rounded-xl border border-base-300 bg-base-100">
+    <summary className="cursor-pointer p-5 font-bold">Buat satu akun dengan paket per kelas</summary>
+    <form onSubmit={create} className="space-y-4 px-5 pb-5" aria-labelledby="buat-akun">
+      <h2 id="buat-akun" className="sr-only">Buat satu akun</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block"><span className="mb-1 block text-sm font-bold">Nama siswa atau orang tua</span><input required className="input input-bordered w-full" value={form.displayName} onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))} /></label>
         <label className="block"><span className="mb-1 block text-sm font-bold">Nomor WhatsApp</span><input inputMode="tel" className="input input-bordered w-full" placeholder="08…" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></label>
@@ -113,6 +121,7 @@ export function AdminPanel() {
       <PackagePicker value={pkg} set={setPkg} idPrefix="baru" />
       <button type="submit" className="btn btn-success gap-1" disabled={busy}><Plus className="size-4" aria-hidden="true" />Buat akun dan PIN</button>
     </form>
+    </details>
     {creds && <Credentials c={creds} close={() => setCreds(null)} />}
 
     {list && <Reminders list={list} onExtend={a => { setQ(a.username); setExtendFor(a.id); const e = a.entitlements[0]; setExtPkg(e ? { package: e.package, classId: e.classId ?? 1 } : { package: "kelas", classId: 1 }); }} />}
@@ -127,7 +136,7 @@ export function AdminPanel() {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div><p className="font-bold">{a.displayName || a.username} <span className="font-normal text-base-content/60">@{a.username}</span>{a.role === "admin" && <span className="badge badge-sm badge-info ms-2">admin</span>}{a.disabled && <span className="badge badge-sm ms-2">nonaktif</span>}</p>
                 <p className="text-xs text-base-content/60">{[a.phone, a.note, `${a.devices} perangkat aktif`].filter(Boolean).join(", ")}</p>
-                <p className="mt-1 text-sm">{act1.length ? act1.map(e => `${e.package === "semua" ? "Semua kelas" : `Kelas ${e.classId}`} s.d. ${fmtDate(e.expiresAt)}`).join("; ") : a.role === "admin" ? "Akses penuh" : "Tidak ada paket aktif"}</p></div>
+                <p className="mt-1 text-sm">{act1.length ? groupEnts(act1).join("; ") : a.role === "admin" ? "Akses penuh" : "Tidak ada paket aktif"}</p></div>
               {a.role !== "admin" && <div className="flex flex-wrap gap-1">
                 <Link href={`/admin/laporan/${a.id}`} className="btn btn-xs btn-outline gap-1"><FileText className="size-3.5" aria-hidden="true" />Laporan</Link>
                 <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => { setExtendFor(extendFor === a.id ? null : a.id); setExtPkg(act1[0] ? { package: act1[0].package, classId: act1[0].classId ?? 1 } : { package: "kelas", classId: 1 }); }}><CalendarPlus className="size-3.5" aria-hidden="true" />Tambah paket</button>

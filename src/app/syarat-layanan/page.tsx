@@ -9,7 +9,7 @@ export default function Page() {
     sections={[
       { id: "layanan", title: "Layanan", body: <p>BeSmartKids menyediakan materi matematika interaktif, latihan, evaluasi, latihan harian, dan laporan belajar untuk kelas 1 sampai 12. Bab pertama setiap kelas boleh dicoba gratis. Video pembelajaran sebagian masih disiapkan dan akan ditambahkan bertahap.</p> },
       { id: "paket", title: "Paket dan masa aktif", body: <ul>
-        <li>Paket satu kelas membuka semua bab di kelas tersebut selama 12 bulan sejak diaktifkan.</li><li>Paket semua kelas membuka semua bab di semua kelas selama 24 bulan sejak diaktifkan.</li>
+        <li>Paket Jenjang berisi 2 akun dan membuka semua bab di satu jenjang (SD kelas 1–6 atau SMP kelas 7–9) selama 12 bulan sejak diaktifkan.</li><li>Paket Semua Kelas berisi 3 akun dan membuka semua bab di semua kelas selama 24 bulan sejak diaktifkan.</li><li>Pembayaran dilakukan melalui Scalev. Username dan PIN dikirim lewat WhatsApp setelah pembayaran diterima.</li>
         <li>Jika paket diperpanjang sebelum berakhir, masa aktif baru dihitung setelah masa aktif lama habis.</li><li>Setelah masa aktif berakhir, akun tetap dapat masuk dan riwayat belajar tetap tersimpan, tetapi bab berbayar terkunci kembali.</li></ul> },
       { id: "pembayaran", title: "Pembayaran", body: <>
         <p>Harga paket diinformasikan oleh admin sebelum pembelian. Akun dan PIN dikirim setelah pembayaran diterima.</p>
