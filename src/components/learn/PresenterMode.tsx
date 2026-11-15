@@ -20,6 +20,7 @@ const LASER_MS = 650, INK_MS = 3000, INK_FADE = 700;
 type Pt = { x: number; y: number; t: number };
 type InkStroke = { p: { x: number; y: number }[]; end: number }; // koordinat halaman (sudah ditambah scroll)
 
+const center = () => ({ x: innerWidth / 2, y: innerHeight / 2 });
 const typing = (e: KeyboardEvent) => { const t = e.target as HTMLElement | null; return !!t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable); };
 /** Blok terdekat yang cukup besar untuk disorot: langkah, paragraf, tabel, gambar, atau kartu. */
 function blockOf(el: Element | null): Element | null {
@@ -66,10 +67,15 @@ export function PresenterMode() {
   // Posisi penunjuk untuk laser dan sorot (overlay tidak menangkap klik, peraga tetap bisa dipakai).
   useEffect(() => {
     if (!on || (tool !== "laser" && tool !== "sorot")) return;
-    const move = (e: PointerEvent) => { setPos({ x: e.clientX, y: e.clientY }); if (tool === "laser") trail.current.push({ x: e.clientX, y: e.clientY, t: performance.now() }); };
+    const at = (x: number, y: number) => { setPos({ x, y }); if (tool === "laser") trail.current.push({ x, y, t: performance.now() }); };
+    const move = (e: PointerEvent) => { if (e.pointerType !== "touch") at(e.clientX, e.clientY); };
+    // Di tablet, menggeser jari dianggap menggulir sehingga pointermove berhenti; touchmove tetap mengirim posisi jari.
+    const touch = (e: TouchEvent) => { const t = e.touches[0]; if (t && !(e.target as Element)?.closest?.("[data-presenter]")) at(t.clientX, t.clientY); };
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", move, { passive: true });
-    return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerdown", move); };
+    window.addEventListener("touchstart", touch, { passive: true });
+    window.addEventListener("touchmove", touch, { passive: true });
+    return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerdown", move); window.removeEventListener("touchstart", touch); window.removeEventListener("touchmove", touch); };
   }, [on, tool]);
 
   // Fokus blok: klik memilih bagian, klik bagian yang sama melepas fokus.
@@ -129,7 +135,7 @@ export function PresenterMode() {
   return <>
     {/* Sorot: layar meredup kecuali lingkaran di sekitar penunjuk. */}
     {tool === "sorot" && <div data-testid="presenter-spot" aria-hidden="true" className="pointer-events-none fixed inset-0 z-[45] transition-[background] duration-75 motion-reduce:transition-none"
-      style={{ background: pos ? `radial-gradient(circle ${radius}px at ${pos.x}px ${pos.y}px, transparent 0, transparent ${radius - 2}px, rgb(15 23 20 / 0.62) ${radius}px)` : "rgb(15 23 20 / 0.62)" }} />}
+      style={{ background: `radial-gradient(circle ${radius}px at ${(pos ?? center()).x}px ${(pos ?? center()).y}px, transparent 0, transparent ${radius - 2}px, rgb(15 23 20 / 0.62) ${radius}px)` }} />}
     {/* Fokus blok. */}
     {tool === "fokus" && focusRect && <div data-testid="presenter-focus" aria-hidden="true" className="pointer-events-none fixed z-[45] rounded-lg ring-4 ring-warning"
       style={{ left: focusRect.left - 6, top: focusRect.top - 6, width: focusRect.width + 12, height: focusRect.height + 12, boxShadow: "0 0 0 200vmax rgb(15 23 20 / 0.55)" }} />}
@@ -145,7 +151,7 @@ export function PresenterMode() {
         <button type="button" aria-label="Perkecil sorot" className="btn btn-xs btn-square btn-ghost" onClick={() => setRadius(r => Math.max(60, r - 30))}><Minus className="size-3.5" aria-hidden="true" /></button>
         <button type="button" aria-label="Perbesar sorot" className="btn btn-xs btn-square btn-ghost" onClick={() => setRadius(r => Math.min(320, r + 30))}><Plus className="size-3.5" aria-hidden="true" /></button></span>}
       <button type="button" aria-label="Tutup mode menjelaskan" title="Tutup (Esc)" className="btn btn-sm btn-square btn-ghost" onClick={close}><X className="size-4" aria-hidden="true" /></button>
-      <p className="hidden w-full px-1.5 pb-0.5 text-[11px] text-base-content/60 sm:block">{tool === "laser" ? "Gerakkan kursor; peraga tetap bisa diklik." : tool === "sorot" ? "Hanya sekitar kursor yang terang. Tombol [ dan ] mengubah ukuran." : tool === "spidol" ? "Coret di layar; coretan hilang sendiri setelah 3 detik." : focusRect ? "Klik bagian yang sama atau Esc untuk melepas fokus." : "Klik satu bagian untuk menyorotnya."}</p>
+      <p className="hidden w-full px-1.5 pb-0.5 text-[11px] text-base-content/60 sm:block">{tool === "laser" ? "Gerakkan kursor atau jari; peraga tetap bisa dipakai." : tool === "sorot" ? "Geser kursor atau jari; hanya sekitarnya yang terang. Ukuran: − / + atau tombol [ ]." : tool === "spidol" ? "Coret di layar; coretan hilang sendiri setelah 3 detik." : focusRect ? "Klik bagian yang sama atau Esc untuk melepas fokus." : "Klik satu bagian untuk menyorotnya."}</p>
     </div>
   </>;
 }

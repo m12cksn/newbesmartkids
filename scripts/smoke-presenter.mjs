@@ -63,4 +63,30 @@ try {
     assert.deepEqual(errors, []); await logout(); await ctx.close();
     console.log(`PASS mode menjelaskan ${width}px: hanya admin, laser, sorot, spidol hilang sendiri, fokus blok, Esc`);
   }
+  // Tablet: sorot dan laser mengikuti jari yang digeser, spidol bisa dipakai dengan sentuhan.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true }), page = await ctx.newPage(); page.setDefaultTimeout(10000);
+    const errors = []; page.on("pageerror", e => errors.push(e.message));
+    await page.goto(`${origin}/masuk`); await page.getByLabel("Username").fill("admin"); await page.getByLabel("PIN").fill("111111"); await page.getByRole("button", { name: "Masuk Sekarang", exact: true }).click(); await page.waitForURL(`${origin}/`);
+    await page.goto(origin + CHAPTER); await page.getByRole("heading", { level: 1 }).waitFor();
+    const cdp = await ctx.newCDPSession(page);
+    const drag = async (pts) => { await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: pts[0][0], y: pts[0][1] }] });
+      for (const [x, y] of pts.slice(1)) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y }] });
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); };
+    await page.getByTestId("presenter-open").tap();
+    const bar = page.getByRole("toolbar", { name: "Mode menjelaskan" }); await bar.waitFor();
+    await bar.getByRole("button", { name: "Sorot", exact: true }).tap();
+    assert.match(await page.getByTestId("presenter-spot").evaluate(e => e.style.background), /384px 512px/, "sorot mulai di tengah layar");
+    await drag([[200, 300], [260, 360], [340, 440], [420, 520], [500, 600]]);
+    assert.match(await page.getByTestId("presenter-spot").evaluate(e => e.style.background), /500px 600px/, "sorot mengikuti jari");
+    await page.screenshot({ path: `${folder}/768-tablet-sorot.png` });
+    await bar.getByRole("button", { name: "Laser", exact: true }).tap();
+    await drag([[100, 300], [200, 320], [300, 340]]);
+    assert.ok(await page.locator("span.rounded-full.bg-\\[\\#e11d2e\\]").count() === 1, "titik laser tampil");
+    await bar.getByRole("button", { name: "Spidol", exact: true }).tap();
+    await drag([[100, 400], [160, 420], [220, 440], [280, 460]]);
+    assert.equal(await page.getByTestId("presenter-canvas").getAttribute("data-ink"), "1", "spidol dengan sentuhan");
+    assert.deepEqual(errors, []); await ctx.close();
+    console.log("PASS mode menjelaskan tablet 768px: sorot dan laser mengikuti jari, spidol dengan sentuhan");
+  }
 } finally { await browser.close(); }
