@@ -11,3 +11,8 @@ Mode menjelaskan untuk admin di setiap halaman bab (`src/components/learn/Presen
 ## Validasi
 - `scripts/smoke-presenter.mjs` (build dengan server Supabase tiruan): tamu dan siswa tidak melihat tombol; admin bisa memakai keempat alat; spidol hilang setelah 3 detik; fokus mengikuti batas blok; Esc melepas fokus lalu menutup mode; tidak ada overflow di 320 dan 1280.
 - CI: `.github/workflows/presenter-qa.yml`.
+
+## Perbaikan tablet (fix/presenter-touch)
+- Di tablet, menggeser jari dianggap menggulir sehingga `pointermove` berhenti; sorot dan laser sekarang juga membaca `touchstart`/`touchmove`, jadi mengikuti jari (halaman tetap bisa tergulir). Sentuhan pada toolbar diabaikan.
+- Sorot mulai di tengah layar sebelum ada kursor atau sentuhan.
+- Smoke: tablet 768 × 1024 dengan sentuhan CDP (geser jari) untuk sorot, laser, dan spidol.
