@@ -1,7 +1,7 @@
 import type { MaterialItem } from "@/data/materials";
 
 const meta: MaterialItem = {
-  id: "kelas-9-nilai-mutlak", classId: 9, chapter: 5, slug: "nilai-mutlak-linear-satu-variabel",
+  id: "kelas-10-nilai-mutlak", classId: 10, chapter: 1, slug: "nilai-mutlak-linear-satu-variabel",
   title: "Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel", topic: "Aljabar",
   description: "Nilai mutlak sebagai jarak, definisi dan bentuk tanpa tanda mutlak, persamaan |ax + b| = c, persamaan dengan dua nilai mutlak dan grafiknya, serta pertidaksamaan nilai mutlak pada garis bilangan.",
   videoStatus: "coming_soon",

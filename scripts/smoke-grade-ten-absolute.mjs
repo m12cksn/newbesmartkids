@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
-import { assessment, practice, sections, SEP, NONE, cells, plain, SHAPES } from "../src/data/grade-nine-absolute.ts";
+import { assessment, practice, sections, SEP, NONE, cells, plain, SHAPES } from "../src/data/grade-ten-absolute.ts";
 
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
-const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/grade-nine-absolute-screenshots";
+const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/grade-ten-absolute-screenshots";
 await mkdir(folder, { recursive: true });
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_EXECUTABLE });
 try {
@@ -38,7 +38,7 @@ try {
         else if (p.kind === "tf") { for (const [k, c] of x.entries()) await group(`Pernyataan ${k + 1}`).getByRole("button", { name: c === "B" ? "Benar" : "Salah", exact: true }).click(); }
       }
     }
-    await page.goto(`${origin}/kelas/strategi-matematika-kelas-9`);
+    await page.goto(`${origin}/kelas/matematika-lanjutan-kelas-10`);
     await page.locator(`a[href$="/materi/nilai-mutlak-linear-satu-variabel"]`).first().click();
     await page.getByRole("heading", { name: "Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel", level: 1 }).waitFor();
     await page.getByText("Video pembelajaran segera hadir").waitFor();
@@ -82,6 +82,6 @@ try {
     await page.getByText(/Jawaban benar .*0,35/).waitFor();
     await fit("hasil"); await shot("result");
     assert.deepEqual(errors, []); await page.close();
-    console.log(`PASS kelas 9 bab 5 at ${width}px: 6 peraga, 24 latihan (1 salah disengaja), 24 evaluasi (nilai mutlak, bentuk per daerah, himpunan penyelesaian, tabel grafik, pilih grafik, interval pada garis bilangan, benar/salah), skor dan pembahasan`);
+    console.log(`PASS kelas 10 bab 1 at ${width}px: 6 peraga, 24 latihan (1 salah disengaja), 24 evaluasi (nilai mutlak, bentuk per daerah, himpunan penyelesaian, tabel grafik, pilih grafik, interval pada garis bilangan, benar/salah), skor dan pembahasan`);
   }
 } finally { await browser.close(); }

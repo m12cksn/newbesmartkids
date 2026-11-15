@@ -48,7 +48,7 @@ try {
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     // Kelas lain memakai gambar topik yang berbeda.
     await page.goto(`${origin}/kelas/strategi-matematika-kelas-9`);
-    assert.ok(await page.locator("#daftar-bab a[id^='bab-']").count() >= 5, "bab kelas 9");
+    assert.equal(await page.locator("#daftar-bab a[id^='bab-']").count(), 4);
     await page.screenshot({ path: `${folder}/${width}-kelas-9.png`, fullPage: true });
     assert.deepEqual(errors, []); await page.close();
     console.log(`PASS halaman kelas ${width}px: gambar, urutan bab, ${nums.length} kartu, bab gratis, tanpa scroll horizontal`);

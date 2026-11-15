@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assessment, practice, topics, sections, correct, ready, formatAnswer, SEP, fields, num, NONE } from "../src/data/grade-nine-absolute.ts";
+import { assessment, practice, topics, sections, correct, ready, formatAnswer, SEP, fields, num, NONE } from "../src/data/grade-ten-absolute.ts";
 
 assert.equal(topics.length, 3); assert.deepEqual(sections.map(s => s.code), ["A.1", "A.2", "B.1", "B.2", "C.1", "C.2"]);
 assert.equal(new Set(sections.map(s => s.lab)).size, 6, "peraga berbeda di setiap bagian");
@@ -62,4 +62,4 @@ for (const q of all) {
 }
 assert.equal(num("2/3"), 2 / 3); assert.equal(num("−4"), -4); assert.equal(num("1,5"), 1.5);
 console.log(`Penyelesaian dan interval dihitung ulang pada grid halus: ${rechecked}`);
-console.log(`Data Kelas 9 Bab 5 valid: ${all.length} soal.`);
+console.log(`Data Kelas 10 Bab 1 valid: ${all.length} soal.`);

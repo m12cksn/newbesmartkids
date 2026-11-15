@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { M, plainMath } from "./GradeEightPowersArt";
-import { idn, type Fn, type Scene, type Shade } from "@/data/grade-nine-absolute";
+import { idn, type Fn, type Scene, type Shade } from "@/data/grade-ten-absolute";
 
 export { M, plainMath };
 const ink = "#1f3b30", soft = "#5b6b64", accent = "#1c64b5", warm = "#c2410c", fill = "#2b8a3e";

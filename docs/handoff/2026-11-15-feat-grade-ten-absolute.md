@@ -1,7 +1,7 @@
-# 2026-11-15 — feat/grade-nine-absolute
+# 2026-11-15 — feat/grade-ten-absolute
 
 ## Ruang lingkup
-Bab baru **Kelas 9 Bab 5 — Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel** dari PDF Buku Siswa Matematika Kelas X Bab 1 (hlm. 9–40). Pemilik meminta "Kelas 9 Bab 3"; Bab 3 dan Bab 4 Kelas 9 sudah terisi, jadi bab ini ditempatkan sebagai Bab 5 dan bisa dipindah ke Kelas 10 bila diminta.
+Bab baru **Kelas 10 Bab 1 — Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel** dari PDF Buku Siswa Matematika Kelas X Bab 1 (hlm. 9–40). Ditempatkan sesuai buku sumber: Kelas 10 (Kelas X), Bab 1. Ini bab pertama di Kelas 10.
 
 - A. Konsep nilai mutlak: A.1 jarak (peraga langkah maju/mundur), A.2 definisi dan bentuk tanpa tanda mutlak (peraga cabang aktif).
 - B. Persamaan: B.1 |ax + b| = c (grafik + garis y = c, banyak penyelesaian), B.2 dua nilai mutlak (titik potong dua grafik + tabel).
@@ -10,9 +10,9 @@ Bab baru **Kelas 9 Bab 5 — Persamaan dan Pertidaksamaan Nilai Mutlak Linear Sa
 - Bentuk jawaban mengikuti buku: isian nilai, bentuk per daerah, himpunan penyelesaian (termasuk "tidak ada penyelesaian"), tabel titik grafik, pilih sketsa grafik, benar/salah, dan interval yang dipilih lalu tampil di garis bilangan.
 
 ## Berkas
-- `src/data/grade-nine-absolute.ts`, `src/components/learn/GradeNineAbsolute.tsx`, `src/components/learn/GradeNineAbsoluteArt.tsx`
-- `src/chapters/kelas-9-nilai-mutlak/{meta.ts,Chapter.tsx}` (+ registri hasil `npm run chapters`)
-- `scripts/verify-grade-nine-absolute.mjs`, `scripts/smoke-grade-nine-absolute.mjs`, `.github/workflows/grade-nine-absolute-qa.yml`
+- `src/data/grade-ten-absolute.ts`, `src/components/learn/GradeTenAbsolute.tsx`, `src/components/learn/GradeTenAbsoluteArt.tsx`
+- `src/chapters/kelas-10-nilai-mutlak/{meta.ts,Chapter.tsx}` (+ registri hasil `npm run chapters`)
+- `scripts/verify-grade-ten-absolute.mjs`, `scripts/smoke-grade-ten-absolute.mjs`, `.github/workflows/grade-ten-absolute-qa.yml`
 
 ## Validasi
 - Verify: kunci setiap soal benar, jawaban salah ditolak, akar persamaan dan interval dihitung ulang pada grid halus −40..40 (32 bagian), urutan subtopik/level, posisi jawaban pilihan 0,0,2,1,2.

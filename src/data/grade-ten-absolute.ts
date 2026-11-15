@@ -1,6 +1,6 @@
 /**
- * Kelas 9 Bab 5 - Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel
- * (sumber: Buku Siswa Matematika Kelas X, Bab 1, hlm. 9-40; ditempatkan di Kelas 9 atas permintaan pemilik).
+ * Kelas 10 Bab 1 - Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel
+ * (sumber: Buku Siswa Matematika Kelas X, Bab 1, hlm. 9-40).
  * A. Konsep nilai mutlak (1.1)  B. Persamaan nilai mutlak linear satu variabel (1.2)  C. Pertidaksamaan (1.3).
  * Bentuk jawaban mengikuti buku: menentukan nilai mutlak, menulis bentuk tanpa tanda mutlak per daerah
  * (Latihan 1.1-1.2), himpunan penyelesaian persamaan (termasuk "tidak ada penyelesaian"), melengkapi tabel

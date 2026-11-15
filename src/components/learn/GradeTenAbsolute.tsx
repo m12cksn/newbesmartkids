@@ -3,11 +3,11 @@
 import { ArrowLeft, ArrowRight, Footprints, Minus, Plus, RotateCcw } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
-import { AbsGraph, fnValue, M, NumberLine, plainMath, SceneView } from "./GradeNineAbsoluteArt";
+import { AbsGraph, fnValue, M, NumberLine, plainMath, SceneView } from "./GradeTenAbsoluteArt";
 import {
   assessment, cells, correct, fmt, formatAnswer, idn, intervalText, NONE, num, oneEnd, practice, ready, sections, SEP, SHAPES, splitParts, topics, twoEnds,
   type Fn, type Part, type PQuestion, type Shape,
-} from "@/data/grade-nine-absolute";
+} from "@/data/grade-ten-absolute";
 
 /* ====================================================================== */
 /* Bagian kecil                                                            */
@@ -198,14 +198,14 @@ function Answer({ q, value, record, checked }: { q: PQuestion; value: string; re
   return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
-export default function GradeNineAbsolute() {
+export default function GradeTenAbsolute() {
   const [idx, setIdx] = useState(0);
   const [mode, setMode] = useState<"learn" | "practice" | "assessment">("learn");
   const s = sections[idx], t = s.topic, Lab = labs[s.lab];
   const go = (i: number) => { setIdx(i); setMode("learn"); };
   const inTopic = sections.map((x, i) => ({ x, i })).filter(o => o.x.topic === t);
   return <section className="mx-auto max-w-6xl overflow-x-clip px-4 py-8 sm:px-8">
-    <p className="text-sm font-semibold text-success">Kelas 9, Bab 5</p>
+    <p className="text-sm font-semibold text-success">Kelas 10, Bab 1</p>
     <h1 className="mt-1 text-3xl font-extrabold sm:text-5xl">Persamaan dan Pertidaksamaan Nilai Mutlak Linear Satu Variabel</h1>
     <p className="mt-3 max-w-3xl text-base-content/70">Memahami nilai mutlak sebagai jarak, menuliskannya tanpa tanda mutlak, menyelesaikan persamaan dan pertidaksamaan nilai mutlak, serta membaca penyelesaiannya pada garis bilangan dan grafik.</p>
     <div className="mt-6 grid overflow-hidden rounded-xl border border-base-300 bg-base-100 md:grid-cols-2">
@@ -252,7 +252,7 @@ export default function GradeNineAbsolute() {
         </div>
       </> : <GradeFourQuiz<PQuestion> key={`${mode}-${idx}`}
         questions={mode === "practice" ? practice[idx] : assessment}
-        title={mode === "practice" ? `Latihan ${s.code} ${plainMath(s.title)}` : "Evaluasi Bab 5"}
+        title={mode === "practice" ? `Latihan ${s.code} ${plainMath(s.title)}` : "Evaluasi Bab 1"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderText={text => <M text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
