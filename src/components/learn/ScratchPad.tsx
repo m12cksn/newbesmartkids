@@ -16,7 +16,7 @@ const COLORS = { pencil: "#3b4a44", pen: "#d93a2b" } as const;
 const MAX_SHEETS = 10, MAX_STROKES = 600;
 const DESKTOP = "(min-width: 900px)";
 // Seberapa kuat titik tulisan dihaluskan (0 = mentah, mendekati 1 = sangat lembut tapi tertinggal).
-const SMOOTH = 0.5;
+const SMOOTH = 0.4;
 
 const keyFor = (path: string) => `bsk-coret:${path}`;
 function load(path: string): Sheet[] {
@@ -40,6 +40,17 @@ function drawStroke(ctx: CanvasRenderingContext2D, s: Stroke) {
   if (p.length > 2) ctx.lineTo(p[p.length - 2], p[p.length - 1]);
   ctx.stroke();
 }
+// Gambar hanya bagian baru dari coretan yang sedang berjalan (mulai dari titik ke-`from`), dengan kurva yang sama seperti drawStroke.
+function drawTail(ctx: CanvasRenderingContext2D, s: Stroke, from: number) {
+  const p = s.p, n = p.length / 2; if (n < 2 || from >= n) return;
+  ctx.strokeStyle = COLORS[s.c]; ctx.lineWidth = s.w; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath();
+  const start = Math.max(from, 1);
+  if (start === 1) { ctx.moveTo(p[0], p[1]); ctx.lineTo((p[0] + p[2]) / 2, (p[1] + p[3]) / 2); }
+  else ctx.moveTo((p[2 * start - 4] + p[2 * start - 2]) / 2, (p[2 * start - 3] + p[2 * start - 1]) / 2);
+  for (let j = Math.max(start, 2); j < n; j++) ctx.quadraticCurveTo(p[2 * j - 2], p[2 * j - 1], (p[2 * j - 2] + p[2 * j]) / 2, (p[2 * j - 1] + p[2 * j + 1]) / 2);
+  ctx.stroke();
+}
 const hits = (s: Stroke, x: number, y: number, r: number) => { for (let i = 0; i < s.p.length; i += 2) if (Math.hypot(s.p[i] - x, s.p[i + 1] - y) <= r + s.w) return true; return false; };
 
 export function ScratchPad() {
@@ -59,12 +70,25 @@ export function ScratchPad() {
   const frame = useRef(0);
   const rect = useRef<DOMRect | null>(null);
   const raw = useRef<[number, number]>([0, 0]); // titik asli terakhir (sebelum dihaluskan)
+  const drawn = useRef(0); // jumlah titik coretan berjalan yang sudah tergambar
+  const activeId = useRef<number | null>(null); // hanya satu penunjuk (pena/jari) yang boleh menulis dalam satu waktu
+  const pending = useRef<{ path: string; sheets: Sheet[] } | null>(null);
+  const saveTimer = useRef(0);
   const sheetsRef = useRef(sheets);
   const pageRef = useRef(page);
   useEffect(() => { sheetsRef.current = sheets; pageRef.current = page; }, [sheets, page]);
 
+  // Simpan ke localStorage ditunda sebentar supaya tidak menahan penulisan; langsung disimpan saat halaman ditutup atau berpindah.
+  const flush = useCallback(() => { window.clearTimeout(saveTimer.current); const q = pending.current; pending.current = null; if (q) save(q.path, q.sheets); }, []);
+  const scheduleSave = useCallback((path: string, sheets: Sheet[]) => { pending.current = { path, sheets }; window.clearTimeout(saveTimer.current); saveTimer.current = window.setTimeout(flush, 500); }, [flush]);
+  useEffect(() => {
+    const onHide = () => { if (document.visibilityState === "hidden") flush(); };
+    addEventListener("pagehide", flush); document.addEventListener("visibilitychange", onHide);
+    return () => { removeEventListener("pagehide", flush); document.removeEventListener("visibilitychange", onHide); flush(); };
+  }, [flush]);
+
   // Muat coretan halaman ini.
-  useEffect(() => { void Promise.resolve().then(() => { const s = load(pathname); setSheets(s); setPage(s.length - 1); }); }, [pathname]);
+  useEffect(() => { void Promise.resolve().then(() => { const s = load(pathname); setSheets(s); setPage(s.length - 1); }); return () => flush(); }, [pathname, flush]);
   useEffect(() => { const m = matchMedia(DESKTOP); const f = () => setDesktop(m.matches); f(); m.addEventListener("change", f); return () => m.removeEventListener("change", f); }, []);
 
   // Coretan yang sudah jadi digambar ke kanvas cadangan, sehingga saat menulis hanya coretan yang sedang berjalan yang digambar ulang.
@@ -107,7 +131,7 @@ export function ScratchPad() {
     return () => { b.paddingBottom = ""; b.paddingRight = ""; };
   }, [open, desktop, height]);
 
-  const commit = useCallback((next: Sheet[]) => { setSheets(next); save(pathname, next); }, [pathname]);
+  const commit = useCallback((next: Sheet[]) => { setSheets(next); scheduleSave(pathname, next); }, [pathname, scheduleSave]);
   const undo = useCallback(() => { if (!sheets[page]?.length) return; commit(sheets.map((x, i) => (i === page ? x.slice(0, -1) : x))); }, [commit, sheets, page]);
 
   useEffect(() => {
@@ -129,7 +153,7 @@ export function ScratchPad() {
     raw.current = [x, y];
     const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
     const nx = last ? x : lx + (x - lx) * (1 - SMOOTH), ny = last ? y : ly + (y - ly) * (1 - SMOOTH);
-    if (Math.hypot(nx - lx, ny - ly) < (last ? 0.3 : 0.8)) return;
+    if (Math.hypot(nx - lx, ny - ly) < (last ? 0.3 : 0.4)) return;
     s.p.push(Math.round(nx * 10) / 10, Math.round(ny * 10) / 10);
   }
   function down(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -137,29 +161,36 @@ export function ScratchPad() {
     // Telapak tangan: abaikan sentuhan jari selama stylus baru saja dipakai.
     if (e.pointerType === "touch" && Date.now() - penSeen.current < 1500) return;
     if (e.button > 0) return;
+    // Sudah ada yang menulis: sentuhan lain diabaikan, kecuali stylus yang mengambil alih.
+    if (live.current && activeId.current !== null && activeId.current !== e.pointerId) { if (e.pointerType !== "pen") return; live.current = null; }
     e.preventDefault(); window.getSelection()?.removeAllRanges(); // jangan sampai teks di sekitar kertas ikut terseleksi
-    e.currentTarget.setPointerCapture(e.pointerId);
+    e.currentTarget.setPointerCapture(e.pointerId); activeId.current = e.pointerId;
     rect.current = e.currentTarget.getBoundingClientRect();
     const [x, y] = at(e.clientX, e.clientY);
     if (tool === "eraser") { erase(x, y); live.current = { c: "pencil", w: 0, p: [] }; return; }
     const base = tool === "pen" ? 2.4 : 2;
     const w = e.pointerType === "pen" && e.pressure > 0 ? base * (0.6 + e.pressure) : base;
-    live.current = { c: tool, w: Math.round(w * 10) / 10, p: [x, y] }; raw.current = [x, y];
+    live.current = { c: tool, w: Math.round(w * 10) / 10, p: [x, y] }; raw.current = [x, y]; drawn.current = 1;
     redraw();
   }
   function move(e: React.PointerEvent<HTMLCanvasElement>) {
-    const s = live.current; if (!s) return;
+    const s = live.current; if (!s || e.pointerId !== activeId.current) return;
     // Stylus dan layar modern mengirim lebih banyak titik daripada satu per frame; pakai semuanya agar garis halus.
     const evs = e.nativeEvent.getCoalescedEvents?.();
     for (const ev of evs && evs.length ? evs : [e.nativeEvent]) {
       const [x, y] = at(ev.clientX, ev.clientY);
       if (tool === "eraser") erase(x, y); else extend(s, x, y);
     }
-    if (tool !== "eraser") redraw();
+    if (tool === "eraser") return;
+    // Gambar langsung hanya bagian baru, tanpa menunggu frame berikutnya dan tanpa menggambar ulang seluruh kertas.
+    const ctx = canvasRef.current?.getContext("2d"); if (!ctx) return;
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+    drawTail(ctx, s, drawn.current); drawn.current = s.p.length / 2;
   }
-  function up() {
-    const s = live.current; live.current = null; if (!s) return;
-    if (tool === "eraser") { save(pathname, sheetsRef.current); return; }
+  function up(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (e.pointerId !== activeId.current) return;
+    const s = live.current; live.current = null; activeId.current = null; if (!s) return;
+    if (tool === "eraser") { scheduleSave(pathname, sheetsRef.current); return; }
     extend(s, raw.current[0], raw.current[1], true); // ujung garis tepat di titik angkat
     const cur = sheetsRef.current;
     const next = cur.map((v, i) => (i === pageRef.current ? [...v, s].slice(-MAX_STROKES) : v));
@@ -213,7 +244,7 @@ export function ScratchPad() {
       style={{ backgroundColor: "#fff", backgroundImage: "linear-gradient(#dbe7f3 1px, transparent 1px), linear-gradient(90deg, #dbe7f3 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
       <canvas ref={canvasRef} data-testid="scratch-canvas" aria-label={`Kertas ${page + 1}, ${strokes} coretan. Gambar dengan jari, stylus, atau mouse.`} role="img"
         className={`absolute inset-0 touch-none select-none ${tool === "eraser" ? "cursor-cell" : "cursor-crosshair"}`}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} />
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up} />
     </div>
     <div className="flex items-center justify-between gap-2 border-t border-base-300 px-2 py-1.5">
       <div className="flex items-center gap-0.5">
