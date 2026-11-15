@@ -26,6 +26,7 @@ try {
     await page.getByTestId("scratch-open").click();
     const pad = page.getByTestId("scratch"); await pad.waitFor();
     const box = await pad.boundingBox();
+    assert.equal(await pad.evaluate(el => getComputedStyle(el).userSelect), "none", "teks di kertas tidak bisa terseleksi saat menulis");
     if (width < 900) { assert.ok(box.y > 800 * 0.3, "soal tetap terlihat di atas kertas"); assert.equal(Math.round(box.width), width); }
     else { assert.equal(Math.round(box.width), 440); assert.ok(await page.evaluate(() => document.body.style.paddingRight === "440px")); }
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `overflow ${width}`);

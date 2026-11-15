@@ -15,6 +15,8 @@ type Sheet = Stroke[];
 const COLORS = { pencil: "#3b4a44", pen: "#d93a2b" } as const;
 const MAX_SHEETS = 10, MAX_STROKES = 600;
 const DESKTOP = "(min-width: 900px)";
+// Seberapa kuat titik tulisan dihaluskan (0 = mentah, mendekati 1 = sangat lembut tapi tertinggal).
+const SMOOTH = 0.5;
 
 const keyFor = (path: string) => `bsk-coret:${path}`;
 function load(path: string): Sheet[] {
@@ -52,6 +54,11 @@ export function ScratchPad() {
   const boxRef = useRef<HTMLDivElement>(null);
   const live = useRef<Stroke | null>(null);
   const penSeen = useRef(0);
+  const baseRef = useRef<HTMLCanvasElement | null>(null); // coretan yang sudah jadi, digambar sekali lalu ditempel
+  const baseDirty = useRef(true);
+  const frame = useRef(0);
+  const rect = useRef<DOMRect | null>(null);
+  const raw = useRef<[number, number]>([0, 0]); // titik asli terakhir (sebelum dihaluskan)
   const sheetsRef = useRef(sheets);
   const pageRef = useRef(page);
   useEffect(() => { sheetsRef.current = sheets; pageRef.current = page; }, [sheets, page]);
@@ -60,19 +67,36 @@ export function ScratchPad() {
   useEffect(() => { void Promise.resolve().then(() => { const s = load(pathname); setSheets(s); setPage(s.length - 1); }); }, [pathname]);
   useEffect(() => { const m = matchMedia(DESKTOP); const f = () => setDesktop(m.matches); f(); m.addEventListener("change", f); return () => m.removeEventListener("change", f); }, []);
 
-  const redraw = useCallback(() => {
+  // Coretan yang sudah jadi digambar ke kanvas cadangan, sehingga saat menulis hanya coretan yang sedang berjalan yang digambar ulang.
+  const paint = useCallback(() => {
+    frame.current = 0;
     const c = canvasRef.current, box = boxRef.current; if (!c || !box) return;
     const dpr = window.devicePixelRatio || 1, w = box.clientWidth, h = box.clientHeight;
-    if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = `${w}px`; c.style.height = `${h}px`; }
+    const pw = Math.round(w * dpr), ph = Math.round(h * dpr);
+    if (c.width !== pw || c.height !== ph) { c.width = pw; c.height = ph; c.style.width = `${w}px`; c.style.height = `${h}px`; baseDirty.current = true; }
     const ctx = c.getContext("2d"); if (!ctx) return;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
-    for (const s of sheetsRef.current[pageRef.current] ?? []) drawStroke(ctx, s);
-    if (live.current) drawStroke(ctx, live.current);
+    const base = baseRef.current ?? (baseRef.current = document.createElement("canvas"));
+    if (base.width !== pw || base.height !== ph) { base.width = pw; base.height = ph; baseDirty.current = true; }
+    if (baseDirty.current) {
+      const b = base.getContext("2d");
+      if (b) {
+        b.setTransform(dpr, 0, 0, dpr, 0, 0); b.clearRect(0, 0, w, h);
+        for (const s of sheetsRef.current[pageRef.current] ?? []) drawStroke(b, s);
+        baseDirty.current = false;
+      }
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, pw, ph); ctx.drawImage(base, 0, 0);
+    if (live.current) { ctx.setTransform(dpr, 0, 0, dpr, 0, 0); drawStroke(ctx, live.current); }
   }, []);
-  useEffect(() => { if (open) redraw(); }, [open, sheets, page, height, desktop, redraw]);
+  const redraw = useCallback((full = false) => {
+    if (full) baseDirty.current = true;
+    if (!frame.current) frame.current = requestAnimationFrame(paint);
+  }, [paint]);
+  useEffect(() => { if (open) redraw(true); }, [open, sheets, page, height, desktop, redraw]);
   useEffect(() => {
     if (!open || !boxRef.current) return;
-    const ro = new ResizeObserver(() => redraw()); ro.observe(boxRef.current); return () => ro.disconnect();
+    const ro = new ResizeObserver(() => redraw(true)); ro.observe(boxRef.current);
+    return () => { ro.disconnect(); cancelAnimationFrame(frame.current); frame.current = 0; };
   }, [open, redraw]);
 
   // Beri ruang untuk kertas agar soal tetap bisa dilihat dan digulir.
@@ -95,38 +119,51 @@ export function ScratchPad() {
     addEventListener("keydown", onKey); return () => removeEventListener("keydown", onKey);
   }, [open, undo]);
 
-  const point = (e: React.PointerEvent) => { const r = canvasRef.current!.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10]; };
+  const at = (clientX: number, clientY: number): [number, number] => { const r = rect.current ?? canvasRef.current!.getBoundingClientRect(); return [Math.round((clientX - r.left) * 10) / 10, Math.round((clientY - r.top) * 10) / 10]; };
   function erase(x: number, y: number) {
     const cur = sheetsRef.current, s = cur[pageRef.current], keep = s.filter(st => !hits(st, x, y, 10));
     if (keep.length !== s.length) { const next = cur.map((v, i) => (i === pageRef.current ? keep : v)); sheetsRef.current = next; setSheets(next); }
+  }
+  // Tambah satu titik ke coretan yang sedang berjalan; titik dihaluskan agar garis tidak bergerigi.
+  function extend(s: Stroke, x: number, y: number, last = false) {
+    raw.current = [x, y];
+    const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
+    const nx = last ? x : lx + (x - lx) * (1 - SMOOTH), ny = last ? y : ly + (y - ly) * (1 - SMOOTH);
+    if (Math.hypot(nx - lx, ny - ly) < (last ? 0.3 : 0.8)) return;
+    s.p.push(Math.round(nx * 10) / 10, Math.round(ny * 10) / 10);
   }
   function down(e: React.PointerEvent<HTMLCanvasElement>) {
     if (e.pointerType === "pen") penSeen.current = Date.now();
     // Telapak tangan: abaikan sentuhan jari selama stylus baru saja dipakai.
     if (e.pointerType === "touch" && Date.now() - penSeen.current < 1500) return;
     if (e.button > 0) return;
+    e.preventDefault(); window.getSelection()?.removeAllRanges(); // jangan sampai teks di sekitar kertas ikut terseleksi
     e.currentTarget.setPointerCapture(e.pointerId);
-    const [x, y] = point(e);
+    rect.current = e.currentTarget.getBoundingClientRect();
+    const [x, y] = at(e.clientX, e.clientY);
     if (tool === "eraser") { erase(x, y); live.current = { c: "pencil", w: 0, p: [] }; return; }
     const base = tool === "pen" ? 2.4 : 2;
     const w = e.pointerType === "pen" && e.pressure > 0 ? base * (0.6 + e.pressure) : base;
-    live.current = { c: tool, w: Math.round(w * 10) / 10, p: [x, y] };
+    live.current = { c: tool, w: Math.round(w * 10) / 10, p: [x, y] }; raw.current = [x, y];
     redraw();
   }
   function move(e: React.PointerEvent<HTMLCanvasElement>) {
     const s = live.current; if (!s) return;
-    const [x, y] = point(e);
-    if (tool === "eraser") { erase(x, y); return; }
-    const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
-    if (Math.hypot(x - lx, y - ly) < 1.2) return;
-    s.p.push(x, y); redraw();
+    // Stylus dan layar modern mengirim lebih banyak titik daripada satu per frame; pakai semuanya agar garis halus.
+    const evs = e.nativeEvent.getCoalescedEvents?.();
+    for (const ev of evs && evs.length ? evs : [e.nativeEvent]) {
+      const [x, y] = at(ev.clientX, ev.clientY);
+      if (tool === "eraser") erase(x, y); else extend(s, x, y);
+    }
+    if (tool !== "eraser") redraw();
   }
   function up() {
     const s = live.current; live.current = null; if (!s) return;
     if (tool === "eraser") { save(pathname, sheetsRef.current); return; }
+    extend(s, raw.current[0], raw.current[1], true); // ujung garis tepat di titik angkat
     const cur = sheetsRef.current;
     const next = cur.map((v, i) => (i === pageRef.current ? [...v, s].slice(-MAX_STROKES) : v));
-    commit(next);
+    sheetsRef.current = next; commit(next); redraw(true);
   }
   function newSheet() { const cur = sheetsRef.current; if (cur[cur.length - 1].length === 0) { setPage(cur.length - 1); return; } const next = [...cur, []].slice(-MAX_SHEETS); commit(next); setPage(next.length - 1); }
   function clearSheet() {
@@ -158,8 +195,9 @@ export function ScratchPad() {
 
   const count = sheets.length, strokes = sheets[page]?.length ?? 0;
   return <section role="dialog" aria-modal="false" aria-label="Kertas coret" data-testid="scratch"
-    className={`fixed z-40 flex flex-col border-base-300 bg-base-100 shadow-[0_-8px_24px_-12px_rgb(23_53_42/0.35)] print:hidden ${desktop ? "inset-y-0 right-0 w-[440px] border-l" : "inset-x-0 bottom-0 rounded-t-2xl border-t"}`}
-    style={desktop ? undefined : { height: `${height}vh` }}>
+    onContextMenu={e => e.preventDefault()}
+    className={`fixed z-40 flex select-none flex-col border-base-300 bg-base-100 shadow-[0_-8px_24px_-12px_rgb(23_53_42/0.35)] print:hidden ${desktop ? "inset-y-0 right-0 w-[440px] border-l" : "inset-x-0 bottom-0 rounded-t-2xl border-t"}`}
+    style={{ WebkitUserSelect: "none", WebkitTouchCallout: "none", ...(desktop ? null : { height: `${height}vh` }) }}>
     {!desktop && <button type="button" aria-label="Tarik untuk mengubah tinggi kertas" onPointerDown={drag} onKeyDown={e => { if (e.key === "ArrowUp") setHeight(h => Math.min(88, h + 5)); if (e.key === "ArrowDown") setHeight(h => Math.max(30, h - 5)); }}
       className="flex h-6 w-full cursor-ns-resize touch-none items-center justify-center text-base-content/40"><GripHorizontal className="size-5" aria-hidden="true" /></button>}
     <div className={`flex items-center justify-between gap-1 border-b border-base-300 px-2 ${desktop ? "py-2" : "pb-2"}`}>
