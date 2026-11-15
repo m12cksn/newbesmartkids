@@ -43,8 +43,8 @@ try {
     await steps.nth(2).click(); await page.waitForTimeout(400);
     assert.ok(await page.locator(`#bab-${nums[2]}`).evaluate(e => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.top < innerHeight; }), "lompat ke kartu");
     // Kelas tanpa bab tetap rapi.
-    await page.goto(`${origin}/kelas/persiapan-matematika-kelas-12`);
-    await page.getByText("Bab Kelas 12 sedang disusun.").waitFor();
+    await page.goto(`${origin}/kelas/penalaran-kuantitatif-kelas-11`);
+    await page.getByText("Bab Kelas 11 sedang disusun.").waitFor();
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     // Kelas lain memakai gambar topik yang berbeda.
     await page.goto(`${origin}/kelas/strategi-matematika-kelas-9`);
