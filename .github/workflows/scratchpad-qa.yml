@@ -1,0 +1,36 @@
+name: Scratchpad QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  scratchpad:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npx eslint src/components/learn/ScratchPad.tsx "src/app/kelas/[slug]/materi/[materiSlug]/layout.tsx" "src/app/mastering-penjumlahan-pengurangan/[level]/layout.tsx" "src/app/mastering-perkalian-pembagian/[level]/layout.tsx" scripts/smoke-scratchpad.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-scratch.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node scripts/smoke-scratchpad.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scratchpad-screenshots
+          path: /tmp/scratchpad-screenshots
+          if-no-files-found: ignore
