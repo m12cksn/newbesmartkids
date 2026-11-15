@@ -21,22 +21,17 @@ const topics = [
 
 function Symbol({ row }: { row: Datum }) {
   if (row.icon === "pensil") {
-    return <svg aria-hidden="true" className="size-5 shrink-0" viewBox="0 0 24 24">
+    return <svg aria-hidden="true" className="size-6 shrink-0" viewBox="0 0 24 24">
       <path d="m3 17 13-13 4 4L7 21 2 22z" fill="#e9bd88"/><path d="m3 17 13-13 4 4L7 21z" fill={row.color}/><path d="m2 22 1-4 3 3z" fill="#1e293b"/>
     </svg>;
   }
-  if (row.icon === "belimbing" || row.icon === "jambu") {
-    return <svg aria-hidden="true" className="size-6 shrink-0" viewBox="0 0 24 24">
-      {row.icon === "belimbing"
-        ? <path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#facc15" stroke="#a16207"/>
-        : <path d="M10 4c-2 2-2 6-6 12-2 6 16 6 16 0-4-6-4-10-6-12z" fill="#e11d48" stroke="#9f1239"/>}
-    </svg>;
-  }
   const illustrations = {
-    "kaus-pendek": <path d="m8 3-6 4 3 5 3-2v11h8V10l3 2 3-5-6-4c-2 3-6 3-8 0Z" fill="#ea580c" stroke="#9a3412"/>,
-    "kaus-panjang": <path d="m8 3-5 3-2 14 4 1 3-11v12h8V10l3 11 4-1-2-14-5-3c-2 3-6 3-8 0Z" fill="#0891b2" stroke="#155e75"/>,
-    celana: <path d="M5 3h14l1 19h-6l-2-11-2 11H4z" fill="#9333ea" stroke="#581c87"/>,
-    tomat: <><circle cx="12" cy="14" r="8" fill="#dc2626"/><path d="m12 7 1-5 2 4 5 1-5 2-3 3-2-3-5-2z" fill="#15803d"/></>,
+    belimbing: <><path d="m12 2 3.2 5.7 6.6 1.2-4.6 4.8.8 6.7-6-2.9-6 2.9.8-6.7-4.6-4.8 6.6-1.2Z" fill="#fde047" stroke="#a16207"/><path d="m12 3 1.5 8 7.4-1.8-6 4.3 2.3 5.8-5.2-4-5.2 4 2.3-5.8-6-4.3 7.4 1.8Z" fill="#f59e0b"/><circle cx="12" cy="12" r="1" fill="#854d0e"/></>,
+    jambu: <><path d="M10 4c-2 2-2 6-6 12-2 6 16 6 16 0-4-6-4-10-6-12Z" fill="#f43f5e" stroke="#9f1239"/><path d="M10 7c-1 4-4 7-4 9" fill="none" stroke="#fda4af" strokeWidth="2" strokeLinecap="round"/><path d="M8 19q4-3 8 0" fill="none" stroke="#9f1239"/><path d="m12 5 1-3" stroke="#166534" strokeWidth="2"/></>,
+    "kaus-pendek": <><path d="m8 3-6 4 3 5 3-2v11h8V10l3 2 3-5-6-4c-2 3-6 3-8 0Z" fill="#fb923c" stroke="#9a3412"/><path d="M9 4q3 4 6 0M8 19h8" fill="none" stroke="#fff7ed"/><path d="M13 9h2v3h-2z" fill="#9a3412"/></>,
+    "kaus-panjang": <><path d="m8 3-5 3-2 14 4 1 3-11v12h8V10l3 11 4-1-2-14-5-3c-2 3-6 3-8 0Z" fill="#22d3ee" stroke="#155e75"/><path d="M8 17h8m-8 2h8M9 4q3 4 6 0" fill="none" stroke="#155e75"/></>,
+    celana: <><path d="M5 3h14l1 19h-6l-2-11-2 11H4z" fill="#818cf8" stroke="#312e81"/><path d="M5 6h14M8 6q0 4-3 4m11-4q0 4 3 4m-7-4v5" fill="none" stroke="#312e81"/><circle cx="12" cy="4.5" r=".8" fill="#fef3c7"/></>,
+    tomat: <><circle cx="12" cy="14" r="8" fill="#ef4444" stroke="#991b1b"/><path d="m12 7 1-5 2 4 5 1-5 2-3 3-2-3-5-2z" fill="#15803d"/><path d="M8 11q-2 2-1 4" fill="none" stroke="#fecaca" strokeWidth="2" strokeLinecap="round"/></>,
     brokoli: <><path d="m9 12 1 10h4l2-10" fill="#65a30d"/><path d="M5 15a4 4 0 0 1-1-7 4 4 0 0 1 6-4 4 4 0 0 1 7 1 5 5 0 0 1 2 9c-4 2-10 2-14 1Z" fill="#15803d"/></>,
     wortel: <><path d="m15 8 2-6m1 7 4-5M16 10l6-1" stroke="#15803d" strokeWidth="2"/><path d="M15 7q7 1 4 7L3 22q-2 0-1-2L10 8q2-2 5-1Z" fill="#ea580c"/><path d="m8 12 3 2m-6 2 2 2" stroke="#fdba74"/></>,
     jagung: <><ellipse cx="13" cy="10" rx="5" ry="8" fill="#facc15"/><path d="M11 5v9m4-9v9M8 8h10m-10 4h10" stroke="#ca8a04"/><path d="M12 22C6 19 4 14 5 9c3 4 6 4 8 8 1-4 5-5 7-9 1 6-2 11-8 14Z" fill="#15803d"/></>,
@@ -45,7 +40,7 @@ function Symbol({ row }: { row: Datum }) {
     mangga: <><path d="M5 7C10 2 17 3 20 8c4 8-5 15-11 13-3-1-4-3-3-6 2-4-5-4-1-8Z" fill="#f59e0b" stroke="#b45309"/><path d="M11 5q2-5 8-3-3 4-8 3Z" fill="#15803d"/></>,
   };
   if (row.icon && row.icon in illustrations) {
-    return <svg aria-hidden="true" className="size-5 shrink-0" viewBox="0 0 24 24">{illustrations[row.icon as keyof typeof illustrations]}</svg>;
+    return <svg aria-hidden="true" className="size-6 shrink-0" viewBox="0 0 24 24">{illustrations[row.icon as keyof typeof illustrations]}</svg>;
   }
   if (row.color) return <span aria-hidden="true" className="size-5 shrink-0 rounded-full border border-slate-800/20 shadow-inner" style={{ background: `radial-gradient(circle at 34% 28%, white -20%, ${row.color} 55%)` }}/>;
   return null;
