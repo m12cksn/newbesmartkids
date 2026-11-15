@@ -1,6 +1,6 @@
 "use client";
 
-import { Crosshair, Flashlight, Focus, Highlighter, Minus, Plus, Presentation, X } from "lucide-react";
+import { Crosshair, Flashlight, Focus, Hand, Highlighter, Minus, Plus, Presentation, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccess } from "@/components/auth/AccessProvider";
 
@@ -8,13 +8,16 @@ import { useAccess } from "@/components/auth/AccessProvider";
  * Mode menjelaskan (khusus admin): alat bantu saat menjelaskan atau merekam video.
  * Laser dengan jejak memudar, sorot (layar meredup kecuali sekitar kursor), spidol sementara yang hilang
  * sendiri, dan fokus blok (klik satu bagian, bagian lain meredup). Tidak ada yang disimpan.
+ * Di layar sentuh, selama alat aktif halaman dikunci: sentuhan tidak menggulir dan tidak menekan tombol.
+ * Alat "Geser" membuka kunci itu untuk menggulir dan memakai peraga.
  */
-type Tool = "laser" | "sorot" | "spidol" | "fokus";
+type Tool = "laser" | "sorot" | "spidol" | "fokus" | "geser";
 const TOOLS: { id: Tool; label: string; key: string; Icon: typeof Crosshair }[] = [
   { id: "laser", label: "Laser", key: "L", Icon: Crosshair },
   { id: "sorot", label: "Sorot", key: "S", Icon: Flashlight },
   { id: "spidol", label: "Spidol", key: "P", Icon: Highlighter },
   { id: "fokus", label: "Fokus", key: "F", Icon: Focus },
+  { id: "geser", label: "Geser", key: "G", Icon: Hand },
 ];
 const LASER_MS = 650, INK_MS = 3000, INK_FADE = 700;
 type Pt = { x: number; y: number; t: number };
@@ -81,17 +84,34 @@ export function PresenterMode() {
   // Fokus blok: klik memilih bagian, klik bagian yang sama melepas fokus.
   useEffect(() => {
     if (!on || tool !== "fokus") return;
-    const click = (e: MouseEvent) => {
-      if ((e.target as Element)?.closest?.("[data-presenter]")) return;
-      e.preventDefault(); e.stopPropagation();
-      const b = blockOf(e.target as Element);
+    const choose = (target: Element | null) => {
+      const b = blockOf(target);
       if (!b || b === focusEl.current) { focusEl.current = null; setFocusRect(null); return; }
       focusEl.current = b; setFocusRect(b.getBoundingClientRect());
     };
+    const click = (e: MouseEvent) => {
+      if ((e.target as Element)?.closest?.("[data-presenter]")) return;
+      e.preventDefault(); e.stopPropagation(); choose(e.target as Element);
+    };
+    // Di layar sentuh, ketukan tidak menghasilkan klik karena halaman dikunci; ketukan singkat memilih blok.
+    let start: { x: number; y: number } | null = null;
+    const tStart = (e: TouchEvent) => { const t = e.touches[0]; start = t && e.touches.length === 1 && !(e.target as Element)?.closest?.("[data-presenter]") ? { x: t.clientX, y: t.clientY } : null; };
+    const tEnd = (e: TouchEvent) => { const t = e.changedTouches[0]; if (start && t && Math.hypot(t.clientX - start.x, t.clientY - start.y) < 12) choose(document.elementFromPoint(t.clientX, t.clientY)); start = null; };
+    window.addEventListener("touchstart", tStart, { passive: true }); window.addEventListener("touchend", tEnd, { passive: true });
     const sync = () => { if (focusEl.current) setFocusRect(focusEl.current.getBoundingClientRect()); };
     window.addEventListener("click", click, true);
     window.addEventListener("scroll", sync, { passive: true }); window.addEventListener("resize", sync);
-    return () => { window.removeEventListener("click", click, true); window.removeEventListener("scroll", sync); window.removeEventListener("resize", sync); };
+    return () => { window.removeEventListener("touchstart", tStart); window.removeEventListener("touchend", tEnd); window.removeEventListener("click", click, true); window.removeEventListener("scroll", sync); window.removeEventListener("resize", sync); };
+  }, [on, tool]);
+
+  // Kunci layar sentuh selama alat aktif: tidak menggulir, tidak memperbesar, tidak menekan isi halaman.
+  useEffect(() => {
+    if (!on || tool === "geser") return;
+    const block = (e: TouchEvent) => { if (e.cancelable && !(e.target as Element)?.closest?.("[data-presenter]")) e.preventDefault(); };
+    window.addEventListener("touchstart", block, { passive: false }); window.addEventListener("touchmove", block, { passive: false });
+    const html = document.documentElement, prev = [html.style.overscrollBehavior, html.style.touchAction];
+    html.style.overscrollBehavior = "none"; html.style.touchAction = "none"; html.dataset.presenterLock = "";
+    return () => { window.removeEventListener("touchstart", block); window.removeEventListener("touchmove", block); [html.style.overscrollBehavior, html.style.touchAction] = prev; delete html.dataset.presenterLock; };
   }, [on, tool]);
 
   // Kanvas untuk jejak laser dan spidol sementara.
@@ -151,7 +171,7 @@ export function PresenterMode() {
         <button type="button" aria-label="Perkecil sorot" className="btn btn-xs btn-square btn-ghost" onClick={() => setRadius(r => Math.max(60, r - 30))}><Minus className="size-3.5" aria-hidden="true" /></button>
         <button type="button" aria-label="Perbesar sorot" className="btn btn-xs btn-square btn-ghost" onClick={() => setRadius(r => Math.min(320, r + 30))}><Plus className="size-3.5" aria-hidden="true" /></button></span>}
       <button type="button" aria-label="Tutup mode menjelaskan" title="Tutup (Esc)" className="btn btn-sm btn-square btn-ghost" onClick={close}><X className="size-4" aria-hidden="true" /></button>
-      <p className="hidden w-full px-1.5 pb-0.5 text-[11px] text-base-content/60 sm:block">{tool === "laser" ? "Gerakkan kursor atau jari; peraga tetap bisa dipakai." : tool === "sorot" ? "Geser kursor atau jari; hanya sekitarnya yang terang. Ukuran: − / + atau tombol [ ]." : tool === "spidol" ? "Coret di layar; coretan hilang sendiri setelah 3 detik." : focusRect ? "Klik bagian yang sama atau Esc untuk melepas fokus." : "Klik satu bagian untuk menyorotnya."}</p>
+      <p className="hidden w-full px-1.5 pb-0.5 text-[11px] text-base-content/60 sm:block">{tool === "laser" ? "Gerakkan kursor atau jari. Di layar sentuh halaman tidak bergeser; pilih Geser untuk menggulir." : tool === "sorot" ? "Geser kursor atau jari; hanya sekitarnya yang terang. Ukuran: − / + atau tombol [ ]." : tool === "spidol" ? "Coret di layar; coretan hilang sendiri setelah 3 detik." : tool === "geser" ? "Layar bisa digulir dan disentuh seperti biasa. Pilih alat lain untuk menunjuk." : focusRect ? "Klik atau ketuk bagian yang sama (atau Esc) untuk melepas fokus." : "Klik atau ketuk satu bagian untuk menyorotnya."}</p>
     </div>
   </>;
 }

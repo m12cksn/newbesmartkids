@@ -86,7 +86,26 @@ try {
     await bar.getByRole("button", { name: "Spidol", exact: true }).tap();
     await drag([[100, 400], [160, 420], [220, 440], [280, 460]]);
     assert.equal(await page.getByTestId("presenter-canvas").getAttribute("data-ink"), "1", "spidol dengan sentuhan");
+    // Halaman terkunci selama alat aktif: geseran jari tidak menggulir; alat Geser membuka kunci.
+    const sy = () => page.evaluate(() => scrollY);
+    const swipe = [[380, 800], [380, 700], [380, 600], [380, 500], [380, 400], [380, 300]];
+    for (const name of ["Laser", "Sorot", "Spidol", "Fokus"]) {
+      await bar.getByRole("button", { name, exact: true }).tap(); const before = await sy();
+      await drag(swipe); await page.waitForTimeout(400); assert.equal(await sy(), before, `${name}: layar tidak bergeser`);
+      assert.equal(await page.evaluate(() => document.documentElement.style.touchAction), "none");
+    }
+    // Fokus dengan ketukan.
+    const h1 = await page.locator("h1").first().boundingBox();
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: h1.x + 20, y: h1.y + h1.height / 2 }] }); await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await page.getByTestId("presenter-focus").waitFor();
+    await page.screenshot({ path: `${folder}/768-tablet-fokus.png` });
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: h1.x + 20, y: h1.y + h1.height / 2 }] }); await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    assert.equal(await page.getByTestId("presenter-focus").count(), 0, "ketuk lagi melepas fokus");
+    await bar.getByRole("button", { name: "Geser", exact: true }).tap();
+    assert.equal(await page.evaluate(() => document.documentElement.style.touchAction), "", "kunci dilepas");
+    { const before = await sy(); await drag(swipe); await page.waitForTimeout(600); assert.ok(await sy() > before, "Geser: layar bisa digulir"); }
+    await page.screenshot({ path: `${folder}/768-tablet-geser.png` });
     assert.deepEqual(errors, []); await ctx.close();
-    console.log("PASS mode menjelaskan tablet 768px: sorot dan laser mengikuti jari, spidol dengan sentuhan");
+    console.log("PASS mode menjelaskan tablet 768px: sorot dan laser mengikuti jari, spidol dengan sentuhan, layar terkunci untuk laser/sorot/spidol/fokus, fokus dengan ketukan, Geser menggulir");
   }
 } finally { await browser.close(); }
