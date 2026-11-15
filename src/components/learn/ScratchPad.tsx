@@ -159,7 +159,7 @@ export function ScratchPad() {
   function down(e: React.PointerEvent<HTMLCanvasElement>) {
     if (e.pointerType === "pen") penSeen.current = Date.now();
     // Telapak tangan: abaikan sentuhan jari selama stylus baru saja dipakai.
-    if (e.pointerType === "touch" && Date.now() - penSeen.current < 1500) return;
+    if (e.pointerType === "touch" && Date.now() - penSeen.current < 5000) return;
     if (e.button > 0) return;
     // Sudah ada yang menulis: sentuhan lain diabaikan, kecuali stylus yang mengambil alih.
     if (live.current && activeId.current !== null && activeId.current !== e.pointerId) { if (e.pointerType !== "pen") return; live.current = null; }
@@ -174,6 +174,7 @@ export function ScratchPad() {
     redraw();
   }
   function move(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (e.pointerType === "pen") penSeen.current = Date.now(); // Pencil melayang di atas layar juga dihitung
     const s = live.current; if (!s || e.pointerId !== activeId.current) return;
     // Stylus dan layar modern mengirim lebih banyak titik daripada satu per frame; pakai semuanya agar garis halus.
     const evs = e.nativeEvent.getCoalescedEvents?.();
