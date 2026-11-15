@@ -17,6 +17,7 @@ const MAX_SHEETS = 10, MAX_STROKES = 600;
 const DESKTOP = "(min-width: 900px)";
 // Seberapa kuat titik tulisan dihaluskan (0 = mentah, mendekati 1 = sangat lembut tapi tertinggal).
 const SMOOTH = 0.4;
+const EMPTY: Sheet = [];
 
 const keyFor = (path: string) => `bsk-coret:${path}`;
 function load(path: string): Sheet[] {
@@ -67,6 +68,7 @@ export function ScratchPad() {
   const penSeen = useRef(0);
   const baseRef = useRef<HTMLCanvasElement | null>(null); // coretan yang sudah jadi, digambar sekali lalu ditempel
   const baseDirty = useRef(true);
+  const baseSrc = useRef<Sheet | null>(null); // daftar coretan yang tergambar di kanvas cadangan
   const frame = useRef(0);
   const rect = useRef<DOMRect | null>(null);
   const raw = useRef<[number, number]>([0, 0]); // titik asli terakhir (sebelum dihaluskan)
@@ -101,12 +103,14 @@ export function ScratchPad() {
     const ctx = c.getContext("2d"); if (!ctx) return;
     const base = baseRef.current ?? (baseRef.current = document.createElement("canvas"));
     if (base.width !== pw || base.height !== ph) { base.width = pw; base.height = ph; baseDirty.current = true; }
+    const cur = sheetsRef.current[pageRef.current] ?? EMPTY;
+    if (baseSrc.current !== cur) baseDirty.current = true; // coretan berubah (urungkan, hapus, ganti kertas, muat)
     if (baseDirty.current) {
       const b = base.getContext("2d");
       if (b) {
         b.setTransform(dpr, 0, 0, dpr, 0, 0); b.clearRect(0, 0, w, h);
-        for (const s of sheetsRef.current[pageRef.current] ?? []) drawStroke(b, s);
-        baseDirty.current = false;
+        for (const s of cur) drawStroke(b, s);
+        baseDirty.current = false; baseSrc.current = cur;
       }
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, pw, ph); ctx.drawImage(base, 0, 0);
@@ -116,7 +120,8 @@ export function ScratchPad() {
     if (full) baseDirty.current = true;
     if (!frame.current) frame.current = requestAnimationFrame(paint);
   }, [paint]);
-  useEffect(() => { if (open) redraw(true); }, [open, sheets, page, height, desktop, redraw]);
+  useEffect(() => { if (open) redraw(true); }, [open, height, desktop, redraw]);
+  useEffect(() => { if (open) redraw(); }, [open, sheets, page, redraw]);
   useEffect(() => {
     if (!open || !boxRef.current) return;
     const ro = new ResizeObserver(() => redraw(true)); ro.observe(boxRef.current);
@@ -152,7 +157,9 @@ export function ScratchPad() {
   function extend(s: Stroke, x: number, y: number, last = false) {
     raw.current = [x, y];
     const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
-    const nx = last ? x : lx + (x - lx) * (1 - SMOOTH), ny = last ? y : ly + (y - ly) * (1 - SMOOTH);
+    // Gerak lambat dihaluskan; gerak cepat diikuti penuh supaya garis tidak tertinggal di belakang ujung pensil.
+    const d = Math.hypot(x - lx, y - ly), follow = last ? 1 : (1 - SMOOTH) + SMOOTH * Math.min(1, Math.max(0, (d - 6) / 14));
+    const nx = lx + (x - lx) * follow, ny = ly + (y - ly) * follow;
     if (Math.hypot(nx - lx, ny - ly) < (last ? 0.3 : 0.4)) return;
     s.p.push(Math.round(nx * 10) / 10, Math.round(ny * 10) / 10);
   }
@@ -195,7 +202,12 @@ export function ScratchPad() {
     extend(s, raw.current[0], raw.current[1], true); // ujung garis tepat di titik angkat
     const cur = sheetsRef.current;
     const next = cur.map((v, i) => (i === pageRef.current ? [...v, s].slice(-MAX_STROKES) : v));
-    sheetsRef.current = next; commit(next); redraw(true);
+    // Coretan yang selesai ditempel ke kanvas cadangan; seluruh kertas tidak perlu dibangun ulang.
+    const base = baseRef.current, bc = base?.getContext("2d");
+    if (bc && !baseDirty.current && baseSrc.current === cur[pageRef.current] && cur[pageRef.current].length < MAX_STROKES) {
+      const dpr = window.devicePixelRatio || 1; bc.setTransform(dpr, 0, 0, dpr, 0, 0); drawStroke(bc, s); baseSrc.current = next[pageRef.current];
+    }
+    sheetsRef.current = next; commit(next); redraw();
   }
   function newSheet() { const cur = sheetsRef.current; if (cur[cur.length - 1].length === 0) { setPage(cur.length - 1); return; } const next = [...cur, []].slice(-MAX_SHEETS); commit(next); setPage(next.length - 1); }
   function clearSheet() {
