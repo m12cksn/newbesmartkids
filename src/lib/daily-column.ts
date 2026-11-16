@@ -5,7 +5,8 @@
 export type ColOp = "tambah" | "kurang" | "kali" | "bagi" | "cerita";
 export type Calc = "tambah" | "kurang" | "kali" | "bagi";
 export type ColLevel = 1 | 2 | 3;
-export type ColQuestion = { calc: Calc; a: number; b: number; answer: number; story?: string; storyUnit?: string };
+/** Pembagian: answer = hasil bagi, rem = sisa, withRem = kotak sisa ditampilkan, long = porogapit (bersusun panjang). */
+export type ColQuestion = { calc: Calc; a: number; b: number; answer: number; rem?: number; withRem?: boolean; long?: boolean; story?: string; storyUnit?: string };
 
 export const COL_OPS: { id: ColOp; name: string; sign: string }[] = [
   { id: "tambah", name: "Tambah", sign: "+" }, { id: "kurang", name: "Kurang", sign: "−" }, { id: "kali", name: "Kali", sign: "×" },
@@ -31,7 +32,7 @@ const RANGE: Record<Calc, Record<ColLevel, () => [number, number, number, number
   tambah: { 1: () => [10, 89, 10, 89], 2: () => [100, 899, 100, 899], 3: () => [1000, 8999, 1000, 8999] },
   kurang: { 1: () => [30, 99, 10, 89], 2: () => [300, 999, 100, 899], 3: () => [3000, 9999, 1000, 8999] },
   kali: { 1: () => [12, 49, 2, 5], 2: () => [102, 499, 3, 9], 3: () => [12, 99, 12, 49] },
-  bagi: { 1: () => [11, 40, 2, 5], 2: () => [21, 199, 3, 9], 3: () => [101, 999, 4, 9] },
+  bagi: { 1: () => [11, 40, 2, 5], 2: () => [21, 199, 3, 9], 3: () => [12, 399, 4, 25] },
 };
 /** Satu soal hitung: penjumlahan dan pengurangan selalu memuat simpanan atau pinjaman agar kotak simpanan terpakai. */
 function makeCalc(calc: Calc, level: ColLevel, r: () => number): ColQuestion {
@@ -41,8 +42,12 @@ function makeCalc(calc: Calc, level: ColLevel, r: () => number): ColQuestion {
     if (calc === "tambah") { if (carries(a, b) >= (level === 1 ? 1 : 2)) return { calc, a, b, answer: a + b }; continue; }
     if (calc === "kurang") { if (b > a) [a, b] = [b, a]; if (a - b >= 10 && borrows(a, b) >= (level === 1 ? 1 : 2)) return { calc, a, b, answer: a - b }; continue; }
     if (calc === "kali") { if (a % 10 !== 0 && b % 10 !== 0) return { calc, a, b, answer: a * b }; continue; }
-    // Bagi: a adalah hasil bagi, dikalikan b untuk mendapat bilangan yang dibagi (habis dibagi, tanpa sisa).
-    const total = a * b; if (total < 10000 && String(total).length >= 2) return { calc, a: total, b, answer: a };
+    // Bagi: a adalah hasil bagi. Tingkat Mudah selalu habis dibagi; Sedang dan Sulit kadang bersisa.
+    // Sulit memakai porogapit dengan pembagi satu angka atau dua angka (11 sampai 25).
+    if (level === 3 && b < 11 && b > 9) continue;
+    const rem = level > 1 && r() < 0.45 ? int(r, 1, b - 1) : 0, total = a * b + rem;
+    if (total >= 10000 || String(total).length < 2 || (level === 3 && total < 100)) continue;
+    return { calc, a: total, b, answer: a, rem, withRem: level > 1, long: level === 3 };
   }
   throw new Error("Soal tidak dapat dibuat");
 }
@@ -63,6 +68,11 @@ const STORIES: Story[] = [
   { calc: "bagi", unit: "kelompok", text: (a, b) => `Sebanyak ${a} siswa dibagi menjadi kelompok yang masing-masing berisi ${b} siswa. Berapa kelompok yang terbentuk?` },
   { calc: "bagi", unit: "botol", text: (a, b) => `Ibu menuang ${a} liter jus ke dalam botol yang masing-masing berisi ${b} liter. Berapa botol yang terisi penuh?` },
 ];
+/** Cerita pembagian bersisa: menanyakan hasil bagi dan sisanya. */
+const REM_STORIES: Story[] = [
+  { calc: "bagi", unit: "kotak", text: (a, b) => `Ada ${a} kue yang dimasukkan ke dalam kotak. Setiap kotak berisi ${b} kue. Berapa kotak yang terisi penuh, dan berapa kue yang tersisa?` },
+  { calc: "bagi", unit: "anak", text: (a, b) => `Bu Guru membagikan ${a} buku tulis kepada anak-anak, masing-masing ${b} buku. Berapa anak yang mendapat buku, dan berapa buku yang tersisa?` },
+];
 
 export function dailyColumn(date: string, op: ColOp, level: ColLevel): ColQuestion[] {
   if (!validDate(date)) throw new Error("Tanggal tidak valid");
@@ -75,7 +85,7 @@ export function dailyColumn(date: string, op: ColOp, level: ColLevel): ColQuesti
     const pick = (["tambah", "kurang", "kali", "bagi"] as Calc[]).map(c => order.find(s => s.calc === c)!);
     for (const s of order) if (pick.length < COUNT && !pick.includes(s)) pick.push(s);
     const shuffled = pick.map(s => ({ s, k: r() })).sort((x, y) => x.k - y.k).map(x => x.s);
-    for (const s of shuffled) { const c = makeCalc(s.calc, level, r); out.push({ ...c, story: s.text(c.a, c.b), storyUnit: s.unit }); }
+    for (const s of shuffled) { const c = makeCalc(s.calc, level, r); const st = c.rem ? REM_STORIES[int(r, 0, REM_STORIES.length - 1)] : s; out.push({ ...c, story: st.text(c.a, c.b), storyUnit: st.unit }); }
     return out;
   }
   while (out.length < COUNT) { const c = makeCalc(op, level, r), key = `${c.a}${c.b}`; if (!seen.has(key)) { seen.add(key); out.push(c); } }
@@ -87,7 +97,30 @@ export function dailyColumn(date: string, op: ColOp, level: ColLevel): ColQuesti
 export const answerWidth = (q: ColQuestion) => String(q.answer).length;
 /** Perkalian dua angka: hasil kali sebagian per baris. */
 export const partials = (q: ColQuestion) => (q.calc === "kali" && q.b >= 10 ? digits(q.b).reverse().map((d, i) => q.a * d * 10 ** i) : []);
-export const isCorrect = (q: ColQuestion, cells: string) => cells.length === answerWidth(q) && !cells.includes(".") && Number(cells) === q.answer;
+export const isCorrect = (q: ColQuestion, cells: string, rem = "") => cells.length === answerWidth(q) && !cells.includes(".") && Number(cells) === q.answer && (!q.withRem || (/^\d+$/.test(rem) && Number(rem) === (q.rem ?? 0)));
+
+/** Porogapit: setiap langkah dengan hasil bagi bukan nol. end = posisi angka terakhir yang dipakai (dari kiri),
+ *  prod = hasil kali yang ditulis di bawah, diff = hasil pengurangan, brings = posisi angka yang diturunkan setelahnya. */
+export type LongStep = { end: number; prod: number; diff: number; brings: number[] };
+export function longDivision(a: number, b: number): LongStep[] {
+  const D = digits(a), steps: LongStep[] = [];
+  let i = 0, cur = D[0];
+  while (i < D.length - 1 && cur < b) { i++; cur = cur * 10 + D[i]; }
+  for (let j = i; j < D.length; j++) {
+    if (j > i) { cur = cur * 10 + D[j]; if (steps.length) steps[steps.length - 1].brings.push(j); }
+    const qd = Math.floor(cur / b);
+    if (qd > 0) { steps.push({ end: j, prod: qd * b, diff: cur - qd * b, brings: [] }); cur -= qd * b; }
+  }
+  return steps;
+}
+/** Pengurangan: angka atas setelah meminjam, per kolom dari kiri (null jika tidak berubah). */
+export function borrowTops(a: number, b: number): (number | null)[] {
+  const x = digits(a).reverse(), y = digits(b).reverse(), out: (number | null)[] = Array(x.length).fill(null);
+  const top = [...x];
+  for (let i = 0; i < x.length; i++) if (top[i] < (y[i] ?? 0)) { top[i] += 10; let k = i + 1; while (top[k] === 0) { top[k] = 9; k++; } top[k] -= 1; }
+  top.forEach((t, i) => { if (t !== x[i]) out[i] = t; });
+  return out.reverse();
+}
 
 /** Langkah per kolom untuk pembahasan. */
 export function steps(q: ColQuestion): string[] {
@@ -97,15 +130,18 @@ export function steps(q: ColQuestion): string[] {
   if (q.calc === "kurang") { let br = 0; for (let i = 0; i < x.length; i++) { let top = x[i] - br, note = ""; br = 0; if (top < (y[i] ?? 0)) { top += 10; br = 1; note = ` (pinjam 1 dari kolom ${place[i + 1]}, jadi ${top})`; } out.push(`Kolom ${place[i]}: ${top} − ${y[i] ?? 0}${note} = ${top - (y[i] ?? 0)}.`); } }
   if (q.calc === "kali" && q.b < 10) { let c = 0; for (let i = 0; i < x.length; i++) { const s = x[i] * q.b + c; out.push(`Kolom ${place[i]}: ${x[i]} × ${q.b}${c ? ` + ${c} (simpanan)` : ""} = ${s}${s >= 10 && i < x.length - 1 ? `, tulis ${s % 10}, simpan ${Math.floor(s / 10)}` : `, tulis ${s}`}.`); c = Math.floor(s / 10); } }
   if (q.calc === "kali" && q.b >= 10) { partials(q).forEach((p, i) => out.push(`${q.a} × ${digits(q.b).reverse()[i]}${i ? "0" : ""} = ${p}.`)); out.push(`Jumlahkan: ${partials(q).join(" + ")} = ${q.answer}.`); }
-  if (q.calc === "bagi") { let rem = 0; digits(q.a).forEach((d, i) => { const cur = rem * 10 + d, qd = Math.floor(cur / q.b); if (i > 0 || qd > 0) out.push(`${cur} : ${q.b} = ${qd}${cur - qd * q.b ? `, sisa ${cur - qd * q.b} diturunkan` : ""}.`); else out.push(`${d} lebih kecil dari ${q.b}, ambil satu angka lagi.`); rem = cur - qd * q.b; }); }
+  if (q.calc === "bagi" && q.long) { const st = longDivision(q.a, q.b); out.push(`Ambil angka dari kiri sampai bilangannya tidak lebih kecil dari ${q.b}.`); st.forEach(x => { const cur = x.prod + x.diff; out.push(`${cur} : ${q.b} = ${x.prod / q.b}, tulis ${x.prod / q.b} di atas. ${x.prod / q.b} × ${q.b} = ${x.prod}, lalu ${cur} − ${x.prod} = ${x.diff}${x.brings.length ? `, turunkan angka berikutnya` : ""}.`); }); }
+  if (q.calc === "bagi" && !q.long) { let rem = 0; digits(q.a).forEach((d, i) => { const cur = rem * 10 + d, qd = Math.floor(cur / q.b); if (i > 0 || qd > 0) out.push(`${cur} : ${q.b} = ${qd}${cur - qd * q.b ? `, sisa ${cur - qd * q.b}${i < String(q.a).length - 1 ? " diturunkan" : ""}` : ""}.`); else out.push(`${d} lebih kecil dari ${q.b}, ambil satu angka lagi.`); rem = cur - qd * q.b; }); }
+  if (q.calc === "bagi" && q.withRem) out.push(`Hasil bagi ${q.answer}, sisa ${q.rem ?? 0}. Periksa: ${q.answer} × ${q.b} + ${q.rem ?? 0} = ${q.a}.`);
+  if (q.calc === "kurang") { const t = borrowTops(q.a, q.b); if (t.some(v => v !== null)) out.unshift(`Kotak pinjaman: ${t.map((v, i) => (v === null ? null : `${String(q.a)[i]} menjadi ${v}`)).filter(Boolean).join(", ")}.`); }
   return out;
 }
 
 /* ---------- Penyimpanan ---------- */
 /** answers[i]: isi kotak hasil dari kiri ke kanan, "." untuk kotak kosong. ops[i]: operasi yang dipilih pada soal cerita. */
-export type SavedColumn = { date: string; answers: string[]; ops: string[]; checked: boolean[] };
-export const columnKey = (op: ColOp, level: ColLevel) => `bsk-bersusun-v1-${op}-${level}`;
-export const emptyColumn = (date: string): SavedColumn => ({ date, answers: Array(COUNT).fill(""), ops: Array(COUNT).fill(""), checked: Array(COUNT).fill(false) });
+export type SavedColumn = { date: string; answers: string[]; rems: string[]; ops: string[]; checked: boolean[]; helped: boolean[] };
+export const columnKey = (op: ColOp, level: ColLevel) => `bsk-bersusun-v2-${op}-${level}`;
+export const emptyColumn = (date: string): SavedColumn => ({ date, answers: Array(COUNT).fill(""), rems: Array(COUNT).fill(""), ops: Array(COUNT).fill(""), checked: Array(COUNT).fill(false), helped: Array(COUNT).fill(false) });
 export const cellsToNumber = (cells: string) => cells.replace(/\./g, "");
 export function readColumn(raw: string | null): SavedColumn | null {
   try {
@@ -113,6 +149,8 @@ export function readColumn(raw: string | null): SavedColumn | null {
     if (!v || !validDate(v.date) || !Array.isArray(v.answers) || v.answers.length !== COUNT) return null;
     const list = (x: unknown, f: (y: unknown) => string) => Array.from({ length: COUNT }, (_, i) => (Array.isArray(x) ? f(x[i]) : ""));
     return { date: v.date, answers: list(v.answers, a => (typeof a === "string" ? a.replace(/[^0-9.]/g, "").slice(0, 8) : "")),
+      rems: list(v.rems, a => (typeof a === "string" ? a.replace(/\D/g, "").slice(0, 2) : "")),
+      helped: Array.from({ length: COUNT }, (_, i) => Array.isArray(v.helped) && v.helped[i] === true),
       ops: list(v.ops, a => (typeof a === "string" && ["tambah", "kurang", "kali", "bagi"].includes(a) ? a : "")),
       checked: Array.from({ length: COUNT }, (_, i) => Array.isArray(v.checked) && v.checked[i] === true) };
   } catch { return null; }

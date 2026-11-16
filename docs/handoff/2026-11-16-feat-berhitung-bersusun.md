@@ -7,14 +7,21 @@
 - Akses sama dengan Mastering lain (akun berpaket; aturan `mastering-*`), ditambahkan ke matcher `src/proxy.ts`. Kartu ketiga di bagian Mastering Matematika Harian beranda, dan sitemap.
 - Tampilan dan teks milik BeSmartKids; susunan terinspirasi contoh yang dikirim pengguna (tanpa koin, nyawa, atau suara).
 
+## Revisi 1 (masukan pengguna)
+- Pengurangan: kotak pinjaman di atas setiap kolom termasuk satuan, muat dua angka (71 − 46: 7 menjadi 6, 1 menjadi 11), angka asli dicoret otomatis; tidak dinilai, tetapi diberi warna setelah diperiksa dan dijelaskan di pembahasan (`borrowTops`, termasuk pinjam berantai seperti 503 − 168).
+- Perkalian dua angka: baris simpanan sendiri untuk setiap hasil sebagian dan untuk penjumlahan akhir; hasil sebagian diberi warna benar/salah setelah diperiksa (tidak memengaruhi skor).
+- Pembagian: Sedang dan Sulit memiliki kotak Sisa (sebagian soal bersisa, sisanya 0); Sulit memakai porogapit (`longDivision`) dengan baris hasil kali, hasil kurang, dan angka yang diturunkan, pembagi satu angka atau 11–25. Soal cerita pembagian bersisa menanyakan hasil dan sisa.
+- Semua jenis: penanda kolom yang sedang dikerjakan, tombol "Bantu satu langkah" (soal yang dibantu tidak mendapat bintang), dan papan angka di layar (otomatis di perangkat sentuh, bisa dinyalakan atau dimatikan).
+- Kunci penyimpanan naik ke `bsk-bersusun-v2-*` karena format jawaban berubah.
+
 ## Berkas
 - `src/lib/daily-column.ts`, `src/components/mastering/ColumnPractice.tsx`, `src/app/mastering-berhitung-bersusun/page.tsx`
 - `src/components/home/DailyPracticeCard.tsx`, `src/proxy.ts`, `src/app/sitemap.ts`
 - `scripts/verify-berhitung-bersusun.mjs`, `scripts/smoke-berhitung-bersusun.mjs`, `.github/workflows/berhitung-bersusun-qa.yml`
 
 ## Validasi
-- Verify: 6.300 soal dalam 60 hari (5 jenis × 3 tingkat), kunci benar, tanpa soal kembar, ada simpanan/pinjaman, soal cerita memuat empat operasi, berganti setiap hari, tingkat makin sulit.
-- Build lulus; smoke lulus di 320/390/768/1280 (tautan beranda, kursor kanan ke kiri, periksa, pembahasan, tersimpan setelah muat ulang, soal cerita, kali dua angka, bagi); smoke beranda dan SEO lulus.
+- Verify (revisi 1 juga memeriksa porogapit, sisa, dan kotak pinjaman): 6.300 soal dalam 60 hari (5 jenis × 3 tingkat), kunci benar, tanpa soal kembar, ada simpanan/pinjaman, soal cerita memuat empat operasi, berganti setiap hari, tingkat makin sulit.
+- Build lulus; smoke lulus di 320/390/768/1280 (tautan beranda, kursor kanan ke kiri, periksa, pembahasan, tersimpan setelah muat ulang, kotak pinjaman dua angka dan coretan, bantu satu langkah, soal cerita, kali dua angka dengan simpanan per baris, porogapit dengan sisa lewat papan angka); smoke beranda dan SEO lulus.
 
 ## Status
 - Draft PR, menunggu persetujuan preview dari pengguna.
