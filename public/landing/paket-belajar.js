@@ -101,16 +101,16 @@ render(false);
 
 (function(){
 var PKGS=[
-{k:'sd',uid:'variant_gLHk7c_W9nHBJ7Ws1H8Lz-yA',name:'Paket SD',desc:'Kelas 1 sampai 6',price:69000},
-{k:'smp',uid:'variant_nMgqMK2fmC3o5XNJmU4PuoxQ',name:'Paket SMP',desc:'Kelas 7 sampai 9',price:69000},
-{k:'sma',uid:'variant_ZkFswk5JfvS-N4oM8eAyvjuz',name:'Paket SMA',desc:'Kelas 10 sampai 12',price:69000},
-{k:'keluarga',uid:'variant_-X2QCs9zUcEbEfE2yU41Locl',name:'Paket Keluarga',desc:'Semua jenjang, Kelas 1 sampai 12, 1 akun',price:129000}];
+{k:'sd',uid:'bpo_FDeyG5ysyV6LJSqaLp-W7WiP',name:'Paket SD',desc:'Kelas 1 sampai 6',price:69000},
+{k:'smp',uid:'bpo_B6PpOuV4Jsfw364T0i1okADD',name:'Paket SMP',desc:'Kelas 7 sampai 9',price:69000},
+{k:'sma',uid:'bpo_nZjwOWaW54Lkx2z7PfUBM_4I',name:'Paket SMA',desc:'Kelas 10 sampai 12',price:69000},
+{k:'keluarga',uid:'bpo_UhwEEYwlIT3Q94QInAMmHTlw',name:'Paket Keluarga',desc:'Semua jenjang, Kelas 1 sampai 12, 1 akun',price:129000}];
 var PAY_ORDER=['qris','gopay','shopeepay','dana','invoice'];
 var st={pkg:PKGS[3].uid,pay:null,busy:false,seq:0,ready:false};
 var $=function(s){return document.querySelector(s)};
 var rp=function(n){n=Math.round(Number(n)||0);return 'Rp'+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
 var form,btn,store,vars={};
-function items(){return [{type:'product',variantUniqueId:st.pkg,quantity:1}]}
+function items(){return [{type:'bundle',bundlePriceOptionUniqueId:st.pkg,quantity:1}]}
 function cust(){return {name:form.name.value.trim(),phone:form.phone.value.trim().replace(/[\s-]/g,''),email:form.email.value.trim()}}
 function err(m){var e=$('#co-err');e.hidden=!m;e.textContent=m||''}
 function setBtn(t){btn.disabled=!st.ready||st.busy||!st.pay;btn.textContent=t||(st.busy?'Memproses pesanan…':'Pesan sekarang')}
@@ -131,7 +131,7 @@ var sticky=$('#sticky'),ord=$('#order');function onScroll(){var r=ord.getBoundin
 function init(){form=$('#bsk-co');btn=$('#co-btn');onScroll();renderPkgs();refresh();form.addEventListener('submit',submit);
 if(!window.Scalev||!Scalev.data||!Scalev.data.get||!Scalev.checkout){$('#co-pay').innerHTML='<p class="muted" style="font-size:.85rem">Metode pembayaran muncul di halaman yang sudah terbit.</p>';setBtn('Form aktif di halaman yang sudah terbit');return}
 var d=Scalev.data.get();store=d&&d.store;if(!store){setBtn('Form belum siap');return}
-(store.products||[]).forEach(function(p){(p.variants||[]).forEach(function(v){vars[v.uniqueId]=v})});
+(store.bundlePriceOptions||[]).forEach(function(b){vars[b.uniqueId]=b});
 if(!vars[st.pkg]){var f=PKGS.filter(function(p){return vars[p.uid]})[0];if(!f){setBtn('Paket belum tersedia');return}st.pkg=f.uid}
 st.ready=true;renderPkgs();renderPay();refresh();setBtn();
 var t;form.addEventListener('input',function(ev){ev.target.classList&&ev.target.classList.remove('bad');clearTimeout(t);t=setTimeout(function(){try{Scalev.checkout.updateIntent({customer:cust(),items:items(),paymentMethod:st.pay})}catch(x){}},600)});
