@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, ChevronDown, Delete, Divide, Hand, Minus, Plus, RotateCcw, Star, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Delete, Divide, Hand, Lightbulb, Minus, Plus, RotateCcw, Star, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { SaveResult } from "@/components/auth/SaveResult";
@@ -21,7 +21,7 @@ const GUIDE: Record<ColOp, string[]> = {
   tambah: ["Tulis kedua bilangan rata kanan: satuan di bawah satuan, puluhan di bawah puluhan.", "Mulai dari kolom paling kanan (satuan).", "Jika hasil satu kolom 10 atau lebih, tulis angka satuannya, lalu simpan 1 di kotak simpanan kolom sebelah kiri.", "Jumlahkan kolom berikutnya bersama simpanannya."],
   kurang: ["Tulis bilangan yang lebih besar di atas, rata kanan.", "Mulai dari kolom satuan.", "Jika angka atas lebih kecil dari angka bawah, pinjam 1 dari kolom sebelah kiri. Angka atas bertambah 10, angka kiri berkurang 1.", "Tulis angka baru di kotak pinjaman di atasnya, misalnya 71 − 46: angka 1 menjadi 11 dan angka 7 menjadi 6. Angka lama otomatis tercoret.", "Kurangkan memakai angka baru: 11 − 6 = 5, lalu 6 − 4 = 2."],
   kali: ["Kalikan angka bawah dengan setiap angka atas, mulai dari satuan.", "Jika hasilnya 10 atau lebih, tulis satuannya dan simpan puluhannya di kotak simpanan.", "Tambahkan simpanan setelah mengalikan kolom berikutnya.", "Untuk pengali dua angka: kalikan dengan satuan dulu, lalu dengan puluhan (geser satu kolom, tulis 0 di satuan), lalu jumlahkan."],
-  bagi: ["Bagi dari kiri ke kanan. Ambil angka pertama; jika lebih kecil dari pembagi, ambil satu angka lagi.", "Bersusun pendek (Mudah, Sedang): tulis hasil bagi di atas, lalu tulis sisanya kecil di depan angka berikutnya.", "Porogapit (Sulit): tulis hasil bagi di atas, kalikan dengan pembagi dan tulis di bawah, kurangkan, lalu turunkan angka berikutnya (berwarna biru). Ulangi sampai angka terakhir.", "Jika ada kotak Sisa, tulis angka yang tersisa di akhir. Tulis 0 jika habis dibagi. Periksa: hasil bagi × pembagi + sisa = bilangan yang dibagi."],
+  bagi: ["Bagi dari kiri ke kanan. Ambil angka pertama; jika lebih kecil dari pembagi, ambil satu angka lagi.", "Bersusun pendek (Mudah, Sedang): ketuk kotak di atas angka. Kotak biru di bawahnya memberi tahu bilangan yang harus dibagi pada langkah itu.", "Contoh 69 : 3. Kotak di atas 6: 6 : 3 = 2. Kotak di atas 9: 9 : 3 = 3. Jadi hasilnya 23. Jika ada sisa, sisa digabung dengan angka berikutnya, misalnya 75 : 3: 7 : 3 = 2 sisa 1, lalu 15 : 3 = 5.", "Porogapit (Sulit): tulis hasil bagi di atas, kalikan dengan pembagi dan tulis di bawah, kurangkan, lalu turunkan angka berikutnya (berwarna biru). Ulangi sampai angka terakhir.", "Jika ada kotak Sisa, tulis angka yang tersisa di akhir. Tulis 0 jika habis dibagi. Periksa: hasil bagi × pembagi + sisa = bilangan yang dibagi."],
   cerita: ["Baca soal sampai selesai, lalu cari bilangan-bilangannya.", "Tentukan operasinya: digabung atau ditambah berarti +, sisa atau berkurang berarti −, setiap atau masing-masing berarti × atau :.", "Setelah memilih operasi, kolom hitung bersusun muncul.", "Kerjakan bersusun seperti biasa, lalu periksa apakah jawabannya masuk akal."],
 };
 
@@ -48,6 +48,15 @@ function Cell({ value, onChange, label, state, size = "lg", max = 1, refCb, onBa
 const Fixed = ({ d, muted = false, struck = false }: { d: string; muted?: boolean; struck?: boolean }) =>
   <span className={`flex h-11 w-10 items-center justify-center text-xl font-extrabold tabular-nums ${muted ? "text-[#adb5bd]" : ""} ${struck ? "text-[#adb5bd] line-through decoration-[#e03131] decoration-2" : ""}`}>{d}</span>;
 const pick = (d: string, want: string | undefined): "ok" | "bad" | undefined => (!d || want === undefined ? undefined : d === want ? "ok" : "bad");
+
+/** Petunjuk satu langkah pembagian untuk kotak hasil di kolom c: bilangan yang dibagi pada langkah itu. */
+function divisionHint(q: ColQuestion, c: number, lead: number) {
+  const dv = String(q.a), prevRem = c === 0 ? 0 : Number(dv.slice(0, c)) % q.b, cur = prevRem * 10 + Number(dv[c]);
+  if (c === lead && lead > 0) return `${dv.slice(0, lead)} lebih kecil dari ${q.b}, jadi ambil ${cur}. Berapa ${cur} : ${q.b}?`;
+  if (prevRem > 0) return `Sisa langkah sebelumnya ${prevRem}, gabungkan dengan ${dv[c]} menjadi ${cur}. Berapa ${cur} : ${q.b}?`;
+  return `Berapa ${cur} : ${q.b}?${cur < q.b ? ` ${cur} lebih kecil dari ${q.b}, jadi tulis 0.` : ""}`;
+}
+const Hint = ({ text }: { text: string }) => <p className="mt-2 flex max-w-xs items-start gap-1.5 rounded-xl bg-[#e7f3ff] px-3 py-2 text-sm font-semibold text-[#1c4f8a]" role="status"><Lightbulb className="mt-0.5 size-4 shrink-0" aria-hidden="true" />{text}</p>;
 
 /** Kerangka hitung bersusun untuk satu soal. cells: kotak hasil dari kiri ke kanan ("." = kosong). */
 function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad }: { q: ColQuestion; cells: string; setCells: (c: string) => void; rem: string; setRem: (r: string) => void; checked: boolean; carry: boolean; id: string; pad: boolean }) {
@@ -76,9 +85,10 @@ function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad }: { 
       <div className="flex items-stretch gap-1">
         <Fixed d={String(q.b)} />
         <div className="flex gap-1 rounded-tl-xl border-l-[3px] border-t-[3px] border-[#17352a] pl-1">
-          {dv.split("").map((d, c) => <span key={c} className={`relative rounded-md ${focusCol === c ? "bg-[#fff1b8]" : ""}`}>{carry && c > 0 && <span className="absolute -left-3.5 bottom-0 z-10 [&_input]:h-6 [&_input]:w-6 [&_input]:text-xs">{H(`r${c}`, `Soal ${id}, sisa sebelum angka ke-${c + 1}`, c)}</span>}<Fixed d={d} /></span>)}
+          {dv.split("").map((d, c) => <span key={c} className={`relative rounded-md ${focusCol === c ? "bg-[#fff1b8]" : ""}`}>{carry && c > lead && <span className="absolute -left-2.5 -top-1 z-10 [&_input]:h-5 [&_input]:w-5 [&_input]:rounded-md [&_input]:text-[11px]">{H(`r${c}`, `Soal ${id}, sisa yang digabung dengan angka ke-${c + 1}`, c)}</span>}<Fixed d={d} /></span>)}
         </div>
       </div>
+      {!checked && focusCol !== null && focusCol >= lead && <Hint text={divisionHint(q, focusCol, lead)} />}
       {remBox}
     </div>;
   }
@@ -100,6 +110,7 @@ function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad }: { 
             </div>; })}
         </div>
       </div>
+      {!checked && focusCol !== null && focusCol >= lead && <Hint text={`${divisionHint(q, focusCol, lead)} Tulis hasilnya di atas, lalu tulis hasil kalinya di bawah dan kurangkan.`} />}
       <div className="self-center">{remBox}</div>
     </div>;
   }
@@ -137,7 +148,10 @@ function loadSave(op: ColOp, level: ColLevel): { save: SavedColumn; stored: bool
 }
 
 export default function ColumnPractice() {
-  const [op, setOp] = useState<ColOp>("tambah"); const [level, setLevel] = useState<ColLevel>(1); const [carry, setCarry] = useState(true);
+  const [op, setOp] = useState<ColOp>("tambah"); const [level, setLevel] = useState<ColLevel>(1);
+  // Kotak bantu menyala untuk tambah, kurang, dan kali; untuk bagi dimatikan dulu karena petunjuk langkah sudah menuntun.
+  const [helpers, setHelpers] = useState<Record<string, boolean>>({ bagi: false });
+  const carry = helpers[op] ?? true, setCarry = (c: boolean) => setHelpers(h => ({ ...h, [op]: c }));
   // Lembar soal baru dibuat setelah halaman berjalan di browser, karena jawaban tersimpan di perangkat.
   const ready = useSyncExternalStore(noop, () => true, () => false);
   return ready ? <Sheet key={`${op}-${level}`} op={op} level={level} setOp={setOp} setLevel={setLevel} carry={carry} setCarry={setCarry} /> : <Sheet op={op} level={level} setOp={setOp} setLevel={setLevel} carry={carry} setCarry={setCarry} loading />;

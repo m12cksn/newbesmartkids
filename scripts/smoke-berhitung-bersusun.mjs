@@ -71,6 +71,13 @@ try {
     await typeRtl(0, String(qs[0].answer)); await card(0).getByRole("button", { name: "Periksa" }).click(); await card(0).getByText(/Tepat!/).waitFor();
     await fit("kali"); if (width === 390 || width === 1280) await page.screenshot({ path: `${folder}/${width}-kali.png`, fullPage: true });
     // Bagi: kerjakan dari kiri.
+    // Bagi, Mudah: petunjuk langkah menyebut bilangan yang dibagi pada kolom itu.
+    await page.getByRole("radiogroup", { name: "Jenis soal" }).getByRole("radio", { name: "Bagi" }).click(); await page.getByRole("radio", { name: /Mudah/ }).click();
+    { const q = dailyColumn(day, "bagi", 1)[0], dv = String(q.a), lead = dv.length - String(q.answer).length, cur = Number(dv.slice(0, lead + 1));
+      await cell(0, 1).click(); await card(0).getByText(new RegExp(`Berapa ${cur} : ${q.b}\\?`)).waitFor();
+      await typeLtr(0, String(q.answer)); await card(0).getByRole("button", { name: "Periksa" }).click(); await card(0).getByText(/Tepat!/).waitFor(); }
+    if (width === 390) await page.screenshot({ path: `${folder}/${width}-bagi-mudah.png`, fullPage: true });
+    await page.getByRole("radio", { name: /Sulit/ }).click();
     // Bagi, Sulit: porogapit dengan kotak sisa, diisi lewat papan angka di layar.
     await page.getByRole("radiogroup", { name: "Jenis soal" }).getByRole("radio", { name: "Bagi" }).click(); qs = dailyColumn(day, "bagi", 3);
     await card(0).getByText("porogapit").waitFor();
@@ -78,6 +85,7 @@ try {
     const padBox = page.getByLabel("Papan angka", { exact: true });
     if (!(await padBox.isChecked())) await padBox.check();
     await cell(0, 1).click();
+    await card(0).getByRole("status").filter({ hasText: /Berapa \d+ : \d+\?/ }).waitFor();
     for (const d of String(qs[0].answer)) await page.getByRole("group", { name: "Papan angka" }).getByRole("button", { name: `Angka ${d}` }).click();
     for (const d of String(qs[0].rem ?? 0)) await page.getByRole("group", { name: "Papan angka" }).getByRole("button", { name: `Angka ${d}` }).click();
     assert.equal(await card(0).getByRole("textbox", { name: "Soal 1, sisa pembagian" }).inputValue(), String(qs[0].rem ?? 0), "papan angka mengisi sisa");

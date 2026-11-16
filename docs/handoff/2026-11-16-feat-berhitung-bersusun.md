@@ -14,6 +14,10 @@
 - Semua jenis: penanda kolom yang sedang dikerjakan, tombol "Bantu satu langkah" (soal yang dibantu tidak mendapat bintang), dan papan angka di layar (otomatis di perangkat sentuh, bisa dinyalakan atau dimatikan).
 - Kunci penyimpanan naik ke `bsk-bersusun-v2-*` karena format jawaban berubah.
 
+## Revisi 2 (pembagian lebih mudah dipahami)
+- Saat anak mengetuk kotak hasil pembagian, muncul petunjuk biru yang menyebut bilangan yang dibagi pada langkah itu, termasuk sisa yang digabung (misalnya 81 : 3, kotak kedua: "Sisa langkah sebelumnya 2, gabungkan dengan 1 menjadi 21. Berapa 21 : 3?"). Porogapit memakai petunjuk yang sama.
+- Kotak sisa kecil pada bersusun pendek kini mati secara bawaan (bisa dinyalakan lewat "Kotak sisa") dan letaknya di pojok kiri atas angka, tidak lagi di antara dua angka. Panduan pembagian diberi contoh 69 : 3 dan 75 : 3.
+
 ## Berkas
 - `src/lib/daily-column.ts`, `src/components/mastering/ColumnPractice.tsx`, `src/app/mastering-berhitung-bersusun/page.tsx`
 - `src/components/home/DailyPracticeCard.tsx`, `src/proxy.ts`, `src/app/sitemap.ts`
