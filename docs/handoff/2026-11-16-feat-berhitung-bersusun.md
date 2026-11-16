@@ -1,0 +1,31 @@
+# Berhitung bersusun harian (feat/berhitung-bersusun)
+
+## Ruang lingkup
+- Halaman baru `/mastering-berhitung-bersusun`: latihan hitung bersusun Tambah, Kurang, Kali, Bagi, dan Soal cerita, tiga tingkat (Mudah Kelas 2–3, Sedang Kelas 3–4, Sulit Kelas 4–6), tujuh soal per jenis dan tingkat.
+- Soal berganti setiap pukul 00.00 WIB dan sama untuk semua anak pada hari yang sama (dihitung dari tanggal, jenis, dan tingkat di `src/lib/daily-column.ts`). Jawaban tersimpan di perangkat per jenis dan tingkat; paket hari sebelumnya tetap bisa diselesaikan.
+- Kotak hasil diisi dari kanan ke kiri (bagi dari kiri ke kanan) dengan kursor pindah otomatis; kotak simpanan/sisa opsional; kali dua angka memakai baris hasil sebagian; soal cerita meminta memilih operasi dulu. Setiap soal diperiksa sendiri, kolom yang salah ditandai, dan pembahasan per kolom tersedia. Bintang di kepala halaman = jumlah jawaban benar hari ini. Hasil tersimpan ke akun lewat `SaveResult` setelah tujuh soal diperiksa.
+- Akses sama dengan Mastering lain (akun berpaket; aturan `mastering-*`), ditambahkan ke matcher `src/proxy.ts`. Kartu ketiga di bagian Mastering Matematika Harian beranda, dan sitemap.
+- Tampilan dan teks milik BeSmartKids; susunan terinspirasi contoh yang dikirim pengguna (tanpa koin, nyawa, atau suara).
+
+## Revisi 1 (masukan pengguna)
+- Pengurangan: kotak pinjaman di atas setiap kolom termasuk satuan, muat dua angka (71 − 46: 7 menjadi 6, 1 menjadi 11), angka asli dicoret otomatis; tidak dinilai, tetapi diberi warna setelah diperiksa dan dijelaskan di pembahasan (`borrowTops`, termasuk pinjam berantai seperti 503 − 168).
+- Perkalian dua angka: baris simpanan sendiri untuk setiap hasil sebagian dan untuk penjumlahan akhir; hasil sebagian diberi warna benar/salah setelah diperiksa (tidak memengaruhi skor).
+- Pembagian: Sedang dan Sulit memiliki kotak Sisa (sebagian soal bersisa, sisanya 0); Sulit memakai porogapit (`longDivision`) dengan baris hasil kali, hasil kurang, dan angka yang diturunkan, pembagi satu angka atau 11–25. Soal cerita pembagian bersisa menanyakan hasil dan sisa.
+- Semua jenis: penanda kolom yang sedang dikerjakan, tombol "Bantu satu langkah" (soal yang dibantu tidak mendapat bintang), dan papan angka di layar (otomatis di perangkat sentuh, bisa dinyalakan atau dimatikan).
+- Kunci penyimpanan naik ke `bsk-bersusun-v2-*` karena format jawaban berubah.
+
+## Revisi 2 (pembagian lebih mudah dipahami)
+- Saat anak mengetuk kotak hasil pembagian, muncul petunjuk biru yang menyebut bilangan yang dibagi pada langkah itu, termasuk sisa yang digabung (misalnya 81 : 3, kotak kedua: "Sisa langkah sebelumnya 2, gabungkan dengan 1 menjadi 21. Berapa 21 : 3?"). Porogapit memakai petunjuk yang sama.
+- Kotak sisa kecil pada bersusun pendek kini mati secara bawaan (bisa dinyalakan lewat "Kotak sisa") dan letaknya di pojok kiri atas angka, tidak lagi di antara dua angka. Panduan pembagian diberi contoh 69 : 3 dan 75 : 3.
+
+## Berkas
+- `src/lib/daily-column.ts`, `src/components/mastering/ColumnPractice.tsx`, `src/app/mastering-berhitung-bersusun/page.tsx`
+- `src/components/home/DailyPracticeCard.tsx`, `src/proxy.ts`, `src/app/sitemap.ts`
+- `scripts/verify-berhitung-bersusun.mjs`, `scripts/smoke-berhitung-bersusun.mjs`, `.github/workflows/berhitung-bersusun-qa.yml`
+
+## Validasi
+- Verify (revisi 1 juga memeriksa porogapit, sisa, dan kotak pinjaman): 6.300 soal dalam 60 hari (5 jenis × 3 tingkat), kunci benar, tanpa soal kembar, ada simpanan/pinjaman, soal cerita memuat empat operasi, berganti setiap hari, tingkat makin sulit.
+- Build lulus; smoke lulus di 320/390/768/1280 (tautan beranda, kursor kanan ke kiri, periksa, pembahasan, tersimpan setelah muat ulang, kotak pinjaman dua angka dan coretan, bantu satu langkah, soal cerita, kali dua angka dengan simpanan per baris, porogapit dengan sisa lewat papan angka); smoke beranda dan SEO lulus.
+
+## Status
+- Draft PR, menunggu persetujuan preview dari pengguna.
