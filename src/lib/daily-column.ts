@@ -47,7 +47,7 @@ function makeCalc(calc: Calc, level: ColLevel, r: () => number): ColQuestion {
     if (level === 3 && b < 11 && b > 9) continue;
     const rem = level > 1 && r() < 0.45 ? int(r, 1, b - 1) : 0, total = a * b + rem;
     if (total >= 10000 || String(total).length < 2 || (level === 3 && total < 100)) continue;
-    return { calc, a: total, b, answer: a, rem, withRem: level > 1, long: level === 3 };
+    return { calc, a: total, b, answer: a, rem, withRem: level > 1, long: true };
   }
   throw new Error("Soal tidak dapat dibuat");
 }
@@ -113,6 +113,27 @@ export function longDivision(a: number, b: number): LongStep[] {
   }
   return steps;
 }
+/** Kotak porogapit dalam urutan pengerjaan. kind: q = hasil bagi (atas), p = hasil kali, d = hasil kurang, b = angka yang diturunkan.
+ *  row 0 = baris bilangan yang dibagi; langkah ke-s memakai baris 2s+1 (hasil kali) dan 2s+2 (hasil kurang dan angka turun). */
+export type LongCell = { key: string; kind: "q" | "p" | "d" | "b"; row: number; col: number; want: string; hint: string };
+export function longLayout(q: ColQuestion): { N: number; lead: number; rows: number; cells: LongCell[] } {
+  const D = digits(q.a), N = D.length, st = longDivision(q.a, q.b), lead = st[0]?.end ?? N - 1, cells: LongCell[] = [];
+  st.forEach((x, s) => {
+    const cur = x.prod + x.diff, qd = x.prod / q.b, ps = String(x.prod), ds = String(x.diff);
+    const first = s === 0 && lead > 0 ? `${String(q.a).slice(0, lead)} lebih kecil dari ${q.b}, jadi ambil ${cur}. ` : "";
+    cells.push({ key: `q${x.end}`, kind: "q", row: -1, col: x.end, want: String(qd), hint: `${first}Berapa ${cur} : ${q.b}? Tulis hasilnya di atas.` });
+    ps.split("").forEach((d, k) => cells.push({ key: `p${s}-${x.end - ps.length + 1 + k}`, kind: "p", row: 2 * s + 1, col: x.end - ps.length + 1 + k, want: d, hint: `Berapa ${qd} × ${q.b}? Tulis hasilnya di bawah ${cur}.` }));
+    if (x.diff > 0 || x.brings.length === 0) ds.split("").forEach((d, k) => cells.push({ key: `d${s}-${x.end - ds.length + 1 + k}`, kind: "d", row: 2 * s + 2, col: x.end - ds.length + 1 + k, want: d, hint: `Berapa ${cur} − ${x.prod}?` }));
+    let run = x.diff;
+    x.brings.forEach(j => {
+      run = run * 10 + D[j];
+      cells.push({ key: `b${s}-${j}`, kind: "b", row: 2 * s + 2, col: j, want: String(D[j]), hint: `Turunkan angka ${D[j]} ke bawah, di samping ${x.diff > 0 ? x.diff : "hasil kurang"}.` });
+      if (run < q.b) cells.push({ key: `q${j}`, kind: "q", row: -1, col: j, want: "0", hint: `${run} lebih kecil dari ${q.b}, jadi tulis 0 di atas.` });
+    });
+  });
+  return { N, lead, rows: 1 + 2 * st.length, cells };
+}
+
 /** Pengurangan: angka atas setelah meminjam, per kolom dari kiri (null jika tidak berubah). */
 export function borrowTops(a: number, b: number): (number | null)[] {
   const x = digits(a).reverse(), y = digits(b).reverse(), out: (number | null)[] = Array(x.length).fill(null);
@@ -139,9 +160,10 @@ export function steps(q: ColQuestion): string[] {
 
 /* ---------- Penyimpanan ---------- */
 /** answers[i]: isi kotak hasil dari kiri ke kanan, "." untuk kotak kosong. ops[i]: operasi yang dipilih pada soal cerita. */
-export type SavedColumn = { date: string; answers: string[]; rems: string[]; ops: string[]; checked: boolean[]; helped: boolean[] };
+/** work[i]: isi kotak langkah porogapit (kunci dari longLayout). */
+export type SavedColumn = { date: string; answers: string[]; rems: string[]; ops: string[]; checked: boolean[]; helped: boolean[]; work: Record<string, string>[] };
 export const columnKey = (op: ColOp, level: ColLevel) => `bsk-bersusun-v2-${op}-${level}`;
-export const emptyColumn = (date: string): SavedColumn => ({ date, answers: Array(COUNT).fill(""), rems: Array(COUNT).fill(""), ops: Array(COUNT).fill(""), checked: Array(COUNT).fill(false), helped: Array(COUNT).fill(false) });
+export const emptyColumn = (date: string): SavedColumn => ({ date, answers: Array(COUNT).fill(""), rems: Array(COUNT).fill(""), ops: Array(COUNT).fill(""), checked: Array(COUNT).fill(false), helped: Array(COUNT).fill(false), work: Array.from({ length: COUNT }, () => ({})) });
 export const cellsToNumber = (cells: string) => cells.replace(/\./g, "");
 export function readColumn(raw: string | null): SavedColumn | null {
   try {
@@ -151,6 +173,7 @@ export function readColumn(raw: string | null): SavedColumn | null {
     return { date: v.date, answers: list(v.answers, a => (typeof a === "string" ? a.replace(/[^0-9.]/g, "").slice(0, 8) : "")),
       rems: list(v.rems, a => (typeof a === "string" ? a.replace(/\D/g, "").slice(0, 2) : "")),
       helped: Array.from({ length: COUNT }, (_, i) => Array.isArray(v.helped) && v.helped[i] === true),
+      work: Array.from({ length: COUNT }, (_, i) => { const w = Array.isArray(v.work) ? v.work[i] : null; return w && typeof w === "object" ? Object.fromEntries(Object.entries(w).filter(([k, x]) => /^[pdb]\d+-\d+$/.test(k) && typeof x === "string" && /^\d?$/.test(x)) as [string, string][]) : {}; }),
       ops: list(v.ops, a => (typeof a === "string" && ["tambah", "kurang", "kali", "bagi"].includes(a) ? a : "")),
       checked: Array.from({ length: COUNT }, (_, i) => Array.isArray(v.checked) && v.checked[i] === true) };
   } catch { return null; }
