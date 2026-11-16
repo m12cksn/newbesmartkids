@@ -1,0 +1,37 @@
+name: Berhitung Bersusun QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  bersusun:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-berhitung-bersusun.mjs
+      - run: npx eslint src/lib/daily-column.ts src/components/mastering/ColumnPractice.tsx src/app/mastering-berhitung-bersusun src/components/home/DailyPracticeCard.tsx src/proxy.ts scripts/smoke-berhitung-bersusun.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-bersusun.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-berhitung-bersusun.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: berhitung-bersusun-screenshots
+          path: /tmp/berhitung-bersusun-screenshots
+          if-no-files-found: ignore
