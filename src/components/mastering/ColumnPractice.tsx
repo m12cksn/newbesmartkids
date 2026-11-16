@@ -6,8 +6,8 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { SaveResult } from "@/components/auth/SaveResult";
 import { BrandMark } from "@/components/home/BrandMark";
 import {
-  answerWidth, borrowTops, COL_LEVELS, COL_OPS, columnKey, COUNT, dailyColumn, emptyColumn, isCorrect, longDivision, partials, readColumn, SIGN, steps, wibDate,
-  type Calc, type ColLevel, type ColOp, type ColQuestion, type SavedColumn,
+  answerWidth, borrowTops, COL_LEVELS, COL_OPS, columnKey, COUNT, dailyColumn, emptyColumn, isCorrect, longLayout, partials, readColumn, SIGN, steps, wibDate,
+  type Calc, type LongCell, type ColLevel, type ColOp, type ColQuestion, type SavedColumn,
 } from "@/lib/daily-column";
 
 const OP_STYLE: Record<ColOp, { bg: string; icon: ReactNode }> = {
@@ -21,7 +21,7 @@ const GUIDE: Record<ColOp, string[]> = {
   tambah: ["Tulis kedua bilangan rata kanan: satuan di bawah satuan, puluhan di bawah puluhan.", "Mulai dari kolom paling kanan (satuan).", "Jika hasil satu kolom 10 atau lebih, tulis angka satuannya, lalu simpan 1 di kotak simpanan kolom sebelah kiri.", "Jumlahkan kolom berikutnya bersama simpanannya."],
   kurang: ["Tulis bilangan yang lebih besar di atas, rata kanan.", "Mulai dari kolom satuan.", "Jika angka atas lebih kecil dari angka bawah, pinjam 1 dari kolom sebelah kiri. Angka atas bertambah 10, angka kiri berkurang 1.", "Tulis angka baru di kotak pinjaman di atasnya, misalnya 71 − 46: angka 1 menjadi 11 dan angka 7 menjadi 6. Angka lama otomatis tercoret.", "Kurangkan memakai angka baru: 11 − 6 = 5, lalu 6 − 4 = 2."],
   kali: ["Kalikan angka bawah dengan setiap angka atas, mulai dari satuan.", "Jika hasilnya 10 atau lebih, tulis satuannya dan simpan puluhannya di kotak simpanan.", "Tambahkan simpanan setelah mengalikan kolom berikutnya.", "Untuk pengali dua angka: kalikan dengan satuan dulu, lalu dengan puluhan (geser satu kolom, tulis 0 di satuan), lalu jumlahkan."],
-  bagi: ["Bagi dari kiri ke kanan. Ambil angka pertama; jika lebih kecil dari pembagi, ambil satu angka lagi.", "Bersusun pendek (Mudah, Sedang): ketuk kotak di atas angka. Kotak biru di bawahnya memberi tahu bilangan yang harus dibagi pada langkah itu.", "Contoh 69 : 3. Kotak di atas 6: 6 : 3 = 2. Kotak di atas 9: 9 : 3 = 3. Jadi hasilnya 23. Jika ada sisa, sisa digabung dengan angka berikutnya, misalnya 75 : 3: 7 : 3 = 2 sisa 1, lalu 15 : 3 = 5.", "Porogapit (Sulit): tulis hasil bagi di atas, kalikan dengan pembagi dan tulis di bawah, kurangkan, lalu turunkan angka berikutnya (berwarna biru). Ulangi sampai angka terakhir.", "Jika ada kotak Sisa, tulis angka yang tersisa di akhir. Tulis 0 jika habis dibagi. Periksa: hasil bagi × pembagi + sisa = bilangan yang dibagi."],
+  bagi: ["Porogapit dikerjakan langkah demi langkah. Kursor pindah sendiri ke kotak berikutnya, dan petunjuk biru menyebut apa yang harus dihitung.", "Contoh 72 : 4. 7 : 4 = 1, tulis 1 di atas. 1 × 4 = 4, tulis di bawah 7. 7 − 4 = 3. Turunkan 2 sehingga menjadi 32.", "32 : 4 = 8, tulis 8 di atas. 8 × 4 = 32, tulis di bawah. 32 − 32 = 0. Hasilnya 18.", "Angka paling bawah adalah sisa. Jika ada kotak Sisa, tulis angka itu (0 jika habis dibagi). Di tingkat Mudah dan Sedang semua kotak langkah wajib diisi; di tingkat Sulit boleh langsung menulis hasil."],
   cerita: ["Baca soal sampai selesai, lalu cari bilangan-bilangannya.", "Tentukan operasinya: digabung atau ditambah berarti +, sisa atau berkurang berarti −, setiap atau masing-masing berarti × atau :.", "Setelah memilih operasi, kolom hitung bersusun muncul.", "Kerjakan bersusun seperti biasa, lalu periksa apakah jawabannya masuk akal."],
 };
 
@@ -31,9 +31,9 @@ type CellApi = { type: (d: string) => void; back: () => void };
 const active: { current: { current: CellApi | null } | null } = { current: null };
 
 /** Kotak angka. max = banyak angka yang muat (kotak pinjaman muat dua angka, misalnya 11). */
-function Cell({ value, onChange, label, state, size = "lg", max = 1, refCb, onBack, onFocusCell, pad }: {
+function Cell({ value, onChange, label, state, size = "lg", max = 1, refCb, onBack, onFocusCell, pad, solid = false }: {
   value: string; onChange: (v: string) => void; label: string; state?: "ok" | "bad"; size?: "lg" | "md" | "sm"; max?: number;
-  refCb?: (el: HTMLInputElement | null) => void; onBack?: () => void; onFocusCell?: () => void; pad: boolean;
+  refCb?: (el: HTMLInputElement | null) => void; onBack?: () => void; onFocusCell?: () => void; pad: boolean; solid?: boolean;
 }) {
   const api = useRef<CellApi | null>(null);
   useEffect(() => { api.current = { type: d => onChange(max === 1 ? d : value.length < max ? value + d : d), back: () => (value ? onChange("") : onBack?.()) }; });
@@ -43,7 +43,7 @@ function Cell({ value, onChange, label, state, size = "lg", max = 1, refCb, onBa
     onKeyDown={e => { if (e.key === "Backspace" && !value) { e.preventDefault(); onBack?.(); } }}
     onFocus={e => { e.target.select(); active.current = api; onFocusCell?.(); }}
     className={`${sz} rounded-lg border-2 bg-white text-center font-extrabold tabular-nums outline-none focus:border-[#208f6d] focus:ring-2 focus:ring-[#208f6d]/30
-      ${state === "ok" ? "border-[#2b8a3e] bg-[#e6f6ec] text-[#2b8a3e]" : state === "bad" ? "border-[#e03131] bg-[#fff0f0] text-[#e03131]" : size === "lg" ? "border-[#17352a]" : "border-dashed border-[#adb5bd] text-[#e8590c]"}`} />;
+      ${state === "ok" ? "border-[#2b8a3e] bg-[#e6f6ec] text-[#2b8a3e]" : state === "bad" ? "border-[#e03131] bg-[#fff0f0] text-[#e03131]" : size === "lg" ? "border-[#17352a]" : solid ? "border-[#1c7ed6] text-[#17352a]" : "border-dashed border-[#adb5bd] text-[#e8590c]"}`} />;
 }
 const Fixed = ({ d, muted = false, struck = false }: { d: string; muted?: boolean; struck?: boolean }) =>
   <span className={`flex h-11 w-10 items-center justify-center text-xl font-extrabold tabular-nums ${muted ? "text-[#adb5bd]" : ""} ${struck ? "text-[#adb5bd] line-through decoration-[#e03131] decoration-2" : ""}`}>{d}</span>;
@@ -59,7 +59,9 @@ function divisionHint(q: ColQuestion, c: number, lead: number) {
 const Hint = ({ text }: { text: string }) => <p className="mt-2 flex max-w-xs items-start gap-1.5 rounded-xl bg-[#e7f3ff] px-3 py-2 text-sm font-semibold text-[#1c4f8a]" role="status"><Lightbulb className="mt-0.5 size-4 shrink-0" aria-hidden="true" />{text}</p>;
 
 /** Kerangka hitung bersusun untuk satu soal. cells: kotak hasil dari kiri ke kanan ("." = kosong). */
-function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad }: { q: ColQuestion; cells: string; setCells: (c: string) => void; rem: string; setRem: (r: string) => void; checked: boolean; carry: boolean; id: string; pad: boolean }) {
+function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad, work, setWork }: { q: ColQuestion; cells: string; setCells: (c: string) => void; rem: string; setRem: (r: string) => void; checked: boolean; carry: boolean; id: string; pad: boolean; work: Record<string, string>; setWork: (w: Record<string, string>) => void }) {
+  const refsByKey = useRef<Record<string, HTMLInputElement | null>>({});
+  const [focusKey, setFocusKey] = useState<string | null>(null);
   const W = answerWidth(q), refs = useRef<(HTMLInputElement | null)[]>([]), remRef = useRef<HTMLInputElement | null>(null);
   const [helper, setHelper] = useState<Record<string, string>>({});
   const [focusCol, setFocusCol] = useState<number | null>(null);
@@ -75,7 +77,7 @@ function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad }: { 
     <div key={k} className={`flex items-center gap-1 ${cls}`}><span className="flex w-6 justify-center text-xl font-extrabold">{gutter}</span>
       {Array.from({ length: n }, (_, c) => { const x = slot(c); return <span key={c} className={`flex min-h-7 w-10 justify-center rounded-md ${focusCol === c && x != null ? "bg-[#fff1b8]" : ""}`}>{x}</span>; })}</div>;
   const remBox = q.withRem && <div className="mt-2 flex items-center justify-center gap-2 font-bold"><span>Sisa</span>
-    <Cell pad={pad} max={2} value={rem} onChange={setRem} refCb={el => { remRef.current = el; }} label={`Soal ${id}, sisa pembagian`} onBack={() => refs.current[W - 1]?.focus()}
+    <Cell pad={pad} max={2} value={rem} onChange={setRem} refCb={el => { remRef.current = el; }} label={`Soal ${id}, sisa pembagian`} onBack={() => refs.current[W - 1]?.focus()} onFocusCell={() => setFocusKey("rem")}
       state={checked ? (rem === String(q.rem ?? 0) ? "ok" : "bad") : undefined} /></div>;
 
   if (q.calc === "bagi" && !q.long) {
@@ -93,24 +95,34 @@ function Column({ q, cells, setCells, rem, setRem, checked, carry, id, pad }: { 
     </div>;
   }
   if (q.calc === "bagi") {
-    // Porogapit: hasil di atas, lalu hasil kali dan hasil pengurangan untuk setiap langkah.
-    const dv = String(q.a), N = dv.length, lead = N - W, st = longDivision(q.a, q.b);
+    // Porogapit: setiap kotak (hasil di atas, hasil kali, hasil kurang, angka turun) diisi berurutan; kursor mengikuti urutan itu.
+    const dv = String(q.a), lay = longLayout(q), N = lay.N, divW = `${String(q.b).length * 1.6 + 0.5}rem`;
+    const order = lay.cells, at = new Map(order.map(c => [`${c.row}:${c.col}`, c]));
+    const val = (c: LongCell) => (c.kind === "q" ? (cells[c.col - lay.lead] ?? ".").replace(".", "") : work[c.key] ?? "");
+    const focusNext = (c: LongCell) => { const k = order.indexOf(c); const nx = order[k + 1]; if (nx) refsByKey.current[nx.key]?.focus(); else remRef.current?.focus(); };
+    const focusPrev = (c: LongCell) => { const k = order.indexOf(c); if (k > 0) refsByKey.current[order[k - 1].key]?.focus(); };
+    const setVal = (c: LongCell, v: string) => {
+      if (c.kind === "q") { const arr = cells.padEnd(W, ".").split(""); arr[c.col - lay.lead] = v || "."; setCells(arr.join("")); }
+      else setWork({ ...work, [c.key]: v });
+      if (v) focusNext(c);
+    };
+    const box = (c: LongCell) => <Cell key={c.key} pad={pad} size={c.kind === "q" ? "lg" : "md"} value={val(c)} onChange={v => setVal(c, v)} onBack={() => focusPrev(c)}
+      refCb={el => { refsByKey.current[c.key] = el; }} onFocusCell={() => { setFocusCol(c.col); setFocusKey(c.key); }}
+      label={`Soal ${id}, ${c.kind === "q" ? `angka hasil ke-${c.col - lay.lead + 1} dari kiri` : c.kind === "p" ? `langkah ${Math.ceil(c.row / 2)}, hasil kali kolom ke-${c.col + 1}` : c.kind === "d" ? `langkah ${c.row / 2}, hasil kurang kolom ke-${c.col + 1}` : `langkah ${c.row / 2}, angka turun kolom ke-${c.col + 1}`}`}
+      state={checked ? (val(c) ? (val(c) === c.want ? "ok" : "bad") : c.kind === "q" ? "bad" : undefined) : undefined} solid={c.kind !== "q"} />;
+    const hint = order.find(c => c.key === focusKey);
     return <div className="inline-flex flex-col items-start" aria-label={`Porogapit ${q.a} dibagi ${q.b}`} role="group">
-      <div className="flex"><span className="h-11" style={{ width: `${String(q.b).length * 1.6 + 0.5}rem` }} />{Row({ k: "q", n: N, slot: c => (c >= lead ? resultCell(c - lead, c) : null) })}</div>
+      <div className="flex"><span className="h-11" style={{ width: divW }} />{Row({ k: "q", n: N, slot: c => { const x = at.get(`-1:${c}`); return x ? box(x) : null; } })}</div>
       <div className="flex items-start">
-        <span className="flex h-11 items-center justify-end pe-1 text-xl font-extrabold" style={{ width: `${String(q.b).length * 1.6 + 0.5}rem` }}>{q.b}</span>
+        <span className="flex h-11 items-center justify-end pe-1 text-xl font-extrabold" style={{ width: divW }}>{q.b}</span>
         <div className="rounded-tl-xl border-l-[3px] border-t-[3px] border-[#17352a]">
-          {Row({ k: "d", n: N, slot: c => <Fixed d={dv[c]} /> })}
-          {st.map((x, s) => { const ps = String(x.prod), p0 = x.end - ps.length + 1, ds = String(x.diff), last = s === st.length - 1, showDiff = x.diff > 0 || x.brings.length === 0, d0 = x.end - ds.length + 1;
-            return <div key={s}>
-              {Row({ k: `p${s}`, n: N, gutter: "−", cls: "mt-1", slot: c => (c >= p0 && c <= x.end ? <span className="border-b-[3px] border-[#17352a] pb-0.5">{H(`lp${s}-${c}`, `Soal ${id}, langkah ${s + 1}, hasil kali angka ke-${c - p0 + 1}`, c, { want: ps[c - p0], size: "md" })}</span> : null) })}
-              {Row({ k: `r${s}`, n: N, cls: "mt-1", slot: c => (showDiff && c >= d0 && c <= x.end ? H(`ld${s}-${c}`, `Soal ${id}, langkah ${s + 1}, hasil kurang angka ke-${c - d0 + 1}`, c, { want: ds[c - d0], size: "md" })
-                : x.brings.includes(c) ? <span className="flex h-8 items-center text-base font-extrabold text-[#1c7ed6]" title="angka yang diturunkan">{dv[c]}</span> : null) })}
-              {last && q.withRem && <p className="ps-7 text-xs text-[#4b5f57]">Angka terakhir di bawah adalah sisanya.</p>}
-            </div>; })}
+          {Row({ k: "dv", n: N, slot: c => <Fixed d={dv[c]} /> })}
+          {Array.from({ length: lay.rows - 1 }, (_, r0) => { const r = r0 + 1, prod = r % 2 === 1;
+            return Row({ k: `r${r}`, n: N, gutter: prod ? "−" : undefined, cls: "mt-1", slot: c => { const x = at.get(`${r}:${c}`); return x ? (prod ? <span className="border-b-[3px] border-[#17352a] pb-0.5">{box(x)}</span> : box(x)) : null; } }); })}
         </div>
       </div>
-      {!checked && focusCol !== null && focusCol >= lead && <Hint text={`${divisionHint(q, focusCol, lead)} Tulis hasilnya di atas, lalu tulis hasil kalinya di bawah dan kurangkan.`} />}
+      {!checked && hint && <Hint text={hint.hint} />}
+      {!checked && !hint && focusKey === "rem" && <Hint text="Angka paling bawah adalah sisa. Tulis 0 jika habis dibagi." />}
       <div className="self-center">{remBox}</div>
     </div>;
   }
@@ -197,7 +209,7 @@ function Sheet({ op, level, setOp, setLevel, carry, setCarry, loading = false }:
           {COL_LEVELS.map(l => <button key={l.id} type="button" role="radio" aria-checked={l.id === level} onClick={() => setLevel(l.id)}
             className={`rounded-2xl border-[3px] border-[#17352a] px-2 py-1.5 shadow-[0_4px_0_#17352a] ${l.id === level ? "bg-[#ffd34f]" : "bg-white"}`}><span className="block text-sm font-extrabold">{l.name}</span><span className="block text-[11px] text-[#4b5f57]">{l.grade}</span></button>)}
         </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm font-bold"><input type="checkbox" className="checkbox checkbox-success" checked={carry} onChange={e => setCarry(e.target.checked)} />{op === "kurang" ? "Kotak pinjaman" : op === "bagi" ? "Kotak sisa" : "Kotak simpanan"}</label>
+        {op !== "bagi" && <label className="flex cursor-pointer items-center gap-2 text-sm font-bold"><input type="checkbox" className="checkbox checkbox-success" checked={carry} onChange={e => setCarry(e.target.checked)} />{op === "kurang" ? "Kotak pinjaman" : "Kotak simpanan"}</label>}
         <label className="flex cursor-pointer items-center gap-2 text-sm font-bold"><input type="checkbox" className="checkbox checkbox-success" checked={pad} onChange={e => setPad(e.target.checked)} />Papan angka</label>
       </div>
 
@@ -213,11 +225,19 @@ function Sheet({ op, level, setOp, setLevel, carry, setCarry, loading = false }:
       {save && <ol className="mt-3 space-y-4">{questions.map((q, i) => {
         const chosen = (op === "cerita" ? save.ops[i] : q.calc) as Calc | "", checked = save.checked[i], ok = good(i);
         const shown: ColQuestion = chosen === q.calc || !chosen ? q : { ...q, calc: chosen, withRem: false, long: false, answer: chosen === "tambah" ? q.a + q.b : chosen === "kurang" ? Math.abs(q.a - q.b) : chosen === "kali" ? q.a * q.b : Math.floor(q.a / q.b) };
-        const full = !save.answers[i].includes(".") && save.answers[i].length === answerWidth(shown) && (!shown.withRem || save.rems[i] !== "");
+        // Porogapit Mudah dan Sedang: semua kotak langkah wajib diisi. Sulit: cukup hasil dan sisa.
+        const stepCells = shown.calc === "bagi" && shown.long ? longLayout(shown).cells.filter(c => c.kind !== "q") : [];
+        const stepsDone = level === 3 || stepCells.every(c => (save.work[i][c.key] ?? "") !== "");
+        const full = !save.answers[i].includes(".") && save.answers[i].length === answerWidth(shown) && (!shown.withRem || save.rems[i] !== "") && stepsDone;
         /** Bantu satu langkah: pilih operasi yang benar, atau isi satu kotak hasil berikutnya. Soal yang dibantu tidak mendapat bintang. */
         const assist = () => upd(i, s => {
           if (op === "cerita" && s.ops[i] !== q.calc) return { ops: setAt(s.ops, i, q.calc), answers: setAt(s.answers, i, ""), rems: setAt(s.rems, i, ""), helped: setAt(s.helped, i, true) };
           const W = answerWidth(q), cur = s.answers[i].padEnd(W, ".").split(""), want = String(q.answer);
+          if (q.calc === "bagi" && q.long) {
+            const lay = longLayout(q), next = lay.cells.find(c => (c.kind === "q" ? cur[c.col - lay.lead] : s.work[i][c.key] ?? "") !== c.want);
+            if (next?.kind === "q") { cur[next.col - lay.lead] = next.want; return { answers: setAt(s.answers, i, cur.join("")), helped: setAt(s.helped, i, true) }; }
+            if (next) return { work: setAt(s.work, i, { ...s.work[i], [next.key]: next.want }), helped: setAt(s.helped, i, true) };
+          }
           const order = q.calc === "bagi" ? [...Array(W).keys()] : [...Array(W).keys()].reverse(), k = order.find(j => cur[j] !== want[j]);
           if (k !== undefined) { cur[k] = want[k]; return { answers: setAt(s.answers, i, cur.join("")), helped: setAt(s.helped, i, true) }; }
           if (q.withRem && s.rems[i] !== String(q.rem ?? 0)) return { rems: setAt(s.rems, i, String(q.rem ?? 0)), helped: setAt(s.helped, i, true) };
@@ -225,21 +245,22 @@ function Sheet({ op, level, setOp, setLevel, carry, setCarry, loading = false }:
         });
         const tone = ["bg-[#e03131]", "bg-[#1c7ed6]", "bg-[#2b8a3e]", "bg-[#e8590c]", "bg-[#7048e8]"][i % 5];
         return <li key={`${save.date}-${op}-${level}-${i}`} data-testid={`bersusun-${i}`} className={`rounded-3xl border-[3px] border-[#17352a] bg-white p-4 shadow-[0_5px_0_#17352a] ${checked ? (ok ? "ring-4 ring-[#2b8a3e]/30" : "ring-4 ring-[#e03131]/25") : ""}`}>
-          <p className="flex items-center gap-2 font-bold"><span className={`flex size-7 items-center justify-center rounded-lg text-sm font-extrabold text-white ${tone}`}>{i + 1}</span>{q.story ? "Soal cerita" : `${q.a} ${SIGN[q.calc]} ${q.b}`}{q.long && !q.story && <span className="rounded-full bg-[#e7f3ff] px-2 py-0.5 text-xs font-bold text-[#1c7ed6]">porogapit</span>}</p>
+          <p className="flex items-center gap-2 font-bold"><span className={`flex size-7 items-center justify-center rounded-lg text-sm font-extrabold text-white ${tone}`}>{i + 1}</span>{q.story ? "Soal cerita" : `${q.a} ${SIGN[q.calc]} ${q.b}`}{q.long && !q.story && <span className="rounded-full bg-[#e7f3ff] px-2 py-0.5 text-xs font-bold text-[#1c7ed6]">porogapit</span>}{q.long && level === 3 && !q.story && <span className="text-xs font-normal text-[#4b5f57]">kotak langkah boleh dilewati</span>}</p>
           {q.story && <><p className="mt-2 leading-7">{q.story}</p>
             <div role="radiogroup" aria-label={`Operasi soal ${i + 1}`} className="mt-2 flex flex-wrap items-center gap-2"><span className="text-sm font-bold">Operasinya:</span>
               {(["tambah", "kurang", "kali", "bagi"] as Calc[]).map(c => <button key={c} type="button" role="radio" aria-checked={chosen === c} aria-label={`Operasi ${COL_OPS.find(o => o.id === c)!.name}`} disabled={checked}
-                onClick={() => upd(i, s => ({ ops: setAt(s.ops, i, c), answers: setAt(s.answers, i, ""), rems: setAt(s.rems, i, "") }))}
+                onClick={() => upd(i, s => ({ ops: setAt(s.ops, i, c), answers: setAt(s.answers, i, ""), rems: setAt(s.rems, i, ""), work: setAt(s.work, i, {}) }))}
                 className={`flex size-10 items-center justify-center rounded-xl border-[3px] border-[#17352a] text-lg font-extrabold shadow-[0_3px_0_#17352a] ${chosen === c ? "bg-[#ffd34f]" : "bg-white"}`}>{SIGN[c]}</button>)}</div>
             {!chosen && <p className="mt-2 text-sm text-[#4b5f57]">Pilih operasi dulu untuk menampilkan kolom hitung.</p>}</>}
           {chosen && <div className="mt-3 flex justify-center overflow-x-auto py-2">
             <Column key={chosen} id={String(i + 1)} q={shown} pad={pad} rem={save.rems[i]} setRem={r => upd(i, s => ({ rems: setAt(s.rems, i, r) }))}
-              cells={save.answers[i]} setCells={c => upd(i, s => ({ answers: setAt(s.answers, i, c) }))} checked={checked} carry={carry} />
+              cells={save.answers[i]} setCells={c => upd(i, s => ({ answers: setAt(s.answers, i, c) }))} checked={checked} carry={carry}
+              work={save.work[i]} setWork={w => upd(i, s => ({ work: setAt(s.work, i, w) }))} />
           </div>}
           {chosen && <div className="mt-3 flex flex-wrap items-center gap-2">
             {!checked ? <button type="button" className="btn rounded-2xl border-[3px] border-[#17352a] bg-[#208f6d] text-white shadow-[0_4px_0_#17352a] hover:bg-[#18785a]" disabled={!full}
               onClick={() => upd(i, s => ({ checked: setAt(s.checked, i, true) }))}>Periksa</button>
-              : <button type="button" className="btn btn-sm rounded-xl border-2 border-[#17352a] bg-white" onClick={() => { upd(i, s => ({ checked: setAt(s.checked, i, false), answers: setAt(s.answers, i, ""), rems: setAt(s.rems, i, "") })); setOpen(null); }}><RotateCcw className="size-4" aria-hidden="true" />Coba lagi</button>}
+              : <button type="button" className="btn btn-sm rounded-xl border-2 border-[#17352a] bg-white" onClick={() => { upd(i, s => ({ checked: setAt(s.checked, i, false), answers: setAt(s.answers, i, ""), rems: setAt(s.rems, i, ""), work: setAt(s.work, i, {}) })); setOpen(null); }}><RotateCcw className="size-4" aria-hidden="true" />Coba lagi</button>}
             {!checked && <button type="button" className="btn btn-sm rounded-xl border-2 border-[#17352a] bg-[#fff6d6]" onClick={assist}><Hand className="size-4" aria-hidden="true" />Bantu satu langkah</button>}
             {save.helped[i] && <span className="text-xs text-[#4b5f57]">Dibantu, tanpa bintang</span>}
             {checked && <p role="status" className={`flex items-center gap-1 font-bold ${ok ? "text-[#2b8a3e]" : "text-[#e03131]"}`}>{ok ? <><Check className="size-5" aria-hidden="true" />Tepat! {q.answer}{q.withRem ? ` sisa ${q.rem ?? 0}` : ""}{q.storyUnit ? ` ${q.storyUnit}` : ""}.</> : <><X className="size-5" aria-hidden="true" />{chosen !== q.calc ? "Operasinya belum tepat." : "Ada kotak yang belum tepat."}</>}</p>}

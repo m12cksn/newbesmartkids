@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
-import { borrowTops, dailyColumn, wibDate } from "../src/lib/daily-column.ts";
+import { borrowTops, dailyColumn, longLayout, wibDate } from "../src/lib/daily-column.ts";
 
 // Berhitung bersusun: tautan dari beranda, ketik dari kanan ke kiri, periksa, pembahasan, soal cerita, kali dua angka, bagi, tersimpan.
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
@@ -18,7 +18,8 @@ try {
     const cell = (i, k) => card(i).getByRole("textbox", { name: `Soal ${i + 1}, angka hasil ke-${k} dari kiri` });
     /** Ketik hasil seperti anak: mulai kotak paling kanan, kursor pindah sendiri ke kiri. */
     const typeRtl = async (i, value) => { await cell(i, value.length).click(); for (const d of [...value].reverse()) await page.keyboard.type(d); };
-    const typeLtr = async (i, value) => { await cell(i, 1).click(); for (const d of value) await page.keyboard.type(d); };
+    /** Porogapit: ketuk kotak hasil pertama, lalu ketik setiap langkah berurutan; kursor mengikuti urutan langkah. */
+    const fillLong = async (i, q) => { await cell(i, 1).click(); for (const c of longLayout(q).cells) await page.keyboard.type(c.want); if (q.withRem) await page.keyboard.type(String(q.rem ?? 0)); };
     await page.goto(origin + "/");
     await page.getByRole("link", { name: "Latihan berhitung bersusun" }).click();
     await page.waitForURL(`${origin}/mastering-berhitung-bersusun`);
@@ -58,8 +59,7 @@ try {
     await card(0).getByText("Pilih operasi dulu untuk menampilkan kolom hitung.").waitFor();
     const opName = { tambah: "Tambah", kurang: "Kurang", kali: "Kali", bagi: "Bagi" }[qs[0].calc];
     await card(0).getByRole("radio", { name: `Operasi ${opName}` }).click();
-    if (qs[0].calc === "bagi") await typeLtr(0, String(qs[0].answer)); else await typeRtl(0, String(qs[0].answer));
-    if (qs[0].withRem) await card(0).getByRole("textbox", { name: "Soal 1, sisa pembagian" }).fill(String(qs[0].rem ?? 0));
+    if (qs[0].calc === "bagi") await fillLong(0, qs[0]); else await typeRtl(0, String(qs[0].answer));
     await card(0).getByRole("button", { name: "Periksa" }).click(); await card(0).getByText(/Tepat!/).waitFor();
     await fit("cerita"); if (width === 390) await page.screenshot({ path: `${folder}/${width}-cerita.png`, fullPage: true });
     // Kali, Sulit: pengali dua angka dengan baris hasil sebagian.
@@ -75,7 +75,14 @@ try {
     await page.getByRole("radiogroup", { name: "Jenis soal" }).getByRole("radio", { name: "Bagi" }).click(); await page.getByRole("radio", { name: /Mudah/ }).click();
     { const q = dailyColumn(day, "bagi", 1)[0], dv = String(q.a), lead = dv.length - String(q.answer).length, cur = Number(dv.slice(0, lead + 1));
       await cell(0, 1).click(); await card(0).getByText(new RegExp(`Berapa ${cur} : ${q.b}\\?`)).waitFor();
-      await typeLtr(0, String(q.answer)); await card(0).getByRole("button", { name: "Periksa" }).click(); await card(0).getByText(/Tepat!/).waitFor(); }
+      // Mudah: hanya hasil di atas belum cukup, semua kotak langkah wajib diisi.
+      for (const [k, d] of String(q.answer).split("").entries()) await cell(0, k + 1).fill(d);
+      assert.ok(await card(0).getByRole("button", { name: "Periksa" }).isDisabled(), "kotak langkah wajib di tingkat Mudah");
+      for (const [k] of String(q.answer).split("").entries()) await cell(0, k + 1).fill("");
+      await cell(0, 1).click(); await page.keyboard.type(longLayout(q).cells[0].want);
+      await card(0).getByText(/Tulis hasilnya di bawah/).waitFor();
+      for (const c of longLayout(q).cells.slice(1)) await page.keyboard.type(c.want);
+      await card(0).getByRole("button", { name: "Periksa" }).click(); await card(0).getByText(/Tepat!/).waitFor(); }
     if (width === 390) await page.screenshot({ path: `${folder}/${width}-bagi-mudah.png`, fullPage: true });
     await page.getByRole("radio", { name: /Sulit/ }).click();
     // Bagi, Sulit: porogapit dengan kotak sisa, diisi lewat papan angka di layar.
@@ -86,7 +93,8 @@ try {
     if (!(await padBox.isChecked())) await padBox.check();
     await cell(0, 1).click();
     await card(0).getByRole("status").filter({ hasText: /Berapa \d+ : \d+\?/ }).waitFor();
-    for (const d of String(qs[0].answer)) await page.getByRole("group", { name: "Papan angka" }).getByRole("button", { name: `Angka ${d}` }).click();
+    const key = d => page.getByRole("group", { name: "Papan angka" }).getByRole("button", { name: `Angka ${d}` }).click();
+    for (const c of longLayout(qs[0]).cells) await key(c.want);
     for (const d of String(qs[0].rem ?? 0)) await page.getByRole("group", { name: "Papan angka" }).getByRole("button", { name: `Angka ${d}` }).click();
     assert.equal(await card(0).getByRole("textbox", { name: "Soal 1, sisa pembagian" }).inputValue(), String(qs[0].rem ?? 0), "papan angka mengisi sisa");
     await card(0).getByRole("button", { name: "Periksa" }).click(); await card(0).getByText(/Tepat!/).waitFor();
