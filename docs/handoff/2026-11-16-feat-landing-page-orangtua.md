@@ -6,15 +6,15 @@
 - Demo tiga soal (benda, gambar, angka) dengan jeruk dan batang yang digambar SVG.
 - Paket diambil dari `src/lib/packages.ts`; paket SMA diaktifkan (`onSale: true`) atas permintaan pengguna.
 - Tombol beli memakai `accessUrl()` (Scalev jika `NEXT_PUBLIC_SCALEV_URL` diisi, selain itu WhatsApp admin).
-- Tautan masuk: menu "Paket" di header (desktop) dan tombol "Lihat paket belajar" di bagian penutup beranda (semua layar). Ditambahkan ke sitemap.
+- Halaman ini untuk tautan iklan dan dibuka langsung lewat URL. Sesuai keputusan sebelumnya (feat/learning-only), beranda tetap khusus belajar: tidak ada menu Paket atau harga di beranda. Halaman ditambahkan ke sitemap.
 
 ## Berkas
 - `src/app/paket-belajar/page.tsx`, `src/components/landing/{ParentLanding,LandingDemo,JenjangTabs}.tsx`
-- `src/lib/packages.ts`, `src/components/home/SiteHeader.tsx`, `src/components/home/CallToAction.tsx`, `src/app/sitemap.ts`
+- `src/lib/packages.ts`, `src/app/sitemap.ts`
 - `scripts/smoke-landing-paket.mjs`, `.github/workflows/landing-paket-qa.yml`
 
 ## Validasi
-- Lint, typecheck, build produksi lulus; `smoke-landing-paket.mjs` lulus di 320/390/768/1280 (tautan dari beranda, demo, tab jenjang, 4 paket, FAQ, tanpa scroll horizontal); smoke halaman kelas lulus.
+- Lint, typecheck, build produksi lulus; `smoke-landing-paket.mjs` lulus di 320/390/768/1280 (demo, tab jenjang, 4 paket, FAQ, tanpa scroll horizontal); smoke halaman kelas lulus.
 
 ## Status
 - Draft PR untuk dilihat pengguna di preview sebelum di-merge. Belum ada foto dan URL Scalev dari pengguna.
