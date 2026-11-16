@@ -13,7 +13,7 @@ export function CallToAction() {
         <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">Belajar matematika dengan lebih tenang.</h2>
         <p className="mt-2 max-w-xl text-sm text-success-content/80">BeSmartKids membantu anak membangun pemahaman satu konsep dalam satu waktu.</p>
       </div>
-      <a href="#kelas" className="btn btn-neutral">Mulai dari kelas 1 <ArrowRight className="size-4" aria-hidden="true" /></a>
+      <div className="flex flex-wrap gap-2"><a href="/paket-belajar" className="btn btn-warning">Lihat paket belajar</a><a href="#kelas" className="btn btn-neutral">Mulai dari kelas 1 <ArrowRight className="size-4" aria-hidden="true" /></a></div>
     </div>
   </section>;
 }
