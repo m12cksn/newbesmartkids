@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/home/SiteFooter";
-import { SiteHeader } from "@/components/home/SiteHeader";
 import { ParentLanding } from "@/components/landing/ParentLanding";
 
 export const metadata: Metadata = {
@@ -9,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <main data-theme="besmartkids" className="min-h-screen bg-base-100 text-base-content">
-    <SiteHeader />
-    <ParentLanding />
-    <SiteFooter />
-  </main>;
+  return <ParentLanding />;
 }

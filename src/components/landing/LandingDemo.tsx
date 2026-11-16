@@ -40,6 +40,8 @@ export function LandingDemo() {
     {done ? <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
       <p className="text-3xl font-extrabold">{score} / 3</p>
       <p className="text-sm">Dari benda, ke gambar, lalu ke angka. Begitulah setiap bab di BeSmartKids disusun.</p>
+      <ol className="w-full space-y-1.5 text-left text-xs">{STEPS.map((x, k) => <li key={x.tag} className="flex items-center gap-2 rounded-lg bg-[#f5faf7] px-2 py-1.5">
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#208f6d] text-[10px] font-bold text-white">{k + 1}</span><span><strong>{x.tag}:</strong> {x.title}</span></li>)}</ol>
       <button type="button" className="btn btn-sm btn-outline gap-1" onClick={() => { setI(0); setPicked(null); setScore(0); }}><RotateCcw className="size-4" aria-hidden="true" />Coba lagi</button>
     </div> : <>
       <p className="w-fit rounded-full bg-[#e6f4ea] px-2 py-0.5 text-xs font-bold text-[#208f6d]">{s.tag}</p>

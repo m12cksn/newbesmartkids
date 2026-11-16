@@ -8,6 +8,10 @@
 - Tombol beli memakai `accessUrl()` (Scalev jika `NEXT_PUBLIC_SCALEV_URL` diisi, selain itu WhatsApp admin).
 - Halaman ini untuk tautan iklan dan dibuka langsung lewat URL. Sesuai keputusan sebelumnya (feat/learning-only), beranda tetap khusus belajar: tidak ada menu Paket atau harga di beranda. Halaman ditambahkan ke sitemap.
 
+## Revisi 1 (masukan pengguna: terlalu banyak putih dan ruang kosong)
+- Tata letak dibuat mengikuti referensi lebih dekat: satu kolom sempit di tengah (juga di desktop), latar hijau muda di seluruh halaman, kartu putih berbingkai hijau, tombol kuning dengan bayangan tebal, kartu fitur dua kolom, banner produk di atas paket, bagian "Cara pesan", dan bar beli tetap di bawah pada semua ukuran layar.
+- Header dan footer situs tidak dipakai di halaman ini (seperti halaman iklan referensi); tautan Beranda, Syarat layanan, dan Kebijakan privasi ada di bagian bawah.
+
 ## Berkas
 - `src/app/paket-belajar/page.tsx`, `src/components/landing/{ParentLanding,LandingDemo,JenjangTabs}.tsx`
 - `src/lib/packages.ts`, `src/app/sitemap.ts`
