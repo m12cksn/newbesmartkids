@@ -11,3 +11,4 @@
 - `public/landing/paket-belajar-scalev-shell.html` adalah salinan kerangka `html_document` yang disimpan di Scalev. Ubah tampilan lewat file CSS/JS ini lalu naikkan `?v=` di kerangka Scalev agar cache baru dipakai.
 - Produk Scalev: "Paket Belajar BeSmartKids" (id 495932), varian SD/SMP/SMA Rp69.000 dan Keluarga Rp129.000. Form memesan lewat bundle "BSK Paket SD/SMP/SMA/Keluarga" (opsi harga 47041 sampai 47044) yang ditempel ke toko 60056, karena produk tidak bisa ditempel ke toko lewat API.
 - Paket Keluarga Rp129.000 berisi 2 akun (permintaan Mr Iwan). Kerangka Scalev memakai `?v=2`.
+- 2026-11-17: harga Paket Jenjang naik ke Rp79.000 dengan akses 1 tahun (permintaan Mr Iwan). Diubah di Scalev (varian 649667–649669, opsi harga bundle 47041–47043) dan di aset landing; kerangka Scalev memakai `?v=3`.
