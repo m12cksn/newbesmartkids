@@ -17,7 +17,7 @@ try {
     const button = name => page.getByRole("button", { name, exact: true });
     const radio = (g, n) => page.getByRole("radiogroup", { name: g, exact: true }).getByRole("radio", { name: String(n), exact: true });
     const result = () => page.getByTestId("lab-result").getAttribute("data-value");
-    const next = async n => { for (let k = 0; k < n; k++) await button("Langkah berikutnya").click(); };
+    const next = async n => { for (let k = 0; k < n; k++) await button("Lanjut").click(); };
     const fit = async label => { const s = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth })); assert.ok(s.scroll <= s.inner, `overflow ${width} ${label}: ${JSON.stringify(s)}`); };
     const shot = async name => { await page.screenshot({ path: `${folder}/${width}-${name}.png` }); };
 
@@ -30,7 +30,9 @@ try {
 
     // Tempel jari 7 × 8
     assert.equal(await result(), "7x8:0");
-    await next(4); assert.equal(await result(), "7x8:4"); await page.getByText("50 + 6 = 56. Jadi 7 × 8 = 56.").waitFor();
+    const handPos = () => page.evaluate(() => document.querySelector('#peraga [aria-label="Tangan kiri"]').parentElement.style.transform);
+    const before = await handPos(); await next(1); assert.notEqual(await handPos(), before, "tangan harus bergeser saat jari dipertemukan");
+    await next(3); assert.equal(await result(), "7x8:4"); await page.getByText("50 + 6 = 56. Jadi 7 × 8 = 56.").waitFor(); await page.getByText("5 × 10 = 50", { exact: true }).waitFor();
     await page.locator("#peraga").scrollIntoViewIfNeeded(); await shot("tempel");
     await page.getByRole("button", { name: "jari tengah tangan kiri, nilai 8" }).click(); assert.equal(await result(), "8x8:0");
     // Lipat jari 9 × 3, lalu ketuk jari ke-2
