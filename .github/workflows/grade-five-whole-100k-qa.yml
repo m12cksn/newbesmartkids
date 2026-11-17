@@ -1,4 +1,4 @@
-name: Grade 5 Whole QA
+name: Grade 5 Whole Numbers 100000 QA
 on:
   pull_request:
     branches: [master]
@@ -6,9 +6,9 @@ on:
     branches: [master]
   workflow_dispatch:
 jobs:
-  whole:
+  whole100k:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,22 +16,22 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm install --no-audit --no-fund
-      - run: node --experimental-strip-types scripts/verify-grade-five-whole.mjs
-      - run: npx eslint src/data/grade-five-whole.ts src/components/learn/GradeFiveWholeNumbers.tsx src/components/learn/GradeFiveWholeAnswer.tsx
+      - run: node --experimental-strip-types scripts/verify-grade-five-whole-100k.mjs
+      - run: npx eslint src/data/grade-five-whole-100k.ts src/components/learn/GradeFiveWhole100k.tsx src/chapters/kelas-5-bilangan-cacah-100000/meta.ts src/chapters/kelas-5-bilangan-cacah-100000/Chapter.tsx scripts/verify-grade-five-whole-100k.mjs scripts/smoke-grade-five-whole-100k.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install chromium
       - name: Browser QA
         run: |
-          npm run start -- --hostname 127.0.0.1 > /tmp/next-grade-five.log 2>&1 &
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-whole100k.log 2>&1 &
           for i in $(seq 1 45); do
             if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
             sleep 2
           done
-          node --experimental-strip-types scripts/smoke-grade-five-whole.mjs
+          node --experimental-strip-types scripts/smoke-grade-five-whole-100k.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: grade-five-whole-screenshots
-          path: /tmp/grade-five-whole-screenshots
+          name: grade-five-whole-100k-screenshots
+          path: /tmp/grade-five-whole-100k-screenshots
           if-no-files-found: ignore
