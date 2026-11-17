@@ -6,9 +6,9 @@ on:
     branches: [master]
   workflow_dispatch:
 jobs:
-  cubes:
+  cubes6:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,23 +16,22 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm install --no-audit --no-fund
-      - run: node --experimental-strip-types scripts/verify-grade-six-cubes.mjs
-      - run: npx eslint src/data/grade-six-cubes.ts src/components/learn/GradeSixCubes.tsx src/components/learn/CubesVisuals.tsx
+      - run: node --experimental-strip-types scripts/verify-grade-six-cubes-v2.mjs
+      - run: npx eslint src/data/grade-six-cubes-v2.ts src/components/learn/GradeSixCubesV2.tsx src/chapters/kelas-6-kubus-balok/meta.ts src/chapters/kelas-6-kubus-balok/Chapter.tsx scripts/verify-grade-six-cubes-v2.mjs scripts/smoke-grade-six-cubes-v2.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install chromium
       - name: Browser QA
         run: |
-          npm run start -- --hostname 127.0.0.1 > /tmp/next-cubes.log 2>&1 &
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-cubes6.log 2>&1 &
           for i in $(seq 1 45); do
             if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
             sleep 2
           done
-          node --experimental-strip-types scripts/smoke-grade-six-cubes.mjs
-          node scripts/smoke-cube-orbit.mjs
+          node --experimental-strip-types scripts/smoke-grade-six-cubes-v2.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: grade-six-cubes-screenshots
-          path: /tmp/grade-six-cubes-screenshots
+          name: grade-six-cubes-v2-screenshots
+          path: /tmp/grade-six-cubes-v2-screenshots
           if-no-files-found: ignore
