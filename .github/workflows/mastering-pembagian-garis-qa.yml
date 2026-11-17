@@ -1,0 +1,35 @@
+name: Mastering pembagian garis QA
+on:
+  pull_request:
+    branches: [master]
+    paths: ['src/components/mastering/PembagianGaris*', 'src/lib/daily-pembagian-garis.ts', 'src/app/mastering-pembagian-garis/**', 'src/components/home/DailyPracticeCard.tsx', 'scripts/*pembagian-garis*', '.github/workflows/mastering-pembagian-garis-qa.yml']
+  workflow_dispatch:
+jobs:
+  pembagian-garis:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-daily-pembagian-garis.mjs
+      - run: npx eslint src/lib/daily-pembagian-garis.ts src/components/mastering/PembagianGarisLab.tsx src/components/mastering/PembagianGarisMastering.tsx src/app/mastering-pembagian-garis
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Test pembagian garis in browser
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/pembagian-garis-next.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-mastering-pembagian-garis.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mastering-pembagian-garis-screenshots
+          path: /tmp/mastering-pembagian-garis-screenshots
+          if-no-files-found: ignore
