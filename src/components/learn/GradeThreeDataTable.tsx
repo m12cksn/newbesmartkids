@@ -140,6 +140,11 @@ function SceneView({ scene }: { scene: Scene }) {
       {scene.items.flatMap(it => Array.from({ length: it.n }, () => { const [x, y, r] = spots[k++ % spots.length]; return <span key={k} className="absolute" style={{ left: `${x * 0.86}%`, top: `${y * 0.8}%`, transform: `rotate(${r}deg)` }}><Icon thing={it.thing} className="size-8" /></span>; }))}
     </div>; }
     case "letters": return <div className="grid grid-cols-9 gap-1 rounded-xl border-2 border-rose-200 bg-white p-2 font-mono text-xl font-bold" role="img" aria-label={`Kotak huruf: ${scene.text}`}>{scene.text.split(" ").map((c, i) => <span key={i} className="grid size-7 place-items-center">{c}</span>)}</div>;
+    case "classes": return <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-wrap justify-center gap-2">{scene.groups.map(g => <figure key={g.label} className="flex flex-col items-center rounded-xl border-2 border-emerald-300 bg-emerald-50 px-2 py-1.5" aria-label={`${g.label}: ${g.books} buku tulis untuk setiap anak`}>
+        <figcaption className="text-sm font-extrabold">{g.label}</figcaption><span className="flex max-w-32 flex-wrap justify-center">{Array.from({ length: g.books }, (_, i) => <Icon key={i} thing="buku" className="size-5" />)}</span><span className="text-xs font-semibold">{g.books} buku per anak</span></figure>)}</div>
+      <div className="flex flex-wrap justify-center gap-1.5">{scene.kids.map(k => <span key={k} className="inline-flex items-center gap-1 rounded-full border border-base-300 bg-white px-2 py-0.5 text-sm font-bold"><Person />{k}</span>)}</div>
+    </div>;
     case "word": return <div className="flex flex-wrap justify-center gap-1" role="img" aria-label={`Kata ${scene.word}`}>{scene.word.split("").map((c, i) => <span key={i} className="grid h-10 w-8 place-items-center rounded-md border-2 border-sky-300 bg-sky-50 text-xl font-extrabold">{c}</span>)}</div>;
   }
 }
