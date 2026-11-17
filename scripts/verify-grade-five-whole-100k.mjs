@@ -51,9 +51,10 @@ const sumNotes = s => s.notes.reduce((a, n) => a + n.value * n.count, 0);
 { const q = Q.find(q => q.prompt.startsWith("Komang membayar Rp45.600 dengan 3")); assert.equal(30000 + 600 + q.parts[0].answers[0] * 1000, 45600); }
 { const q = practice[2][2]; const [r, h] = q.parts[0].answers; assert.equal(40000 + r * 1000 + h * 100, 45600); }
 { const q = practice[2][3]; assert.equal(55000 + q.parts[0].answers[0] * 2000, 59000); }
-{ const q = Q.find(q => q.prompt.startsWith("Uang Lukas 6 lembar")); assert.deepEqual(q.parts[0].answers, [63500, 38600]); }
+{ const q = Q.find(q => q.prompt.startsWith("Hitung uang Lukas")); assert.deepEqual(q.parts[0].answers, q.scene.groups.map(sumNotes)); assert.equal(q.parts[1].answer, q.scene.groups[0].name === "Uang Lukas" && sumNotes(q.scene.groups[0]) > sumNotes(q.scene.groups[1]) ? "Lukas" : "Asep"); }
 // Nilai tempat, urutan, buah
-for (const q of all) for (const p of q.parts) if (p.kind === "pv") assert.ok(q.prompt.includes(fmt(p.n)), q.prompt);
+for (const q of all) for (const p of q.parts) if (p.kind === "pv") assert.ok(q.prompt.includes(fmt(p.n)) || q.parts.some(f => f.kind === "fill" && f.answers[0] === p.n), q.prompt);
+{ const q = Q.find(q => q.prompt.startsWith("Jumlah penduduk sebuah kecamatan")), d = digits5(q.parts[0].n); assert.deepEqual(d, [2, 2 + 4, 9, 9 / 3, 2]); assert.ok(Q.filter(x => x.level !== "Sedang").every(x => !x.parts.some(p => p.kind === "pv" && x.prompt.includes(fmt(p.n)))), "soal menantang tidak boleh menyalin bilangan ke tabel"); }
 for (const q of all) for (const p of q.parts) if (p.kind === "choice" && /^\d+\.\d+ … \d+\.\d+$/.test(p.label)) { const [a, b] = p.label.split(" … ").map(s => Number(s.replace(".", ""))); assert.equal(p.answer, a < b ? "<" : a > b ? ">" : "="); }
 for (const q of all) for (const p of q.parts) if (p.kind === "choice" && / dan .*:$/.test(p.label) && /^\d/.test(p.label)) assert.equal(Number(p.answer.replace(".", "")), Math.min(...p.options.map(o => Number(o.replace(".", "")))));
 { const q = Q.find(q => q.prompt.startsWith("Bilangan mana yang angka 7")); const ok = q.parts[0].options.filter(o => { const d = digits5(Number(o.replace(".", ""))); return d[0] === 7 && d[4] === 7; }); assert.deepEqual(ok, [q.parts[0].answer]); }
