@@ -1,0 +1,37 @@
+name: Grade 3 Whole Numbers 1000 QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  whole1000:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-three-whole-1000.mjs
+      - run: npx eslint src/data/grade-three-whole-1000.ts src/components/learn/GradeThreeWhole1000.tsx src/components/learn/GradeThreeWhole1000Art.tsx src/chapters/kelas-3-bilangan-cacah-1000/meta.ts src/chapters/kelas-3-bilangan-cacah-1000/Chapter.tsx scripts/verify-grade-three-whole-1000.mjs scripts/smoke-grade-three-whole-1000.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-whole1000.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-three-whole-1000.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-three-whole-1000-screenshots
+          path: /tmp/grade-three-whole-1000-screenshots
+          if-no-files-found: ignore
