@@ -7,7 +7,7 @@
 - Laporan untuk orang tua.
 - Dibuka lewat browser HP, tablet, laptop. Tanpa install.
 - Bab pertama setiap kelas bisa dicoba gratis.
-- Harga: Paket Jenjang (SD, SMP, atau SMA) Rp79.000 sekali bayar, akses 1 tahun (berlaku sejak 17 November 2026; sebelumnya Rp69.000). Paket Keluarga Rp129.000, semua jenjang, 2 akun (masa akses belum ditetapkan, jangan disebut). Bukan bulanan.
+- Harga: Paket Jenjang (SD, SMP, atau SMA) Rp79.000 sekali bayar, akses 1 tahun (berlaku sejak 17 November 2026; sebelumnya Rp69.000). Paket Keluarga Rp129.000, semua jenjang, 2 akun, akses 1 tahun. Akun dikirim lewat WhatsApp maksimal 1 × 24 jam setelah pembayaran diterima. Bukan bulanan.
 - Pesan di: https://be-smart-kids.myscalev.com/paket-belajar-besmartkids
 - Akses dikirim admin (username dan PIN) lewat WhatsApp setelah pembayaran diterima.
 - Video pembelajaran: sedang disiapkan bertahap. Jangan klaim video sudah ada.
