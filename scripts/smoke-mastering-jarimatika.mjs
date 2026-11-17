@@ -49,29 +49,44 @@ try {
 
     // Soal harian level 1
     const qs = dailyQuestions(wibDate(), 1);
-    for (const [i, q] of qs.entries()) await page.getByTestId(`question-${i}`).locator("input:visible").fill(String(i === 0 ? q.answer + 1 : q.answer));
+    for (const [i, q] of qs.entries()) await page.getByTestId(`question-${i}`).locator('input[aria-label^="Jawaban soal"]:visible').fill(String(i === 0 ? q.answer + 1 : q.answer));
     await page.getByRole("button", { name: /Periksa jawaban/ }).click();
     await page.getByText("Benar 6, perlu diperbaiki 1, skor 86/100").waitFor();
-    await page.getByTestId("question-0").getByRole("button", { name: "Cara jari" }).click();
-    const [a, b] = qs[0].fact;
-    await page.getByTestId("question-0").getByRole("button", { name: `Peragakan ${a} × ${b}` }).click();
-    await page.waitForFunction(v => document.querySelector('[data-testid="lab-result"]').dataset.value === v, `${a}x${b}:0`);
-    await page.waitForTimeout(600); const top = await page.locator("#peraga").boundingBox(); assert.ok(top.y < height && top.y + 40 > 0, `peraga tidak terlihat setelah Peragakan: ${top.y}`);
-    await shot("hasil");
+    // Peraga di bawah soal: murid sendiri yang memilih dan menekuk jari, tanpa jawaban otomatis
+    const row = page.getByTestId("question-0"), wrong = String(qs[0].answer + 1);
+    await row.getByRole("button", { name: "Tampilkan peraga" }).click();
+    const box = row.getByTestId("peraga-latihan"); await box.waitFor();
+    await box.getByRole("radio", { name: "Tempel jari" }).click();
+    const hand = () => box.evaluate(el => el.querySelector('[aria-label="Tangan kiri"]').parentElement.style.transform);
+    const apart = await hand();
+    await box.getByRole("button", { name: "jari tengah tangan kiri, nilai 8" }).click();
+    await box.getByRole("button", { name: "jari manis tangan kanan, nilai 7" }).click();
+    assert.notEqual(await hand(), apart, "tangan bergeser setelah dua jari dipilih");
+    await box.getByRole("button", { name: "jari manis tangan kiri, nilai 7" }).click();
+    await box.getByRole("button", { name: "jari manis tangan kiri, nilai 7, ditekuk" }).waitFor();
+    await box.getByRole("radio", { name: "Lipat jari untuk 9" }).click();
+    await box.getByRole("button", { name: "Jari ke-3, berdiri" }).click(); await box.getByRole("button", { name: "Jari ke-3, ditekuk" }).waitFor();
+    await box.getByRole("radio", { name: "Hitung loncat dengan jari" }).click();
+    await box.getByRole("button", { name: "Jari ke-1, ditekuk" }).click(); await box.getByRole("button", { name: "Jari ke-1, berdiri" }).waitFor();
+    assert.equal(await row.locator('input[aria-label^="Jawaban soal"]:visible').inputValue(), wrong, "peraga tidak mengisi jawaban");
+    assert.ok(!(await box.textContent()).includes(`= ${qs[0].result}`), "peraga tidak menampilkan hasil");
+    await box.scrollIntoViewIfNeeded(); await shot("hasil");
     // Tersimpan setelah dimuat ulang
-    await page.reload(); await page.getByText("Latihan hari ini").waitFor(); await page.getByTestId("question-0").locator("input:visible").waitFor();
-    assert.equal(await page.getByTestId("question-1").locator("input:visible").inputValue(), String(qs[1].answer));
-    await page.getByTestId("question-0").locator("input:visible").fill(String(qs[0].answer));
+    await page.reload(); await page.getByText("Latihan hari ini").waitFor(); await page.getByTestId("question-0").locator('input[aria-label^="Jawaban soal"]:visible').waitFor();
+    assert.equal(await page.getByTestId("question-1").locator('input[aria-label^="Jawaban soal"]:visible').inputValue(), String(qs[1].answer));
+    await page.getByTestId("question-0").getByRole("button", { name: "Tampilkan peraga" }).click();
+    await page.getByTestId("question-0").locator('input[aria-label^="Jawaban soal"]:visible').fill(String(qs[0].answer));
+    await page.getByTestId("question-0").getByTestId("peraga-latihan").waitFor();
     await page.getByRole("button", { name: /Periksa jawaban/ }).click(); await page.getByText("Hebat, lengkap dan tepat!").waitFor();
 
     // Level 3: bilangan yang hilang di posisi berbeda
     await page.getByRole("link", { name: /Level 3/ }).click(); await page.waitForURL(/level-3$/);
     const q3 = dailyQuestions(wibDate(), 3); assert.ok(q3.some(q => q.blank !== 2));
     await page.getByTestId("question-0").locator(`input:visible[aria-label^="Jawaban soal 1: ${[q3[0].blank === 0 ? "kosong" : q3[0].left]}"]`).waitFor();
-    for (const [i, q] of q3.entries()) await page.getByTestId(`question-${i}`).locator("input:visible").fill(String(q.answer));
+    for (const [i, q] of q3.entries()) await page.getByTestId(`question-${i}`).locator('input[aria-label^="Jawaban soal"]:visible').fill(String(q.answer));
     await page.getByRole("button", { name: /Periksa jawaban/ }).locator("visible=true").click(); await page.getByText("Benar 7, perlu diperbaiki 0, skor 100/100").locator("visible=true").waitFor();
     await fit("level 3"); await shot("level3");
     assert.deepEqual(errors, []); await page.close();
-    console.log(`PASS mastering jarimatika di ${width}×${height}: beranda, tempel, lipat, loncat, putar otomatis, 7 soal, petunjuk dan peragakan, tersimpan, level 3`);
+    console.log(`PASS mastering jarimatika di ${width}×${height}: beranda, tempel, lipat, loncat, putar otomatis, 7 soal, peraga di soal, tersimpan, level 3`);
   }
 } finally { await browser.close(); }

@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Hand, Pause, Play, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
-import { lesson, lipatParts, loncatParts, methodFor, methodName, tempelParts } from "@/lib/daily-jarimatika";
+import { lesson, lipatParts, loncatParts, methodFor, methodName, tempelParts, type Method } from "@/lib/daily-jarimatika";
 
 /* ====================================================================== */
 /* Jari dan tangan                                                         */
@@ -252,4 +252,75 @@ export default function JarimatikaLab({ a, b, setPair }: { a: number; b: number;
     </div>
     <p className="mt-2 text-sm text-[#617367]">{m === "tempel" ? "Ketuk jari di gambar untuk mengganti bilangan 6 sampai 10." : m === "lipat9" ? "Ketuk jari mana saja untuk mengganti bilangan yang dikali 9." : "Pilih bilangan di atas, lalu tekan Lanjut untuk mengangkat jari satu per satu."}</p>
   </section>;
+}
+
+/* ====================================================================== */
+/* Peraga kerja untuk soal latihan: murid sendiri yang memilih, menekuk    */
+/* dan mengangkat jari. Peraga tidak menghitung atau menampilkan jawaban.  */
+/* ====================================================================== */
+type Side = { touch: number | null; folded: number[] };
+function PracticeSide({ side, s, onTap }: { side: "kiri" | "kanan"; s: Side; onTap: (v: number) => void }) {
+  const reachOf = (f: (typeof SIDE)[number]) => (s.folded.includes(f.v) ? 0 : s.touch !== null && f.v !== s.touch ? sideReach(f, s.touch, 1) : 1);
+  const finger = (f: (typeof SIDE)[number]) => <g key={f.v} {...tapProps(`${f.name} tangan ${side}, nilai ${f.v}${s.folded.includes(f.v) ? ", ditekuk" : ""}`, () => onTap(f.v), f.v === s.touch)}>
+    <Finger {...f} reach={reachOf(f)} tone={s.folded.includes(f.v) ? "tens" : "skin"} nail={false} ring={f.v === s.touch && !s.folded.includes(f.v)} />
+  </g>;
+  return <>
+    {SIDE.slice(1).map(finger)}
+    <path d="M74 90 C84 80 90 70 100 62 C120 56 142 60 156 76 C166 86 172 96 172 110 L174 198 C172 210 160 216 140 216 C112 216 92 212 74 206 Z" fill="url(#jm-palm)" stroke={LINE} strokeWidth="1.6" />
+    <path d="M150 110 C128 106 108 114 96 126 M156 150 C132 146 114 152 102 162 M122 80 C104 102 100 134 110 172" fill="none" stroke={CREASE} strokeWidth="1.3" strokeLinecap="round" opacity=".7" />
+    {finger(SIDE[0])}
+  </>;
+}
+function PracticeTempel() {
+  const empty: Side = { touch: null, folded: [] };
+  const [h, setH] = useState<{ l: Side; r: Side }>({ l: empty, r: empty });
+  const tap = (hand: "l" | "r") => (v: number) => setH(p => {
+    const s = p[hand];
+    const next: Side = s.touch === null ? { ...s, touch: v } : { ...s, folded: s.folded.includes(v) ? s.folded.filter(x => x !== v) : [...s.folded, v] };
+    return { ...p, [hand]: next };
+  });
+  const met = h.l.touch !== null && h.r.touch !== null;
+  const ta = h.l.touch !== null ? tipOf(SIDE.find(f => f.v === h.l.touch)!) : null, tb = h.r.touch !== null ? tipOf(SIDE.find(f => f.v === h.r.touch)!) : null;
+  const dy = met && ta && tb ? (tb.y - ta.y) / 2 : 0;
+  const L = { x: met && ta ? SC - 2 - ta.x : SC - 18 - MAXTIP, y: SY + dy }, R = { x: met && tb ? SC + 2 + tb.x : SC + 18 + MAXTIP, y: SY - dy };
+  const move = { transition: `transform .9s ${EASE}` };
+  const marks = (dir: 1 | -1) => SIDE.map(f => { const v = at(f, BASE * f.L * 0.55); return <Bubble key={f.v} x={dir * v.x} y={v.y} text={f.v} color="#8a5a3b" light />; });
+  const say = !h.l.touch && !h.r.touch ? "Ketuk satu jari di tangan kiri dan satu jari di tangan kanan untuk dipertemukan."
+    : !met ? "Sekarang ketuk satu jari di tangan yang lain." : "Ketuk jari untuk menekuk atau meluruskannya. Hitung sendiri puluhan dan satuannya.";
+  return <div>
+    <p className="mb-1 text-sm font-bold text-[#33583e] sm:text-base" aria-live="polite">{say}</p>
+    <svg viewBox={`84 ${SY - 52} ${SW - 168} 350`} className="mx-auto h-auto w-full max-w-lg" role="group" aria-label="Peraga tempel jari">
+      <Defs />
+      <g style={{ ...move, transform: `translate(${L.x}px, ${L.y}px)` }}><g role="group" aria-label="Tangan kiri"><PracticeSide side="kiri" s={h.l} onTap={tap("l")} /></g>{marks(1)}</g>
+      <g style={{ ...move, transform: `translate(${R.x}px, ${R.y}px)` }}><g role="group" aria-label="Tangan kanan" transform="scale(-1 1)"><PracticeSide side="kanan" s={h.r} onTap={tap("r")} /></g>{marks(-1)}</g>
+    </svg>
+    <button type="button" className="btn btn-ghost btn-sm gap-1" onClick={() => setH({ l: empty, r: empty })}><RotateCcw className="size-4" aria-hidden="true" />Pilih ulang jari</button>
+  </div>;
+}
+function PracticeUpright({ mode, each }: { mode: "lipat9" | "loncat"; each: number | null }) {
+  const start = mode === "loncat" ? [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] : [];
+  const [folded, setFolded] = useState<number[]>(start);
+  const say = mode === "lipat9" ? "Ketuk jari nomor yang dikali 9 untuk menekuknya. Hitung jari di kiri dan di kanannya."
+    : each ? `Mulai dari tangan mengepal. Setiap jari bernilai ${each}. Ketuk jari untuk mengangkatnya satu per satu sambil menghitung loncat.` : "Mulai dari tangan mengepal. Ketuk jari untuk mengangkatnya satu per satu sambil menghitung loncat.";
+  return <div>
+    <p className="mb-1 text-sm font-bold text-[#33583e] sm:text-base">{say}</p>
+    <TenFingers reach={k => (folded.includes(k) ? 0 : 1)} tone={k => (folded.includes(k) ? "off" : "skin")}
+      marks={k => (mode === "lipat9" ? { text: k + 1, color: "#8a5a3b", light: true } : null)}
+      label={k => `Jari ke-${k + 1}${folded.includes(k) ? ", ditekuk" : ", berdiri"}`}
+      onTap={k => setFolded(f => (f.includes(k) ? f.filter(x => x !== k) : [...f, k]))} />
+    <button type="button" className="btn btn-ghost btn-sm gap-1" onClick={() => setFolded(start)}><RotateCcw className="size-4" aria-hidden="true" />Ulangi peraga</button>
+  </div>;
+}
+/** Peraga jarimatika di bawah soal latihan. `blank` menandai bilangan yang ditanyakan (0 kiri, 1 kanan, 2 hasil). */
+export function JarimatikaPractice({ a, b, blank }: { a: number; b: number; blank: 0 | 1 | 2 }) {
+  const [mode, setMode] = useState<Method>(methodFor(a, b));
+  const each = blank === 0 ? b : blank === 1 ? a : Math.max(a, b);
+  return <div className="rounded-2xl border border-[#e0e9df] bg-[#fbfcf9] p-3 text-[#17352a] sm:p-4" data-testid="peraga-latihan">
+    <div role="radiogroup" aria-label="Cara jari" className="mb-2 flex flex-wrap gap-1">
+      {(["tempel", "lipat9", "loncat"] as Method[]).map(m => <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}
+        className={`rounded-full px-3 py-1.5 text-sm font-bold ${mode === m ? "bg-[#208f6d] text-white" : "border border-[#dbe5dc] bg-white text-[#33583e]"}`}>{methodName[m]}</button>)}
+    </div>
+    {mode === "tempel" ? <PracticeTempel /> : <PracticeUpright key={mode} mode={mode} each={mode === "loncat" ? each : null} />}
+    <p className="mt-1 text-xs text-[#617367] sm:text-sm">Peraga tidak menghitung jawaban. Tulis hasil hitunganmu di kotak jawaban.</p>
+  </div>;
 }
