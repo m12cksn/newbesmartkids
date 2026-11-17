@@ -17,12 +17,14 @@ function Strokes({ col, q }: { col: Col; q: number }) {
   if (!total) return <p className="py-4 text-center text-xs font-bold text-[#9aa59e]">Belum ada garis</p>;
   const ids = Array.from({ length: total }, (_, i) => i), groups: number[][] = [];
   for (let g = 0; g < col.tied; g++) groups.push(ids.slice(g * q, g * q + q));
-  const loose = ids.slice(col.tied * q);
+  // Garis lepas dipecah per pembagi agar membungkus di dalam kolom sempit (layar ponsel).
+  const looseIds = ids.slice(col.tied * q), loose: number[][] = [];
+  for (let k = 0; k < looseIds.length; k += q) loose.push(looseIds.slice(k, k + q));
   const stroke = (i: number) => <span key={i} aria-hidden="true" className="block h-7 w-[3px] rounded-full" style={{ background: i < col.carried ? CARRY : INK, transform: `rotate(${(i * 37) % 7 - 3}deg)` }} />;
   return <div className="flex flex-wrap content-start justify-center gap-x-3 gap-y-2 py-2">
     {groups.map((g, k) => <span key={k} className="relative inline-flex items-end gap-[5px] px-1" data-ikat="ya">{g.map(stroke)}
       <span aria-hidden="true" className="absolute left-[-3px] right-[-3px] top-1/2 h-[3px] rounded-full" style={{ background: TIE, transform: "rotate(-24deg)" }} /></span>)}
-    {loose.length > 0 && <span className="inline-flex items-end gap-[5px] px-1" data-ikat="belum">{loose.map(stroke)}</span>}
+    {loose.map((g, k) => <span key={`l${k}`} className="inline-flex items-end gap-[5px] px-1" data-ikat="belum">{g.map(stroke)}</span>)}
   </div>;
 }
 

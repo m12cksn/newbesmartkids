@@ -67,6 +67,12 @@ try {
     assert.equal(await box.getByRole("textbox", { name: `Banyak ikatan kolom ${place}` }).inputValue(), "", "hasil kolom tidak diisi otomatis");
     await box.getByRole("textbox", { name: `Banyak ikatan kolom ${place}` }).fill(String(Math.floor(d0 / q)));
     assert.equal(await row.locator('input[aria-label^="Jawaban soal"]:visible').inputValue(), wrong, "peraga tidak mengisi jawaban");
+    // Pindahkan sisa: kolom kanan mendapat banyak garis (10 per sisa) dan semuanya harus tetap di dalam kolomnya
+    for (let k = 0; k < 2; k++) await box.getByRole("button", { name: `Tambah garis kolom ${place}` }).click();
+    await box.getByRole("button", { name: `Pindahkan sisa kolom ${place} ke kanan` }).click();
+    const spill = await box.getByTestId("latihan-kolom-1").evaluate(col => { const r = col.getBoundingClientRect(); return [...col.querySelectorAll("[data-ikat] > span")].filter(s => { const b = s.getBoundingClientRect(); return b.left < r.left - 1 || b.right > r.right + 1; }).length; });
+    assert.ok(await box.getByTestId("latihan-kolom-1").locator("[data-ikat] > span").count() >= 20, "garis sisa pindah ke kolom kanan");
+    assert.equal(spill, 0, "garis meluber keluar kolom");
     await box.scrollIntoViewIfNeeded(); await shot("hasil");
     // Tersimpan setelah dimuat ulang
     await page.reload(); await page.getByText("Latihan hari ini").waitFor(); await page.getByTestId("question-0").locator('input[aria-label^="Jawaban soal"]:visible').waitFor();
