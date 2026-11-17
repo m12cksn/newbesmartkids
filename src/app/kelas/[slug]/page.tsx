@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, ClipboardCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -10,6 +10,7 @@ import { classes } from "@/components/home/home-data";
 import { SiteFooter } from "@/components/home/SiteFooter";
 import { SiteHeader } from "@/components/home/SiteHeader";
 import { getMaterialsByClass } from "@/data/materials";
+import { SAT_SLUG, satExams } from "@/exams/registry";
 
 export function generateStaticParams() {
   return classes.map(({ slug }) => ({ slug }));
@@ -37,6 +38,7 @@ async function ClassPageContent({ params }: { params: Promise<{ slug: string }> 
   const classMaterials = [...getMaterialsByClass(classItem.id)].sort((a, b) => a.chapter - b.chapter);
 
   const free = classMaterials.find(m => freeMaterialSlugs.has(m.slug)) ?? null;
+  const sat = satExams[classItem.id];
 
   return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader />
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
@@ -50,7 +52,12 @@ async function ClassPageContent({ params }: { params: Promise<{ slug: string }> 
         {classMaterials.length > 0 ? <>
           <div className="mt-6"><ChapterPath list={classMaterials} /></div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{classMaterials.map(m => <MaterialCard key={m.id} material={m} classSlug={classItem.slug} free={m.id === free?.id} />)}</div>
-        </> : <div className="mt-6 rounded-md border border-dashed border-base-300 bg-base-100 p-6 text-base-content/70">Bab Kelas {classItem.id} sedang disusun. Sementara itu, coba <Link href="/#kelas" className="link text-success">kelas lain</Link> atau <Link href="/mastering-penjumlahan-pengurangan/level-1" className="link text-success">latihan harian</Link>.</div>}
+          {sat && <Link href={`/kelas/${classItem.slug}/${SAT_SLUG}`} className="mt-8 flex flex-col gap-3 rounded-2xl border-2 border-success/40 bg-base-100 p-5 transition hover:border-success sm:flex-row sm:items-center sm:justify-between">
+            <span className="flex items-start gap-3"><ClipboardCheck className="mt-1 size-6 shrink-0 text-success" strokeWidth={1.75} aria-hidden="true" />
+              <span><span className="block text-xl font-extrabold">{sat.title}</span><span className="block text-sm text-base-content/70">{sat.questions} soal dari semua bab, {sat.minutes} menit, dengan skor dan pembahasan. Untuk akun Kelas {classItem.id}.</span></span></span>
+            <span className="btn btn-success shrink-0">Buka ujian<ArrowRight className="size-4" aria-hidden="true" /></span>
+          </Link>}
+        </> :<div className="mt-6 rounded-md border border-dashed border-base-300 bg-base-100 p-6 text-base-content/70">Bab Kelas {classItem.id} sedang disusun. Sementara itu, coba <Link href="/#kelas" className="link text-success">kelas lain</Link> atau <Link href="/mastering-penjumlahan-pengurangan/level-1" className="link text-success">latihan harian</Link>.</div>}
       </section>
     </div><SiteFooter /></main>;
 }

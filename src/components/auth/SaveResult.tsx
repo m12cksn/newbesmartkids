@@ -4,7 +4,7 @@ import { CloudCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAccess } from "./AccessProvider";
 
-const PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian)\/level-[1-3]$/;
+const PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian)\/level-[1-3]$|^\/kelas\/[a-z0-9-]+\/ujian-akhir-tahun$/;
 
 /**
  * Simpan hasil latihan atau evaluasi ke akun yang sedang masuk (sekali per penyelesaian).
