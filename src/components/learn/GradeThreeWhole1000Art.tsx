@@ -33,7 +33,7 @@ export function Flat({ size = 64 }: { size?: number }) {
 }
 /** Kumpulan balok: papan ratusan, batang puluhan, kubus satuan. */
 export function Blocks({ h, t, u, scale = 1, label }: { h: number; t: number; u: number; scale?: number; label?: string }) {
-  const flat = Math.round(64 * scale), bar = Math.round(16 * scale), cube = Math.round(20 * scale);
+  const flat = Math.round((h <= 4 ? 64 : h <= 6 ? 48 : 38) * scale), bar = Math.round(16 * scale), cube = Math.round(20 * scale);
   return <div role="img" aria-label={label ?? `${h} papan ratusan, ${t} batang puluhan, ${u} kubus satuan`} className="flex flex-wrap items-end justify-center gap-x-5 gap-y-3">
     {h > 0 && <div className="flex max-w-[22rem] flex-wrap justify-center gap-1.5">{Array.from({ length: h }, (_, i) => <Flat key={i} size={flat} />)}</div>}
     {t > 0 && <div className={`grid gap-0.5 ${t > 6 ? "grid-cols-2 gap-x-2" : ""}`}>{Array.from({ length: t }, (_, i) => <Rod key={i} size={bar} />)}</div>}

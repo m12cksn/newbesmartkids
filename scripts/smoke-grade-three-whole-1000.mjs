@@ -48,7 +48,8 @@ try {
     await fit("awal");
 
     const labChecks = {
-      blocks: async () => { assert.equal(await result(), "115"); await clicks("Satuan tambah", 5); assert.equal(await result(), "tukar"); await button("Tukar 10 satuan jadi 1 puluhan").click(); assert.equal(await result(), "120"); },
+      blocks: async () => { assert.equal(await result(), "115"); await clicks("Satuan tambah", 5); assert.equal(await result(), "tukar"); await button("Tukar 10 satuan jadi 1 puluhan").click(); assert.equal(await result(), "120");
+        await clicks("Ratusan tambah", 7); await clicks("Puluhan tambah", 8); await button("Tukar 10 puluhan jadi 1 ratusan").click(); assert.equal(await result(), "900"); await clicks("Puluhan tambah", 10); assert.ok(await button("Satuan tambah").isDisabled(), "satuan berhenti di 1.000"); assert.ok(await button("Puluhan tambah").isDisabled(), "batas 1.000"); await button("Tukar 10 puluhan jadi 1 ratusan").click(); assert.equal(await result(), "1000"); },
       cards: async () => { assert.equal(await result(), ""); for (const d of [7, 0, 3]) await button(`Kartu ${d}`).click(); assert.equal(await result(), "703"); },
       cans: async () => { assert.equal(await result(), "251"); await button("Puluhan tambah").click(); assert.equal(await result(), "261"); },
       compare: async () => { assert.equal(await result(), "0|"); await button("Tanda <").click(); assert.equal(await result(), "0|ok"); await button("Berikutnya").click(); await button("Tanda <").click(); assert.equal(await result(), "1|no"); },

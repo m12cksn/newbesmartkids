@@ -73,20 +73,26 @@ function Column({ a, b, op, out, carry }: { a: number; b: number; op: "+" | "−
 /* ====================================================================== */
 function BlocksLab() {
   const [h, setH] = useState(1), [t, setT] = useState(1), [u, setU] = useState(5);
-  const n = 100 * h + 10 * t + u, over = t > 9 || u > 9;
+  const n = 100 * h + 10 * t + u, over = t > 9 || u > 9, room = 1000 - n, thousand = h === 10;
+  const shown = thousand ? [0, 0, 0] : [h, t, u];
   return <div className="space-y-3">
     <div className="flex flex-wrap justify-around gap-2">
-      <VStepper label="Ratusan" color={placeColor.h} value={h} set={setH} min={0} max={9} />
-      <VStepper label="Puluhan" color={placeColor.t} value={t} set={setT} min={0} max={12} />
-      <VStepper label="Satuan" color={placeColor.u} value={u} set={setU} min={0} max={12} />
+      <VStepper label="Ratusan" color={placeColor.h} value={h} set={setH} min={0} max={Math.max(h, Math.min(9, h + Math.floor(room / 100)))} />
+      <VStepper label="Puluhan" color={placeColor.t} value={t} set={setT} min={0} max={Math.max(t, Math.min(12, t + Math.floor(room / 10)))} />
+      <VStepper label="Satuan" color={placeColor.u} value={u} set={setU} min={0} max={Math.max(u, Math.min(12, u + room))} />
     </div>
     <div className="grid min-h-32 place-items-center rounded-xl bg-base-100 p-2 sm:min-h-40 sm:p-3 [@media(max-height:700px)]:min-h-0 [@media(max-height:700px)]:[zoom:0.75] lg:[zoom:1.4]"><Blocks h={h} t={t} u={u} scale={1} /></div>
     <div className="flex flex-wrap items-center gap-1.5">
       <button type="button" className="btn btn-sm btn-success" disabled={u < 10} onClick={() => { setU(u - 10); setT(t + 1); }}>Tukar 10 satuan jadi 1 puluhan</button>
-      <button type="button" className="btn btn-sm btn-success" disabled={t < 10 || h >= 9} onClick={() => { setT(t - 10); setH(h + 1); }}>Tukar 10 puluhan jadi 1 ratusan</button>
+      <button type="button" className="btn btn-sm btn-success" disabled={t < 10} onClick={() => { setT(t - 10); setH(h + 1); }}>Tukar 10 puluhan jadi 1 ratusan</button>
     </div>
-    <div className="flex flex-wrap items-center gap-4"><PvTable cell={i => [h, t, u][i] > 9 ? <span className="text-error">{[h, t, u][i]}</span> : [h, t, u][i]} /><span className="text-4xl font-extrabold text-success sm:text-5xl">{over ? "?" : n}</span></div>
-    <Result value={over ? "tukar" : String(n)}>{over ? <>Ada lebih dari 9 di satu tempat. Tukar dulu 10 menjadi 1 di tempat sebelah kirinya.</> : <><strong>{n}</strong> dibaca <strong>{reading(n).toLowerCase()}</strong>.</>}</Result>
+    <div className="flex flex-wrap items-center gap-3">
+      {thousand ? <div className="inline-grid grid-cols-4 overflow-hidden rounded-xl border-2 border-lime-300 bg-lime-50 text-center">
+        {["Ribuan", ...placeNames].map((p, i) => <span key={p} className="border-b-2 border-lime-300 px-1.5 py-0.5 text-xs font-bold" style={{ color: ["#b45309", ...placeColors][i] }}>{p}</span>)}
+        {[1, 0, 0, 0].map((d, i) => <span key={i} className="grid min-h-12 place-items-center text-3xl font-extrabold">{d}</span>)}
+      </div> : <PvTable cell={i => shown[i] > 9 ? <span className="text-error">{shown[i]}</span> : shown[i]} />}
+      <span className="text-4xl font-extrabold text-success sm:text-5xl">{over ? "?" : n.toLocaleString("id-ID")}</span></div>
+    <Result value={over ? "tukar" : String(n)}>{over ? <>Ada lebih dari 9 di satu tempat. Tukar dulu 10 menjadi 1 di tempat sebelah kirinya.</> : thousand ? <>10 ratusan = 1 ribuan: <strong>1.000</strong>, dibaca <strong>seribu</strong>.</> : <><strong>{n}</strong> dibaca <strong>{reading(n).toLowerCase()}</strong>.</>}</Result>
   </div>;
 }
 function CardsLab() {
