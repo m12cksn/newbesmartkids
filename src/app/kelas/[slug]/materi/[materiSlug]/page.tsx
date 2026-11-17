@@ -27,7 +27,6 @@ import GradeOneChapterFive from "@/components/learn/GradeOneChapterFive";
 import GradeOneChapterSix from "@/components/learn/GradeOneChapterSix";
 import GradeOneChapterSeven from "@/components/learn/GradeOneChapterSeven";
 import GradeOneAddition from "@/components/learn/GradeOneAddition";
-import GradeThreeWholeNumbers from "@/components/learn/GradeThreeWholeNumbers";
 import GradeSixProbability from "@/components/learn/GradeSixProbability";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -81,9 +80,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   }
   if (material.id === "kelas-2-membilang-50") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 2</Link></div><GradeTwoCounting /><SiteFooter /></main>;
-  }
-  if (material.id === "kelas-3-bilangan-cacah-1000") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreeWholeNumbers /><SiteFooter /></main>;
   }
   if (material.id === "kelas-3-unsur-bangun-datar") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreePlaneElements /><SiteFooter /></main>;
