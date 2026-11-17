@@ -139,6 +139,12 @@ for (const q of all) if (q.scene?.type === "isos" && q.parts[0].label === "Jawab
 { const q = Q.find(q => q.prompt.startsWith("Bandingkan kedua bangun")); const [a, b] = q.scene.items.map(i => i.cubes); const same = VIEWS.filter(v => sameGrid(viewOf(v, a), viewOf(v, b))); assert.deepEqual(same, ["depan", "kanan"]); assert.equal(q.parts[0].answer, "Tampak depan dan kanan"); }
 { const q = Q.find(q => q.prompt.includes("3 × 2 × 2")); assert.deepEqual(q.parts[0].answers, [q.scene.cubes.length, 12 - q.scene.cubes.length]); }
 
+/* Tiga tanda segaris: hanya satu titik kosong yang segaris dengan kedua X */
+for (const q of all) for (const p of q.parts) if (p.kind === "point" && (p.marks ?? []).filter(m => m.kind === "X").length === 2) {
+  const [a, b] = p.marks.filter(m => m.kind === "X").map(m => pt(m.at)), used = new Set(p.marks.map(m => m.at)), ok = [];
+  for (let c = 0; c < p.cols; c++) for (let r = 1; r <= p.rows; r++) { const n = `${"ABCDEFGHIJ"[c]}${r}`; if (!used.has(n) && (b.c - a.c) * (r - a.r) === (b.r - a.r) * (c - a.c)) ok.push(n); }
+  assert.deepEqual(ok, [p.at], `${q.prompt}: titik segaris yang kosong ${ok}`);
+}
 /* Sebaran posisi jawaban pilihan */
 const pos = Q.flatMap(q => q.parts.filter(p => p.kind === "choice" || p.kind === "pick").map(p => (p.kind === "pick" ? p.answer : p.options.indexOf(p.answer))));
 console.log(`Kelas 6 Bab 3 OK: ${topics.length} subtopik, ${practice.flat().length} latihan, ${Q.length} evaluasi (tingkat ${lv("Sedang")}/${lv("Menantang")}/${lv("Sangat menantang")}), ${action} soal beraksi, bentuk ${[...kinds].join(", ")}, posisi jawaban pilihan ${pos.join(",")}`);
