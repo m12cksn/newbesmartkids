@@ -29,3 +29,6 @@ Mastering Jarimatika: an interactive finger-math demonstrator for multiplication
 
 ## Remaining
 - No video. Not reviewed by a human teacher yet.
+- Score history: `SaveResult`, `/api/hasil` and `supabase/migrations/20261117130000_bsk_results_jarimatika.sql` now accept `/mastering-jarimatika/level-1..3`.
+  - Until that migration is applied to Supabase, the save fails with "Nilai belum tersimpan".
+  - `SaveResult` now hides itself on routes that are not saved, instead of staying on "Menyimpan nilai…".
