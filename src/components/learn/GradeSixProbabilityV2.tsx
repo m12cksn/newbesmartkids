@@ -159,7 +159,7 @@ function GameLab() {
 }
 function BoxLab() {
   const [k, setK] = useState([[4, 3], [3, 4]]);
-  const f = k.map(([b, w]) => [b, b + w]), v = cmp(f[0][0], f[0][1], f[1][0], f[1][1]), best = v === 0 ? "=" : v > 0 ? "A" : "B";
+  const f = k.map(([b, w]) => [b, b + w]), empty = f.some(x => x[1] === 0), v = cmp(f[0][0], f[0][1], f[1][0], f[1][1]), best = empty ? "-" : v === 0 ? "=" : v > 0 ? "A" : "B";
   const set = (i: number, j: number) => (x: number) => setK(k.map((r, a) => (a === i ? r.map((y, b) => (b === j ? x : y)) : r)));
   return <div className="space-y-3">
     <div className="grid grid-cols-2 gap-2">{["A", "B"].map((name, i) => <div key={name} className="flex flex-col items-center gap-1.5 rounded-xl bg-base-100 p-2 ring-1 ring-base-300">
@@ -168,7 +168,7 @@ function BoxLab() {
       <Stepper label={`Kotak ${name} putih`} show="Putih" icon={<BallArt c="putih" size={14} />} value={k[i][1]} set={set(i, 1)} min={0} max={9} />
       <p className="text-lg font-extrabold">{f[i][0]} dari {f[i][1]}</p>
     </div>)}</div>
-    <Result value={best}>Bola biru berhadiah piring. Bandingkan {f[0][0]}/{f[0][1]} dan {f[1][0]}/{f[1][1]} dengan perkalian silang: {f[0][0]} × {f[1][1]} = {f[0][0] * f[1][1]} dan {f[1][0]} × {f[0][1]} = {f[1][0] * f[0][1]}. {best === "=" ? "Peluangnya sama besar." : <>Pilih <strong>Kotak {best}</strong>, walaupun belum pasti mendapat piring.</>}</Result>
+    <Result value={best}>{empty ? <>Ada kotak yang kosong. Tambahkan paling sedikit satu bola agar peluangnya bisa dibandingkan.</> : <>Bola biru berhadiah piring. Bandingkan {f[0][0]}/{f[0][1]} dan {f[1][0]}/{f[1][1]} dengan perkalian silang: {f[0][0]} × {f[1][1]} = {f[0][0] * f[1][1]} dan {f[1][0]} × {f[0][1]} = {f[1][0] * f[0][1]}. {best === "=" ? "Peluangnya sama besar." : <>Pilih <strong>Kotak {best}</strong>, walaupun belum pasti mendapat piring.</>}</>}</Result>
   </div>;
 }
 const labs: Record<string, () => ReactNode> = { bag: BagLab, die: DieLab, game: GameLab, boxes: BoxLab };

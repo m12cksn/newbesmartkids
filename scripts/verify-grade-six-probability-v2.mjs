@@ -34,6 +34,12 @@ for (const q of all) {
   }
 }
 
+/* Roda: setiap warna yang diminta harus dipakai */
+for (const q of all) for (const p of q.parts) if (p.kind === "spin") {
+  for (const c of p.rules.need ?? []) { const others = p.colors.filter(x => x !== c); const bad = Array.from({ length: p.n }, (_, i) => (i < p.n - 1 ? others[0] : others.at(-1))); assert.ok(!meets(tally(bad), p.n, p.rules), `${q.prompt}: tanpa ${c} dianggap benar`); }
+  assert.ok(!meets(tally([...Array(7).fill("merah"), "hijau"]), p.n, p.rules), `${q.prompt}: 7 merah 1 hijau tanpa biru dianggap benar`);
+  assert.deepEqual([...(p.rules.need ?? [])].sort(), [...p.colors].sort(), `${q.prompt}: semua warna wajib`);
+}
 /* Skala dari gambar */
 const counts = s => {
   if (s.type === "bags" && s.bags.length === 1) return { m: Object.fromEntries(s.bags[0].balls), n: s.bags[0].balls.reduce((a, [, k]) => a + k, 0) };
