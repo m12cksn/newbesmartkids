@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../kit/kit.css">
+<style>
+  /* Konsep: kertas kotak buku tulis + tipografi bergerak. Beda dari batch 1 (latar hijau + bingkai HP). */
+  .stage { background-color: var(--krem); background-image: linear-gradient(#e9dcc0 2px, transparent 2px), linear-gradient(90deg, #e9dcc0 2px, transparent 2px); background-size: 72px 72px; }
+  .margin-merah { position: absolute; top: 0; bottom: 0; left: 120px; width: 4px; background: #f3a6a6; }
+  .pecahan { font-size: 330px; font-weight: 900; line-height: .9; color: var(--tinta); display: inline-flex; flex-direction: column; align-items: center; }
+  .pecahan b { display: block; } .pecahan i { display: block; width: 260px; height: 26px; background: var(--tinta); border-radius: 13px; margin: 20px 0; }
+  .baris { font-size: 84px; font-weight: 800; line-height: 1.15; }
+  .akhir { position: absolute; inset: 0; background: var(--hijau-tua); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 46px; color: #fff; text-align: center; }
+</style></head>
+<body data-detik="12">
+<div class="stage">
+  <div class="margin-merah"></div>
+
+  <!-- Adegan 1: hook (0–2.4 s) -->
+  <div class="posisi tengah" style="top:400px"><div class="m" data-in="pop" data-out="fade" style="--d:0s;--o:2.3s"><span class="pecahan"><b>3</b><i></i><b>8</b></span></div></div>
+  <div class="posisi tengah" style="top:1330px"><div class="m baris" data-in="up" data-out="fade" style="--d:.35s;--o:2.3s">itu yang mana?</div></div>
+
+  <!-- Adegan 2: lingkaran digambar lalu diarsir (2.4–5.2 s) -->
+  <div class="posisi tengah" style="top:380px"><div class="m" data-in="fade" data-out="fade" style="--d:2.4s;--o:5.1s"><svg id="pie" width="840" height="840" viewBox="0 0 200 200"></svg></div></div>
+  <div class="posisi tengah" style="top:1300px"><div class="m baris" data-in="up" data-out="fade" style="--d:3.9s;--o:5.1s">Diarsir <span class="sorot">3</span> dari <span class="sorot">8</span> bagian</div></div>
+
+  <!-- Adegan 3: masalah (5.2–8 s) -->
+  <div class="posisi" style="left:180px;right:90px;top:640px">
+    <div class="m baris" data-in="left" data-out="fade" style="--d:5.2s;--o:7.9s">Kalau anak cuma</div>
+    <div class="m baris" data-in="left" data-out="fade" style="--d:5.45s;--o:7.9s"><span class="sorot">menghafal</span> cara,</div>
+    <div class="m baris" data-in="left" data-out="fade" style="--d:6.1s;--o:7.9s;margin-top:40px">soal diubah sedikit</div>
+    <div class="m baris" data-in="left" data-out="fade" style="--d:6.35s;--o:7.9s;color:var(--merah)">langsung bingung.</div>
+  </div>
+
+  <!-- Adegan 4: solusi + bukti aplikasi (8–10.2 s) -->
+  <div class="posisi tengah" style="top:200px"><div class="m baris" data-in="down" data-out="fade" style="--d:8s;--o:10.1s;font-size:66px">Lihat dulu, baru hitung.</div></div>
+  <div class="posisi" style="left:240px;top:360px;width:600px"><div class="m hp kamera" data-in="up" data-out="fade" style="--d:8.1s;--o:10.1s;--lama:2s;--skala:1.06"><img src="mockup-pecahan.webp"></div></div>
+
+  <!-- Adegan 5: penutup (10.2–12 s) -->
+  <div class="m akhir" data-in="wipe" style="--d:10.2s">
+    <span class="logo-chip"><img src="https://cdn.scalev.id/uploads/1770351441/0bmLuAafT-8qSTnfBVxh5A/1770351441636-logo_horizontal_transparent.webp"></span>
+    <div class="judul">Matematika<br>Kelas 1 sampai 12</div>
+    <div class="teks" style="color:var(--mint)">Sekali bayar, mulai <b style="color:var(--kuning)">Rp69.000</b></div>
+    <div class="tombol">Coba bab pertama gratis</div>
+  </div>
+</div>
+<script>
+  // Lingkaran 8 bagian: garis digambar berurutan, lalu 3 bagian diarsir satu per satu.
+  const svg = document.getElementById('pie'), n = 8, r = 92, c = 100;
+  let html = `<circle cx="100" cy="100" r="${r}" fill="#fff" stroke="#17352a" stroke-width="5" class="gores" style="--panjang:580;--d:2.45s"/>`;
+  for (let i = 0; i < n; i++) {
+    const a0 = -Math.PI / 2 + i * 2 * Math.PI / n, a1 = a0 + 2 * Math.PI / n;
+    const p = (a) => `${(c + r * Math.cos(a)).toFixed(2)} ${(c + r * Math.sin(a)).toFixed(2)}`;
+    const isi = i < 3 ? `class="isi" style="--d:${(3.3 + i * .25).toFixed(2)}s;--dari:#fff;--ke:#208f6d"` : 'fill="none"';
+    html += `<path d="M100 100L${p(a0)}A${r} ${r} 0 0 1 ${p(a1)}Z" ${isi} ${i < 3 ? '' : ''}/>`;
+  }
+  for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / n; html += `<line x1="100" y1="100" x2="${(c + r * Math.cos(a)).toFixed(2)}" y2="${(c + r * Math.sin(a)).toFixed(2)}" stroke="#17352a" stroke-width="4" class="gores" style="--panjang:92;--d:${(2.7 + i * .06).toFixed(2)}s"/>`; }
+  svg.innerHTML = html;
+</script>
+</body></html>
