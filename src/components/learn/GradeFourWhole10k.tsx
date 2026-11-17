@@ -80,8 +80,8 @@ function Blocks({ d, size = 1 }: { d: number[]; size?: number }) {
   const s = (n: number) => n * size;
   const art = [
     (k: number) => <svg key={`r${k}`} viewBox="0 0 34 34" width={s(34)} height={s(34)} aria-hidden="true"><path d="M2 10l10-8h20v22l-10 8H2z" fill="#9cc0f0" stroke={ink} /><path d="M2 10h20v22M22 10l10-8" fill="none" stroke={ink} /></svg>,
-    (k: number) => <svg key={`h${k}`} viewBox="0 0 30 30" width={s(28)} height={s(28)} aria-hidden="true"><rect x="1" y="1" width="28" height="28" fill="#f6c27c" stroke={ink} />{[1, 2, 3, 4].map(i => <path key={i} d={`M${1 + i * 5.6} 1v28M1 ${1 + i * 5.6}h28`} stroke={ink} strokeWidth=".4" />)}</svg>,
-    (k: number) => <svg key={`t${k}`} viewBox="0 0 7 30" width={s(7)} height={s(28)} aria-hidden="true"><rect x=".5" y=".5" width="6" height="29" fill="#93d18a" stroke={ink} />{[1, 2, 3, 4].map(i => <path key={i} d={`M.5 ${i * 5.8}h6`} stroke={ink} strokeWidth=".4" />)}</svg>,
+    (k: number) => <svg key={`h${k}`} viewBox="0 0 30 30" width={s(28)} height={s(28)} aria-hidden="true"><rect x="1" y="1" width="28" height="28" fill="#f6c27c" stroke={ink} />{[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => <path key={i} d={`M${1 + i * 2.8} 1v28M1 ${1 + i * 2.8}h28`} stroke={ink} strokeWidth=".3" />)}</svg>,
+    (k: number) => <svg key={`t${k}`} viewBox="0 0 7 30" width={s(7)} height={s(28)} aria-hidden="true"><rect x=".5" y=".5" width="6" height="29" fill="#93d18a" stroke={ink} />{[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => <path key={i} d={`M.5 ${0.5 + i * 2.9}h6`} stroke={ink} strokeWidth=".3" />)}</svg>,
     (k: number) => <svg key={`o${k}`} viewBox="0 0 7 7" width={s(7)} height={s(7)} aria-hidden="true"><rect x=".5" y=".5" width="6" height="6" fill="#f28b8b" stroke={ink} /></svg>,
   ];
   return <div className="flex flex-wrap items-end justify-center gap-2" role="img" aria-label={`Balok: ${d.map((x, i) => `${x} ${places[i].toLowerCase()}`).join(", ")}`}>{d.map((x, i) => x > 0 && <span key={i} className="flex max-w-36 flex-wrap items-end gap-0.5">{Array.from({ length: x }, (_, k) => art[i](k))}</span>)}</div>;
@@ -231,12 +231,14 @@ function FactorLab() {
   const [mode, setMode] = useState<"faktor" | "kelipatan">("faktor"), [n, setN] = useState(12), [b, setB] = useState(3), [sel, setSel] = useState(1);
   const fs = Array.from({ length: n }, (_, i) => i + 1).filter(d => n % d === 0), pairsF = fs.filter(d => d * d <= n), mul = Array.from({ length: 50 }, (_, i) => i + 1).filter(x => x % b === 0);
   const a = pairsF[Math.min(sel, pairsF.length - 1)] ?? 1, c = n / a;
+  /** Ukuran kotak menyesuaikan agar susunan muat lebar 240px dan tinggi 110px. */
+  const cell = Math.max(3, Math.min(14, Math.floor(240 / c) - 1, Math.floor(110 / a) - 1));
   return <div className="space-y-2.5">
     <div role="radiogroup" aria-label="Cara" className="flex gap-1.5">{(["faktor", "kelipatan"] as const).map(m => <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)} className={`btn btn-sm ${mode === m ? "btn-success" : "btn-outline"}`}>{m === "faktor" ? "Faktor" : "Kelipatan"}</button>)}</div>
     {mode === "faktor" ? <>
       <div className="flex flex-wrap items-end justify-around gap-2"><Stepper label="Bilangan" value={n} set={x => { setN(x); setSel(0); }} min={2} max={48} />
         <div role="radiogroup" aria-label="Pasangan faktor" className="flex flex-wrap gap-1">{pairsF.map((d, i) => <button key={d} type="button" role="radio" aria-checked={a === d} onClick={() => setSel(i)} className={`btn btn-xs ${a === d ? "btn-success" : "btn-outline"}`}>{d} × {n / d}</button>)}</div></div>
-      <div className="flex justify-center rounded-xl bg-base-100 p-2 [@media(max-height:700px)]:[zoom:0.75]"><div className="inline-grid gap-0.5" style={{ gridTemplateColumns: `repeat(${c}, 0.9rem)` }} role="img" aria-label={`${a} baris, ${c} kolom`}>{Array.from({ length: n }, (_, i) => <span key={i} className="size-3.5 rounded-sm bg-sky-500" />)}</div></div>
+      <div className="flex justify-center rounded-xl bg-base-100 p-2 [@media(max-height:700px)]:[zoom:0.75]"><div className="inline-grid" style={{ gridTemplateColumns: `repeat(${c}, ${cell}px)`, gap: cell > 8 ? 2 : 1 }} role="img" aria-label={`${a} baris, ${c} kolom`}>{Array.from({ length: n }, (_, i) => <span key={i} className="rounded-sm bg-sky-500" style={{ width: cell, height: cell }} />)}</div></div>
       <Result value={`f:${n}:${fs.length}`}>Faktor {n}: <strong>{fs.join(", ")}</strong>. Susunan {a} baris × {c} kolom = {n}.{fs.length === 2 ? ` ${n} hanya punya dua faktor.` : ""}</Result>
     </> : <>
       <div className="flex justify-center"><Stepper label="Kelipatan dari" value={b} set={setB} min={2} max={9} /></div>

@@ -58,7 +58,9 @@ try {
       sub: async () => { assert.equal(await result(), "l0"); await clicks("Langkah berikutnya", 3); assert.equal(await result(), "66"); },
       mult: async () => { assert.equal(await result(), "48"); await button("Isi tiap kotak tambah").click(); assert.equal(await result(), "60"); },
       share: async () => { assert.equal(await result(), "12|0"); await button("Wadah tambah").click(); assert.equal(await result(), "9|3"); },
-      factor: async () => { assert.equal(await result(), "f:12:6"); await button("Bilangan tambah").click(); assert.equal(await result(), "f:13:2"); await page.getByRole("radio", { name: "Kelipatan" }).click(); assert.equal(await result(), "k:3:16"); },
+      factor: async () => { assert.equal(await result(), "f:12:6"); await button("Bilangan tambah").click(); assert.equal(await result(), "f:13:2"); await clicks("Bilangan tambah", 35); assert.equal(await result(), "f:48:10");
+        { const arr = await page.getByRole("img", { name: "1 baris, 48 kolom" }).boundingBox(), lab = await page.getByTestId("lab").boundingBox(); assert.ok(arr.x >= lab.x && arr.x + arr.width <= lab.x + lab.width + 1, `susunan 1 × 48 terpotong: ${JSON.stringify(arr)} vs ${JSON.stringify(lab)}`); }
+        await page.getByRole("radio", { name: "Kelipatan" }).click(); assert.equal(await result(), "k:3:16"); },
     };
     for (const [t, set] of practice.entries()) {
       if (t > 0) await button(`${topics[t].code}. ${topics[t].short}`).click();

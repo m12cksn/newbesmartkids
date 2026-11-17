@@ -59,6 +59,11 @@ for (const q of all) for (const p of q.parts) if (p.kind === "choice" && p.optio
 }
 // Tabel nilai tempat
 for (const q of all) for (const p of q.parts) if (p.kind === "pv") assert.ok(q.prompt.includes(fmt(p.n)) || q.parts.some(f => f.kind === "fill" && f.answers[0] === p.n), q.prompt);
+{ const q = Q.find(q => q.prompt.startsWith("Angka 5 pada 4.253")); const v5 = s => { const d = digits4(Number(s.replace(".", ""))); return d.map((x, i) => (x === 5 ? 5 * [1000, 100, 10, 1][i] : 0)).reduce((a, b) => a + b); };
+  assert.deepEqual(q.parts[0].options.filter(o => v5(o) === 500), [q.parts[0].answer]); assert.equal(q.parts[1].answers[0], v5("5.234") - v5("4.253")); }
+{ const q = Q.find(q => q.prompt.startsWith("Bilangan 7.034 ditambah")); assert.equal(q.parts[0].n, 7034 + 200); }
+// Evaluasi tidak boleh menyalin bilangan dari kalimat ke tabel atau sekadar menamai nilai tempat
+for (const q of Q) { for (const p of q.parts) if (p.kind === "pv") assert.ok(!q.prompt.includes(fmt(p.n)), `${q.prompt}: tabel hanya menyalin`); assert.ok(!q.parts.some(p => p.kind === "choice" && p.options.join() === PL.join()), `${q.prompt}: hanya menamai nilai tempat`); }
 { const q = Q.find(q => q.prompt.startsWith("Sebuah bilangan empat angka")); const d = digits4(q.parts[0].n); assert.deepEqual(d, [6, 6 + 2, 8 / 2, 6 - 1]); }
 // Tanda dan urutan
 for (const q of all) for (const p of q.parts) if (p.kind === "choice" && /^\d\.\d{3} … \d\.\d{3}$/.test(p.label)) { const [a, b] = p.label.split(" … ").map(s => Number(s.replace(".", ""))); assert.equal(p.answer, a < b ? "<" : a > b ? ">" : "="); }
