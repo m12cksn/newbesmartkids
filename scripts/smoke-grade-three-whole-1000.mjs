@@ -16,13 +16,14 @@ const tall = [];
 try {
   for (const [width, height] of sizes) {
     const page = await browser.newPage({ viewport: { width, height } }); page.setDefaultTimeout(10000);
+    if (process.env.FONT) await page.addInitScript(f => { document.addEventListener("DOMContentLoaded", () => { const st = document.createElement("style"); st.textContent = `*{font-family:"${f}",sans-serif !important}`; document.head.append(st); }); }, process.env.FONT);
     const errors = []; page.on("pageerror", e => errors.push(e.message)); page.on("console", m => { if (m.type() === "error" && !/401|Failed to load resource/.test(m.text())) errors.push(m.text()); });
     const button = name => page.getByRole("button", { name, exact: true });
     const box = name => page.getByRole("textbox", { name, exact: true });
     const group = name => page.getByRole("group", { name, exact: true });
     const fit = async label => { const s = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth })); assert.ok(s.scroll <= s.inner, `overflow ${width} ${label}: ${JSON.stringify(s)}`); };
     const room = () => page.evaluate(() => innerHeight - document.querySelector("header").getBoundingClientRect().height);
-    const fitsScreen = async (locator, label, strict = true) => { const b = await locator.boundingBox(), r = await room(); if (b.height > r + 1) { if (strict) assert.fail(`${width}×${height} ${label}: tinggi ${Math.round(b.height)} > layar ${Math.round(r)}`); else tall.push(`${width}×${height} ${label} ${Math.round(b.height)}/${Math.round(r)}`); } };
+    const fitsScreen = async (locator, label, strict = !process.env.SOFT) => { const b = await locator.boundingBox(), r = await room(); if (b.height > r + 1) { if (strict) assert.fail(`${width}×${height} ${label}: tinggi ${Math.round(b.height)} > layar ${Math.round(r)}`); else tall.push(`${width}×${height} ${label} ${Math.round(b.height)}/${Math.round(r)}`); } };
     const quiz = page.locator("section:has(> progress)");
     const shot = async (name, full = false) => { if (width === 390 || width === 1280) await page.screenshot({ path: `${folder}/${width}-${name}.png`, fullPage: full }); };
     const result = () => page.getByTestId("lab-result").getAttribute("data-value");

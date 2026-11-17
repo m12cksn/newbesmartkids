@@ -308,10 +308,10 @@ function MatchPart({ p, value, set, checked }: { p: Extract<Part, { kind: "match
     <p className="text-sm text-base-content/70">{sel === null ? "Ketuk kotak di kiri, lalu ketuk pasangannya di kanan." : "Sekarang ketuk pasangannya di kanan."}</p>
     <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)]" style={{ minHeight: Math.max(n, m) * 46 }}>
       <div className="grid gap-1.5" style={{ gridTemplateRows: `repeat(${n}, minmax(0, 1fr))` }}>{p.left.map((l, k) => <button key={k} type="button" disabled={checked} aria-label={`Pilih ${l}`} aria-pressed={sel === k} onClick={() => setSel(sel === k ? null : k)}
-        className={`rounded-xl border-2 px-1.5 py-1 text-sm font-bold leading-snug sm:text-base ${sel === k ? "border-success bg-success/10" : vals[k] !== "" ? "border-info/60 bg-base-100" : "border-orange-300 bg-orange-50"}`}>{l}</button>)}</div>
+        className={`rounded-xl border-2 px-1.5 py-1 text-sm font-bold leading-snug sm:text-base [@media(max-height:700px)]:text-xs ${sel === k ? "border-success bg-success/10" : vals[k] !== "" ? "border-info/60 bg-base-100" : "border-orange-300 bg-orange-50"}`}>{l}</button>)}</div>
       <div className="relative"><svg viewBox={`0 0 40 ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">{vals.map((r, k) => r !== "" && <line key={k} x1="0" y1={((k + 0.5) / n) * H} x2="40" y2={((Number(r) + 0.5) / m) * H} stroke="#0f766e" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />)}</svg></div>
       <div className="grid gap-1.5" style={{ gridTemplateRows: `repeat(${m}, minmax(0, 1fr))` }}>{p.right.map((r, j) => <button key={j} type="button" disabled={checked || sel === null} aria-label={`Hubungkan ke ${r}`} onClick={() => { if (sel === null) return; const v = [...vals]; v[sel] = String(j); set(v.join("|")); setSel(null); }}
-        className="rounded-xl border-2 border-purple-300 bg-purple-50 px-1.5 py-1 text-sm font-bold leading-snug sm:text-base">{r}</button>)}</div>
+        className="rounded-xl border-2 border-purple-300 bg-purple-50 px-1.5 py-1 text-sm font-bold leading-snug sm:text-base [@media(max-height:700px)]:text-xs">{r}</button>)}</div>
     </div>
     <button type="button" className="btn btn-ghost btn-xs gap-1" disabled={checked || vals.every(v => v === "")} onClick={() => set("")}><Eraser className="size-3.5" aria-hidden="true" />Hapus semua garis</button>
   </div>;
@@ -340,7 +340,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
 }
 function Answer({ q, value, record, checked }: { q: KQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4 [@media(max-height:700px)]:space-y-2 [@media(max-height:700px)]:[zoom:0.88]">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
+  return <div className="space-y-4 [@media(max-height:700px)]:space-y-1.5 [@media(max-height:700px)]:[zoom:0.8]">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
 export default function GradeThreeWhole1000() {
@@ -403,7 +403,7 @@ export default function GradeThreeWhole1000() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 1"}
         practiceMode={mode === "practice"} close={() => { setMode("learn"); show(); }}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-2.5 [@media(max-height:700px)]:p-1.5 [@media(max-height:700px)]:[zoom:0.72]"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
+        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-2.5 [@media(max-height:700px)]:p-1 [@media(max-height:700px)]:[zoom:0.62]"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt} q={q} value={value} record={record} checked={checked} />}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>

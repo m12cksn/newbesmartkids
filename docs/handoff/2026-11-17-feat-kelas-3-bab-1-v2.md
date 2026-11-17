@@ -45,7 +45,8 @@
   - 9 peraga diuji interaksinya;
   - 28 latihan, termasuk 1 jawaban salah yang disengaja;
   - 24 evaluasi dengan skor 96 dan pembahasan.
-- Uji muat layar: setiap peraga dan setiap soal (sampai tombol jawab) tidak lebih tinggi dari layar di keempat ukuran.
+- Uji muat layar: setiap peraga dan setiap soal (sampai tombol jawab) tidak lebih tinggi dari layar di keempat ukuran. Juga diuji dengan font pengganti yang lebih lebar (`FONT="DejaVu Sans"`), karena Poppins tidak dimuat sebagai webfont.
+- Peraga balok bisa menukar 10 ratusan menjadi 1.000 (masukan review Codex).
 
 ## Catatan
 - Di 320×640, setelah jawaban latihan diperiksa, teks pembahasan membuat kartu 1–120px lebih tinggi dari layar pada 9 soal latihan. Menjawab tetap tanpa menggulir.
