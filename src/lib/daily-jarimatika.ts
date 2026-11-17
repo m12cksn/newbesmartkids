@@ -39,36 +39,39 @@ export const lipatParts = (n: number) => ({ left: n - 1, right: 10 - n });
 /** Hitung loncat: angkat jari sebanyak bilangan kecil, setiap jari menambah bilangan besar. */
 export const loncatParts = (a: number, b: number) => { const fingers = Math.min(a, b), step = Math.max(a, b); return { fingers, step, totals: Array.from({ length: fingers }, (_, i) => (i + 1) * step) }; };
 
-/** Langkah penjelasan untuk peraga dan petunjuk. */
-export function steps(a: number, b: number): string[] {
-  const m = methodFor(a, b);
+export type Lesson = { title: string; text: string };
+/** Langkah peraga: judul pendek dan penjelasan yang mudah dibaca anak. */
+export function lesson(a: number, b: number): Lesson[] {
+  const m = methodFor(a, b), ab = a * b;
   if (m === "tempel") {
-    const p = tempelParts(a, b);
+    const p = tempelParts(a, b), n = p.downL + p.downR;
     return [
-      `Kelingking bernilai 6, jari manis 7, jari tengah 8, telunjuk 9, ibu jari 10.`,
-      `Tempelkan jari ${a} di tangan kiri dengan jari ${b} di tangan kanan.`,
-      `Jari yang menempel dan di bawahnya: ${p.downL} + ${p.downR} = ${p.downL + p.downR} jari. Setiap jari bernilai 10, jadi ${p.tens}.`,
-      `Jari di atasnya: ${p.upL} jari × ${p.upR} jari = ${p.units}.`,
-      `${p.tens} + ${p.units} = ${a * b}. Jadi ${a} × ${b} = ${a * b}.`,
+      { title: "Kenali nilai jari", text: "Kelingking bernilai 6, jari manis 7, jari tengah 8, telunjuk 9, dan ibu jari 10. Kedua tangan sama." },
+      { title: "Pertemukan jarinya", text: `Geser kedua tangan sampai jari ${a} di tangan kiri bertemu jari ${b} di tangan kanan.` },
+      { title: "Tekuk, lalu hitung puluhan", text: `Tekuk jari yang bertemu dan semua jari di bawahnya: ${p.downL} jari kiri dan ${p.downR} jari kanan, jadi ${n} jari. Setiap jari yang ditekuk bernilai 10, jadi ${p.tens}.` },
+      { title: "Kalikan jari yang berdiri", text: `Jari yang masih berdiri: ${p.upL} di kiri dan ${p.upR} di kanan. Kalikan: ${p.upL} × ${p.upR} = ${p.units}.` },
+      { title: "Jumlahkan", text: `${p.tens} + ${p.units} = ${ab}. Jadi ${a} × ${b} = ${ab}.` },
     ];
   }
   if (m === "lipat9") {
     const n = a === 9 ? b : a, p = lipatParts(n);
     return [
-      `Buka kesepuluh jari. Beri nomor 1 sampai 10 dari kiri.`,
-      `Lipat jari ke-${n}.`,
-      `Jari di kiri lipatan ada ${p.left}. Itu puluhannya: ${p.left * 10}.`,
-      `Jari di kanan lipatan ada ${p.right}. Itu satuannya: ${p.right}.`,
-      `${p.left * 10} + ${p.right} = ${9 * n}. Jadi 9 × ${n} = ${9 * n}.`,
+      { title: "Beri nomor jari", text: "Letakkan kedua tangan dengan semua jari berdiri. Beri nomor 1 sampai 10, mulai dari kelingking kiri." },
+      { title: `Tekuk jari ke-${n}`, text: `Untuk 9 × ${n}, tekuk jari nomor ${n}.` },
+      { title: "Hitung puluhan", text: `Jari yang berdiri di kiri jari yang ditekuk ada ${p.left}. Itu puluhannya: ${p.left * 10}.` },
+      { title: "Hitung satuan", text: `Jari yang berdiri di kanannya ada ${p.right}. Itu satuannya: ${p.right}.` },
+      { title: "Gabungkan", text: `${p.left * 10} + ${p.right} = ${ab}. Jadi ${a} × ${b} = ${ab}.` },
     ];
   }
   const p = loncatParts(a, b);
   return [
-    `Angkat ${p.fingers} jari satu per satu. Setiap jari bernilai ${p.step}.`,
-    ...p.totals.map((t, i) => `Jari ke-${i + 1}: ${t}.`),
-    `Jari terakhir menunjukkan ${p.fingers * p.step}. Jadi ${a} × ${b} = ${a * b}.`,
+    { title: "Kepalkan tangan", text: `Mulai dari tangan mengepal. Angkat ${p.fingers} jari satu per satu. Setiap jari bernilai ${p.step}.` },
+    ...p.totals.map((t, i) => ({ title: `Angkat jari ke-${i + 1}`, text: i === 0 ? `Jari ke-1 bernilai ${p.step}.` : `Jari ke-${i + 1}: ${p.totals[i - 1]} + ${p.step} = ${t}.` })),
+    { title: "Jawabannya", text: `Jari terakhir menunjukkan ${p.fingers * p.step}. Jadi ${a} × ${b} = ${ab}.` },
   ];
 }
+/** Teks langkah untuk petunjuk soal. */
+export const steps = (a: number, b: number): string[] => lesson(a, b).map(l => l.text);
 
 function rng(seed: number) { return () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; }; }
 function shuffle<T>(items: T[], random: () => number): T[] { const c = [...items]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return c; }
