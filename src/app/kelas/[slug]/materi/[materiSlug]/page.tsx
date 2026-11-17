@@ -1,7 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import GradeFourGeometry from "@/components/learn/GradeFourGeometry";
-import GradeFiveWholeNumbers from "@/components/learn/GradeFiveWholeNumbers";
 import GradeThreePlaneElements from "@/components/learn/GradeThreePlaneElements";
 import GradeTwoCounting from "@/components/learn/GradeTwoCounting";
 import GradeTwoShapes from "@/components/learn/GradeTwoShapes";
@@ -59,9 +58,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   const material = getMaterialBySlug(materiSlug);
   if (!classItem || !material || material.classId !== classItem.id) notFound();
 
-  if (material.id === "kelas-5-bilangan-cacah-100000") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">Kembali ke kelas 5</Link></div><GradeFiveWholeNumbers /><SiteFooter /></main>;
-  }
   if (material.id === "kelas-2-pengukuran") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover inline-flex items-center gap-1 text-sm text-success"><ArrowLeft className="size-4" aria-hidden="true" />Kembali ke kelas 2</Link></div><GradeTwoMeasurement /><SiteFooter /></main>;
   }
