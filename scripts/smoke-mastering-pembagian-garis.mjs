@@ -70,6 +70,8 @@ try {
 
     // Level 3: bilangan yang hilang di posisi berbeda
     await page.getByRole("link", { name: /Level 3/ }).click(); await page.waitForURL(/level-3$/);
+    await page.getByTestId("lab-result").locator("visible=true").waitFor();
+    assert.equal(await page.locator('#peraga:visible [role="status"]').count(), 0, "soal awal level 3 harus valid");
     const q3 = dailyQuestions(wibDate(), 3); assert.ok(q3.some(x => x.blank !== 2));
     await page.getByTestId("question-0").locator(`input:visible[aria-label^="Jawaban soal 1: ${[q3[0].blank === 0 ? "kosong" : q3[0].left]}"]`).waitFor();
     for (const [i, x] of q3.entries()) await page.getByTestId(`question-${i}`).locator("input:visible").fill(String(x.answer));

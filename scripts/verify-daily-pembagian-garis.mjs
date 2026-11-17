@@ -1,7 +1,7 @@
 // Verifikasi Mastering Pembagian Garis: langkah garis per kolom, batas garis, kolam soal dan paket harian.
 // Jalankan: node --experimental-strip-types scripts/verify-daily-pembagian-garis.mjs
 import assert from "node:assert/strict";
-import { checkProblem, columns, dailyQuestions, LEVELS, lesson, MAX_LINES, pool, steps, storageKey } from "../src/lib/daily-pembagian-garis.ts";
+import { checkProblem, columns, dailyQuestions, FIRST_PROBLEM, LEVELS, lesson, MAX_LINES, pool, steps, storageKey } from "../src/lib/daily-pembagian-garis.ts";
 
 // Contoh dari sumber: 756 : 3 = 252 dengan kolom 7 | 15 | 6.
 assert.deepEqual(columns(756, 3).map(c => [c.lines, c.groups, c.rem]), [[7, 2, 1], [15, 5, 0], [6, 2, 0]]);
@@ -27,6 +27,7 @@ assert.ok(p1.every(([n, q]) => q <= 5 && columns(n, q).every(c => c.carryIn === 
 assert.ok(p2.every(([n, q]) => q <= 5 && columns(n, q).some(c => c.carryIn > 0)), "level 2 ada sisa pindah");
 assert.ok(new Set(p3.map(([, q]) => q)).size === 8, "level 3 memakai pembagi 2–9");
 assert.equal(new Set(LEVELS.map(l => storageKey(l.id))).size, 3);
+for (const l of LEVELS) assert.equal(checkProblem(...FIRST_PROBLEM[l.id]), null, `soal awal level ${l.id} harus valid`);
 
 // Paket harian: 7 soal, tetap sepanjang hari, berganti setiap hari
 const base = Date.parse("2026-01-01T00:00:00Z");

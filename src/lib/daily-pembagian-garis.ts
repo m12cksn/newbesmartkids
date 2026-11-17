@@ -22,6 +22,8 @@ export const LEVELS = [
   { id: 2 as Level, name: "Sisa pindah kolom", description: "Ada sisa garis yang pindah ke kolom kanan menjadi 10 garis. Pembagi 2 sampai 5.", detail: "Satu sisa garis bernilai 10 di kolom sebelahnya." },
   { id: 3 as Level, name: "Campuran", description: "Pembagi 2 sampai 9, termasuk bilangan yang hilang.", detail: "Pilih langkah garis yang tepat untuk setiap kolom." },
 ];
+/** Soal awal peraga di setiap level; harus lolos checkProblem. */
+export const FIRST_PROBLEM: Record<Level, [number, number]> = { 1: [84, 4], 2: [756, 3], 3: [924, 7] };
 export const storageKey = (level: Level) => `bsk-mastering-pembagian-garis-v1-level-${level}`;
 /** Batas garis dalam satu kolom agar tetap bisa dicoret dan dihitung anak. */
 export const MAX_LINES = 30;

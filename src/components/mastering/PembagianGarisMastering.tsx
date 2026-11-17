@@ -5,12 +5,11 @@ import { ArrowLeft, ArrowRight, Divide } from "lucide-react";
 import { SaveResult } from "@/components/auth/SaveResult";
 import { BrandMark } from "@/components/home/BrandMark";
 import PembagianGarisLab from "./PembagianGarisLab";
-import { correctAnswer, dailyQuestions, LEVELS, questionLabel, readPractice, steps, storageKey, wibDate, type Level, type SavedPractice } from "@/lib/daily-pembagian-garis";
+import { correctAnswer, dailyQuestions, FIRST_PROBLEM, LEVELS, questionLabel, readPractice, steps, storageKey, wibDate, type Level, type SavedPractice } from "@/lib/daily-pembagian-garis";
 import "./DailyMastering.css";
 
 const s = (k: string) => `bsk-daily-${k}`;
 const empty = (date: string): SavedPractice => ({ date, answers: Array(7).fill(""), checked: false });
-const firstPair: Record<Level, [number, number]> = { 1: [84, 4], 2: [756, 3], 3: [896, 7] };
 
 const noop = () => () => {};
 const subscribeDay = (cb: () => void) => { const t = setInterval(cb, 1000); window.addEventListener("focus", cb); document.addEventListener("visibilitychange", cb); return () => { clearInterval(t); window.removeEventListener("focus", cb); document.removeEventListener("visibilitychange", cb); }; };
@@ -27,7 +26,7 @@ export default function PembagianGarisMastering({ level }: { level: Level }) {
   return ready ? <Sheet key={level} level={level} /> : <Sheet level={level} loading />;
 }
 function Sheet({ level, loading = false }: { level: Level; loading?: boolean }) {
-  const [pair, setPair] = useState<[number, number]>(firstPair[level]);
+  const [pair, setPair] = useState<[number, number]>(FIRST_PROBLEM[level]);
   const [init] = useState(() => (loading ? null : loadSave(level)));
   const [practice, setPractice] = useState<SavedPractice | null>(init?.save ?? null);
   const storageAvailable = init?.stored ?? true;
