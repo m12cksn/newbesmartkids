@@ -77,11 +77,13 @@ function Ladybug({ left, right }: { left: number; right: number }) {
     {spots(left, -1)}{spots(right, 1)}
   </svg>;
 }
+/** Kelereng biru untuk bingkai 10 (varian kedua kelereng Bab 1 berwarna hijau, jadi dibuat khusus di sini). */
+const BlueMarble = () => <svg viewBox="0 0 24 24" className="size-10" aria-hidden="true"><circle cx="12" cy="12" r="6.4" fill="#2f6fd6" stroke={ink} strokeWidth="1" /><path d="M8.4 13.4c2-2.8 5.2-3.6 7.4-2.2" stroke="#fff" strokeWidth="1.2" fill="none" opacity=".55" /><circle cx="9.6" cy="9.4" r="1.5" fill="#fff" opacity=".75" /></svg>;
 /** Bingkai 10: `filled` petak merah; petak lain bisa diisi biru. */
-function TenFrame({ filled, blue, toggle, disabled, thingAlt = true }: { filled: number; blue: boolean[]; toggle?: (k: number) => void; disabled?: boolean; thingAlt?: boolean }) {
+function TenFrame({ filled, blue, toggle, disabled }: { filled: number; blue: boolean[]; toggle?: (k: number) => void; disabled?: boolean }) {
   return <div role="group" aria-label="Bingkai 10" className="grid grid-cols-5 gap-1 rounded-xl border-4 border-sky-400 bg-white p-1">
     {Array.from({ length: 10 }, (_, k) => k < filled ? <span key={k} className="grid size-12 place-items-center rounded-lg bg-sky-50 sm:size-14"><Art thing="kelereng" className="size-10" /></span>
-      : <button key={k} type="button" disabled={disabled || !toggle} aria-label={`Petak ${k + 1}`} aria-pressed={blue[k]} onClick={() => toggle?.(k)} className="grid size-12 place-items-center rounded-lg border-2 border-dashed border-sky-300 bg-white sm:size-14">{blue[k] && <Art thing="kelereng" alt={thingAlt} className="size-10" />}</button>)}
+      : <button key={k} type="button" disabled={disabled || !toggle} aria-label={`Petak ${k + 1}`} aria-pressed={blue[k]} onClick={() => toggle?.(k)} className="grid size-12 place-items-center rounded-lg border-2 border-dashed border-sky-300 bg-white sm:size-14">{blue[k] && <BlueMarble />}</button>)}
   </div>;
 }
 

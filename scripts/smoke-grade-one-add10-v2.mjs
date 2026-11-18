@@ -53,7 +53,9 @@ try {
       cara: async () => { assert.equal(await result(), "pasangan:5:0"); await button("Apel 1").click(); await button("Apel 2").click(); assert.equal(await result(), "pasangan:5:2");
         await tab("Lompat maju").click(); assert.equal(await result(), "lompat:3:0"); await button("Lompat").click(); await button("Lompat").click(); assert.equal(await result(), "lompat:3:2");
         await tab("Berulang").click(); assert.equal(await result(), "berulang:3"); await tab("Hasilnya 10").click(); assert.equal(await result(), "sepuluh:7:0");
-        for (const k of [8, 9, 10]) await button(`Petak ${k}`).click(); assert.equal(await result(), "sepuluh:7:3"); },
+        for (const k of [8, 9, 10]) await button(`Petak ${k}`).click(); assert.equal(await result(), "sepuluh:7:3");
+        // Petak yang diisi harus menampilkan kelereng biru, sesuai kalimat soal.
+        assert.equal(await button("Petak 8").locator("circle").first().getAttribute("fill"), "#2f6fd6"); },
       cerita: async () => { assert.equal(await result(), "4+2:0"); await button("Lihat penyelesaian").click(); assert.equal(await result(), "4+2:1"); },
     };
     for (const [t, set] of practice.entries()) {
