@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Droplet, Eraser, Minus, Plus, RotateCcw, Undo2 }
 import { useId, useRef, useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import {
-  assessment, cells, correct, cubeCount, fmt, formatAnswer, practice, ready, SEP, splitParts, thingName, topics,
+  assessment, cells, correct, fmt, formatAnswer, practice, ready, SEP, splitParts, thingName, topics,
   type MQuestion, type Part, type Poly, type Scene, type Thing,
 } from "@/data/grade-four-measure-v2";
 
@@ -111,7 +111,7 @@ export function CubeStack({ heights, a = 18, label }: { heights: number[][]; a?:
   const pts = (...ps: (readonly [number, number])[]) => ps.map(p => p.join(",")).join(" ");
   return <figure className="flex flex-col items-center gap-1">
     {label && <figcaption className="text-base font-extrabold text-sky-700">{label}</figcaption>}
-    <svg role="img" aria-label={`Bangun ${label ?? ""} dari ${cubeCount(heights)} kubus satuan`} width={maxX - minX} height={maxY - minY} viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`} className="h-auto max-w-full">
+    <svg role="img" aria-label={`Bangun ${label ?? ""} dari kubus satuan. Tinggi tumpukan dari baris depan ke belakang: ${heights.map(r => r.join(", ")).join("; ")}`} width={maxX - minX} height={maxY - minY} viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`} className="h-auto max-w-full">
       {list.map(({ x, y, z }, i) => {
         const top = pts(P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1));
         const front = pts(P(x, y + 1, z), P(x, y + 1, z + 1), P(x + 1, y + 1, z + 1), P(x + 1, y + 1, z));
@@ -126,7 +126,7 @@ function SceneView({ scene }: { scene: Scene }) {
     case "polys": return <PolyScene polys={scene.polys} />;
     case "bottles": return <div className="flex flex-wrap items-end justify-center gap-3">{scene.rows.map(r => <figure key={r.label} className="flex flex-col items-center gap-1">
       <PumpBottle label={r.label} h={66} />
-      <div className="flex max-w-20 flex-wrap justify-center gap-0.5" role="img" aria-label={`sama dengan ${r.small} botol kecil`}>{Array.from({ length: r.small }, (_, k) => <SmallBottle key={k} h={20} />)}</div>
+      <div className="flex max-w-20 flex-wrap justify-center gap-0.5" role="img" aria-label={`${r.small} botol kecil`}>{Array.from({ length: r.small }, (_, k) => <SmallBottle key={k} h={20} />)}</div>
 </figure>)}</div>;
     case "cartons": return <div className="flex flex-wrap items-end justify-center gap-4">{scene.items.map(c => <Carton key={c.name} {...c} />)}</div>;
     case "cubes": { const big = Math.max(...scene.shapes.map(s => Math.max(s.heights.length, ...s.heights.map(r => r.length)))); return <div className="flex flex-wrap items-end justify-center gap-6">{scene.shapes.map((s, i) => <CubeStack key={i} heights={s.heights} label={s.label} a={big > 3 ? 20 : 24} />)}</div>; }
