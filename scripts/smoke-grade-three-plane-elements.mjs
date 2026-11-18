@@ -39,6 +39,12 @@ try{
    if(t===0){await page.getByRole("slider",{name:"Tarik titik B"}).fill("7.3");await page.getByText("7 cm 3 mm").first().waitFor();await page.getByRole("slider",{name:"Banyak sisi"}).fill("6");assert.equal(await result(),"6");await page.getByText(/AB, BC, CD, DE, EF, FA/).waitFor();}
    if(t===1){await page.getByRole("slider",{name:"Putar kaki OB"}).fill("90");assert.equal(await result(),"90");await page.getByTestId("lab-result").filter({hasText:"Sudut siku-siku"}).waitFor();await page.getByRole("slider",{name:"Putar kaki OB"}).fill("120");await page.getByTestId("lab-result").filter({hasText:"240°"}).waitFor();}
    if(t===2){await page.getByRole("slider",{name:"Putar garis biru"}).fill("0");assert.equal(await result(),"sejajar");await page.getByRole("slider",{name:"Putar garis biru"}).fill("90");assert.equal(await result(),"tegak lurus");await page.getByRole("slider",{name:"Putar garis biru"}).fill("45");assert.equal(await result(),"berpotongan");}
+   // Penjelasan langkah demi langkah: urutan titik → garis → sinar garis → ruas garis, lalu sampai langkah terakhir.
+   {const g=page.getByTestId("step-guide"),total=[8,9,7][t];await g.getByText(`Langkah 1 dari ${total}`).waitFor();
+    if(t===0){await g.getByRole("heading",{name:"1. Titik"}).waitFor();await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"2. Garis"}).waitFor();await g.getByRole("button",{name:"Perpanjang"}).click();await g.getByRole("img",{name:"garis AB, diperpanjang"}).waitFor();
+     await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"3. Sinar garis"}).waitFor();await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"4. Ruas garis"}).waitFor();await g.getByRole("button",{name:"Perpanjang"}).click();await g.getByText("Panjangnya tetap AB.").waitFor();}
+    for(let k=0;k<total;k++){if(await g.getByRole("button",{name:"Lanjut"}).isDisabled())break;await g.getByRole("button",{name:"Lanjut"}).click();}
+    await g.getByText(`Langkah ${total} dari ${total}`).waitFor();await fit(`langkah ${t}`);await g.getByRole("button",{name:"Kembali"}).click();await g.getByText(`Langkah ${total-1} dari ${total}`).waitFor();}
    await fit(`lab ${t}`);await shot(`lab-${topics[t].code}`);
    await button("Latihan materi →").click();
    let wrong=0;
