@@ -63,8 +63,11 @@ export function partCorrect(p: Part, v: string): boolean {
     case "fill": { const got = cells(p, v); return p.answers.every((a, i) => toNum(got[i]) === toNum(a)); }
   }
 }
+/** Lengkap (belum tentu benar): semua kotak terisi, semua item diurutkan, dan setiap kotak kiri punya pasangan. */
 export function partReady(p: Part, v: string): boolean {
   if (p.kind === "fill") return cells(p, v).every(x => x.trim() !== "");
+  if (p.kind === "rank") return new Set(list(v)).size === p.items.length;
+  if (p.kind === "match") { const x = list(v); return p.left.every((_, i) => (x[i] ?? "") !== ""); }
   return v !== "";
 }
 export const answerKey = (parts: Part[]) => parts.map(partKey).join(SEP);
@@ -154,7 +157,7 @@ export const practice: FQuestion[][] = [
 
 /* ---------- Evaluasi (24 soal) ---------- */
 export const assessment: FQuestion[] = [
-  A({ level: "Sedang", prompt: "Tuliskan pecahan dari daerah yang diarsir.", scene: figs(fig("hexagon", 6, 1)), parts: [fill(frac, 1, 6)], explanation: "Segi enam dibagi menjadi 6 segitiga sama besar dan 1 diarsir, jadi {1/6}." }),
+  A({ level: "Sedang", prompt: "Dua kue sama besar. Kue cokelat dibagi rata untuk 6 anak, kue keju untuk 8 anak. Berapa bagian setiap anak?", scene: figs(fig("circle", 6, 0, "Kue cokelat"), fig("circle", 8, 0, "Kue keju")), parts: [fill(`Cokelat ${frac}, keju ${frac}`, 1, 6, 1, 8), pick("Lebih besar:", ["Cokelat", "Keju"], "Cokelat")], explanation: "Setiap anak mendapat {1/6} kue cokelat atau {1/8} kue keju. Pembilangnya sama, penyebut 6 lebih kecil, jadi {1/6} > {1/8}: potongan kue cokelat lebih besar." }),
   B({ level: "Sedang", prompt: "Isilah dengan tanda <, =, atau >.", parts: [sign("{3/9} … {7/9}", "<"), sign("{11/15} … {8/15}", ">")], explanation: "Penyebutnya sama, bandingkan pembilangnya: 3 < 7 dan 11 > 8." }),
   C({ level: "Sedang", prompt: "Tuliskan pecahan kedua gambar yang senilai ini.", scene: figs(fig("bar", 3, 1), fig("bar", 9, 3)), parts: [fill(`${frac} = ${frac}`, 1, 3, 3, 9)], explanation: "Pita kiri {1/3}, pita kanan {3/9}. Daerah arsirnya sama panjang: {1/3} = {3/9}." }),
   D({ level: "Sedang", prompt: "Arsirlah pita sesuai pecahan desimal 0,6, lalu tuliskan pecahannya.", parts: [{ kind: "shade", label: "Arsir pita", fig: fig("bar", 10, 0), need: 6 }, fill("0,6 = {□/10}", 6)], explanation: "0,6 artinya 6 per sepuluh. Pita dibagi 10, arsir 6 bagian: 0,6 = {6/10}." }),

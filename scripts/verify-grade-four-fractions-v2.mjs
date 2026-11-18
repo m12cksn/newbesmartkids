@@ -23,6 +23,8 @@ for (const q of all) {
   assert.ok(correct(q, q.answer), `${q.prompt}: kunci tidak lolos`);
   assert.ok(ready(q, q.answer), `${q.prompt}: kunci belum lengkap`);
   assert.ok(!correct(q, ""), `${q.prompt}: kosong dianggap benar`);
+  assert.ok(!ready(q, ""), `${q.prompt}: kosong dianggap lengkap`);
+  for (const [i, p] of q.parts.entries()) if (p.kind === "rank" || p.kind === "match") { const v = q.answer.split("‖"); v[i] = v[i].split("|").slice(0, 1).join("|"); assert.ok(!ready(q, v.join("‖")), `${q.prompt}: ${p.kind} sebagian dianggap lengkap`); }
   assert.ok(q.explanation.length > 25, `${q.prompt}: pembahasan terlalu pendek`);
   for (const p of q.parts) {
     if (p.kind === "fill") { assert.equal(boxes(p.text), p.answers.length, `${q.prompt}: banyak kotak`); p.answers.forEach(a => assert.ok(!Number.isNaN(toNum(a)), `${q.prompt}: ${a}`)); }
@@ -75,6 +77,9 @@ for (const q of all) if (q.scene?.type === "people") { assert.equal(Number(q.par
 for (const q of all) if (q.scene?.type === "sheet") { assert.equal(Number(q.parts[0].answers.at(-1)), (q.scene.right / q.scene.total) * 100); checked++; }
 // Cerita
 { const q = Q.find(q => /semangka/.test(q.prompt)); const a = q.parts[0].answers.map(Number); assert.equal(a[0] + a[2], a[1]); assert.equal(a[1], q.scene.figs[0].parts); assert.equal(q.parts[1].answer, a[2] > a[0] ? "Putu" : "Helen"); }
+{ const q = Q[0]; const a = q.parts[0].answers.map(Number); assert.deepEqual([a[1], a[3]], q.scene.figs.map(f => f.parts)); assert.equal(q.parts[1].answer, a[1] < a[3] ? "Cokelat" : "Keju"); }
+// Evaluasi tidak boleh hanya menamai pecahan dari satu gambar
+for (const q of Q) assert.ok(!(q.parts.length === 1 && q.parts[0].kind === "fill" && q.parts[0].text === "{□/□}"), `${q.prompt}: soal hanya melabeli gambar`);
 { const q = Q.find(q => /Bibi/.test(q.prompt)); assert.equal(Number(q.parts[0].answers[0]), 9 - 2 - 4); }
 for (const q of all) for (const p of q.parts) if (p.kind === "choice" && /^(Lebih panjang|Lebih banyak):$/.test(p.label)) {
   const caps = q.scene.figs.map(f => [plain(f.caption ?? "").split(" ")[0], f.shaded / f.parts]); const best = caps.reduce((a, b) => (b[1] > a[1] ? b : a)); assert.equal(p.answer, best[0], q.prompt); checked++;

@@ -81,14 +81,14 @@ try {
     for (const [i, q] of assessment.entries()) {
       await page.getByText(`Soal ${i + 1}/24`).waitFor();
       assert.equal(await button("Lanjut →").count(), 0, `evaluasi ${i + 1} terkunci sebelum dijawab`);
-      await answer(q, i === 0 ? "1|5" : q.answer);
+      await answer(q, i === 0 ? q.answer.replace("‖Cokelat", "‖Keju") : q.answer);
       await fit(`evaluasi ${i + 1}`); await fitsScreen(quiz, `evaluasi ${i + 1}`);
       await quiz.scrollIntoViewIfNeeded(); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
       await button(i === 23 ? "Lihat hasil" : "Lanjut →").click();
     }
     await page.getByText("Benar 23 · Salah 1 · Skor 96/100", { exact: true }).waitFor();
     await page.getByText("Bahas jawaban yang salah", { exact: true }).click();
-    await page.getByText(/Jawaban benar 1\/6/).waitFor();
+    await page.getByText(/Jawaban benar Cokelat 1\/6, keju 1\/8/).waitFor();
     await fit("hasil"); await shot("result", true);
     assert.deepEqual(errors, []); await page.close();
     console.log(`PASS kelas 4 bab 2 di ${width}×${height}: 5 peraga, 20 latihan (1 salah disengaja), 24 evaluasi, muat di layar, skor dan pembahasan`);

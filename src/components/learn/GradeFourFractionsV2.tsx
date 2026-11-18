@@ -128,7 +128,7 @@ function Sacks({ items }: { items: { name: string; label: string }[] }) {
 }
 function SceneView({ scene }: { scene: Scene }) {
   switch (scene.type) {
-    case "figs": return <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-2">{scene.figs.map((f, i) => <FigCard key={i} f={f} w={scene.figs.length === 1 ? 220 : ["circle", "melon", "hexagon", "triangle"].includes(f.shape) ? 120 : 180} />)}</div>;
+    case "figs": return <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-2">{scene.figs.map((f, i) => <FigCard key={i} f={f} w={scene.figs.length === 1 ? 220 : ["circle", "melon", "hexagon", "triangle"].includes(f.shape) ? 100 : 180} />)}</div>;
     case "items": return <Items {...scene} />;
     case "people": return <People {...scene} />;
     case "sheet": return <Sheet {...scene} />;
