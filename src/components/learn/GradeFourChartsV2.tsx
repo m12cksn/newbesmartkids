@@ -23,7 +23,10 @@ export function IconArt({ icon, size = 22, cls }: { icon: Icon; size?: number; c
     case "kue": return <svg {...s}><path d="M4 12h16l-2 10H6z" fill="#c98b4a" stroke={ink} strokeWidth=".9" /><path d="M7 13.5l.6 7M11 13.5v7M15 13.5l-.4 7" stroke="#a96e33" strokeWidth=".7" /><path d="M3.4 12C3.4 7 7 4.6 12 4.6S20.6 7 20.6 12z" fill="#f8b4c8" stroke={ink} strokeWidth=".9" /><circle cx="12" cy="3.6" r="1.8" fill="#e23c3c" stroke={ink} strokeWidth=".6" /></svg>;
     case "telur": return <svg {...s}><path d="M12 2.4c4.6 0 7.4 7.6 7.4 12 0 4.4-3.2 7.2-7.4 7.2S4.6 18.8 4.6 14.4C4.6 10 7.4 2.4 12 2.4z" fill="#f6ead7" stroke={ink} strokeWidth=".9" /><ellipse cx="9.4" cy="9" rx="1.4" ry="2.4" fill="#fff" opacity=".85" /></svg>;
     case "apel": return <svg {...s}><path d="M12 7.6C9.6 5.8 3.4 6 3.4 13c0 5.4 3.8 9.4 6.2 9.4 1.2 0 1.6-.8 2.4-.8s1.2.8 2.4.8c2.4 0 6.2-4 6.2-9.4 0-7-6.2-7.2-8.6-5.4z" fill="#e23c3c" stroke={ink} strokeWidth=".9" /><path d="M12 7.6c0-2.4.8-4 1.6-4.8" stroke="#6b4423" strokeWidth="1.2" fill="none" /><path d="M13.6 4.4c2.4-1.6 4.8-.8 4.8 0-1.6 1.6-3.2 1.6-4.8 0z" fill="#3f9b45" /></svg>;
-    case "kotak": return <svg {...s}><rect x="3" y="3" width="18" height="18" rx="2" fill="#e2574c" stroke={ink} strokeWidth=".9" /></svg>;
+    case "spidol": return <svg {...s}><g transform="rotate(-40 12 12)"><rect x="3" y="9" width="13" height="6" rx="1.2" fill="#f4f4f4" stroke={ink} strokeWidth=".9" /><rect x="12.5" y="9" width="3.5" height="6" fill="#2f6fb5" /><path d="M16 9.6h3.2l2 2.4-2 2.4H16z" fill="#2f6fb5" stroke={ink} strokeWidth=".9" /><rect x="4.5" y="10.6" width="6" height="2.8" fill="#9fc3ea" /></g></svg>;
+    case "penghapus": return <svg {...s}><g transform="rotate(-20 12 12)"><rect x="3" y="7.5" width="18" height="9" rx="1.6" fill="#f7b6c8" stroke={ink} strokeWidth=".9" /><path d="M11 7.5h10v9H11z" fill="#5aa9e6" stroke={ink} strokeWidth=".9" /></g></svg>;
+    case "pulpen": return <svg {...s}><g transform="rotate(-45 12 12)"><rect x="3" y="10" width="14" height="4" rx="1" fill="#2f6fb5" stroke={ink} strokeWidth=".9" /><path d="M17 10h2.4l2.4 2-2.4 2H17z" fill="#d9e3ea" stroke={ink} strokeWidth=".8" /><path d="M5 10V7.6h5.4V10" fill="none" stroke={ink} strokeWidth="1" /></g></svg>;
+    case "taplak": return <svg {...s}><path d="M3 6h18l-1.6 13H4.6z" fill="#fff" stroke={ink} strokeWidth=".9" /><path d="M3 6h18v3H3z" fill="#e2574c" stroke={ink} strokeWidth=".9" />{[6, 10, 14, 18].map(x => <path key={x} d={`M${x} 9.6v8.6`} stroke="#e2574c" strokeWidth="1" />)}<path d="M4.4 13.6h15.2" stroke="#e2574c" strokeWidth="1" /></svg>;
     case "bola": return <svg {...s}><circle cx="12" cy="12" r="9.6" fill="#f08a2c" stroke={ink} strokeWidth=".9" /><path d="M2.6 12h18.8M12 2.4v19.2M5 5.4c3.6 3 3.6 10.2 0 13.2M19 5.4c-3.6 3-3.6 10.2 0 13.2" fill="none" stroke={ink} strokeWidth=".8" /></svg>;
   }
 }
@@ -43,13 +46,13 @@ function PiktoView({ chart, edit, values, set, disabled }: { chart: Pikto; edit?
         <td className="px-1 py-0.5"><div className="flex items-center gap-1">
           {editable && <button type="button" aria-label={`${it.name} kurangi gambar`} disabled={disabled || n <= 0} onClick={() => bump(it.name, -1)} className="btn btn-xs btn-square btn-outline"><Minus className="size-3.5" aria-hidden="true" /></button>}
           <div role="img" aria-label={editable ? `${it.name}: ${n} gambar` : it.name === chart.hide ? `${it.name}: belum digambar` : `${it.name}: ${n} gambar`} className={`flex min-h-6 flex-1 flex-wrap items-center gap-0.5 ${editable ? "justify-start rounded border border-dashed border-orange-300 bg-orange-50 px-0.5" : "justify-center"}`}>
-            {Array.from({ length: n }, (_, j) => <IconArt key={j} icon={chart.icon} cls={cls} />)}
+            {Array.from({ length: n }, (_, j) => <IconArt key={j} icon={chart.icons?.[it.name] ?? chart.icon} cls={cls} />)}
             {it.name === chart.hide && !editable && <span className="text-xs text-base-content/50">belum digambar</span>}
           </div>
           {editable && <button type="button" aria-label={`${it.name} tambah gambar`} disabled={disabled || n >= 16} onClick={() => bump(it.name, 1)} className="btn btn-xs btn-square btn-outline"><Plus className="size-3.5" aria-hidden="true" /></button>}
         </div></td>
       </tr>; })}</tbody>
-    <tfoot><tr className="border-t-2 border-sky-300 bg-sky-50"><td colSpan={2} className="px-2 py-0.5 text-center"><span className="inline-flex items-center gap-1.5 font-semibold"><IconArt icon={chart.icon} size={20} />menyatakan {chart.scale} {chart.unit ?? iconName[chart.icon]}</span></td></tr></tfoot>
+    <tfoot><tr className="border-t-2 border-sky-300 bg-sky-50"><td colSpan={2} className="px-2 py-0.5 text-center"><span className="inline-flex items-center gap-1.5 font-semibold">{chart.icons ? "Setiap gambar" : <IconArt icon={chart.icon} size={20} />} menyatakan {chart.hideKey ? <span aria-label="belum diketahui" className="rounded border-2 border-dashed border-orange-400 px-1.5 text-orange-600">?</span> : chart.scale} {chart.unit ?? iconName[chart.icon]}</span></td></tr></tfoot>
   </table>;
 }
 

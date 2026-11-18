@@ -70,6 +70,10 @@ for (const q of all) {
   }
 }
 { const q = Q.find(q => /Keranjang A berisi 30 bola dan digambar dengan 6 gambar/.test(q.prompt)); const c = q.scene.chart; assert.equal(get(c, "A"), 30); assert.equal(30 / c.scale, 6); checked++; }
+// Soal yang meminta nilai satu gambar tidak boleh menampilkan kuncinya.
+for (const q of all) if (q.parts.some(p => p.kind === "fill" && p.ask.some(a => a.f === "scale"))) assert.ok(q.scene.chart.hideKey, `${q.prompt}: kunci piktogram terlihat`);
+// Piktogram benda yang berbeda-beda memakai gambar benda masing-masing.
+for (const q of all) for (const c of [q.scene?.chart, ...q.parts.map(p => p.chart)].filter(x => x?.kind === "pikto")) if (c.icons) c.items.forEach(i => assert.ok(c.icons[i.name], `${q.prompt}: ${i.name} tanpa gambar`));
 { const q = Q.find(q => /seluruhnya 52 buah/.test(q.prompt)); assert.equal(q.scene.chart.hide, "Bu Sri"); checked++; }
 assert.ok(checked >= 35, `kunci yang dihitung ulang ${checked}`);
 console.log(`Kelas 4 Bab 6 OK: ${topics.length} subtopik, ${practice.flat().length} latihan, ${Q.length} evaluasi (tingkat ${lv("Sedang")}/${lv("Menantang")}/${lv("Sangat menantang")}), ${action} soal beraksi, ${checked} kunci dihitung ulang, bentuk ${[...kinds].join(", ")}`);

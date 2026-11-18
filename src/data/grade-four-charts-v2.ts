@@ -5,11 +5,15 @@ import type { Question } from "./grade-four-whole-numbers";
 /* ====================================================================== */
 /* Data dan diagram                                                        */
 /* ====================================================================== */
-export type Icon = "siswa" | "buku" | "kelereng" | "bunga" | "kue" | "telur" | "apel" | "bola" | "kotak";
-export const iconName: Record<Icon, string> = { siswa: "siswa", buku: "buku", kelereng: "kelereng", bunga: "bunga", kue: "kue", telur: "telur", apel: "apel", bola: "bola", kotak: "benda" };
+export type Icon = "siswa" | "buku" | "kelereng" | "bunga" | "kue" | "telur" | "apel" | "bola" | "spidol" | "penghapus" | "pulpen" | "taplak";
+export const iconName: Record<Icon, string> = { siswa: "siswa", buku: "buku", kelereng: "kelereng", bunga: "bunga", kue: "kue", telur: "telur", apel: "apel", bola: "bola", spidol: "spidol", penghapus: "penghapus", pulpen: "pulpen", taplak: "taplak" };
 export type Item = { name: string; value: number };
-/** `unit`: kata satuan pada keterangan, misalnya "1 gambar menyatakan 2 siswa". */
-export type Pikto = { kind: "pikto"; cat: string; head: string; icon: Icon; scale: number; items: Item[]; hide?: string; unit?: string };
+/**
+ * `unit`: kata satuan pada keterangan, misalnya "1 gambar menyatakan 2 siswa".
+ * `icons`: gambar berbeda untuk setiap baris (benda yang berbeda-beda, seperti Aktivitas 1 di buku).
+ * `hideKey`: sembunyikan nilai satu gambar ketika soal meminta siswa menemukannya.
+ */
+export type Pikto = { kind: "pikto"; cat: string; head: string; icon: Icon; scale: number; items: Item[]; hide?: string; unit?: string; icons?: Record<string, Icon>; hideKey?: boolean };
 export type Bar = { kind: "bar"; dir: "v" | "h"; cat: string; axis: string; step: number; max: number; items: Item[]; color?: string; hide?: string };
 export type Chart = Pikto | Bar;
 export type Scene =
@@ -197,7 +201,7 @@ const tabungan = bar("v", "Bulan", "Tabungan (ribu rupiah)", 5, 50, { Januari: 2
 const kelompok = { ...pikto("Kelompok", "Banyak Bunga", "bunga", 3, { Mawar: 12, Melati: 18, Anggrek: 9, Kenanga: 15 }), unit: "bunga" };
 const pakaian = bar("v", "Bulan", "Banyak Baju", 4, 40, { Juli: 24, Agustus: 36, September: 16, Oktober: 28 }, "#7c5cbf");
 const panen = { ...pikto("Kebun", "Banyak Apel", "apel", 2, { "Pak Ali": 14, "Bu Tini": 10, "Pak Joko": 16, "Bu Sri": 0 }, "Bu Sri"), unit: "apel" };
-const bolaKey = { ...pikto("Keranjang", "Banyak Bola", "bola", 5, { A: 30, B: 20, C: 35, D: 15 }), unit: "bola" };
+const bolaKey = { ...pikto("Keranjang", "Banyak Bola", "bola", 5, { A: 30, B: 20, C: 35, D: 15 }), unit: "bola", hideKey: true };
 const renangH = bar("h", "Lomba", "Banyak Siswa", 1, 12, { Lari: 9, Lompat: 7, Renang: 6, Senam: 10 }, "#e07a3a");
 const sayurH = bar("h", "Sayur", "Banyak Ikat", 1, 10, { Wortel: 7, Kol: 3, Sawi: 9, Kangkung: 6, Buncis: 4 }, "#3f9b45");
 const minat = { ...pikto("Olahraga", "Banyak Siswa", "siswa", 3, { "Sepak bola": 15, "Bulu tangkis": 9, Voli: 6, Catur: 12 }), unit: "siswa" };
@@ -207,7 +211,7 @@ export const assessment: CQuestion[] = [
   B({ level: "Sedang", prompt: "Diagram batang ekstrakurikuler yang diikuti siswa.", scene: chart(ekskul), parts: [choose(ekskul, "Paling banyak diikuti:", { f: "max" }), fill(ekskul, "Pramuka = □ siswa", { f: "value", cat: "Pramuka" })], explanation: "Batang Sepak bola paling tinggi (9 siswa). Batang Pramuka sampai garis 8." }),
   A({ level: "Sedang", prompt: "Piktogram alat transportasi siswa kelas IV ke sekolah.", scene: chart(transport), parts: [choose(transport, "Paling banyak dipakai:", { f: "max" }), fill(transport, "Sepeda = □ siswa", { f: "value", cat: "Sepeda" })], explanation: "Baris Sepeda motor paling panjang, 12 gambar. Baris Sepeda ada 6 gambar, jadi 6 siswa." }),
   B({ level: "Sedang", prompt: "Diagram batang lomba PORSENI.", scene: chart(porseni), parts: [choose(porseni, "Diikuti 3 siswa:", { f: "which", value: 3 }), fill(porseni, "Catur + renang = □ siswa", { f: "sum", cats: ["Catur", "Renang"] })], explanation: "Batang Renang berhenti di 3. Catur 5 dan renang 3, jumlahnya 8 siswa." }),
-  A({ level: "Sedang", prompt: "Benda di meja guru. Sajikan dalam piktogram, 1 gambar = 1 benda.", scene: table(["Benda", "Banyaknya"], meja, true), parts: [{ kind: "pikto", chart: { ...pikto("Benda", "Banyaknya", "kotak", 1, meja), unit: "benda" }, edit: Object.keys(meja) }], explanation: "Gambarkan sebanyak datanya: buku 5, spidol 4, penghapus 2, pulpen 6, dan taplak 1 gambar." }),
+  A({ level: "Sedang", prompt: "Benda di meja guru. Sajikan dalam piktogram, 1 gambar = 1 benda.", scene: table(["Benda", "Banyaknya"], meja, true), parts: [{ kind: "pikto", chart: { ...pikto("Benda", "Banyaknya", "buku", 1, meja), unit: "benda", icons: { Buku: "buku", Spidol: "spidol", Penghapus: "penghapus", Pulpen: "pulpen", Taplak: "taplak" } }, edit: Object.keys(meja) }], explanation: "Gambarkan sebanyak datanya: buku 5, spidol 4, penghapus 2, pulpen 6, dan taplak 1 gambar." }),
   B({ level: "Sedang", prompt: "Benda di meja guru. Sajikan dalam diagram batang tegak.", scene: table(["Benda", "Banyaknya"], meja, true), parts: [{ kind: "bar", chart: gambarV, edit: Object.keys(meja) }], explanation: "Tinggi setiap batang sama dengan banyak benda: buku 5, spidol 4, penghapus 2, pulpen 6, dan taplak 1." }),
   A({ level: "Sedang", prompt: "Piktogram buku yang dipinjam siswa dari perpustakaan.", scene: chart(pinjam2), parts: [choose(pinjam2, "Dipinjam 14 buku hari:", { f: "which", value: 14 }), fill(pinjam2, "Kamis + Jumat = □ buku", { f: "sum", cats: ["Kamis", "Jumat"] })], explanation: "Baris Rabu ada 14 gambar. Kamis 5 dan Jumat 9, jumlahnya 14 buku." }),
   B({ level: "Sedang", prompt: "Diagram batang tanaman di kebun sekolah.", scene: chart(tanamH), parts: [choose(tanamH, "Paling sedikit:", { f: "min" }), fill(tanamH, "Seledri = □ pot", { f: "value", cat: "Seledri" })], explanation: "Batang Terong paling pendek (4 pot). Batang Seledri sampai angka 9." }),
