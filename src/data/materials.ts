@@ -54,25 +54,6 @@ export const materials: MaterialItem[] = [
     description: "Estimate and calculate with fractions using interactive fraction strips.",
     videoStatus: "coming_soon", summary: "Add, subtract, multiply and divide fractions, and use fractions as operators.", questionIds: [],
   },
-  {
-    id: "kelas-4-pola", classId: 4, chapter: 3, slug: "pola-gambar-dan-pola-bilangan",
-    title: "Pola Gambar dan Pola Bilangan", topic: "Pola",
-    description: "Susun pola gambar, lengkapi pola bilangan, dan pecahkan cerita dengan peraga interaktif.",
-    videoStatus: "coming_soon", summary: "Pola membesar dan mengecil, selisih tetap, tabel, dan soal cerita.", questionIds: [],
-  },
-  {
-    id: "kelas-4-pecahan",
-    classId: 4,
-    chapter: 2,
-    slug: "pecahan",
-    title: "Pecahan",
-    topic: "Bilangan",
-    description: "Bandingkan pecahan, cari pecahan senilai, dan hubungkan desimal dengan persen melalui peraga.",
-    videoStatus: "coming_soon",
-    summary: "Pelajari pecahan, desimal persepuluhan dan perseratusan, serta persen.",
-    questionIds: [],
-  },
-
 
   {
     id: "kelas-1-penjumlahan-10",
