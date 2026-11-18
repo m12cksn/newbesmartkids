@@ -44,18 +44,6 @@ export const materials: MaterialItem[] = [
   },
 
   {
-    id: "kelas-1-penjumlahan-10",
-    classId: 1,
-    chapter: 2,
-    slug: "penjumlahan-sampai-dengan-10",
-    title: "Penjumlahan sampai dengan 10",
-    topic: "Penjumlahan",
-    description: "Memahami penjumlahan melalui cerita, benda konkret, dan berbagai cara menghitung.",
-    videoStatus: "coming_soon",
-    summary: "Penjumlahan berarti menggabungkan dua kelompok atau lebih. Hasil penjumlahan dapat ditemukan dengan menghitung semua benda atau melanjutkan hitungan dari bilangan pertama.",
-    questionIds: [],
-  },
-  {
     id: "kelas-1-pengurangan-10",
     classId: 1,
     chapter: 3,
