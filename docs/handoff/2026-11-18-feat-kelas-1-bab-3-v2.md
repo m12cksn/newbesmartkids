@@ -15,10 +15,11 @@
 - Dihapus: `GradeOneSubtraction.tsx`, `src/data/grade-one-subtraction.ts`, rute statis `src/app/kelas/matematika-dasar-kelas-1/materi/pengurangan-sampai-dengan-10`, `scripts/verify-grade-one-subtraction.mjs`, `scripts/smoke-grade-one-subtraction.mjs`, `scripts/smoke-grade-one-chapters-one-to-three.mjs` (sudah tidak ada bab yang diuji), entri di `materials.ts` dan baris di `grade-one-addition-qa.yml`.
 
 ## Validasi (lokal)
-- verify: 73 kunci dihitung ulang dari gambar/kalimat, tingkat 8/9/7, tidak ada subtopik berurutan, posisi jawaban pilihan bervariasi.
+- verify: 76 kunci dihitung ulang dari gambar/kalimat, tingkat 8/9/7, tidak ada subtopik berurutan, posisi jawaban pilihan bervariasi.
 - eslint berkas bab, `npm run build`.
 - smoke mode ketat 320×640, 390×844, 768×1024, 1280×800: jalur klik dari halaman kelas, keempat peraga, 16 latihan (1 salah disengaja), 24 evaluasi, muat di layar tanpa menggulir, skor 96 dan pembahasan.
-- Catatan: latihan C1 setelah diperiksa di 320×640 lebih 3 px (pemeriksaan sesudah jawab tidak wajib).
+- Catatan: latihan C1 dan D4 setelah diperiksa di 320×640 lebih 3–4 px (pemeriksaan sesudah jawab tidak wajib).
+- Temuan Codex (soal cerita tanpa gambar) diperbaiki: semua soal cerita kini bergambar (mula-mula, yang pergi, sisa); bagian yang ditanyakan digambar "?".
 
 ## Sisa
 - Video belum ada (panel placeholder).

@@ -57,10 +57,16 @@ for (const q of all) {
     if (p.kind === "build") { const v = q.parts.length === 1 ? q : { ...q, parts: [p] }; const good = []; for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) for (let c = 0; c < 3; c++) if (new Set([a, b, c]).size === 3) { const s = `${a},${b},${c}`; if (correct(v, s)) good.push(s); } assert.ok(good.length >= 1 && good.length <= 2, `${q.prompt}: susunan benar ${good.length}`); good.forEach(s => { const [a, b, c] = s.split(",").map(Number); assert.equal(apply(p.tiles[a], p.op, p.tiles[b]), p.tiles[c]); }); checked++; }
     if (p.kind === "pairs") { const v = { ...q, parts: [p] }; assert.ok(correct(v, "6|1|7|2|10|5")); assert.ok(!correct(v, "6|1|6|1|7|2"), "operasi sama harus ditolak"); assert.ok(!correct(v, "6|1|7|1|8|3"), "hasil salah harus ditolak"); assert.ok(!correct(v, "6|1|7|2|15|10"), "bilangan lebih dari 10 harus ditolak"); checked++; }
   }
+  if (sc?.type === "story") { const n = nums(q.prompt); assert.equal(sc.first, n[0], q.prompt); const known = sc.away.filter(a => a.n !== null).map(a => a.n); for (const k of known) assert.ok(n.includes(k), `${q.prompt}: ${k} tidak ada di kalimat`);
+    // Bagian yang ditanyakan tidak boleh tergambar.
+    for (const p of q.parts.filter(x => x.kind === "fill")) { const asked = p.answers.at(-1); if (/^□ − □/.test(p.text)) continue; if (sc.away.some(a => a.n === null)) assert.ok(!known.includes(asked) || n.slice(1).includes(asked), `${q.prompt}: jawaban tergambar`); }
+    if (sc.left !== undefined) { const tot = sc.first - known.reduce((a, b) => a + b, 0); const miss = sc.away.filter(a => a.n === null).length; assert.ok(miss === 1 && tot - sc.left > 0, q.prompt); } checked++; }
   // Soal cerita tanpa gambar: angka di kalimat.
   if (!sc && q.topic === 3) { const n = nums(q.prompt); const f = q.parts.find(x => x.kind === "fill"); if (f.text.startsWith("□ − □")) { assert.deepEqual(f.answers.slice(0, -1), n.slice(0, f.answers.length - 1), q.prompt); checked++; } }
 }
-// Soal "berapa yang pergi" tidak boleh punya gambar yang membocorkan jawaban.
-for (const q of all.filter(q => /Beberapa|beberapa/.test(q.prompt) && q.topic === 3)) assert.ok(!q.scene, `${q.prompt}: gambar membocorkan jawaban`);
+// Soal "berapa yang pergi": bagian yang ditanyakan digambar "?".
+for (const q of all.filter(q => /Beberapa|beberapa/.test(q.prompt) && q.topic === 3)) assert.ok(q.scene?.type === "story" && q.scene.away[0].n === null, `${q.prompt}: gambar membocorkan jawaban`);
+// Soal cerita yang memakai kelompok benda harus bergambar.
+for (const q of all.filter(q => q.topic === 3)) assert.ok(q.scene || q.parts.some(p => ["cross", "back"].includes(p.kind)), `${q.prompt}: soal cerita tanpa gambar`);
 assert.ok(checked >= 40, `kunci yang dihitung ulang ${checked}`);
 console.log(`Kelas 1 Bab 3 OK: ${topics.length} subtopik, ${practice.flat().length} latihan, ${Q.length} evaluasi (tingkat ${lv("Sedang")}/${lv("Menantang")}/${lv("Sangat menantang")}), ${action} soal beraksi, ${checked} kunci dihitung ulang, posisi pilihan ${pos.join("/")}, bentuk ${[...kinds].join(", ")}`);

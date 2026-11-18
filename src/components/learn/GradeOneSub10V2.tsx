@@ -38,6 +38,12 @@ function SceneView({ scene }: { scene: Scene }) {
       <Box><Many thing={scene.thing} n={scene.stay} size={size(scene.stay)} label={`${scene.stay} ${thingName[scene.thing]} tetap ada`} /></Box>
       {scene.away.map((a, i) => <Box key={i} dashed label={a.verb}><Many thing={scene.thing} n={a.n} gone size={size(a.n)} label={`${a.n} ${thingName[scene.thing]} ${a.verb}`} /></Box>)}</div>;
     case "boxes": return <div className="flex w-full max-w-lg gap-3"><div className="flex-1"><Box><Many thing={scene.thing} n={scene.a} size={size(scene.a)} /></Box></div><div className="flex-1"><Box><Many thing={scene.thing} n={scene.b} alt size={size(scene.b)} /></Box></div></div>;
+    case "story": { const sz = (n: number) => (scene.away.length > 1 || scene.left !== undefined ? "size-5 sm:size-9" : size(n)), q = <span className="grid size-12 place-items-center rounded-full bg-base-200 text-3xl font-extrabold text-base-content/70" aria-label="belum diketahui">?</span>;
+      return <div className="flex w-full max-w-2xl flex-wrap items-center justify-center gap-1 sm:gap-2">
+        <Box label="mula-mula"><Many thing={scene.thing} n={scene.first} size={sz(scene.first)} /></Box>
+        {scene.away.map((a, i) => <span key={i} className="flex items-center gap-2"><Minus className="size-6 shrink-0 text-error" strokeWidth={2.5} aria-hidden="true" /><Box dashed label={a.verb}>{a.n === null ? q : <Many thing={scene.thing} n={a.n} gone size={sz(a.n)} label={`${a.n} ${thingName[scene.thing]} ${a.verb}`} />}</Box></span>)}
+        {scene.left !== undefined && <span className="flex items-center gap-2"><span className="text-3xl font-extrabold" aria-hidden="true">=</span><Box label="tersisa"><Many thing={scene.thing} n={scene.left} size={sz(scene.left)} /></Box></span>}
+      </div>; }
     case "frame": return <Frame thing={scene.thing} n={scene.n} />;
     case "line": return <div role="img" aria-label={`garis bilangan, mulai di ${scene.from}, mendarat di ${scene.to}`} className="w-full max-w-xl"><HopLine start={scene.from} to={scene.to} showHops={false} /></div>;
   }
@@ -46,9 +52,9 @@ function SceneView({ scene }: { scene: Scene }) {
 /* ====================================================================== */
 /* Bagian interaktif bersama                                               */
 /* ====================================================================== */
-function NumBox({ value, onChange, label, disabled, round = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; round?: boolean }) {
+function NumBox({ value, onChange, label, disabled, round = false, small = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; round?: boolean; small?: boolean }) {
   return <input aria-label={label} inputMode="numeric" value={value} disabled={disabled} placeholder="…" onChange={e => onChange(e.target.value.replace(/\D/g, "").slice(0, 2))}
-    className={`h-14 w-16 border-4 border-orange-400 bg-white text-center text-3xl font-extrabold text-neutral focus:border-success focus:outline-none ${round ? "rounded-full" : "rounded-2xl"}`} />;
+    className={`${small ? "h-12 w-12 text-2xl sm:h-14 sm:w-16 sm:text-3xl" : "h-14 w-16 text-3xl"} border-4 border-orange-400 bg-white text-center font-extrabold text-neutral focus:border-success focus:outline-none ${round ? "rounded-full" : "rounded-2xl"}`} />;
 }
 /** Pasangan bilangan: lingkaran gabungan di kiri, dua lingkaran sebagian di kanan. */
 function BondView({ whole, parts, values, set, disabled }: { whole: number | null; parts: [number | null, number | null]; values?: string[]; set?: (k: number, v: string) => void; disabled?: boolean }) {
@@ -161,8 +167,8 @@ const ids = (v: string) => (v ? v.split(",").filter(Boolean) : []);
 function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: (v: string) => void; checked: boolean; i: number }) {
   const x = cells(p, value), put = (k: number, v: string) => { const a = [...x]; a[k] = v; set(a.join("|")); };
   switch (p.kind) {
-    case "fill": { const bits = p.text.split("□");
-      return <p className="flex flex-wrap items-center gap-x-2 gap-y-2 text-2xl font-bold sm:text-3xl">{bits[0] && <span>{bits[0].trim()}</span>}{bits.slice(1).map((b, k) => <span key={k} className="inline-flex items-center gap-2 whitespace-nowrap"><NumBox label={`Bagian ${i + 1} kotak ${k + 1}`} value={x[k]} onChange={v => put(k, v)} disabled={checked} />{b.trim() && <span>{b.trim()}</span>}</span>)}</p>; }
+    case "fill": { const bits = p.text.split("□"), small = bits.length > 3;
+      return <p className={`flex flex-wrap items-center gap-y-2 text-2xl font-bold sm:text-3xl ${small ? "gap-x-1 sm:gap-x-2" : "gap-x-2"}`}>{bits[0] && <span>{bits[0].trim()}</span>}{bits.slice(1).map((b, k) => <span key={k} className="inline-flex items-center gap-2 whitespace-nowrap"><NumBox small={small} label={`Bagian ${i + 1} kotak ${k + 1}`} value={x[k]} onChange={v => put(k, v)} disabled={checked} />{b.trim() && <span>{b.trim()}</span>}</span>)}</p>; }
     case "bond": return <div className="flex justify-center"><BondView whole={p.whole} parts={p.parts} values={x} set={put} disabled={checked} /></div>;
     case "back": return <div className="space-y-1"><p className="text-base text-base-content/70">Katak mulai di angka {p.start} (oranye). Ketuk angka tempat katak mendarat.</p><HopLine start={p.start} to={value ? Number(value) : p.start} pick={n => set(n === p.start ? "" : String(n))} disabled={checked} showHops={!!value && Number(value) < p.start} /><p className="text-2xl font-bold">{p.start} − {p.steps} = {value || "…"}</p></div>;
     case "cross": { const sel = ids(value), crossed = Array.from({ length: p.total }, (_, k) => sel.includes(String(k)));

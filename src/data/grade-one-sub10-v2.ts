@@ -27,6 +27,8 @@ export type Scene =
   | { type: "boxes"; thing: Thing; a: number; b: number }
   /** Bingkai 10 berisi `n` benda; sisanya kotak kosong. */
   | { type: "frame"; thing: Thing; n: number }
+  /** Soal cerita: kelompok mula-mula, lalu kelompok yang pergi (n null = ditanyakan, digambar "?"), dan sisa bila diketahui. */
+  | { type: "story"; thing: Thing; first: number; away: { n: number | null; verb: string }[]; left?: number }
   /** Garis bilangan dengan titik mulai dan titik mendarat (tanpa lompatan). */
   | { type: "line"; from: number; to: number };
 
@@ -165,6 +167,7 @@ const make = (topic: number) => (s: Spec): SQuestion => ({ ...s, topic, answer: 
 const [A, B, C, D] = [make(0), make(1), make(2), make(3)];
 const fill = (text: string, ...answers: number[]): Part => ({ kind: "fill", text, answers });
 const gone = (thing: Thing, stay: number, ...away: Away[]): Scene => ({ type: "gone", thing, stay, away });
+const story = (thing: Thing, first: number, away: { n: number | null; verb: string }[], left?: number): Scene => ({ type: "story", thing, first, away, left });
 const bond = (whole: number | null, a: number | null, b: number | null, ...answers: number[]): Part => ({ kind: "bond", whole, parts: [a, b], answers });
 
 /* ---------- Latihan (4 soal per subtopik) ---------- */
@@ -189,9 +192,9 @@ export const practice: SQuestion[][] = [
   ],
   [
     D({ prompt: "Ada 8 burung di pohon. Sebanyak 2 burung terbang. Berapa burung yang masih di pohon?", scene: gone("burung", 6, { n: 2, verb: "terbang" }), parts: [fill("□ − □ = □", 8, 2, 6), fill("Masih ada □ burung.", 6)], explanation: "8 burung, 2 terbang. 8 − 2 = 6. Masih ada 6 burung." }),
-    D({ prompt: "Ada 7 siswa bermain. Beberapa siswa pulang. Sekarang tersisa 5 siswa. Berapa siswa yang pulang?", parts: [fill("7 − □ = 5", 2), fill("Yang pulang □ siswa.", 2)], explanation: "7 dikurangi berapa hasilnya 5? Mundur dari 7 ke 5 ada 2 langkah. Yang pulang 2 siswa." }),
-    D({ prompt: "Ada 10 bola. Sebanyak 3 bola ada di luar kotak. Berapa bola di dalam kotak?", parts: [fill("□ − □ = □", 10, 3, 7), fill("Di dalam kotak ada □ bola.", 7)], explanation: "10 bola, 3 di luar. 10 − 3 = 7 bola di dalam kotak." }),
-    D({ prompt: "Dina punya 9 kelereng. Ia memberi Kira 3 kelereng dan memberi Upe 4 kelereng. Berapa sisa kelereng Dina?", parts: [fill("□ − □ − □ = □", 9, 3, 4, 2), fill("Sisa kelereng Dina □.", 2)], explanation: "9 − 3 = 6, lalu 6 − 4 = 2. Sisa kelereng Dina 2." }),
+    D({ prompt: "Ada 7 siswa bermain. Beberapa pulang, tersisa 5 siswa. Berapa yang pulang?", scene: story("siswa", 7, [{ n: null, verb: "pulang" }], 5), parts: [fill("7 − □ = 5", 2), fill("Yang pulang □ siswa.", 2)], explanation: "7 dikurangi berapa hasilnya 5? Mundur dari 7 ke 5 ada 2 langkah. Yang pulang 2 siswa." }),
+    D({ prompt: "Ada 10 bola. Sebanyak 3 bola ada di luar kotak. Berapa bola di dalam kotak?", scene: story("bola", 10, [{ n: 3, verb: "di luar kotak" }]), parts: [fill("□ − □ = □", 10, 3, 7), fill("Di dalam kotak ada □ bola.", 7)], explanation: "10 bola, 3 di luar. 10 − 3 = 7 bola di dalam kotak." }),
+    D({ prompt: "Dina punya 9 kelereng. Ia memberi Kira 3 dan Upe 4. Berapa sisa kelereng Dina?", scene: story("kelereng", 9, [{ n: 3, verb: "untuk Kira" }, { n: 4, verb: "untuk Upe" }]), parts: [fill("□ − □ − □ = □", 9, 3, 4, 2), fill("Sisa kelereng Dina □.", 2)], explanation: "9 − 3 = 6, lalu 6 − 4 = 2. Sisa kelereng Dina 2." }),
   ],
 ];
 
@@ -209,7 +212,7 @@ export const assessment: SQuestion[] = [
   A({ level: "Menantang", prompt: "Pilih operasi yang cocok dengan gambar.", scene: gone("kepik", 5, { n: 3, verb: "terbang" }), parts: [{ kind: "pick", label: "Operasinya:", options: ["8 − 5 = 3", "8 − 3 = 5", "5 − 3 = 2"], answer: "8 − 3 = 5" }], explanation: "Semua ada 8 kepik. Yang terbang 3, tersisa 5. Jadi 8 − 3 = 5." }),
   B({ level: "Menantang", prompt: "Hitung mundur. Mulai dari 10, mundur 3 langkah.", parts: [{ kind: "back", start: 10, steps: 3 }], explanation: "Dari 10 mundur 3 langkah: 9, 8, 7. Jadi 10 − 3 = 7." }),
   C({ level: "Menantang", prompt: "Pilih semua operasi yang hasilnya 4.", parts: [{ kind: "multi", label: "Hasilnya 4:", options: ["7 − 3", "2 + 3", "9 − 5", "1 + 3", "8 − 3", "6 − 2"], answers: [0, 2, 3, 5] }], explanation: "7 − 3 = 4, 9 − 5 = 4, 1 + 3 = 4, dan 6 − 2 = 4. Sedangkan 2 + 3 = 5 dan 8 − 3 = 5." }),
-  D({ level: "Menantang", prompt: "Beni punya 10 bola. Beberapa bola diberikan kepada Tika. Sisa bola Beni 4. Berapa bola yang diberikan kepada Tika?", parts: [fill("10 − □ = 4", 6), fill("Bola yang diberikan □.", 6)], explanation: "10 dikurangi berapa hasilnya 4? Periksa dengan penjumlahan: 4 + 6 = 10. Jadi 6 bola." }),
+  D({ level: "Menantang", prompt: "Beni punya 10 bola. Beberapa diberikan kepada Tika, sisanya 4. Berapa bola yang diberikan?", scene: story("bola", 10, [{ n: null, verb: "untuk Tika" }], 4), parts: [fill("10 − □ = 4", 6), fill("Diberikan □ bola.", 6)], explanation: "10 dikurangi berapa hasilnya 4? Periksa dengan penjumlahan: 4 + 6 = 10. Jadi 6 bola." }),
   A({ level: "Menantang", prompt: "Amati gambar. Tulislah operasi pengurangannya.", scene: gone("apel", 6, { n: 3, verb: "dimakan ulat" }), parts: [fill("□ − □ = □", 9, 3, 6)], explanation: "Semua ada 9 apel, 3 dimakan ulat, tersisa 6. 9 − 3 = 6." }),
   B({ level: "Menantang", prompt: "Kelinci makan beberapa wortel dari 10 wortel. Sisanya ada di bingkai.", scene: { type: "frame", thing: "wortel", n: 3 }, parts: [fill("10 − □ = 3", 7)], explanation: "Tersisa 3 wortel. Kotak kosong ada 7, itu wortel yang dimakan. 10 − 7 = 3." }),
   C({ level: "Menantang", prompt: "Susun operasi pengurangan yang benar dari kartu 9, 5, dan 4.", parts: [{ kind: "build", tiles: [5, 9, 4], op: "−" }], explanation: "9 − 5 = 4 atau 9 − 4 = 5. Bilangan terbesar ditulis pertama." }),
@@ -218,9 +221,9 @@ export const assessment: SQuestion[] = [
 
   B({ level: "Sangat menantang", prompt: "Isilah pasangan bilangannya, lalu lengkapi pengurangannya.", parts: [bond(10, 4, null, 6), fill("10 − □ = 4", 6)], explanation: "10 dipisah menjadi 4 dan 6. Jadi 10 − 6 = 4." }),
   C({ level: "Sangat menantang", prompt: "Buatlah tiga operasi pengurangan yang hasilnya 5.", parts: [{ kind: "pairs", result: 5, count: 3, op: "−" }], explanation: "Banyak jawaban yang benar, misalnya 6 − 1, 7 − 2, 8 − 3, 9 − 4, 10 − 5, atau 5 − 0. Ketiganya harus berbeda." }),
-  D({ level: "Sangat menantang", prompt: "Lina punya 8 balon. Sebanyak 2 balon meletus, lalu 3 balon terbang. Berapa balon Lina sekarang?", parts: [fill("□ − □ − □ = □", 8, 2, 3, 3), fill("Balon Lina tinggal □.", 3)], explanation: "8 − 2 = 6, lalu 6 − 3 = 3. Balon Lina tinggal 3." }),
+  D({ level: "Sangat menantang", prompt: "Lina punya 8 balon. 2 balon meletus, lalu 3 terbang. Berapa balon Lina sekarang?", scene: story("balon", 8, [{ n: 2, verb: "meletus" }, { n: 3, verb: "terbang" }]), parts: [fill("□ − □ − □ = □", 8, 2, 3, 3), fill("Balon Lina tinggal □.", 3)], explanation: "8 − 2 = 6, lalu 6 − 3 = 3. Balon Lina tinggal 3." }),
   A({ level: "Sangat menantang", prompt: "Pilih cerita yang cocok dengan 6 − 2 = 4.", parts: [{ kind: "pick", label: "Ceritanya:", options: ["Ada 6 burung. Datang lagi 2 burung.", "Ada 4 burung. Sebanyak 2 burung terbang.", "Ada 6 burung. Sebanyak 2 burung terbang."], answer: "Ada 6 burung. Sebanyak 2 burung terbang." }], explanation: "Mula-mula 6 burung, lalu 2 pergi, tersisa 4. Cerita yang datang lagi adalah penjumlahan." }),
   B({ level: "Sangat menantang", prompt: "Katak mundur dari 9 dan mendarat di 4. Berapa langkah katak mundur?", scene: { type: "line", from: 9, to: 4 }, parts: [fill("9 − □ = 4", 5)], explanation: "Dari 9 ke 4: 8, 7, 6, 5, 4. Ada 5 langkah. Jadi 9 − 5 = 4." }),
   C({ level: "Sangat menantang", prompt: "Isilah bilangan yang hilang.", parts: [fill("6 + □ = 9", 3), fill("□ − 3 = 6", 9)], explanation: "6 + 3 = 9. Bilangan yang dikurangi 3 hasilnya 6 adalah 9, karena 6 + 3 = 9." }),
-  D({ level: "Sangat menantang", prompt: "Ada 10 telur. Beberapa telur pecah, yang utuh tinggal 7. Ibu memakai 2 telur utuh untuk membuat kue.", parts: [fill("Telur pecah: 10 − □ = 7", 3), fill("Telur utuh sekarang: 7 − 2 = □", 5)], explanation: "10 − 3 = 7, jadi 3 telur pecah. Lalu 7 − 2 = 5 telur utuh." }),
+  D({ level: "Sangat menantang", prompt: "Ada 10 telur. Beberapa pecah, yang utuh 7. Ibu memakai 2 telur utuh. Tulis berapa yang pecah, lalu sisa telur utuh.", scene: story("telur", 10, [{ n: null, verb: "pecah" }, { n: 2, verb: "dipakai" }]), parts: [fill("10 − □ = 7", 3), fill("7 − 2 = □", 5)], explanation: "10 − 3 = 7, jadi 3 telur pecah. Lalu 7 − 2 = 5 telur utuh." }),
 ];
