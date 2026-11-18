@@ -1,0 +1,37 @@
+name: Grade 4 Measure QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  measure4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-grade-four-measure-v2.mjs
+      - run: npx eslint src/data/grade-four-measure-v2.ts src/components/learn/GradeFourMeasureV2.tsx src/chapters/kelas-4-pengukuran/meta.ts src/chapters/kelas-4-pengukuran/Chapter.tsx scripts/verify-grade-four-measure-v2.mjs scripts/smoke-grade-four-measure-v2.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-measure4.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-grade-four-measure-v2.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grade-four-measure-v2-screenshots
+          path: /tmp/grade-four-measure-v2-screenshots
+          if-no-files-found: ignore

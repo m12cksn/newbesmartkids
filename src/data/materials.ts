@@ -54,13 +54,6 @@ export const materials: MaterialItem[] = [
     description: "Estimate and calculate with fractions using interactive fraction strips.",
     videoStatus: "coming_soon", summary: "Add, subtract, multiply and divide fractions, and use fractions as operators.", questionIds: [],
   },
-  {
-    id: "kelas-4-pengukuran", classId: 4, chapter: 4, slug: "pengukuran-luas-dan-volume",
-    title: "Pengukuran Luas & Volume", topic: "Pengukuran",
-    description: "Ukur luas dengan petak, takar isi wadah, dan hubungkan liter dengan mililiter.",
-    videoStatus: "coming_soon", summary: "Satuan luas, petak satuan, kapasitas dan konversi volume.", questionIds: [],
-  },
-
 
   {
     id: "kelas-1-penjumlahan-10",
