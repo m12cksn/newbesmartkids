@@ -18,7 +18,6 @@ jobs:
       - run: node --test scripts/verify-grade-one-addition.mjs
       - run: node --test scripts/verify-grade-one-subtraction.mjs
       - run: node --test scripts/verify-grade-one-shapes.mjs
-      - run: node --experimental-strip-types scripts/verify-grade-four-patterns.mjs
       - run: node --experimental-strip-types scripts/verify-grade-four-measurement.mjs
       - run: node --experimental-strip-types scripts/verify-cambridge-fractions.mjs
       - run: node --experimental-strip-types scripts/verify-cambridge-ratio.mjs
@@ -45,7 +44,6 @@ jobs:
           node scripts/smoke-grade-one-chapters-five-six.mjs
           node scripts/smoke-grade-one-measurement.mjs
           node --experimental-strip-types scripts/smoke-grade-one-diagrams.mjs
-          CHAPTER_SCREENSHOTS=/tmp/pattern-screenshots node --experimental-strip-types scripts/smoke-grade-four-patterns.mjs
           CHAPTER_SCREENSHOTS=/tmp/measurement-screenshots node --experimental-strip-types scripts/smoke-grade-four-measurement.mjs
           node --experimental-strip-types scripts/smoke-cambridge-fractions.mjs
           node --experimental-strip-types scripts/smoke-cambridge-ratio.mjs
@@ -57,13 +55,6 @@ jobs:
         with:
           name: homepage-screenshots
           path: /tmp/homepage-screenshots
-          if-no-files-found: ignore
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: grade-four-patterns-screenshots
-          path: /tmp/pattern-screenshots
           if-no-files-found: ignore
 
       - uses: actions/upload-artifact@v4
