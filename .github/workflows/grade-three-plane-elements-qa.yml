@@ -17,7 +17,7 @@ jobs:
           cache: npm
       - run: npm install --no-audit --no-fund
       - run: node --experimental-strip-types scripts/verify-grade-three-plane-elements.mjs
-      - run: npx eslint src/data/grade-three-plane-elements.ts src/components/learn/GradeThreePlaneElements.tsx src/components/learn/PlaneVisuals.tsx
+      - run: npx eslint src/data/grade-three-plane-elements.ts src/components/learn/GradeThreePlaneElements.tsx src/components/learn/PlaneVisuals.tsx src/components/learn/PlaneStepGuide.tsx
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install chromium

@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { assessment, correct, formatAnswer, practice, ready, SEP, splitParts, topics, type PQuestion, type Part } from "@/data/grade-three-plane-elements";
 import { AngleFig, AngleTool, CutTool, FigView, GridFig, SegmentTool } from "./PlaneVisuals";
+import PlaneStepGuide from "./PlaneStepGuide";
 
 function Result({ value, ok, children }: { value: string; ok: boolean; children: ReactNode }) {
   return <output data-testid="lab-result" data-value={value} aria-live="polite" className={`block rounded-lg p-3 text-sm leading-6 ${ok ? "bg-success/10" : "bg-base-100"}`}>{children}</output>;
@@ -129,8 +130,7 @@ export default function GradeThreePlaneElements() {
   const t = topics[topic], Lab = labs[topic];
   const go = (i: number) => { setTopic(i); setMode("learn"); };
   return <section className="mx-auto max-w-6xl overflow-x-clip px-4 py-8 sm:px-8">
-    <p className="text-xs font-bold uppercase tracking-widest text-success">Kelas 3 · Bab 4</p>
-    <h1 className="mt-2 text-3xl font-extrabold sm:text-5xl">Unsur-Unsur Bangun Datar</h1>
+    <h1 className="text-3xl font-extrabold sm:text-5xl">Unsur-Unsur Bangun Datar</h1>
     <p className="mt-3 max-w-3xl text-base-content/70">Kenali sisi, ukur dan gambar sudut dengan busur derajat, lalu temukan garis tegak lurus dan garis sejajar.</p>
     <div className="mt-6 grid overflow-hidden rounded-xl border border-base-300 bg-base-100 md:grid-cols-2">
       <div className="flex min-h-40 flex-col items-center justify-center bg-gradient-to-br from-info/10 to-success/10 p-6 text-center">
@@ -154,7 +154,8 @@ export default function GradeThreePlaneElements() {
           <div className="min-w-0 bg-info/5 p-4 sm:p-6"><Lab key={topic} /></div>
           <div className="min-w-0 p-5 sm:p-6">
             <h2 className="text-2xl font-extrabold">{t.code}. {t.title}</h2>
-            <ol className="mt-3 list-decimal space-y-2 ps-5 text-sm leading-7">{t.steps.map(x => <li key={x}>{x}</li>)}</ol>
+            <p className="mt-1 text-sm text-base-content/60">Ikuti langkahnya satu per satu, lalu coba peraganya.</p>
+            <div className="mt-3"><PlaneStepGuide key={topic} topic={topic} /></div>
             <p className="mt-4 rounded-lg bg-info/10 p-3 text-sm"><strong>Coba bersama. </strong>{t.demo}</p>
           </div>
         </div>
