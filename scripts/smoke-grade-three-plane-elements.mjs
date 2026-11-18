@@ -41,10 +41,14 @@ try{
    if(t===2){await page.getByRole("slider",{name:"Putar garis biru"}).fill("0");assert.equal(await result(),"sejajar");await page.getByRole("slider",{name:"Putar garis biru"}).fill("90");assert.equal(await result(),"tegak lurus");await page.getByRole("slider",{name:"Putar garis biru"}).fill("45");assert.equal(await result(),"berpotongan");}
    // Penjelasan langkah demi langkah: urutan titik → garis → sinar garis → ruas garis, lalu sampai langkah terakhir.
    {const g=page.getByTestId("step-guide"),total=[8,9,7][t];await g.getByText(`Langkah 1 dari ${total}`).waitFor();
-    if(t===0){await g.getByRole("heading",{name:"1. Titik"}).waitFor();await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"2. Garis"}).waitFor();await g.getByRole("button",{name:"Perpanjang"}).click();await g.getByRole("img",{name:"garis AB, diperpanjang"}).waitFor();
+    if(t===0){await g.getByRole("heading",{name:"1. Titik"}).waitFor();await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"2. Garis"}).waitFor();await g.getByRole("button",{name:"Perpanjang"}).click();await g.getByRole("img",{name:"garis AB, diperpanjang"}).waitFor();await g.getByRole("button",{name:"Perpanjang"}).click();await g.getByRole("button",{name:"Perpanjang"}).click();
+     // Mata panah tetap di dalam gambar setelah perpanjangan terakhir.
+     {const ok=await g.getByRole("img",{name:"garis AB, diperpanjang"}).evaluate(svg=>{const vb=svg.viewBox.baseVal;return [...svg.querySelectorAll("path,line")].every(e=>{const b=e.getBBox();return b.x>=vb.x&&b.x+b.width<=vb.x+vb.width;});});assert.ok(ok,"panah garis keluar gambar");}
      await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"3. Sinar garis"}).waitFor();await g.getByRole("button",{name:"Lanjut"}).click();await g.getByRole("heading",{name:"4. Ruas garis"}).waitFor();await g.getByRole("button",{name:"Perpanjang"}).click();await g.getByText("Panjangnya tetap AB.").waitFor();}
     for(let k=0;k<total;k++){if(await g.getByRole("button",{name:"Lanjut"}).isDisabled())break;await g.getByRole("button",{name:"Lanjut"}).click();}
-    await g.getByText(`Langkah ${total} dari ${total}`).waitFor();await fit(`langkah ${t}`);await g.getByRole("button",{name:"Kembali"}).click();await g.getByText(`Langkah ${total-1} dari ${total}`).waitFor();}
+    await g.getByText(`Langkah ${total} dari ${total}`).waitFor();
+    // Tombol Lanjut dan Kembali tidak terpotong di dalam panduan.
+    for(const n of ["Lanjut","Kembali"]){const ok=await g.getByRole("button",{name:n}).evaluate(el=>{const r=el.getBoundingClientRect(),c=el.closest(".overflow-hidden").getBoundingClientRect();return r.left>=c.left-1&&r.right<=c.right+1;});assert.ok(ok,`${n} terpotong di ${width}`);}await fit(`langkah ${t}`);await g.getByRole("button",{name:"Kembali"}).click();await g.getByText(`Langkah ${total-1} dari ${total}`).waitFor();}
    await fit(`lab ${t}`);await shot(`lab-${topics[t].code}`);
    await button("Latihan materi →").click();
    let wrong=0;

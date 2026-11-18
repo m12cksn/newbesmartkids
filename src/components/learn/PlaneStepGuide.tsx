@@ -17,7 +17,8 @@ const Frame = ({ children, label, h = 150 }: { children: ReactNode; label: strin
 /** Garis, sinar garis, atau ruas garis dari A ke B yang bisa "diperpanjang". */
 function LineKind({ kind, grow }: { kind: "garis" | "sinar" | "ruas"; grow: number }) {
   const ax = 110, bx = 210, y = 80, c = kind === "garis" ? red : kind === "sinar" ? blue : green;
-  const left = kind === "garis" ? ax - 30 - grow * 30 : ax, right = kind === "ruas" ? bx : bx + 30 + grow * 30;
+  // Setiap ketukan menambah 22 satuan; tiga ketukan masih menyisakan ruang untuk mata panah di dalam gambar (0–320).
+  const left = kind === "garis" ? ax - 30 - grow * 22 : ax, right = kind === "ruas" ? bx : bx + 30 + grow * 22;
   return <Frame label={`${kind} AB${grow ? ", diperpanjang" : ""}`}>
     <line x1={left} y1={y} x2={right} y2={y} stroke={c} strokeWidth="5" strokeLinecap="round" />
     {kind === "garis" && <Head x={left - 2} y={y} ux={-1} uy={0} c={c} />}
@@ -166,9 +167,10 @@ export default function PlaneStepGuide({ topic }: { topic: number }) {
     </div>}
     <p className="text-base leading-7">{s.text}</p>
     {s.tip && <p className="text-sm text-base-content/70">{s.tip}</p>}
-    <div className="flex items-center justify-between gap-2 pt-1">
+    {/* Titik langkah di baris sendiri agar tombol Kembali dan Lanjut tetap utuh di layar sempit. */}
+    <div className="flex flex-wrap justify-center gap-1.5 pt-1" role="tablist" aria-label="Langkah">{steps.map((x, k) => <button key={k} type="button" role="tab" aria-selected={k === i} aria-label={`Langkah ${k + 1}: ${x.title.replace(/^\d+\.\s*/, "")}`} onClick={() => go(k)} className={`size-3 rounded-full ${k === i ? "bg-success" : "bg-base-300"}`} />)}</div>
+    <div className="flex items-center justify-between gap-2">
       <button type="button" className="btn btn-sm btn-ghost gap-1" disabled={i === 0} onClick={() => go(i - 1)}><ArrowLeft className="size-4" aria-hidden="true" />Kembali</button>
-      <div className="flex gap-1.5" role="tablist" aria-label="Langkah">{steps.map((x, k) => <button key={k} type="button" role="tab" aria-selected={k === i} aria-label={`Langkah ${k + 1}: ${x.title.replace(/^\d+\.\s*/, "")}`} onClick={() => go(k)} className={`size-3 rounded-full ${k === i ? "bg-success" : "bg-base-300"}`} />)}</div>
       <button type="button" className="btn btn-sm btn-success gap-1" disabled={i === steps.length - 1} onClick={() => go(i + 1)}>Lanjut<ArrowRight className="size-4" aria-hidden="true" /></button>
     </div>
   </div>;
