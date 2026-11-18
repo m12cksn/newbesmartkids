@@ -66,18 +66,6 @@ export const materials: MaterialItem[] = [
     description: "Susun pola gambar, lengkapi pola bilangan, dan pecahkan cerita dengan peraga interaktif.",
     videoStatus: "coming_soon", summary: "Pola membesar dan mengecil, selisih tetap, tabel, dan soal cerita.", questionIds: [],
   },
-  {
-    id: "kelas-4-pecahan",
-    classId: 4,
-    chapter: 2,
-    slug: "pecahan",
-    title: "Pecahan",
-    topic: "Bilangan",
-    description: "Bandingkan pecahan, cari pecahan senilai, dan hubungkan desimal dengan persen melalui peraga.",
-    videoStatus: "coming_soon",
-    summary: "Pelajari pecahan, desimal persepuluhan dan perseratusan, serta persen.",
-    questionIds: [],
-  },
 
 
   {

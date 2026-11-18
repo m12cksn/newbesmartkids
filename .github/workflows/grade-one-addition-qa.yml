@@ -45,7 +45,6 @@ jobs:
           node scripts/smoke-grade-one-chapters-five-six.mjs
           node scripts/smoke-grade-one-measurement.mjs
           node --experimental-strip-types scripts/smoke-grade-one-diagrams.mjs
-          node --experimental-strip-types scripts/smoke-grade-four-fractions.mjs
           CHAPTER_SCREENSHOTS=/tmp/pattern-screenshots node --experimental-strip-types scripts/smoke-grade-four-patterns.mjs
           CHAPTER_SCREENSHOTS=/tmp/measurement-screenshots node --experimental-strip-types scripts/smoke-grade-four-measurement.mjs
           node --experimental-strip-types scripts/smoke-cambridge-fractions.mjs
