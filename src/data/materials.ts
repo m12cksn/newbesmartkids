@@ -60,18 +60,6 @@ export const materials: MaterialItem[] = [
     description: "Ukur luas dengan petak, takar isi wadah, dan hubungkan liter dengan mililiter.",
     videoStatus: "coming_soon", summary: "Satuan luas, petak satuan, kapasitas dan konversi volume.", questionIds: [],
   },
-  {
-    id: "kelas-4-pecahan",
-    classId: 4,
-    chapter: 2,
-    slug: "pecahan",
-    title: "Pecahan",
-    topic: "Bilangan",
-    description: "Bandingkan pecahan, cari pecahan senilai, dan hubungkan desimal dengan persen melalui peraga.",
-    videoStatus: "coming_soon",
-    summary: "Pelajari pecahan, desimal persepuluhan dan perseratusan, serta persen.",
-    questionIds: [],
-  },
 
 
   {
