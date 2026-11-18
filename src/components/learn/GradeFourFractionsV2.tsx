@@ -128,7 +128,7 @@ function Sacks({ items }: { items: { name: string; label: string }[] }) {
 }
 function SceneView({ scene }: { scene: Scene }) {
   switch (scene.type) {
-    case "figs": return <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-2">{scene.figs.map((f, i) => <FigCard key={i} f={f} w={scene.figs.length === 1 ? 220 : ["circle", "melon", "hexagon", "triangle"].includes(f.shape) ? 100 : 180} />)}</div>;
+    case "figs": return <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-2">{scene.figs.map((f, i) => <FigCard key={i} f={f} w={scene.figs.length === 1 ? 220 : ["circle", "melon", "hexagon", "triangle"].includes(f.shape) ? 100 : 130} />)}</div>;
     case "items": return <Items {...scene} />;
     case "people": return <People {...scene} />;
     case "sheet": return <Sheet {...scene} />;
@@ -287,7 +287,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
 }
 function Answer({ q, value, record, checked }: { q: FQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-3 [@media(max-height:700px)]:space-y-1.5 [@media(max-height:700px)]:[zoom:0.8]">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
+  return <div className="space-y-3 [@media(max-height:700px)]:space-y-1 [@media(max-height:700px)]:[zoom:0.74]">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
 export default function GradeFourFractionsV2() {
@@ -345,7 +345,7 @@ export default function GradeFourFractionsV2() {
         practiceMode={mode === "practice"} close={() => { setMode("learn"); show(); }}
         renderText={text => <Rich text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-2.5 [@media(max-height:700px)]:p-1 [@media(max-height:700px)]:[zoom:0.7]"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
+        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-2.5 [@media(max-height:700px)]:p-1 [@media(max-height:700px)]:[zoom:0.62]"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt} q={q} value={value} record={record} checked={checked} />}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
