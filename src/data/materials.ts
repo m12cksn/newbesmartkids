@@ -31,12 +31,6 @@ export const materials: MaterialItem[] = [
     videoStatus: "coming_soon", summary: "Perkalian dan pembagian pecahan dengan bilangan asli, pecahan desimal, serta membandingkan dan mengurutkan bilangan desimal.", questionIds: [],
   },
   {
-    id: "kelas-4-piktogram-diagram-batang", classId: 4, chapter: 6, slug: "piktogram-dan-diagram-batang",
-    title: "Piktogram dan Diagram Batang", topic: "Penyajian Data",
-    description: "Susun piktogram, buat diagram batang tegak dan mendatar, lalu baca informasi datanya.",
-    videoStatus: "coming_soon", summary: "Penyajian dan pembacaan data melalui gambar, kunci simbol, tabel, dan diagram batang.", questionIds: [],
-  },
-  {
     id: "cambridge-grade-6-ratio", classId: 6, chapter: 11, slug: "cambridge-ratio-and-proportion",
     title: "Ratio and Proportion", topic: "Cambridge Curriculum · Grade 6",
     description: "Group counters, scale recipes and compare unit prices.",
