@@ -4,8 +4,8 @@ import type { Question } from "./grade-four-whole-numbers";
 
 /* ---------- Gambar ---------- */
 export type Thing = "jeruk" | "semangka" | "bola" | "lolipop" | "apel" | "bata" | "kue" | "kelereng";
-/** Cara benda disusun dalam satu kumpulan. */
-export type Layout = "rows" | "frame" | "x" | "lshape";
+/** Cara benda disusun dalam satu kumpulan. `rows`: `per` benda setiap baris. `band`: tepat `per` baris, diisi kolom demi kolom. */
+export type Layout = "rows" | "band" | "frame" | "x" | "lshape";
 export type Group = { thing: Thing; layout: Layout; per?: number };
 export type Scene =
   /** Kumpulan-kumpulan berurutan; `ask` menambahkan kotak tanya setelahnya. */
@@ -117,7 +117,7 @@ const build = (label: string, gr: Group, answer: number, max = 20): Part => ({ k
 /* ---------- Latihan (4 soal per subtopik) ---------- */
 export const practice: PQuestion[][] = [
   [
-    A({ prompt: "Tentukan banyak jeruk pada kumpulan berikutnya.", scene: groups(g("jeruk", "rows", 2), [2, 4, 6]), parts: [fill("Kumpulan ke-4: □ jeruk", 8)], explanation: "Jeruk 2, 4, 6: setiap kumpulan bertambah 2. Kumpulan ke-4: 6 + 2 = 8 jeruk." }),
+    A({ prompt: "Tentukan banyak jeruk pada kumpulan berikutnya.", scene: groups(g("jeruk", "band", 2), [2, 4, 6]), parts: [fill("Kumpulan ke-4: □ jeruk", 8)], explanation: "Jeruk 2, 4, 6: setiap kumpulan bertambah 2. Kumpulan ke-4: 6 + 2 = 8 jeruk." }),
     A({ prompt: "Susun lolipop untuk kumpulan berikutnya.", scene: groups(g("lolipop", "rows", 3), [9, 7, 5]), parts: [build("Kumpulan ke-4:", g("lolipop", "rows", 3), 3, 10)], explanation: "Lolipop 9, 7, 5: setiap kumpulan berkurang 2. Kumpulan ke-4: 5 − 2 = 3 lolipop." }),
     A({ prompt: "Pilih gambar yang tepat untuk kotak kosong.", parts: [{ kind: "pick", label: "Kotak kosong:", group: g("apel", "rows", 4), row: [1, 3, 5, null], options: [6, 7, 9], answer: 7 }], explanation: "Apel 1, 3, 5: bertambah 2. Kotak kosong berisi 5 + 2 = 7 apel." }),
     A({ prompt: "Tentukan banyak bola pada kumpulan ke-4, lalu tentukan jenis polanya.", scene: groups(g("bola", "x"), [1, 5, 9]), parts: [fill("Kumpulan ke-4: □ bola", 13), trendIs("Membesar")], explanation: "Bola 1, 5, 9: setiap kumpulan bertambah 4 (satu bola di setiap ujung). Kumpulan ke-4: 9 + 4 = 13. Polanya membesar." }),
@@ -145,11 +145,11 @@ export const assessment: PQuestion[] = [
   B({ level: "Menantang", prompt: "Susun kartu bilangan ini menjadi pola bilangan mengecil.", parts: [{ kind: "rank", label: "Ketuk dari kartu pertama:", items: [26, 40, 12, 33, 19], dir: "turun" }], explanation: "Pola mengecil dimulai dari bilangan terbesar: 40, 33, 26, 19, 12. Selisihnya selalu −7." }),
   A({ level: "Menantang", prompt: "Kelereng disusun membentuk huruf L. Berapa kelereng pada kumpulan ke-6?", scene: groups(g("kelereng", "lshape"), [1, 3, 5, 7], false), parts: [fill("Kumpulan ke-6: □ kelereng", 11)], explanation: "Kelereng 1, 3, 5, 7 bertambah 2. Kumpulan ke-5: 9, kumpulan ke-6: 11." }),
   B({ level: "Menantang", prompt: "Tarik garis dari setiap pola bilangan ke aturannya.", parts: [{ kind: "match", left: ["7, 11, 15, …", "30, 24, 18, …", "9, 15, 21, …", "50, 46, 42, …"], right: ["−4", "+6", "+4", "−6"], answer: [2, 3, 1, 0] }], explanation: "7 → 11 bertambah 4. 30 → 24 berkurang 6. 9 → 15 bertambah 6. 50 → 46 berkurang 4." }),
-  A({ level: "Menantang", prompt: "Jeruk disusun 2 baris. Susun kumpulan ke-4, lalu tentukan kumpulan ke-7.", scene: groups(g("jeruk", "rows", 2), [2, 4, 6]), parts: [build("Kumpulan ke-4:", g("jeruk", "rows", 2), 8, 16), fill("Kumpulan ke-7: □ jeruk", 14)], explanation: "Jeruk bertambah 2: 2, 4, 6, 8, 10, 12, 14. Kumpulan ke-4 berisi 8, kumpulan ke-7 berisi 14." }),
+  A({ level: "Menantang", prompt: "Jeruk disusun 2 baris. Susun kumpulan ke-4, lalu tentukan kumpulan ke-7.", scene: groups(g("jeruk", "band", 2), [2, 4, 6]), parts: [build("Kumpulan ke-4:", g("jeruk", "band", 2), 8, 16), fill("Kumpulan ke-7: □ jeruk", 14)], explanation: "Jeruk bertambah 2: 2, 4, 6, 8, 10, 12, 14. Kumpulan ke-4 berisi 8, kumpulan ke-7 berisi 14." }),
   B({ level: "Menantang", prompt: "Pabrik mencatat banyak televisi yang dibuat setiap bulan dengan pola tetap.", scene: { type: "table", head: ["Bulan", "Banyak televisi"], rows: [["Januari", "82"], ["Februari", "76"], ["Maret", "70"], ["April", "64"]] }, parts: [fill("Juni: □ televisi", 52), fill("Agustus: □ televisi", 40)], explanation: "Setiap bulan berkurang 6: Mei 58, Juni 52, Juli 46, Agustus 40." }),
   A({ level: "Menantang", prompt: "Pilih gambar yang tepat untuk kotak kosong.", parts: [{ kind: "pick", label: "Kotak kosong:", group: g("kue", "rows", 4), row: [14, 11, null, 5], options: [6, 8, 9], answer: 8 }], explanation: "Kue 14, 11, …, 5: berkurang 3. Kotak kosong: 11 − 3 = 8 (lalu 8 − 3 = 5)." }),
   B({ level: "Menantang", prompt: "Tentukan bilangan yang tepat sesuai pola.", parts: [seq(14, 23, 32, null, 50, null)], explanation: "Selisihnya +9. 32 + 9 = 41, lalu 50 + 9 = 59." }),
-  A({ level: "Menantang", prompt: "Kue disusun 3 baris di nampan. Susun kumpulan ke-5.", scene: groups(g("kue", "rows", 3), [3, 6, 9]), parts: [build("Kumpulan ke-5:", g("kue", "rows", 3), 15, 18)], explanation: "Kue 3, 6, 9 bertambah 3: kumpulan ke-4 berisi 12, kumpulan ke-5 berisi 15." }),
+  A({ level: "Menantang", prompt: "Kue disusun 3 baris di nampan. Susun kumpulan ke-5.", scene: groups(g("kue", "band", 3), [3, 6, 9]), parts: [build("Kumpulan ke-5:", g("kue", "band", 3), 15, 18)], explanation: "Kue 3, 6, 9 bertambah 3: kumpulan ke-4 berisi 12, kumpulan ke-5 berisi 15." }),
 
   B({ level: "Sangat menantang", prompt: "Gedung bioskop punya 12 baris kursi. Baris pertama 12 kursi, baris kedua 15 kursi, baris ketiga 18 kursi, dan seterusnya. Berapa kursi pada baris terakhir?", parts: [fill("Baris ke-12: □ kursi", 45)], explanation: "Setiap baris bertambah 3. Dari baris 1 ke baris 12 ada 11 kali penambahan: 12 + 11 × 3 = 12 + 33 = 45 kursi." }),
   A({ level: "Sangat menantang", prompt: "Lolipop dibagikan sehingga setiap kumpulan berkurang dengan pola tetap.", scene: groups(g("lolipop", "rows", 5), [20, 16, 12]), parts: [fill("Kumpulan ke-5: □ lolipop", 4), fill("Lolipop habis pada kumpulan ke-□", 6)], explanation: "Berkurang 4: 20, 16, 12, 8, 4, 0. Kumpulan ke-5 berisi 4 dan pada kumpulan ke-6 lolipop habis." }),

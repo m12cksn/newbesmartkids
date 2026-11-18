@@ -38,6 +38,8 @@ for (const q of all) {
     if (p.kind === "build") { assert.ok(p.answer <= p.max && p.answer > 0); }
   }
   // Soal bergambar: kunci = kumpulan ke-k dari pola pada gambar
+  // Gambar sesuai kalimat: "disusun N baris" berarti susunan tepat N baris, juga pada kotak susun jawaban
+  { const m = q.prompt.match(/disusun (\d) baris/); if (m) { for (const gr of [q.scene, ...q.parts.filter(p => p.kind === "build").map(p => p.group)]) assert.deepEqual([gr.layout, gr.per], ["band", Number(m[1])], q.prompt); checked++; } }
   if (q.scene?.type === "groups") {
     const c = q.scene.counts;
     if (q.scene.layout === "frame") c.forEach(n => assert.equal(n % 4, 0, q.prompt));

@@ -32,6 +32,7 @@ function cellsOf(layout: Layout, n: number, per = 3): [number, number][] {
   if (layout === "frame") { const s = n / 4 + 1, out: [number, number][] = []; for (let x = 0; x < s; x++) out.push([x, 0]); for (let y = 1; y < s; y++) out.push([s - 1, y]); for (let x = s - 2; x >= 0; x--) out.push([x, s - 1]); for (let y = s - 2; y >= 1; y--) out.push([0, y]); return out; }
   if (layout === "x") { const k = (n - 1) / 4, out: [number, number][] = [[k, k]]; for (let j = 1; j <= k; j++) out.push([k - j, k - j], [k + j, k - j], [k - j, k + j], [k + j, k + j]); return out; }
   if (layout === "lshape") { const k = (n + 1) / 2, out: [number, number][] = []; for (let y = 0; y < k; y++) out.push([0, y]); for (let x = 1; x < k; x++) out.push([x, k - 1]); return out; }
+  if (layout === "band") return Array.from({ length: n }, (_, i) => [Math.floor(i / per), i % per]);
   return Array.from({ length: n }, (_, i) => [i % per, Math.floor(i / per)]);
 }
 export function GroupArt({ group, n, size = 22 }: { group: Group; n: number; size?: number }) {
@@ -90,7 +91,8 @@ function PictureLab() {
   const group: Group = { thing, layout: "rows", per: 3 };
   return <div className="space-y-2.5">
     <div role="radiogroup" aria-label="Benda" className="flex flex-wrap gap-1.5">{labThings.map(t => <button key={t} type="button" role="radio" aria-checked={thing === t} onClick={() => setThing(t)} className={`btn btn-sm gap-1 ${thing === t ? "btn-success" : "btn-outline"}`}><ThingArt thing={t} size={18} />{thingName[t]}</button>)}</div>
-    <div className="flex flex-wrap justify-around gap-2"><Stepper label="Banyak awal" value={start} set={x => { setStart(x); setK(3); }} min={1} max={12} /><Stepper label="Perubahan" value={d} set={x => { setD(x); setK(3); }} min={-3} max={4} skip={0} /></div>
+    {/* Tiga kumpulan pertama selalu berisi benda: banyak awal + 2 × perubahan > 0. */}
+    <div className="flex flex-wrap justify-around gap-2"><Stepper label="Banyak awal" value={start} set={x => { setStart(x); setK(3); }} min={Math.max(1, 1 - 2 * d)} max={12} /><Stepper label="Perubahan" value={d} set={x => { setD(x); setK(3); }} min={Math.max(-3, Math.ceil((1 - start) / 2))} max={4} skip={0} /></div>
     <div className="flex flex-wrap items-stretch justify-center gap-1.5 rounded-xl bg-base-100 p-2 [@media(max-height:700px)]:[zoom:0.75]">{counts.map((c, i) => <GroupCard key={i} group={group} n={c} label={`Kumpulan ${i + 1}`} size={k > 4 || start + 3 * Math.max(d, 0) > 12 ? 16 : 20} />)}</div>
     <p className="text-center text-lg font-extrabold tabular-nums">{counts.join(", ")}<span className="text-sm font-bold text-orange-600"> ({signed(d)} setiap kumpulan)</span></p>
     <div className="flex flex-wrap gap-2"><button type="button" className="btn btn-success gap-1" disabled={k >= 6 || next <= 0} onClick={() => setK(k + 1)}>Kumpulan berikutnya<ArrowRight className="size-4" aria-hidden="true" /></button>
@@ -158,7 +160,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
           <span className="flex items-center gap-1.5"><button type="button" aria-label="Kurangi satu" className="btn btn-square btn-outline" disabled={checked || n <= 0} onClick={() => set(String(n - 1))}><Minus className="size-5" aria-hidden="true" /></button>
             <span className="min-w-20 text-center text-lg font-extrabold">{n} {thingName[p.group.thing]}</span>
             <button type="button" aria-label="Tambah satu" className="btn btn-square btn-outline" disabled={checked || n >= p.max} onClick={() => set(String(n + 1))}><Plus className="size-5" aria-hidden="true" /></button></span>
-          <span className="grid min-h-14 min-w-24 place-items-center rounded-xl border-2 border-dashed border-orange-300 bg-orange-50 p-1.5">{n > 0 ? <GroupArt group={{ ...p.group, per: Math.max(p.group.per ?? 3, 6) }} n={n} size={n > 12 ? 16 : 18} /> : <span className="text-sm text-base-content/50">kosong</span>}</span>
+          <span className="grid min-h-14 min-w-24 place-items-center rounded-xl border-2 border-dashed border-orange-300 bg-orange-50 p-1.5">{n > 0 ? <GroupArt group={p.group} n={n} size={n > 12 ? 16 : 18} /> : <span className="text-sm text-base-content/50">kosong</span>}</span>
         </div></div>; }
     case "pick": return <div role="group" aria-label={p.label} className="space-y-2">
       <div className="flex flex-wrap items-stretch justify-center gap-1.5">{p.row.map((c, k) => <GroupCard key={k} group={p.group} n={c} label={`Kumpulan ${k + 1}`} size={16} />)}</div>

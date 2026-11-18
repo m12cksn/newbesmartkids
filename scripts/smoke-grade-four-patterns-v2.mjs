@@ -49,7 +49,7 @@ try {
     await fit("awal");
 
     const labChecks = {
-      picture: async () => { assert.equal(await result(), "2:2:3"); await button("Kumpulan berikutnya").click(); assert.equal(await result(), "2:2:4"); await button("Perubahan kurangi").click(); assert.equal(await result(), "2:1:3"); await button("Perubahan kurangi").click(); assert.equal(await result(), "2:-1:3"); },
+      picture: async () => { assert.equal(await result(), "2:2:3"); await button("Kumpulan berikutnya").click(); assert.equal(await result(), "2:2:4"); await button("Perubahan kurangi").click(); assert.equal(await result(), "2:1:3"); assert.ok(await button("Perubahan kurangi").isDisabled(), "pola mengecil tidak boleh habis sebelum kumpulan ke-3"); await button("Banyak awal tambah").click(); await button("Perubahan kurangi").click(); assert.equal(await result(), "3:-1:3"); },
       number: async () => { assert.equal(await result(), "3:2:"); await box("Tebak bilangan berikutnya").fill("12"); assert.equal(await result(), "3:2:no"); await box("Tebak bilangan berikutnya").fill("13"); assert.equal(await result(), "3:2:ok"); await button("Selisih kurangi").click(); assert.equal(await result(), "3:1:"); },
     };
     for (const [t, set] of practice.entries()) {
