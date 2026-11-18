@@ -19,5 +19,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/kelas/:slug/:path+", "/mastering-penjumlahan-pengurangan/:path*", "/mastering-perkalian-pembagian/:path*", "/mastering-berhitung-bersusun", "/admin/:path*"],
+  matcher: ["/kelas/:slug/:path+", "/mastering-penjumlahan-pengurangan/:path*", "/mastering-perkalian-pembagian/:path*", "/mastering-berhitung-bersusun", "/mastering-jarimatika/:path*", "/mastering-pembagian-garis/:path*", "/admin/:path*"],
 };

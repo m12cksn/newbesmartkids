@@ -1,7 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import GradeFourGeometry from "@/components/learn/GradeFourGeometry";
-import GradeFiveWholeNumbers from "@/components/learn/GradeFiveWholeNumbers";
 import GradeThreePlaneElements from "@/components/learn/GradeThreePlaneElements";
 import GradeTwoCounting from "@/components/learn/GradeTwoCounting";
 import GradeTwoShapes from "@/components/learn/GradeTwoShapes";
@@ -9,10 +8,7 @@ import GradeTwoPositionPatterns from "@/components/learn/GradeTwoPositionPattern
 import GradeTwoMeasurement from "@/components/learn/GradeTwoMeasurement";
 import GradeTwoFractions from "@/components/learn/GradeTwoFractions";
 import GradeThreeMeasurement from "@/components/learn/GradeThreeMeasurement";
-import GradeThreeData from "@/components/learn/GradeThreeData";
 import GradeThreeMathSentences from "@/components/learn/GradeThreeMathSentences";
-import GradeSixCubes from "@/components/learn/GradeSixCubes";
-import GradeSixRatio from "@/components/learn/GradeSixRatio";
 import GradeSixFractionsDecimals from "@/components/learn/GradeSixFractionsDecimals";
 import GradeFourDataDisplay from "@/components/learn/GradeFourDataDisplay";
 import CambridgeRatio from "@/components/learn/CambridgeRatio";
@@ -20,15 +16,12 @@ import CambridgeFractions from "@/components/learn/CambridgeFractions";
 import GradeFourMeasurement from "@/components/learn/GradeFourMeasurement";
 import GradeFourPatterns from "@/components/learn/GradeFourPatterns";
 import GradeFourFractions from "@/components/learn/GradeFourFractions";
-import GradeFourWholeNumbers from "@/components/learn/GradeFourWholeNumbers";
 import GradeOneChapterEight from "@/components/learn/GradeOneChapterEight";
 import Link from "next/link";
 import GradeOneChapterFive from "@/components/learn/GradeOneChapterFive";
 import GradeOneChapterSix from "@/components/learn/GradeOneChapterSix";
 import GradeOneChapterSeven from "@/components/learn/GradeOneChapterSeven";
 import GradeOneAddition from "@/components/learn/GradeOneAddition";
-import GradeThreeWholeNumbers from "@/components/learn/GradeThreeWholeNumbers";
-import GradeSixProbability from "@/components/learn/GradeSixProbability";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { classes } from "@/components/home/home-data";
@@ -61,12 +54,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   const material = getMaterialBySlug(materiSlug);
   if (!classItem || !material || material.classId !== classItem.id) notFound();
 
-  if (material.id === "kelas-5-bilangan-cacah-100000") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">Kembali ke kelas 5</Link></div><GradeFiveWholeNumbers /><SiteFooter /></main>;
-  }
-  if (material.id === "kelas-3-penyajian-data") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreeData /><SiteFooter /></main>;
-  }
   if (material.id === "kelas-2-pengukuran") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover inline-flex items-center gap-1 text-sm text-success"><ArrowLeft className="size-4" aria-hidden="true" />Kembali ke kelas 2</Link></div><GradeTwoMeasurement /><SiteFooter /></main>;
   }
@@ -82,9 +69,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   if (material.id === "kelas-2-membilang-50") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 2</Link></div><GradeTwoCounting /><SiteFooter /></main>;
   }
-  if (material.id === "kelas-3-bilangan-cacah-1000") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreeWholeNumbers /><SiteFooter /></main>;
-  }
   if (material.id === "kelas-3-unsur-bangun-datar") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreePlaneElements /><SiteFooter /></main>;
   }
@@ -95,16 +79,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
 
   if (material.id === "kelas-3-kalimat-matematika") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 3</Link></div><GradeThreeMathSentences /><SiteFooter /></main>;
-  }
-
-  if (material.id === "kelas-6-peluang") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 6</Link></div><GradeSixProbability /><SiteFooter /></main>;
-  }
-  if (material.id === "kelas-6-kubus-balok") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 6</Link></div><GradeSixCubes /><SiteFooter /></main>;
-  }
-  if (material.id === "kelas-6-rasio") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 6</Link></div><GradeSixRatio /><SiteFooter /></main>;
   }
 
   if (material.id === "kelas-1-penjumlahan-10") {
@@ -125,10 +99,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
 
   if (material.id === "kelas-1-mengenal-diagram") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 1</Link></div><GradeOneChapterEight /><SiteFooter /></main>;
-  }
-
-  if (material.id === "kelas-4-bilangan-cacah-10000") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 4</Link></div><GradeFourWholeNumbers /><SiteFooter /></main>;
   }
 
   if (material.id === "kelas-6-pecahan-desimal") {

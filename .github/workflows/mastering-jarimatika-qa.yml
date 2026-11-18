@@ -1,0 +1,35 @@
+name: Mastering jarimatika QA
+on:
+  pull_request:
+    branches: [master]
+    paths: ['src/components/mastering/Jarimatika*', 'src/lib/daily-jarimatika.ts', 'src/app/mastering-jarimatika/**', 'src/components/home/DailyPracticeCard.tsx', 'scripts/*jarimatika*', '.github/workflows/mastering-jarimatika-qa.yml']
+  workflow_dispatch:
+jobs:
+  jarimatika:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-daily-jarimatika.mjs
+      - run: npx eslint src/lib/daily-jarimatika.ts src/components/mastering/JarimatikaLab.tsx src/components/mastering/JarimatikaMastering.tsx src/app/mastering-jarimatika
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Test jarimatika in browser
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/jarimatika-next.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-mastering-jarimatika.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mastering-jarimatika-screenshots
+          path: /tmp/mastering-jarimatika-screenshots
+          if-no-files-found: ignore

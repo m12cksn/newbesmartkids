@@ -18,7 +18,7 @@
 - `src/app/kelas/[slug]/ujian-akhir-tahun/page.tsx`: halaman ujian.
 - `src/app/kelas/[slug]/page.tsx`: kartu "Buka ujian" di bawah daftar bab.
 - `src/components/auth/SaveResult.tsx` dan `src/app/api/hasil/route.ts`: jalur SAT diizinkan.
-- `supabase/migrations/20261117120000_bsk_results_sat.sql`: memperbarui constraint jalur dan fungsi `bsk_save_result`. **Belum diterapkan ke Supabase**; tanpa migrasi ini nilai SAT tidak tersimpan di akun.
+- `supabase/migrations/20261118020000_bsk_results_sat.sql`: memperbarui constraint jalur dan fungsi `bsk_save_result` (juga memuat jalur jarimatika dan pembagian garis yang sudah diterapkan). **Belum diterapkan ke Supabase**; tanpa migrasi ini nilai SAT tidak tersimpan di akun.
 - `scripts/verify-sat-kelas-1.mjs`, `scripts/smoke-sat-kelas-1.mjs`, `.github/workflows/sat-kelas-1-qa.yml`.
 
 ## Validasi
