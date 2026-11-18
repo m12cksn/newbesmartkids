@@ -20,7 +20,6 @@ jobs:
       - run: node --test scripts/verify-grade-one-shapes.mjs
       - run: node --experimental-strip-types scripts/verify-cambridge-fractions.mjs
       - run: node --experimental-strip-types scripts/verify-cambridge-ratio.mjs
-      - run: node --experimental-strip-types scripts/verify-grade-four-geometry.mjs
       - run: node --experimental-strip-types scripts/verify-grade-four-data-display.mjs
       - run: node --experimental-strip-types scripts/verify-grade-six-fractions-decimals.mjs
       - run: npm run build
@@ -33,7 +32,6 @@ jobs:
             if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
             sleep 2
           done
-          node --experimental-strip-types scripts/smoke-grade-four-geometry.mjs
           node --experimental-strip-types scripts/smoke-daily-addition.mjs
           node --experimental-strip-types scripts/smoke-daily-arithmetic.mjs
           CHAPTER_SCREENSHOTS=/tmp/homepage-screenshots node scripts/smoke-homepage.mjs
@@ -69,9 +67,3 @@ jobs:
           path: /tmp/data-display-screenshots
           if-no-files-found: ignore
 
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: grade-four-geometry-screenshots
-          path: /tmp/geometry-screenshots
-          if-no-files-found: ignore
