@@ -44,18 +44,6 @@ export const materials: MaterialItem[] = [
   },
 
   {
-    id: "kelas-1-pengurangan-10",
-    classId: 1,
-    chapter: 3,
-    slug: "pengurangan-sampai-dengan-10",
-    title: "Pengurangan sampai dengan 10",
-    topic: "Pengurangan",
-    description: "Belajar mengurangi benda, menghitung mundur, dan memahami hubungan pengurangan dengan penjumlahan.",
-    videoStatus: "coming_soon",
-    summary: "Pengurangan berarti mengambil sebagian dari suatu kelompok. Kita dapat menghitung sisa benda, menghitung mundur, dan menggunakan penjumlahan untuk memeriksa jawaban.",
-    questionIds: [],
-  },
-  {
     id: "kelas-1-mengenal-bentuk",
     classId: 1,
     chapter: 4,
