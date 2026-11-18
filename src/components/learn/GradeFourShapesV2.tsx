@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Eraser, RotateCcw, Scissors, Undo2 } from
 import { useRef, useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import {
-  angleCount, angles, assessment, cells, correct, dist, formatAnswer, parallelPairs, polyName, practice, quadNames, ready, SEP, sides, splitParts, tangram, thingName, topics, triKind,
+  angleCount, angles, assessment, cells, congruent, correct, dist, formatAnswer, parallelPairs, polyName, practice, quadNames, ready, SEP, sides, splitParts, tangram, thingName, topics, triKind,
   type Fig, type Part, type Piece, type Pt, type Scene, type SQuestion, type Thing,
 } from "@/data/grade-four-shapes-v2";
 
@@ -110,9 +110,12 @@ function SlotBoard({ slots, pieces, value, set, disabled, colors = palette }: { 
     return <svg aria-hidden="true" width={(w + 0.3) * u} height={(h + 0.3) * u} viewBox={`${a - 0.15} ${b - 0.15} ${w + 0.3} ${h + 0.3}`}><polygon points={ptsStr(p)} fill={colors[i % colors.length]} stroke={ink} strokeWidth={0.06} strokeLinejoin="round" /></svg>; };
   return <div className="flex flex-wrap items-center justify-center gap-3">
     <svg role="group" aria-label="Bangun yang disusun" width={(x1 - x0 + 2 * pad) * unit} height={(y1 - y0 + 2 * pad) * unit} viewBox={`${x0 - pad} ${y0 - pad} ${x1 - x0 + 2 * pad} ${y1 - y0 + 2 * pad}`} className="h-auto max-w-full">
-      {slots.map((s, i) => { const k = value[i], c = centroid(s);
+      {slots.map((s, i) => { const k = value[i], c = centroid(s), piece = k !== "" ? pieces[Number(k)] : undefined, fits = !!piece && congruent(piece, s);
+        // Keping yang tidak pas digambar dengan bentuk aslinya di tengah tempat, agar terlihat tidak cocok.
+        const pc = piece ? centroid(piece) : c;
         return <g key={i} role="button" tabIndex={disabled ? -1 : 0} aria-label={`Tempat ${i + 1}${k !== "" ? " terisi" : ""}`} onClick={() => tapSlot(i)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tapSlot(i); } }} className="cursor-pointer outline-none focus-visible:[&>polygon]:stroke-[0.16]">
-          <polygon points={ptsStr(s)} fill={k !== "" ? colors[Number(k) % colors.length] : sel !== null ? "#fff7e6" : "#f8fafc"} stroke={k !== "" ? ink : "#94a3b8"} strokeWidth={0.07} strokeDasharray={k !== "" ? undefined : "0.18 0.12"} strokeLinejoin="round" />
+          <polygon points={ptsStr(s)} fill={fits ? colors[Number(k) % colors.length] : piece ? "#fde2e2" : sel !== null ? "#fff7e6" : "#f8fafc"} stroke={fits ? ink : piece ? "#c0392b" : "#94a3b8"} strokeWidth={0.07} strokeDasharray={fits ? undefined : "0.18 0.12"} strokeLinejoin="round" />
+          {piece && !fits && <polygon pointerEvents="none" points={ptsStr(piece)} transform={`translate(${c[0] - pc[0]} ${c[1] - pc[1]})`} fill={colors[Number(k) % colors.length]} fillOpacity={0.85} stroke="#c0392b" strokeWidth={0.07} strokeLinejoin="round" />}
           {k === "" && <text x={c[0]} y={c[1] + 0.18} textAnchor="middle" fontSize={0.55} fontWeight={800} fill="#64748b">{i + 1}</text>}
         </g>; })}
     </svg>
@@ -135,11 +138,14 @@ const Result = ({ value, children }: { value: string; children: ReactNode }) => 
 const presets: Record<string, Pt[]> = { Segitiga: [[1, 5], [5, 5], [3, 1]], Segiempat: [[1, 1], [5, 1], [5, 4], [1, 4]], Segilima: [[3, 0], [6, 2], [5, 5], [1, 5], [0, 2]], Segienam: [[2, 0], [4, 0], [6, 3], [4, 6], [2, 6], [0, 3]] };
 const cross = (a: Pt, b: Pt, c: Pt) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
 const segX = (a: Pt, b: Pt, c: Pt, d: Pt) => cross(a, b, c) * cross(a, b, d) < 0 && cross(c, d, a) * cross(c, d, b) < 0;
+const onSeg = (v: Pt, a: Pt, b: Pt) => Math.abs(cross(a, b, v)) < 1e-9 && v[0] >= Math.min(a[0], b[0]) && v[0] <= Math.max(a[0], b[0]) && v[1] >= Math.min(a[1], b[1]) && v[1] <= Math.max(a[1], b[1]);
+/** Titik sudut yang menempel pada sisi lain, atau tiga titik berurutan segaris (sisi bertumpuk). */
+const touches = (p: Pt[]) => p.some((v, i) => Math.abs(cross(p[(i - 1 + p.length) % p.length], v, p[(i + 1) % p.length])) < 1e-9 || p.some((a, j) => j !== i && (j + 1) % p.length !== i && onSeg(v, a, p[(j + 1) % p.length])));
 const selfCross = (p: Pt[]) => p.some((a, i) => p.some((c, j) => j > i + 1 && !(i === 0 && j === p.length - 1) && segX(a, p[(i + 1) % p.length], c, p[(j + 1) % p.length])));
 const letters = "ABCDEF";
 function ShapeLab() {
   const [pts, setPts] = useState<Pt[]>(presets.Segiempat), [sel, setSel] = useState<number | null>(null);
-  const N = 7, cell = 36, ok = !selfCross(pts) && new Set(pts.map(p => p.join())).size === pts.length && Math.abs(pts.reduce((s, a, i) => { const b = pts[(i + 1) % pts.length]; return s + a[0] * b[1] - b[0] * a[1]; }, 0)) > 0.1;
+  const N = 7, cell = 36, ok = !selfCross(pts) && !touches(pts) && new Set(pts.map(p => p.join())).size === pts.length && Math.abs(pts.reduce((s, a, i) => { const b = pts[(i + 1) % pts.length]; return s + a[0] * b[1] - b[0] * a[1]; }, 0)) > 0.1;
   const move = (x: number, y: number) => { if (sel === null) return; const p = [...pts]; p[sel] = [x, y]; setPts(p); setSel(null); };
   let name = polyName(pts.length), extra = "";
   if (ok && pts.length === 3) { const t = triKind(pts); name = `segitiga ${t.bySide}`; extra = `Menurut sudutnya: segitiga ${t.byAngle}.`; }
@@ -159,19 +165,19 @@ function ShapeLab() {
         </g>)}
       </svg>
     </div>
-    <Result value={`${pts.length}:${ok ? name : "x"}`}>{!ok ? "Sisinya saling berpotongan atau dua titik bertumpuk. Pindahkan salah satu titik sudut." : sel !== null ? `Titik ${letters[sel]} dipilih. Ketuk titik petak tujuannya.` : <>
+    <Result value={`${pts.length}:${ok ? name : "x"}`}>{!ok ? "Sisinya saling berpotongan, bertumpuk, atau segaris. Pindahkan salah satu titik sudut." : sel !== null ? `Titik ${letters[sel]} dipilih. Ketuk titik petak tujuannya.` : <>
       <strong className="capitalize">{name}</strong>: {pts.length} sisi dan {pts.length} sudut ({[lc && `${lc} lancip`, sk && `${sk} siku-siku`, tp && `${tp} tumpul`].filter(Boolean).join(", ")}).{pts.length === 4 ? ` Sisi sejajar: ${parallelPairs(pts)} pasang.` : ""} {extra}</>}</Result>
   </div>;
 }
 const tanSlots = tangram.map(p => p.pts!), tanColors = tangram.map(p => p.color);
 function TangramLab() {
   const full = tanSlots.map((_, i) => String(i)), [v, setV] = useState<string[]>(full);
-  const placed = v.filter(Boolean).length;
+  const placed = v.filter(Boolean).length, fit = v.filter((k, i) => k !== "" && congruent(tanSlots[Number(k)], tanSlots[i])).length;
   return <div className="space-y-2.5">
     <div className="flex flex-wrap gap-2"><button type="button" className="btn btn-sm btn-outline gap-1" disabled={placed === 0} onClick={() => setV(tanSlots.map(() => ""))}><Scissors className="size-4" aria-hidden="true" />Uraikan</button>
       <button type="button" className="btn btn-sm btn-ghost gap-1" disabled={placed === 7} onClick={() => setV(full)}><RotateCcw className="size-4" aria-hidden="true" />Susun otomatis</button></div>
     <div className="[@media(max-height:700px)]:[zoom:0.8]"><SlotBoard slots={tanSlots} pieces={tanSlots} value={v} set={setV} colors={tanColors} /></div>
-    <Result value={`${placed}`}>{placed === 7 ? "Tujuh keping tersusun menjadi persegi besar: 5 segitiga (2 besar, 1 sedang, 2 kecil), 1 persegi, dan 1 jajargenjang." : placed === 0 ? "Persegi sudah diurai menjadi 7 keping. Ketuk keping, lalu ketuk tempat yang bentuk dan ukurannya sama." : `${placed} dari 7 keping sudah tersusun.`}</Result>
+    <Result value={`${fit}:${placed}`}>{placed > fit ? `${placed - fit} keping belum pas: bentuk atau ukurannya berbeda dengan tempatnya. Ketuk tempat bergaris merah untuk melepasnya.` : fit === 7 ? "Tujuh keping tersusun menjadi persegi besar: 5 segitiga (2 besar, 1 sedang, 2 kecil), 1 persegi, dan 1 jajargenjang." : placed === 0 ? "Persegi sudah diurai menjadi 7 keping. Ketuk keping, lalu ketuk tempat yang bentuk dan ukurannya sama." : `${placed} dari 7 keping sudah tersusun.`}</Result>
   </div>;
 }
 const labs: Record<string, () => ReactNode> = { shape: ShapeLab, tangram: TangramLab };
