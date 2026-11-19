@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
 
-// Mode menjelaskan: hanya admin yang melihatnya; laser, sorot, spidol sementara, fokus blok, pintasan keyboard.
+// Mode menjelaskan: hanya admin yang melihatnya; laser, spidol yang tetap ada (warna, urungkan, hapus, ikut gulir), pintasan keyboard.
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
 const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/presenter-screenshots";
 await mkdir(folder, { recursive: true });
 const CHAPTER = "/kelas/matematika-lanjutan-kelas-10/materi/nilai-mutlak-linear-satu-variabel"; // bab 1: boleh dibuka tamu
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_EXECUTABLE });
-const inked = page => page.getByTestId("presenter-canvas").evaluate(c => { const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; });
+const inked = (page, rgb) => page.getByTestId("presenter-ink").evaluate((c, rgb) => { const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && (!rgb || (Math.abs(d[i] - rgb[0]) < 40 && Math.abs(d[i + 1] - rgb[1]) < 40 && Math.abs(d[i + 2] - rgb[2]) < 40))) n++; return n; }, rgb);
 try {
   for (const width of [320, 1280]) {
     const ctx = await browser.newContext({ viewport: { width, height: 900 } }), page = await ctx.newPage(); page.setDefaultTimeout(10000);
@@ -34,36 +34,53 @@ try {
     await page.mouse.move(width / 2, 300); await page.mouse.move(width / 2 + 40, 320);
     await fit("laser"); await page.screenshot({ path: `${folder}/${width}-laser.png` });
 
-    await page.keyboard.press("s"); assert.equal(await bar.getAttribute("data-tool"), "sorot");
-    await page.mouse.move(width / 2, 400);
-    const bg = await page.getByTestId("presenter-spot").evaluate(e => e.style.background);
-    assert.match(bg, /radial-gradient\((circle )?140px at/);
-    await bar.getByRole("button", { name: "Perbesar sorot" }).click(); await page.mouse.move(width / 2, 410);
-    assert.match(await page.getByTestId("presenter-spot").evaluate(e => e.style.background), /(circle )?170px at/);
-    await page.screenshot({ path: `${folder}/${width}-sorot.png` });
+    assert.equal(await page.getByTestId("presenter-dot").count(), 1, "titik laser tampil");
+    // Alat yang dihapus tidak ada lagi.
+    for (const gone of ["Sorot", "Fokus"]) assert.equal(await bar.getByRole("button", { name: gone, exact: true }).count(), 0, `${gone} sudah dihapus`);
 
     await page.keyboard.press("p"); assert.equal(await bar.getAttribute("data-tool"), "spidol");
-    const cv = page.getByTestId("presenter-canvas");
-    await page.mouse.move(40, 250); await page.mouse.down(); for (let i = 1; i <= 10; i++) await page.mouse.move(40 + i * 20, 250 + i * 6); await page.mouse.up();
-    assert.equal(await cv.getAttribute("data-ink"), "1"); await page.waitForTimeout(150); assert.ok(await inked(page) > 50, "coretan terlihat");
+    const cv = page.getByTestId("presenter-ink");
+    const line = async (x, y) => { await page.mouse.move(x, y); await page.mouse.down(); for (let i = 1; i <= 10; i++) await page.mouse.move(x + i * 20, y + i * 6); await page.mouse.up(); await page.waitForTimeout(80); };
+    await line(40, 250);
+    assert.equal(await cv.getAttribute("data-ink"), "1"); assert.ok(await inked(page, [217, 45, 32]) > 50, "coretan merah terlihat");
+    await page.waitForTimeout(3400); assert.equal(await cv.getAttribute("data-ink"), "1", "coretan tidak hilang sendiri"); assert.ok(await inked(page, [217, 45, 32]) > 50, "masih terlihat setelah 3 detik");
+    await bar.getByRole("radio", { name: "Biru", exact: true }).click(); await line(40, 330);
+    assert.equal(await cv.getAttribute("data-ink"), "2"); assert.ok(await inked(page, [29, 99, 201]) > 50, "coretan biru");
     await page.screenshot({ path: `${folder}/${width}-spidol.png` });
-    await page.waitForTimeout(3400); assert.equal(await cv.getAttribute("data-ink"), "0", "coretan hilang sendiri"); assert.equal(await inked(page), 0);
-
-    await page.keyboard.press("f"); assert.equal(await bar.getAttribute("data-tool"), "fokus");
-    const target = page.locator("h1").first(); const tb = await target.boundingBox();
-    await page.mouse.click(tb.x + 20, tb.y + tb.height / 2);
-    const fb = await page.getByTestId("presenter-focus").boundingBox();
-    assert.ok(Math.abs(fb.x - (tb.x - 6)) < 3 && Math.abs(fb.width - (tb.width + 12)) < 3, `fokus mengikuti blok ${JSON.stringify([fb, tb])}`);
-    await fit("fokus"); await page.screenshot({ path: `${folder}/${width}-fokus.png` });
-    await page.keyboard.press("Escape"); assert.equal(await page.getByTestId("presenter-focus").count(), 0, "Esc melepas fokus");
+    // Ctrl+Z hanya mengurungkan spidol, bukan kertas coret yang terbuka bersamaan (dan sebaliknya).
+    await bar.getByRole("button", { name: "Laser", exact: true }).click(); await page.getByTestId("scratch-open").click(); await page.getByTestId("scratch").waitFor();
+    {
+      const r = await page.getByTestId("scratch-canvas").boundingBox(); await page.mouse.move(r.x + 30, r.y + 40); await page.mouse.down(); await page.mouse.move(r.x + 120, r.y + 60); await page.mouse.up();
+      const pad = () => page.getByTestId("scratch-canvas").getAttribute("aria-label");
+      assert.match(await pad(), /1 coretan/);
+      await bar.getByRole("button", { name: "Spidol", exact: true }).click(); await page.keyboard.press("Control+z"); await page.waitForTimeout(80);
+      assert.equal(await cv.getAttribute("data-ink"), "1", "Ctrl+Z saat spidol: coretan spidol terakhir diurungkan"); assert.match(await pad(), /1 coretan/, "kertas coret tidak ikut");
+      await bar.getByRole("button", { name: "Laser", exact: true }).click(); await page.keyboard.press("Control+z"); await page.waitForTimeout(80);
+      assert.match(await pad(), /0 coretan/, "Ctrl+Z saat laser: kertas coret diurungkan"); assert.equal(await cv.getAttribute("data-ink"), "1", "spidol tidak ikut");
+      await page.getByRole("button", { name: "Tutup kertas coret" }).click(); await bar.getByRole("button", { name: "Spidol", exact: true }).click();
+    }
+    await page.waitForTimeout(80);
+    assert.equal(await cv.getAttribute("data-ink"), "1"); assert.equal(await inked(page, [29, 99, 201]), 0, "urungkan menghapus coretan terakhir");
+    // Coretan menempel pada halaman: ikut bergeser saat digulir.
+    const top = () => cv.evaluate(c => { const x = c.getContext("2d"), d = x.getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) return Math.floor(i / 4 / c.width) / (devicePixelRatio || 1); return -1; });
+    const before = await top(); await page.evaluate(() => scrollBy(0, 100)); await page.waitForTimeout(150); const after = await top();
+    assert.ok(before > 0 && Math.abs(before - after - 100) < 4, `coretan ikut gulir ${before} → ${after}`);
+    await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(100);
+    // Menutup dan membuka lagi: coretan tetap ada.
     await page.keyboard.press("Escape"); await open.waitFor(); assert.equal(await bar.count(), 0, "Esc menutup mode");
+    await open.click(); await bar.waitFor(); await page.waitForTimeout(100);
+    assert.equal(await cv.getAttribute("data-ink"), "1", "coretan tetap ada setelah dibuka lagi"); assert.ok(await inked(page) > 50);
+    await bar.getByRole("button", { name: "Hapus semua coretan" }).click(); await page.waitForTimeout(80);
+    assert.equal(await cv.getAttribute("data-ink"), "0"); assert.equal(await inked(page), 0, "hapus semua");
+    await fit("spidol");
+    await page.keyboard.press("Escape"); await open.waitFor();
     // Mengetik di kotak isian tidak mengganti alat.
     await open.click(); await page.getByTestId("scratch-open").click(); await page.keyboard.press("s");
     await bar.getByRole("button", { name: "Tutup mode menjelaskan" }).click(); await open.waitFor();
     assert.deepEqual(errors, []); await logout(); await ctx.close();
-    console.log(`PASS mode menjelaskan ${width}px: hanya admin, laser, sorot, spidol hilang sendiri, fokus blok, Esc`);
+    console.log(`PASS mode menjelaskan ${width}px: hanya admin, laser, spidol tetap ada (warna, urungkan, ikut gulir, tetap setelah dibuka lagi, hapus semua), Esc`);
   }
-  // Tablet: sorot dan laser mengikuti jari yang digeser, spidol bisa dipakai dengan sentuhan.
+  // Tablet: laser mengikuti jari yang digeser, spidol bisa dipakai dengan sentuhan.
   {
     const ctx = await browser.newContext({ viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true }), page = await ctx.newPage(); page.setDefaultTimeout(10000);
     const errors = []; page.on("pageerror", e => errors.push(e.message));
@@ -75,37 +92,25 @@ try {
       await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); };
     await page.getByTestId("presenter-open").tap();
     const bar = page.getByRole("toolbar", { name: "Mode menjelaskan" }); await bar.waitFor();
-    await bar.getByRole("button", { name: "Sorot", exact: true }).tap();
-    assert.match(await page.getByTestId("presenter-spot").evaluate(e => e.style.background), /384px 512px/, "sorot mulai di tengah layar");
-    await drag([[200, 300], [260, 360], [340, 440], [420, 520], [500, 600]]);
-    assert.match(await page.getByTestId("presenter-spot").evaluate(e => e.style.background), /500px 600px/, "sorot mengikuti jari");
-    await page.screenshot({ path: `${folder}/768-tablet-sorot.png` });
     await bar.getByRole("button", { name: "Laser", exact: true }).tap();
     await drag([[100, 300], [200, 320], [300, 340]]);
-    assert.ok(await page.locator("span.rounded-full.bg-\\[\\#e11d2e\\]").count() === 1, "titik laser tampil");
+    assert.equal(await page.getByTestId("presenter-dot").count(), 1, "titik laser tampil");
     await bar.getByRole("button", { name: "Spidol", exact: true }).tap();
     await drag([[100, 400], [160, 420], [220, 440], [280, 460]]);
-    assert.equal(await page.getByTestId("presenter-canvas").getAttribute("data-ink"), "1", "spidol dengan sentuhan");
+    assert.equal(await page.getByTestId("presenter-ink").getAttribute("data-ink"), "1", "spidol dengan sentuhan");
     // Halaman terkunci selama alat aktif: geseran jari tidak menggulir; alat Geser membuka kunci.
     const sy = () => page.evaluate(() => scrollY);
     const swipe = [[380, 800], [380, 700], [380, 600], [380, 500], [380, 400], [380, 300]];
-    for (const name of ["Laser", "Sorot", "Spidol", "Fokus"]) {
+    for (const name of ["Laser", "Spidol"]) {
       await bar.getByRole("button", { name, exact: true }).tap(); const before = await sy();
       await drag(swipe); await page.waitForTimeout(400); assert.equal(await sy(), before, `${name}: layar tidak bergeser`);
       assert.equal(await page.evaluate(() => document.documentElement.style.touchAction), "none");
     }
-    // Fokus dengan ketukan.
-    const h1 = await page.locator("h1").first().boundingBox();
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: h1.x + 20, y: h1.y + h1.height / 2 }] }); await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    await page.getByTestId("presenter-focus").waitFor();
-    await page.screenshot({ path: `${folder}/768-tablet-fokus.png` });
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: h1.x + 20, y: h1.y + h1.height / 2 }] }); await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    assert.equal(await page.getByTestId("presenter-focus").count(), 0, "ketuk lagi melepas fokus");
     await bar.getByRole("button", { name: "Geser", exact: true }).tap();
     assert.equal(await page.evaluate(() => document.documentElement.style.touchAction), "", "kunci dilepas");
     { const before = await sy(); await drag(swipe); await page.waitForTimeout(600); assert.ok(await sy() > before, "Geser: layar bisa digulir"); }
     await page.screenshot({ path: `${folder}/768-tablet-geser.png` });
     assert.deepEqual(errors, []); await ctx.close();
-    console.log("PASS mode menjelaskan tablet 768px: sorot dan laser mengikuti jari, spidol dengan sentuhan, layar terkunci untuk laser/sorot/spidol/fokus, fokus dengan ketukan, Geser menggulir");
+    console.log("PASS mode menjelaskan tablet 768px: laser mengikuti jari, spidol dengan sentuhan, layar terkunci untuk laser/spidol, Geser menggulir");
   }
 } finally { await browser.close(); }

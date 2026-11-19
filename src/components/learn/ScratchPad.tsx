@@ -7,6 +7,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 /**
  * Kertas coret: kertas petak untuk menghitung dengan jari, stylus, atau mouse.
  * Coretan hanya disimpan di perangkat ini (localStorage, per halaman) dan tidak dinilai.
+ * Agar tulisan mulus: coretan yang sedang ditulis digambar di lapisan sendiri (sekali per frame),
+ * semua titik antara dari browser (getCoalescedEvents) dipakai, dan kertas digambar ulang penuh
+ * hanya saat urungkan, hapus, ganti kertas, atau ukuran berubah.
  */
 type Tool = "pencil" | "pen" | "eraser";
 type Stroke = { c: "pencil" | "pen"; w: number; p: number[] }; // p = [x0, y0, x1, y1, ...] dalam piksel CSS kertas
@@ -49,6 +52,8 @@ export function ScratchPad() {
   const [height, setHeight] = useState(55); // tinggi kertas di HP, dalam persen tinggi layar
   const [desktop, setDesktop] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const liveRef = useRef<HTMLCanvasElement>(null);
+  const frame = useRef(0);
   const boxRef = useRef<HTMLDivElement>(null);
   const live = useRef<Stroke | null>(null);
   const penSeen = useRef(0);
@@ -60,16 +65,29 @@ export function ScratchPad() {
   useEffect(() => { void Promise.resolve().then(() => { const s = load(pathname); setSheets(s); setPage(s.length - 1); }); }, [pathname]);
   useEffect(() => { const m = matchMedia(DESKTOP); const f = () => setDesktop(m.matches); f(); m.addEventListener("change", f); return () => m.removeEventListener("change", f); }, []);
 
-  const redraw = useCallback(() => {
-    const c = canvasRef.current, box = boxRef.current; if (!c || !box) return;
+  /** Samakan ukuran kanvas dengan kotak kertas; kembalikan konteks yang siap digambar. */
+  const fit = useCallback((c: HTMLCanvasElement | null, fast = false) => {
+    const box = boxRef.current; if (!c || !box) return null;
     const dpr = window.devicePixelRatio || 1, w = box.clientWidth, h = box.clientHeight;
     if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = `${w}px`; c.style.height = `${h}px`; }
-    const ctx = c.getContext("2d"); if (!ctx) return;
+    const ctx = c.getContext("2d", fast ? { desynchronized: true } : undefined); if (!ctx) return null;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
-    for (const s of sheetsRef.current[pageRef.current] ?? []) drawStroke(ctx, s);
-    if (live.current) drawStroke(ctx, live.current);
+    return ctx;
   }, []);
-  useEffect(() => { if (open) redraw(); }, [open, sheets, page, height, desktop, redraw]);
+  /** Gambar ulang semua coretan kertas ini (lapisan bawah). */
+  const redraw = useCallback(() => {
+    const ctx = fit(canvasRef.current); if (!ctx) return;
+    for (const s of sheetsRef.current[pageRef.current] ?? []) drawStroke(ctx, s);
+    fit(liveRef.current, true);
+  }, [fit]);
+  /** Gambar coretan yang sedang ditulis di lapisan atas, paling banyak sekali per frame. */
+  const drawLive = useCallback(() => {
+    if (frame.current) return;
+    frame.current = requestAnimationFrame(() => { frame.current = 0; const ctx = fit(liveRef.current, true); if (ctx && live.current && live.current.w) drawStroke(ctx, live.current); });
+  }, [fit]);
+  // Menambah satu coretan tidak perlu menggambar ulang semua; hal lain (urungkan, hapus, ganti kertas) perlu.
+  const skipRedraw = useRef(false);
+  useEffect(() => { if (!open) return; if (skipRedraw.current) { skipRedraw.current = false; return; } redraw(); }, [open, sheets, page, height, desktop, redraw]);
   useEffect(() => {
     if (!open || !boxRef.current) return;
     const ro = new ResizeObserver(() => redraw()); ro.observe(boxRef.current); return () => ro.disconnect();
@@ -90,7 +108,8 @@ export function ScratchPad() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
-      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); }
+      // Saat spidol mode menjelaskan aktif, Ctrl+Z milik spidol.
+      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !("presenterPen" in document.documentElement.dataset)) { e.preventDefault(); undo(); }
     };
     addEventListener("keydown", onKey); return () => removeEventListener("keydown", onKey);
   }, [open, undo]);
@@ -111,22 +130,31 @@ export function ScratchPad() {
     const base = tool === "pen" ? 2.4 : 2;
     const w = e.pointerType === "pen" && e.pressure > 0 ? base * (0.6 + e.pressure) : base;
     live.current = { c: tool, w: Math.round(w * 10) / 10, p: [x, y] };
-    redraw();
+    drawLive();
   }
   function move(e: React.PointerEvent<HTMLCanvasElement>) {
     const s = live.current; if (!s) return;
-    const [x, y] = point(e);
-    if (tool === "eraser") { erase(x, y); return; }
-    const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
-    if (Math.hypot(x - lx, y - ly) < 1.2) return;
-    s.p.push(x, y); redraw();
+    // Pakai semua titik antara yang dikumpulkan browser sejak event sebelumnya, agar garis tidak patah-patah.
+    const evs = (e.nativeEvent.getCoalescedEvents?.() ?? []) as PointerEvent[], list = evs.length ? evs : [e.nativeEvent];
+    const r = canvasRef.current!.getBoundingClientRect();
+    for (const ev of list) {
+      const x = Math.round((ev.clientX - r.left) * 10) / 10, y = Math.round((ev.clientY - r.top) * 10) / 10;
+      if (tool === "eraser") { erase(x, y); continue; }
+      const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
+      if (Math.hypot(x - lx, y - ly) < 0.8) continue;
+      s.p.push(x, y);
+    }
+    if (tool !== "eraser") drawLive();
   }
   function up() {
     const s = live.current; live.current = null; if (!s) return;
     if (tool === "eraser") { save(pathname, sheetsRef.current); return; }
+    // Tempel coretan ke lapisan bawah tanpa menggambar ulang semua coretan.
+    const ctx = canvasRef.current?.getContext("2d"); if (ctx) drawStroke(ctx, s);
+    cancelAnimationFrame(frame.current); frame.current = 0; fit(liveRef.current, true);
     const cur = sheetsRef.current;
     const next = cur.map((v, i) => (i === pageRef.current ? [...v, s].slice(-MAX_STROKES) : v));
-    commit(next);
+    sheetsRef.current = next; skipRedraw.current = true; commit(next);
   }
   function newSheet() { const cur = sheetsRef.current; if (cur[cur.length - 1].length === 0) { setPage(cur.length - 1); return; } const next = [...cur, []].slice(-MAX_SHEETS); commit(next); setPage(next.length - 1); }
   function clearSheet() {
@@ -174,6 +202,8 @@ export function ScratchPad() {
     <div ref={boxRef} className="relative min-h-0 flex-1 overflow-hidden"
       style={{ backgroundColor: "#fff", backgroundImage: "linear-gradient(#dbe7f3 1px, transparent 1px), linear-gradient(90deg, #dbe7f3 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
       <canvas ref={canvasRef} data-testid="scratch-canvas" aria-label={`Kertas ${page + 1}, ${strokes} coretan. Gambar dengan jari, stylus, atau mouse.`} role="img"
+        className="pointer-events-none absolute inset-0 select-none" />
+      <canvas ref={liveRef} data-testid="scratch-live" aria-hidden="true"
         className={`absolute inset-0 touch-none select-none ${tool === "eraser" ? "cursor-cell" : "cursor-crosshair"}`}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} />
     </div>

@@ -33,6 +33,8 @@ try {
     assert.equal(await count(page), 0);
     await stroke(page, 30, 40, 150, 60);
     assert.equal(await count(page), 1); assert.ok(await inked(page) > 50, "coretan tergambar");
+    // Coretan yang sedang ditulis ada di lapisan atas; setelah selesai pindah ke kertas dan lapisan atas kosong lagi.
+    assert.equal(await page.getByTestId("scratch-live").evaluate(c => { const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; }), 0, "lapisan tulis kosong setelah selesai");
     // Menulis dengan jari tidak menggulir halaman.
     if (width < 900) {
       const before = await page.evaluate(() => scrollY);
