@@ -61,6 +61,12 @@ try {
     }
     await page.waitForTimeout(80);
     assert.equal(await cv.getAttribute("data-ink"), "1"); assert.equal(await inked(page, [29, 99, 201]), 0, "urungkan menghapus coretan terakhir");
+    // Penghapus: menggeser di atas coretan biru menghapusnya saja; coretan merah tetap.
+    await line(40, 330); assert.equal(await cv.getAttribute("data-ink"), "2");
+    await page.keyboard.press("e"); assert.equal(await bar.getAttribute("data-tool"), "hapus");
+    await page.mouse.move(100, 330 + 18); await page.mouse.down(); await page.mouse.move(110, 330 + 21, { steps: 4 }); await page.mouse.up(); await page.waitForTimeout(80);
+    assert.equal(await cv.getAttribute("data-ink"), "1", "penghapus menghapus coretan yang tersentuh"); assert.equal(await inked(page, [29, 99, 201]), 0, "coretan biru hilang"); assert.ok(await inked(page, [217, 45, 32]) > 50, "coretan merah tetap");
+    await page.keyboard.press("p");
     // Coretan menempel pada halaman: ikut bergeser saat digulir.
     const top = () => cv.evaluate(c => { const x = c.getContext("2d"), d = x.getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) return Math.floor(i / 4 / c.width) / (devicePixelRatio || 1); return -1; });
     const before = await top(); await page.evaluate(() => scrollBy(0, 100)); await page.waitForTimeout(150); const after = await top();
@@ -78,7 +84,7 @@ try {
     await open.click(); await page.getByTestId("scratch-open").click(); await page.keyboard.press("s");
     await bar.getByRole("button", { name: "Tutup mode menjelaskan" }).click(); await open.waitFor();
     assert.deepEqual(errors, []); await logout(); await ctx.close();
-    console.log(`PASS mode menjelaskan ${width}px: hanya admin, laser, spidol tetap ada (warna, urungkan, ikut gulir, tetap setelah dibuka lagi, hapus semua), Esc`);
+    console.log(`PASS mode menjelaskan ${width}px: hanya admin, laser, spidol tetap ada (warna, urungkan, penghapus, ikut gulir, tetap setelah dibuka lagi, hapus semua), Esc`);
   }
   // Tablet: laser mengikuti jari yang digeser, spidol bisa dipakai dengan sentuhan.
   {
@@ -98,10 +104,13 @@ try {
     await bar.getByRole("button", { name: "Spidol", exact: true }).tap();
     await drag([[100, 400], [160, 420], [220, 440], [280, 460]]);
     assert.equal(await page.getByTestId("presenter-ink").getAttribute("data-ink"), "1", "spidol dengan sentuhan");
+    await bar.getByRole("button", { name: "Penghapus", exact: true }).tap();
+    await drag([[160, 420], [170, 423], [180, 426]]); await page.waitForTimeout(80);
+    assert.equal(await page.getByTestId("presenter-ink").getAttribute("data-ink"), "0", "penghapus dengan sentuhan");
     // Halaman terkunci selama alat aktif: geseran jari tidak menggulir; alat Geser membuka kunci.
     const sy = () => page.evaluate(() => scrollY);
     const swipe = [[380, 800], [380, 700], [380, 600], [380, 500], [380, 400], [380, 300]];
-    for (const name of ["Laser", "Spidol"]) {
+    for (const name of ["Laser", "Spidol", "Penghapus"]) {
       await bar.getByRole("button", { name, exact: true }).tap(); const before = await sy();
       await drag(swipe); await page.waitForTimeout(400); assert.equal(await sy(), before, `${name}: layar tidak bergeser`);
       assert.equal(await page.evaluate(() => document.documentElement.style.touchAction), "none");
@@ -111,6 +120,6 @@ try {
     { const before = await sy(); await drag(swipe); await page.waitForTimeout(600); assert.ok(await sy() > before, "Geser: layar bisa digulir"); }
     await page.screenshot({ path: `${folder}/768-tablet-geser.png` });
     assert.deepEqual(errors, []); await ctx.close();
-    console.log("PASS mode menjelaskan tablet 768px: laser mengikuti jari, spidol dengan sentuhan, layar terkunci untuk laser/spidol, Geser menggulir");
+    console.log("PASS mode menjelaskan tablet 768px: laser mengikuti jari, spidol dan penghapus dengan sentuhan, layar terkunci untuk laser/spidol/penghapus, Geser menggulir");
   }
 } finally { await browser.close(); }
