@@ -22,16 +22,16 @@ function SceneView({ scene }: { scene: Scene }) {
     case "pv": return <PvScene bundle={scene.bundle} ones={scene.ones} />;
     case "jar": return <Jar thing={scene.thing} n={scene.n} />;
     case "groups": { const small = scene.ns.length > 2 || scene.layout === "frames";
-      return <div className="flex flex-wrap items-start justify-center gap-2">{scene.ns.map((n, k) => <Box key={k} label={scene.labels[k]}><Objs thing={scene.thing} n={n} layout={scene.layout} size={small ? 15 : 19} spread={scene.spread?.[k] ?? 1} label={`${scene.labels[k]}: ${thingName[scene.thing]}`} /></Box>)}</div>; }
+      return <div className="flex flex-wrap items-start justify-center gap-2">{scene.ns.map((n, k) => <Box key={k} label={scene.labels[k]}>{n === null ? <span aria-label={`${scene.labels[k]}: belum diketahui`} className="grid h-16 w-20 place-items-center text-4xl font-extrabold text-base-content/50">?</span> : <Objs thing={scene.thing} n={n} layout={scene.layout} size={scene.ns.length > 2 ? 13 : small ? 15 : 19} spread={scene.spread?.[k] ?? 1} label={`${scene.labels[k]}: ${thingName[scene.thing]}`} />}</Box>)}</div>; }
   }
 }
 
 /* ====================================================================== */
 /* Bentuk jawaban                                                          */
 /* ====================================================================== */
-function NumBox({ value, onChange, label, disabled, round = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; round?: boolean }) {
+function NumBox({ value, onChange, label, disabled, round = false, small = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; round?: boolean; small?: boolean }) {
   return <input aria-label={label} inputMode="numeric" value={value} disabled={disabled} placeholder="…" onChange={e => onChange(e.target.value.replace(/\D/g, "").slice(0, 2))}
-    className={`h-12 w-14 border-4 border-orange-400 bg-white text-center text-2xl font-extrabold text-neutral focus:border-success focus:outline-none sm:h-14 sm:w-16 sm:text-3xl ${round ? "rounded-full" : "rounded-2xl"}`} />;
+    className={`${small ? "h-10 w-10 text-xl sm:h-12 sm:w-14 sm:text-2xl" : "h-12 w-14 text-2xl sm:h-14 sm:w-16 sm:text-3xl"} border-4 border-orange-400 bg-white text-center font-extrabold text-neutral focus:border-success focus:outline-none ${round ? "rounded-full" : "rounded-2xl"}`} />;
 }
 function Bond({ whole, parts, values, set, disabled }: { whole: number | null; parts: [number | null, number | null]; values?: string[]; set?: (k: number, v: string) => void; disabled?: boolean }) {
   let k = 0;
@@ -81,8 +81,10 @@ function FramesPart({ value, set, checked }: { value: string; set: (v: string) =
 function SeqPart({ p, value, set, checked, i }: { p: Extract<Part, { kind: "seq" }>; value: string; set: (v: string) => void; checked: boolean; i: number }) {
   const x = cells(p, value), put = (k: number, v: string) => { const a = [...x]; a[k] = v; set(a.join("|")); };
   let k = 0;
-  const cell = (n: number | null) => { if (n !== null) return <span className="text-2xl font-extrabold sm:text-3xl">{n}</span>; const j = k++; return <NumBox label={`Bagian ${i + 1} kotak ${j + 1}`} value={x[j]} onChange={v => put(j, v)} disabled={checked} />; };
-  if (p.look === "tabel") return <div className="mx-auto grid w-fit grid-cols-5 border-2 border-neutral/60">{p.items.map((n, j) => <span key={j} className="grid h-14 w-16 place-items-center border border-neutral/40 bg-white">{cell(n)}</span>)}</div>;
+  const tabel = p.look === "tabel";
+  const cell = (n: number | null) => { if (n !== null) return <span className="text-2xl font-extrabold sm:text-3xl">{n}</span>; const j = k++; return <NumBox small={tabel} label={`Bagian ${i + 1} kotak ${j + 1}`} value={x[j]} onChange={v => put(j, v)} disabled={checked} />; };
+  // Lebar kolom mengikuti layar: 5 kolom × 3rem muat di layar 320 px tanpa bergantung pada zoom.
+  if (tabel) return <div className="mx-auto grid w-full max-w-xs grid-cols-5 border-2 border-neutral/60">{p.items.map((n, j) => <span key={j} className="grid h-12 min-w-0 place-items-center border border-neutral/40 bg-white sm:h-14">{cell(n)}</span>)}</div>;
   if (p.look === "eskrim") return <div className="flex flex-wrap justify-center gap-1.5">{p.items.map((n, j) => <Cone key={j}>{cell(n)}</Cone>)}</div>;
   return <div className="flex items-center justify-center"><CaterHead />{p.items.map((n, j) => <span key={j} className="-ms-2 grid size-16 place-items-center rounded-full border-4 border-[#5aa83a] bg-white shadow-[0_6px_0_-2px_#e23d3d]">{cell(n)}</span>)}</div>;
 }
@@ -107,8 +109,8 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
     case "ring": case "paint": return <TapGrid p={p} value={value} set={set} checked={checked} />;
     case "frames": return <FramesPart value={value} set={set} checked={checked} />;
     case "seq": return <SeqPart p={p} value={value} set={set} checked={checked} i={i} />;
-    case "pick": return <div role="group" aria-label={p.label} className="flex flex-wrap items-center gap-2"><p className="text-lg font-bold">{p.label}</p>
-      {p.options.map(o => <button key={o} type="button" aria-pressed={value === o} disabled={checked} onClick={() => set(o)} className={`min-h-12 rounded-full border-4 px-4 text-xl font-extrabold ${sel(value === o)}`}>{o}</button>)}</div>;
+    case "pick": return <div role="group" aria-label={p.label} className="flex flex-wrap items-center gap-1.5 sm:gap-2"><p className="text-base font-bold sm:text-lg">{p.label}</p>
+      {p.options.map(o => <button key={o} type="button" aria-pressed={value === o} disabled={checked} onClick={() => set(o)} className={`min-h-11 rounded-full border-4 px-3 text-lg font-extrabold sm:min-h-12 sm:px-4 sm:text-xl ${sel(value === o)}`}>{o}</button>)}</div>;
     case "order": return <OrderPart p={p} value={value} set={set} checked={checked} />;
     case "guess": return <div className="flex flex-wrap items-center gap-4 text-xl font-bold"><label className="flex items-center gap-2">Tebakanku<NumBox label="Tebakanku" value={x[0]} onChange={v => put(0, v)} disabled={checked} /></label><label className="flex items-center gap-2">Hitunganku<NumBox label="Hitunganku" value={x[1]} onChange={v => put(1, v)} disabled={checked} /></label></div>;
   }

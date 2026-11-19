@@ -10,7 +10,8 @@ import { thingName } from "../src/data/grade-one-sub10-v2.ts";
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
 const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/grade-one-count20-v2-screenshots";
 await mkdir(folder, { recursive: true });
-const sizes = [[320, 640], [390, 844], [768, 1024], [1280, 800]];
+// 320×800: lebar sempit tanpa zoom tinggi-layar, agar isi yang terpotong ikut tertangkap.
+const sizes = [[320, 640], [320, 800], [390, 844], [768, 1024], [1280, 800]];
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_EXECUTABLE });
 const tall = [];
 try {
@@ -23,7 +24,8 @@ try {
     const group = name => page.getByRole("group", { name, exact: true });
     const fit = async label => { const s = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth })); assert.ok(s.scroll <= s.inner, `overflow ${width} ${label}: ${JSON.stringify(s)}`); };
     const room = () => page.evaluate(() => innerHeight - document.querySelector("header").getBoundingClientRect().height);
-    const fitsScreen = async (locator, label, strict = !process.env.SOFT) => { const b = await locator.boundingBox(), r = await room(); if (b.height > r + 1) { if (strict) assert.fail(`${width}×${height} ${label}: tinggi ${Math.round(b.height)} > layar ${Math.round(r)}`); else { const parts = process.env.DEBUG ? await locator.evaluate(el => [...el.children].map(c => `${c.tagName.toLowerCase()}:${Math.round(c.getBoundingClientRect().height)}`).join(' ')) : ''; tall.push(`${width}×${height} ${label} ${Math.round(b.height)}/${Math.round(r)} ${parts}`); } } };
+    // 320×800 hanya untuk memeriksa tepi kanan; tinggi layar dinilai ketat di empat ukuran standar.
+    const fitsScreen = async (locator, label, strict = !process.env.SOFT && height !== 800) => { const b = await locator.boundingBox(), r = await room(); if (b.height > r + 1) { if (strict) assert.fail(`${width}×${height} ${label}: tinggi ${Math.round(b.height)} > layar ${Math.round(r)}`); else { const parts = process.env.DEBUG ? await locator.evaluate(el => [...el.children].map(c => `${c.tagName.toLowerCase()}:${Math.round(c.getBoundingClientRect().height)}`).join(' ')) : ''; tall.push(`${width}×${height} ${label} ${Math.round(b.height)}/${Math.round(r)} ${parts}`); } } };
     const quiz = page.locator("section:has(> progress)");
     const shot = async (name, full = false) => { if (width === 390 || width === 1280 || (process.env.SHOT320 && width === 320)) await page.screenshot({ path: `${folder}/${width}-${name}.png`, fullPage: full }); };
     const result = () => page.getByTestId("lab-result").getAttribute("data-value");
@@ -73,6 +75,7 @@ try {
         await answer(q, miss ? q.answer.replace(/\d+$/, d => String(Number(d) + 1)) : q.answer); if (miss) wrong++;
         await fitsScreen(quiz, `latihan ${topics[t].code}${k + 1}`);
         await button("Periksa jawaban").click(); await page.getByText(miss ? "Belum tepat." : "Tepat!", { exact: true }).waitFor();
+        assert.ok(await quiz.evaluate(el => [...el.querySelectorAll("*")].every(c => c.getBoundingClientRect().right <= el.getBoundingClientRect().right + 1)), `${width}×${height} latihan ${topics[t].code}${k + 1}: isi melewati tepi kanan`);
         await fit(`latihan ${t}-${k}`); await fitsScreen(quiz, `latihan ${topics[t].code}${k + 1} setelah diperiksa`, false);
         await quiz.scrollIntoViewIfNeeded(); await shot(`practice-${topics[t].code}-${k + 1}`);
         await button(k === set.length - 1 ? "Lihat hasil" : "Lanjut →").click();
@@ -87,6 +90,7 @@ try {
       assert.equal(await button("Lanjut →").count(), 0, `evaluasi ${i + 1} terkunci sebelum dijawab`);
       await answer(q, i === 0 ? q.answer.replace(/\d+$/, d => String(Number(d) + 1)) : q.answer);
       await fit(`evaluasi ${i + 1}`); await fitsScreen(quiz, `evaluasi ${i + 1}`);
+      { const over = await quiz.evaluate(el => [...el.querySelectorAll("*")].filter(c => c.getBoundingClientRect().right > el.getBoundingClientRect().right + 1).map(c => `${c.tagName.toLowerCase()}.${String(c.className).slice(0, 40)}`).slice(0, 3)); assert.deepEqual(over, [], `${width}×${height} evaluasi ${i + 1}: isi melewati tepi kanan`); }
       await quiz.scrollIntoViewIfNeeded(); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
       await button(i === 23 ? "Lihat hasil" : "Lanjut →").click();
     }

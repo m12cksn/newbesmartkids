@@ -18,6 +18,8 @@
 - eslint berkas bab, `npm run build`.
 - smoke mode ketat 320×640, 390×844, 768×1024, 1280×800: jalur klik dari halaman kelas, keempat peraga, 16 latihan (1 salah disengaja), 24 evaluasi, muat di layar tanpa menggulir sebelum menjawab, skor 96 dan pembahasan.
 - `smoke-grade-one-chapters-five-six.mjs` (Bab 6) tetap lulus di 4 lebar.
+- Smoke juga berjalan di 320×800 (tanpa zoom tinggi-layar) dan memeriksa bahwa tidak ada isi soal yang melewati tepi kanan kartu. Tinggi layar di ukuran ini tidak dinilai ketat; di 320×800 beberapa soal lebih tinggi dari layar.
+- Temuan Codex diperbaiki: tabel urutan 1–20 kini selebar layar (kolom fleksibel), soal 16 dan 20 bergambar (bilangan yang ditanyakan digambar "?").
 
 ## Sisa
 - Video belum ada (panel placeholder).

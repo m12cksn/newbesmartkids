@@ -53,7 +53,9 @@ for (const q of all) {
   }
 }
 // Gambar tidak membocorkan jawaban: soal "lebih banyak" tidak memakai gambar yang jumlahnya sama.
-for (const q of all.filter(q => q.scene?.type === "groups")) assert.equal(new Set(q.scene.ns).size, q.scene.ns.length, `${q.prompt}: jumlah gambar kembar`);
+for (const q of all.filter(q => q.scene?.type === "groups")) { const known = q.scene.ns.filter(x => x !== null); assert.equal(new Set(known).size, known.length, `${q.prompt}: jumlah gambar kembar`); }
+// Soal cerita yang membandingkan banyak benda harus bergambar; bilangan yang ditanyakan digambar "?".
+for (const q of all.filter(q => q.topic === 3 && /punya/.test(q.prompt))) { assert.equal(q.scene?.type, "groups", q.prompt); q.scene.ns.forEach((x, k) => { if (x !== null) assert.ok(q.prompt.includes(`${q.scene.labels[k]} punya ${x}`), `${q.prompt}: gambar tidak sesuai kalimat`); }); }
 // Pembahasan jawaban salah menunjukkan isian anak.
 const m = practice[0][0]; assert.notEqual(formatAnswer(m, "0|1|2|3"), formatAnswer(m, m.answer));
 assert.ok(checked >= 45, `kunci yang dihitung ulang ${checked}`);
