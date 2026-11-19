@@ -1,26 +1,31 @@
 "use client";
 
-import { Crosshair, Hand, PenTool, Presentation, Trash2, Undo2, X } from "lucide-react";
+import { Crosshair, Eraser, Hand, PenTool, Presentation, Trash2, Undo2, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccess } from "@/components/auth/AccessProvider";
 
 /**
  * Mode menjelaskan (khusus admin): alat bantu saat menjelaskan atau merekam video.
- * Laser dengan jejak memudar, dan spidol yang coretannya tetap ada (tidak memudar) sampai diurungkan
- * atau dihapus. Coretan menempel pada halaman, jadi ikut bergeser saat halaman digulir.
+ * Laser dengan jejak memudar, dan spidol yang coretannya tetap ada (tidak memudar) sampai diurungkan,
+ * dihapus dengan penghapus (coretan yang tersentuh hilang), atau dihapus semua. Coretan menempel pada halaman, jadi ikut bergeser saat halaman digulir.
  * Coretan dihapus saat pindah halaman. Tidak ada yang disimpan.
- * Di layar sentuh, selama laser atau spidol aktif halaman dikunci: sentuhan tidak menggulir dan tidak
+ * Di layar sentuh, selama laser, spidol, atau penghapus aktif halaman dikunci: sentuhan tidak menggulir dan tidak
  * menekan tombol. Alat "Geser" membuka kunci itu untuk menggulir dan memakai peraga.
  */
-type Tool = "laser" | "spidol" | "geser";
+type Tool = "laser" | "spidol" | "hapus" | "geser";
 const TOOLS: { id: Tool; label: string; key: string; Icon: typeof Crosshair }[] = [
   { id: "laser", label: "Laser", key: "L", Icon: Crosshair },
   { id: "spidol", label: "Spidol", key: "P", Icon: PenTool },
+  { id: "hapus", label: "Penghapus", key: "E", Icon: Eraser },
   { id: "geser", label: "Geser", key: "G", Icon: Hand },
 ];
 const INKS = [{ id: "merah", label: "Merah", c: "#d92d20" }, { id: "biru", label: "Biru", c: "#1d63c9" }, { id: "hitam", label: "Hitam", c: "#1f2420" }] as const;
-const LASER_MS = 650, INK_W = 4;
+const LASER_MS = 650, INK_W = 4, ERASE_R = 14;
+/** Jarak titik (x, y) ke ruas garis (ax, ay)–(bx, by). */
+const segDist = (x: number, y: number, ax: number, ay: number, bx: number, by: number) => { const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy, t = l ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / l)) : 0; return Math.hypot(x - (ax + t * dx), y - (ay + t * dy)); };
+/** Coretan tersentuh penghapus bila (x, y) dekat dengan garisnya, termasuk bagian di antara titik-titik sampel. */
+const touches = (s: InkStroke, x: number, y: number) => { const p = s.p, r = ERASE_R + INK_W / 2; if (p.length === 2) return Math.hypot(p[0] - x, p[1] - y) <= r; for (let i = 0; i + 3 < p.length; i += 2) if (segDist(x, y, p[i], p[i + 1], p[i + 2], p[i + 3]) <= r) return true; return false; };
 type Pt = { x: number; y: number; t: number };
 type InkStroke = { c: string; p: number[] }; // p = [x0, y0, x1, y1, …] dalam koordinat halaman (sudah ditambah scroll)
 
@@ -47,6 +52,7 @@ export function PresenterMode() {
   const trail = useRef<Pt[]>([]);
   const ink = useRef<InkStroke[]>([]);
   const drawing = useRef<InkStroke | null>(null);
+  const erasing = useRef(false);
   const raf = useRef(0), inkFrame = useRef(0);
   const [inkCount, setInkCount] = useState(0);
 
@@ -78,7 +84,7 @@ export function PresenterMode() {
     const onKey = (e: KeyboardEvent) => {
       if (typing(e) || e.altKey) return;
       // Ctrl+Z hanya untuk spidol saat spidol aktif; selain itu milik kertas coret.
-      if (on && tool === "spidol" && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
+      if (on && (tool === "spidol" || tool === "hapus") && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
       if (e.ctrlKey || e.metaKey) return;
       if (e.key === "Escape" && on) { close(); return; }
       const t = TOOLS.find(x => x.key.toLowerCase() === e.key.toLowerCase());
@@ -113,7 +119,7 @@ export function PresenterMode() {
   }, [on, tool]);
   // Tanda untuk kertas coret: selama spidol aktif, Ctrl+Z milik spidol.
   useEffect(() => {
-    if (!on || tool !== "spidol") return;
+    if (!on || (tool !== "spidol" && tool !== "hapus")) return;
     document.documentElement.dataset.presenterPen = "";
     return () => { delete document.documentElement.dataset.presenterPen; };
   }, [on, tool]);
@@ -147,7 +153,7 @@ export function PresenterMode() {
   }, [on, tool]);
 
   if (!isAdmin) return null;
-  const pen = on && tool === "spidol";
+  const pen = on && tool === "spidol", rub = on && tool === "hapus";
   const add = (s: InkStroke, e: PointerEvent) => {
     // Pakai semua titik antara dari browser agar coretan cepat tetap mulus.
     const evs = e.getCoalescedEvents?.() ?? [];
@@ -156,6 +162,15 @@ export function PresenterMode() {
   const down = (e: React.PointerEvent) => { if (e.button > 0) return; (e.target as HTMLElement).setPointerCapture(e.pointerId); drawing.current = { c: color, p: [e.clientX + scrollX, e.clientY + scrollY] }; paintInk(); };
   const moveInk = (e: React.PointerEvent) => { if (!drawing.current) return; add(drawing.current, e.nativeEvent); paintInk(); };
   const up = () => { if (!drawing.current) return; ink.current.push(drawing.current); drawing.current = null; setInkCount(ink.current.length); paintInk(); };
+  // Penghapus: coretan spidol yang tersentuh langsung hilang, seperti penghapus kertas coret.
+  const rubAt = (e: PointerEvent) => {
+    const evs = e.getCoalescedEvents?.() ?? [], before = ink.current.length;
+    for (const ev of evs.length ? evs : [e]) { const x = ev.clientX + scrollX, y = ev.clientY + scrollY; ink.current = ink.current.filter(st => !touches(st, x, y)); }
+    if (ink.current.length !== before) { setInkCount(ink.current.length); paintInk(); }
+  };
+  const rubDown = (e: React.PointerEvent) => { if (e.button > 0) return; (e.target as HTMLElement).setPointerCapture(e.pointerId); erasing.current = true; rubAt(e.nativeEvent); };
+  const rubMove = (e: React.PointerEvent) => { if (erasing.current) rubAt(e.nativeEvent); };
+  const rubUp = () => { erasing.current = false; };
 
   if (!on) return <button type="button" data-presenter data-testid="presenter-open" onClick={() => setOn(true)}
     className="fixed bottom-4 left-4 z-40 flex items-center gap-2 rounded-full border border-base-300 bg-base-100 px-3 py-2.5 sm:px-4 text-sm font-medium shadow-[0_4px_14px_-6px_rgb(23_53_42/0.35)] hover:border-success focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-success/40 print:hidden sm:bottom-6 sm:left-6">
@@ -163,8 +178,8 @@ export function PresenterMode() {
 
   return <>
     {/* Coretan spidol (tetap ada). Kanvas hanya menangkap sentuhan saat spidol aktif. */}
-    <canvas ref={inkRef} data-testid="presenter-ink" aria-hidden="true" onPointerDown={pen ? down : undefined} onPointerMove={pen ? moveInk : undefined} onPointerUp={pen ? up : undefined} onPointerCancel={pen ? up : undefined}
-      className={`fixed inset-0 z-[45] h-screen w-screen touch-none ${pen ? "cursor-crosshair" : "pointer-events-none"}`} data-ink={inkCount} />
+    <canvas ref={inkRef} data-testid="presenter-ink" aria-hidden="true" onPointerDown={pen ? down : rub ? rubDown : undefined} onPointerMove={pen ? moveInk : rub ? rubMove : undefined} onPointerUp={pen ? up : rub ? rubUp : undefined} onPointerCancel={pen ? up : rub ? rubUp : undefined}
+      className={`fixed inset-0 z-[45] h-screen w-screen touch-none ${pen ? "cursor-crosshair" : rub ? "cursor-cell" : "pointer-events-none"}`} data-ink={inkCount} />
     {/* Jejak laser. */}
     <canvas ref={laserRef} data-testid="presenter-canvas" aria-hidden="true" className="pointer-events-none fixed inset-0 z-[46] h-screen w-screen" />
     {tool === "laser" && pos && <span data-testid="presenter-dot" aria-hidden="true" className="pointer-events-none fixed z-[47] size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#e11d2e] shadow-[0_0_12px_4px_rgb(225_29_46/0.55)]" style={{ left: pos.x, top: pos.y }} />}
@@ -177,7 +192,7 @@ export function PresenterMode() {
       <button type="button" aria-label="Urungkan coretan" title="Urungkan (Ctrl+Z)" className="btn btn-sm btn-square btn-ghost" disabled={inkCount === 0} onClick={undo}><Undo2 className="size-4" strokeWidth={1.75} aria-hidden="true" /></button>
       <button type="button" aria-label="Hapus semua coretan" title="Hapus semua coretan" className="btn btn-sm btn-square btn-ghost" disabled={inkCount === 0} onClick={clearInk}><Trash2 className="size-4" strokeWidth={1.75} aria-hidden="true" /></button>
       <button type="button" aria-label="Tutup mode menjelaskan" title="Tutup (Esc)" className="btn btn-sm btn-square btn-ghost" onClick={close}><X className="size-4" aria-hidden="true" /></button>
-      <p className="hidden w-full px-1.5 pb-0.5 text-[11px] text-base-content/60 sm:block">{tool === "laser" ? "Gerakkan kursor atau jari. Di layar sentuh halaman tidak bergeser; pilih Geser untuk menggulir." : tool === "spidol" ? "Coret di layar. Coretan tetap ada sampai diurungkan atau dihapus, dan ikut bergeser bersama halaman." : "Layar bisa digulir dan disentuh seperti biasa. Coretan tetap terlihat."}</p>
+      <p className="hidden w-full px-1.5 pb-0.5 text-[11px] text-base-content/60 sm:block">{tool === "laser" ? "Gerakkan kursor atau jari. Di layar sentuh halaman tidak bergeser; pilih Geser untuk menggulir." : tool === "spidol" ? "Coret di layar. Coretan tetap ada sampai diurungkan atau dihapus, dan ikut bergeser bersama halaman." : tool === "hapus" ? "Geser di atas coretan spidol untuk menghapus coretan yang tersentuh." : "Layar bisa digulir dan disentuh seperti biasa. Coretan tetap terlihat."}</p>
     </div>
   </>;
 }
