@@ -36,7 +36,7 @@
   - entri di `materials.ts`.
 
 ## Validasi (lokal)
-- verify: 49 kunci dihitung ulang dari gambar, mencakup:
+- verify: 48 kunci dihitung ulang dari gambar, mencakup:
   - paling, lebih, dan sama dari tinggi/panjang/posisi;
   - urutan, termasuk penolakan urutan terbalik;
   - hitungan alat ukur pas dengan panjang benda;
@@ -60,3 +60,9 @@
 ## Sisa
 - Video belum ada (panel placeholder).
 - Pratinjau perlu dilihat Mr Iwan.
+
+## Catatan CI
+- Runner CI merender dengan font cadangan yang lebih lebar. `FONT="DejaVu Sans"` pada smoke meniru ukurannya (latihan A4: 594 px, sama dengan CI).
+- Di layar pendek (tinggi ≤ 700 px), gambar dibatasi 21vh dan jawaban di-zoom 0,78.
+- Beberapa sub-soal yang tumpang tindih dihapus agar setiap soal muat di 320×640.
+- `MARGIN=n` mencatat soal yang sisa ruangnya kurang dari n px.

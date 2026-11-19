@@ -6,7 +6,8 @@ import GradeFourQuiz from "./GradeFourQuiz";
 import { AnimalArt, animalW, FlyerArt, HArt, HArtAt, Kid, thick, UnitArt, VArt, vWidth, WayArt } from "./GradeOneLengthArt";
 import { assessment, cells, circleNames, colorName, correct, flyerName, formatAnswer, layCount, objName, practice, ready, SEP, splitParts, topics, unitLen, unitName, wayName, type Color, type HObj, type LQuestion, type Part, type Scene, type Unit, type Way } from "@/data/grade-one-length-v2";
 
-const svgCls = "mx-auto block h-auto w-full";
+/** Di layar pendek (tinggi ≤ 700 px) gambar dibatasi lebih rendah agar soal muat tanpa menggulir. */
+const svgCls = "mx-auto block h-auto w-full [@media(max-height:700px)]:max-h-[21vh]!";
 const Label = ({ x, y, t }: { x: number; y: number; t: string }) => <g><circle cx={x} cy={y} r={5.5} fill="#fff4e0" stroke="#f08a24" strokeWidth={1} /><text x={x} y={y + 2.6} textAnchor="middle" fontSize={7.5} fontWeight={700} fill="#3b2f2a">{t}</text></g>;
 type Tapper = { marked?: number[]; toggle?: (k: number) => void; names?: string[] };
 /** Benda yang bisa diketuk untuk dilingkari. */
@@ -219,7 +220,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
 }
 function Answer({ q, value, record, checked }: { q: LQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-2.5 [@media(max-height:700px)]:space-y-1.5 [@media(max-height:700px)]:[zoom:0.82]">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5 [@media(max-height:700px)]:space-y-1 [@media(max-height:700px)]:[zoom:0.78]">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
 /* ====================================================================== */
