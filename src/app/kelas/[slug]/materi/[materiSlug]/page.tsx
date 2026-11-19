@@ -13,7 +13,6 @@ import CambridgeRatio from "@/components/learn/CambridgeRatio";
 import CambridgeFractions from "@/components/learn/CambridgeFractions";
 import GradeOneChapterEight from "@/components/learn/GradeOneChapterEight";
 import Link from "next/link";
-import GradeOneChapterSeven from "@/components/learn/GradeOneChapterSeven";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { classes } from "@/components/home/home-data";
@@ -74,10 +73,6 @@ async function MaterialPageContent({ params }: { params: Promise<{ slug: string;
   }
 
 
-
-  if (material.id === "kelas-1-panjang-benda") {
-    return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 1</Link></div><GradeOneChapterSeven /><SiteFooter /></main>;
-  }
 
   if (material.id === "kelas-1-mengenal-diagram") {
     return <main data-theme="besmartkids" className="min-h-screen bg-base-200 text-base-content"><SiteHeader /><div className="mx-auto max-w-6xl px-4 pt-5 sm:px-8"><Link href={`/kelas/${classItem.slug}`} className="link link-hover text-sm text-success">← Kembali ke kelas 1</Link></div><GradeOneChapterEight /><SiteFooter /></main>;

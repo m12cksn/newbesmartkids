@@ -44,18 +44,6 @@ export const materials: MaterialItem[] = [
   },
 
   {
-    id: "kelas-1-panjang-benda",
-    classId: 1,
-    chapter: 7,
-    slug: "mengukur-panjang-benda",
-    title: "Mengukur Panjang Benda",
-    topic: "Pengukuran",
-    description: "Membandingkan, mengurutkan, dan mengukur panjang benda menggunakan satuan yang sesuai.",
-    videoStatus: "coming_soon",
-    summary: "Panjang benda dapat dibandingkan dengan melihat langsung atau menggunakan alat ukur. Saat mengukur, mulai dari angka nol dan gunakan satuan yang sama.",
-    questionIds: [],
-  },
-  {
     id: "kelas-1-mengenal-diagram",
     classId: 1,
     chapter: 8,
