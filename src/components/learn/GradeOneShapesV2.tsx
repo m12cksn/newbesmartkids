@@ -114,7 +114,7 @@ function SlotBoard({ picture, order, value, set, disabled }: { picture: string; 
     <svg viewBox={`-2 -2 ${pic.vb[0] + 4} ${pic.vb[1] + 4}`} style={{ height: boardH, width: (boardH * (pic.vb[0] + 4)) / (pic.vb[1] + 4) }} className="max-w-full shrink-0" role="group" aria-label={`papan ${pic.name}`}>
       {pic.figs.map((f, k) => { const got = value[k] === "" ? null : pieces[Number(value[k])]; const ok = got && fits(got, f);
         return <g key={k} role="button" tabIndex={disabled ? -1 : 0} aria-label={`Tempat ${k + 1}${got ? ", terisi" : ""}`} onClick={() => place(k)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); place(k); } }} className="cursor-pointer focus:outline-none [&:focus-visible>*]:stroke-[3]">
-          {got ? <FigShape fig={{ ...got, x: f.x, y: f.y }} line={ok ? undefined : "#dc2626"} sw={ok ? 1.4 : 2.4} /> : <FigShape fig={f} dashed fill="#fff" sw={1.2} />}
+          {got ? <FigShape fig={{ ...got, x: f.x, y: f.y }} line={ok ? undefined : "#dc2626"} sw={ok ? 1.4 : 2.4} /> : <><FigShape fig={f} dashed fill="#fff" sw={1.2} /><text x={(f.x ?? 0) + f.w / 2} y={(f.y ?? 0) + f.h * (f.f === "tri" ? 0.68 : f.f === "triDown" ? 0.38 : 0.5)} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(5, Math.min(11, f.w / 3, f.h / 2.2))} fontWeight="700" fill="#9ca3af" aria-hidden="true">{k + 1}</text></>}
         </g>; })}
     </svg>
     <div role="group" aria-label="Keping" className="flex max-w-xs flex-wrap items-end justify-center gap-1">{pieces.map((f, k) => <button key={k} type="button" disabled={disabled || used.has(k)} aria-label={`Keping ${k + 1}: ${itemName(f)}`} aria-pressed={pick === k} onClick={() => setPick(pick === k ? null : k)}
@@ -128,6 +128,7 @@ function SlotBoard({ picture, order, value, set, disabled }: { picture: string; 
 function SceneView({ q }: { q: SQuestion }) {
   const sc = q.scene; if (!sc) return null;
   if (sc.type === "join") return <JoinView mode={sc.mode} colors={sc.colors} />;
+  if (sc.type === "ref") return <div className="rounded-2xl border-4 border-purple-300 bg-white p-2"><ObjArt obj={sc.obj} size={96} /></div>;
   const pick = q.parts.find(p => p.kind === "pick") as Extract<Part, { kind: "pick" }> | undefined;
   const unit = pick?.same ? sharedUnit([...sc.figs, ...figsOf(pick.options), { f: "rect", w: 44, h: 44, c: "merah" }], 60) : sharedUnit(sc.figs, 60);
   return <div role="group" aria-label="gambar di atas" className="flex items-end justify-center gap-4 rounded-2xl border-4 border-purple-300 bg-white px-4 py-2">{sc.figs.map((f, k) => <FigView key={k} fig={f} unit={unit} />)}</div>;
@@ -181,7 +182,7 @@ function SusunLab() {
     <div role="tablist" aria-label="Kegiatan" className="flex gap-1.5">{([["gabung", "Gabung dua segitiga"], ["rumah", "Susun rumah"]] as const).map(([k, n]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`btn btn-sm ${tab === k ? "btn-success" : "btn-outline"}`}>{n}</button>)}</div>
     {tab === "gabung" ? <>
       <div className="flex min-h-36 items-center justify-center rounded-2xl border-4 border-purple-200 bg-white p-2">{pos === 0
-        ? <svg viewBox="-2 -2 134 64" className="h-32 w-64" role="img" aria-label="dua segitiga yang sama besar, terpisah"><polygon points="0,0 0,60 60,60" fill={tone.merah.fill} stroke={tone.merah.line} strokeWidth="2" /><polygon points="130,0 130,60 70,60" fill={tone.biru.fill} stroke={tone.biru.line} strokeWidth="2" /></svg>
+        ? <svg viewBox="-2 -2 104 64" className="h-32 w-56" role="img" aria-label="dua segitiga yang sama besar, terpisah"><polygon points="0,0 0,60 40,60" fill={tone.merah.fill} stroke={tone.merah.line} strokeWidth="2" /><polygon points="100,0 100,60 60,60" fill={tone.biru.fill} stroke={tone.biru.line} strokeWidth="2" /></svg>
         : <JoinView mode={pos === 1 ? "segitiga" : "kotak"} colors={["merah", "biru"]} />}</div>
       <div className="flex flex-wrap gap-2"><button type="button" className="btn btn-success gap-1" onClick={() => setPos(pos === 2 ? 0 : ((pos + 1) as 1 | 2))}><RotateCcw className="size-4 -scale-x-100" aria-hidden="true" />{pos === 0 ? "Tempelkan" : pos === 1 ? "Putar segitiga biru" : "Pisahkan"}</button></div>
       <Result value={`gabung:${pos}`}>{pos === 0 ? "Dua segitiga ini sama besar. Ketuk Tempelkan." : pos === 1 ? "Sisi tegaknya ditempel. Hasilnya segitiga yang lebih besar." : "Segitiga biru diputar dan sisi miringnya ditempel. Hasilnya segi empat."}</Result>

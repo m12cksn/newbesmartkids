@@ -88,7 +88,8 @@ export function PieceView({ id, k, size = 72 }: { id: string; k: number; size?: 
 export function JoinView({ mode, colors }: { mode: "kotak" | "segitiga"; colors: [Color, Color] }) {
   const [a, b] = colors.map(c => tone[c]);
   return <svg viewBox="-2 -2 104 64" className="h-32 w-56" role="img" aria-label="dua segitiga sama besar yang digabungkan">
-    {mode === "kotak" ? <><polygon points="20,0 20,60 80,60" fill={a.fill} stroke={a.line} strokeWidth="2" /><polygon points="20,0 80,0 80,60" fill={b.fill} stroke={b.line} strokeWidth="2" /></>
+    {/* Kedua segitiga selalu sama: siku-siku dengan kaki 40 dan 60. */}
+    {mode === "kotak" ? <><polygon points="30,0 30,60 70,60" fill={a.fill} stroke={a.line} strokeWidth="2" /><polygon points="30,0 70,0 70,60" fill={b.fill} stroke={b.line} strokeWidth="2" /></>
       : <><polygon points="50,0 50,60 10,60" fill={a.fill} stroke={a.line} strokeWidth="2" /><polygon points="50,0 50,60 90,60" fill={b.fill} stroke={b.line} strokeWidth="2" /></>}
   </svg>;
 }

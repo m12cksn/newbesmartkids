@@ -92,7 +92,7 @@ export type Part =
   /** Hubungkan garis putus-putus, lalu pilih namanya (nilai: "1|nama"). */
   | { kind: "trace"; fig: Fig; answer: string }
   /** Lingkari semua yang benar (nilai: nomor dipisah koma). */
-  | { kind: "multi"; label: string; items: Item[]; answers: number[]; same?: boolean }
+  | { kind: "multi"; label: string; items: Item[]; answers: number[]; same?: boolean; ref?: Obj }
   /** Lingkari satu jawaban (nilai: nomor pilihan). */
   | { kind: "pick"; label: string; options: (Item | string)[]; answer: number; same?: boolean }
   /** Warnai: merah untuk paling besar, kuning untuk paling kecil (nilai: m/k/kosong per bentuk). */
@@ -110,6 +110,8 @@ export type SQuestion = Question & { topic: number; level?: Level; scene?: Scene
 export type Scene =
   /** Kelompok rujukan "gambar di atas". */
   | { type: "group"; figs: Fig[] }
+  /** Satu benda rujukan. */
+  | { type: "ref"; obj: Obj }
   /** Dua segitiga siku-siku yang sama digabung. */
   | { type: "join"; mode: "kotak" | "segitiga"; colors: [Color, Color] };
 
@@ -168,7 +170,8 @@ export function formatAnswer(q: SQuestion, raw: string): string {
       case "sort": return p.bins.map((b, bi) => `${b}: ${p.items.filter((_, k) => x[k] === String(bi)).map(itemName).join(", ") || "-"}`).join("; ");
       case "puzzle": return v[i] === "" ? "…" : `potongan ${"abc"[Number(v[i])]}`;
       case "count": return p.cats.map((c, k) => `${c === "semua" ? "Bangun datar" : catName[c]} ada ${x[k] || "…"}`).join(", ");
-      case "slots": return `${x.filter(Boolean).length} keping dipasang`;
+      case "slots": { const pic = pictures[p.picture];
+        return pic.figs.map((f, k) => { if (x[k] === "") return `tempat ${k + 1}: kosong`; const g = pic.figs[p.order[Number(x[k])]]; return `tempat ${k + 1} (${formWord[f.f]}): ${itemName(g)}${fits(g, f) ? "" : " (tidak pas)"}`; }).join(", "); }
     }
   }).join(" | ");
 }
@@ -237,7 +240,7 @@ export const assessment: SQuestion[] = [
   A({ level: "Sedang", prompt: "Pasangkan bentuk dengan namanya.", parts: [{ kind: "match", left: [fig("rect", 34, 34, "biru"), fig("tri", 38, 32, "ungu"), fig("rect", 46, 24, "biru"), fig("circle", 36, 36, "merah")], right: [LK, SE, SG], answer: [1, 2, 1, 0] }], explanation: "Persegi dan persegi panjang sama-sama segi empat. Bangun 3 sisi adalah segitiga. Lingkaran adalah bentuk lengkung." }),
   B({ level: "Sedang", prompt: "Warnailah. Merah untuk bentuk yang paling besar. Kuning untuk bentuk yang paling kecil.", parts: [{ kind: "paint", figs: [fig("circle", 50, 50, "biru"), fig("circle", 22, 22, "biru"), fig("circle", 38, 38, "biru")] }], explanation: "Lingkaran kiri paling besar, jadi merah. Lingkaran tengah paling kecil, jadi kuning." }),
   C({ level: "Sedang", prompt: "Hitunglah banyaknya bentuk bangun pada rumah.", parts: [{ kind: "count", picture: "rumah", cats: ["lengkung", "segiempat", "segitiga"] }], explanation: "Matahari dan daun pohon ada 2 bentuk lengkung. Dinding, pintu, 2 jendela, dan batang pohon ada 5 segi empat. Atap 1 segitiga." }),
-  A({ level: "Sedang", prompt: "Hubungkan garis putus-putusnya. Lalu pilih namanya.", parts: [{ kind: "trace", fig: fig("circle", 64, 64, "hijau"), answer: LK }], explanation: "Garisnya melengkung terus tanpa sudut. Jadi bentuknya bentuk lengkung." }),
+  A({ level: "Sedang", prompt: "Lingkari semua benda yang berbentuk lengkung.", parts: [{ kind: "multi", label: "Bentuk lengkung:", items: ["jam", "buku", "telur", "risol", "kukis", "pintu"], answers: [0, 2, 4] }], explanation: "Jam dinding, telur, dan kue kering tidak punya sudut, jadi berbentuk lengkung. Buku dan pintu segi empat, kue risol segitiga." }),
   B({ level: "Sedang", prompt: "Lingkari bangun yang satu warna dengan gambar di atas.", scene: { type: "group", figs: [fig("circle", 34, 34, "hijau"), fig("tri", 36, 30, "hijau"), fig("rect", 40, 26, "hijau")] }, parts: [{ kind: "pick", label: "Satu warna:", options: [fig("right", 32, 34, "hijau"), fig("rect", 34, 34, "ungu"), fig("tri", 34, 30, "kuning")], answer: 0 }], explanation: "Semua gambar di atas hijau. Segitiga hijau satu warna dengan mereka." }),
 
   C({ level: "Menantang", prompt: "Dua segitiga yang sama digabungkan seperti ini. Bentuk apa yang terjadi?", scene: { type: "join", mode: "segitiga", colors: ["merah", "biru"] }, parts: [{ kind: "pick", label: "Bentuknya:", options: [LK, SG, SE], answer: 1 }], explanation: "Sisi tegak kedua segitiga ditempelkan. Hasilnya segitiga besar dengan 3 sisi." }),
@@ -254,7 +257,7 @@ export const assessment: SQuestion[] = [
   A({ level: "Sangat menantang", prompt: "Pasangkan yang bentuknya sama.", parts: [{ kind: "match", left: ["lolipop", "amplop", "penggaris", "telur", "rambu"], right: [fig("rect", 46, 28, "biru"), fig("circle", 38, 38, "merah"), fig("tri", 40, 34, "ungu")], answer: [1, 0, 2, 1, 2] }], explanation: "Lolipop dan telur lengkung. Amplop segi empat. Penggaris segitiga dan rambu peringatan segitiga." }),
   B({ level: "Sangat menantang", prompt: "Lingkari semua bangun yang bentuk dan warnanya sama dengan gambar ini.", scene: { type: "group", figs: [fig("tri", 40, 34, "merah")] }, parts: [{ kind: "multi", label: "Bentuk dan warna sama:", items: [fig("tri", 24, 20, "merah"), fig("tri", 36, 30, "kuning"), fig("circle", 32, 32, "merah"), fig("right", 32, 36, "merah"), fig("rect", 30, 30, "merah"), fig("triDown", 34, 30, "hijau")], answers: [0, 3] }], explanation: "Harus segitiga dan merah. Segitiga merah kecil dan segitiga siku-siku merah memenuhi keduanya. Ukuran tidak dipakai." }),
   C({ level: "Sangat menantang", prompt: "Hitunglah banyaknya bangun datar pada perahu.", parts: [{ kind: "count", picture: "perahu", cats: ["semua"] }], explanation: "Ada 2 layar segitiga, 1 tiang, 1 badan perahu, dan 1 matahari. Semuanya 5 bangun datar." }),
-  A({ level: "Sangat menantang", prompt: "Hubungkan garis putus-putusnya. Lalu pilih namanya.", parts: [{ kind: "trace", fig: fig("diamond", 64, 64, "pink"), answer: SE }], explanation: "Bangun ini diputar, tetapi sisinya tetap 4 dan semuanya lurus. Jadi segi empat." }),
+  A({ level: "Sangat menantang", prompt: "Lingkari semua benda yang bentuknya sama dengan rambu ini.", scene: { type: "ref", obj: "rambu" }, parts: [{ kind: "multi", label: "Bentuknya sama:", ref: "rambu", items: ["penggaris", "amplop", "semangka", "kukis", "gantungan", "pintu"], answers: [0, 2, 4] }], explanation: "Rambu peringatan berbentuk segitiga. Penggaris segitiga, potongan semangka, dan gantungan baju juga segitiga. Amplop dan pintu segi empat, kue kering lengkung." }),
   B({ level: "Sangat menantang", prompt: "Kelompokkan berdasarkan ukuran.", parts: [{ kind: "sort", same: true, items: [fig("tri", 20, 18, "merah"), fig("rect", 42, 40, "kuning"), fig("circle", 18, 18, "kuning"), fig("right", 44, 44, "merah"), fig("diamond", 20, 20, "hijau"), fig("circle", 44, 44, "hijau")], bins: ["Besar", "Kecil"], answer: [1, 0, 1, 0, 1, 0] }], explanation: "Segi empat kuning, segitiga siku-siku merah, dan lingkaran hijau besar. Tiga lainnya kecil. Warnanya tercampur, jadi lihat ukurannya saja." }),
   C({ level: "Sangat menantang", prompt: "Lingkari pasangannya agar mainan menjadi utuh.", parts: [{ kind: "puzzle", puzzle: "kunci", answer: 0 }], explanation: "Lubangnya punya kepala bulat dan kaki lurus. Potongan a pas. Potongan b kepalanya terlalu kecil, potongan c tidak punya kepala bulat." }),
 ];

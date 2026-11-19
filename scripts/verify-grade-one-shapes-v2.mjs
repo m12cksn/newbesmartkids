@@ -1,7 +1,7 @@
 // Verifikasi Kelas 1 Bab 4 Mengenal Bentuk: susunan soal dan kunci yang dihitung ulang dari bentuk, warna, ukuran, dan gambar.
 // Jalankan: node --experimental-strip-types scripts/verify-grade-one-shapes-v2.mjs
 import assert from "node:assert/strict";
-import { assessment as Q, practice, topics, answerKey, correct, ready, catName, itemCat, formCat, area, pictures, countOf, puzzles, paintKey, fits } from "../src/data/grade-one-shapes-v2.ts";
+import { assessment as Q, practice, topics, answerKey, correct, ready, catName, itemCat, formCat, area, pictures, countOf, puzzles, paintKey, fits, formatAnswer } from "../src/data/grade-one-shapes-v2.ts";
 
 const all = [...practice.flat(), ...Q];
 assert.equal(topics.length, 3); assert.equal(practice.length, 3);
@@ -13,9 +13,11 @@ assert.deepEqual([lv("Sedang"), lv("Menantang"), lv("Sangat menantang")], [8, 9,
 for (let t = 0; t < 3; t++) assert.equal(Q.filter(q => q.topic === t).length, 8, `evaluasi subtopik ${topics[t].code} 8 soal`);
 for (let i = 1; i < Q.length; i++) assert.notEqual(Q[i].topic, Q[i - 1].topic, `soal ${i} dan ${i + 1} dari subtopik yang sama berurutan`);
 const kinds = new Set(Q.flatMap(q => q.parts.map(p => p.kind)));
-for (const k of ["match", "trace", "multi", "pick", "paint", "sort", "puzzle", "count", "slots"]) assert.ok(kinds.has(k), `evaluasi memakai bentuk jawaban ${k}`);
+for (const k of ["match", "multi", "pick", "paint", "sort", "puzzle", "count", "slots"]) assert.ok(kinds.has(k), `evaluasi memakai bentuk jawaban ${k}`);
 // Aksi geometri (tarik garis, kelompokkan, susun/lengkapi keping) harus banyak.
-const action = Q.filter(q => q.parts.some(p => ["match", "sort", "slots", "puzzle", "trace", "paint"].includes(p.kind))).length;
+const action = Q.filter(q => q.parts.some(p => ["match", "sort", "slots", "puzzle", "paint"].includes(p.kind))).length;
+// Hubungkan garis putus-putus hanya mengingat nama, jadi tidak dipakai di evaluasi.
+assert.ok(!kinds.has("trace"), "evaluasi tidak memakai soal sebut nama");
 assert.ok(action >= 12, `soal beraksi minimal 12, sekarang ${action}`);
 const pos = Q.flatMap(q => q.parts.filter(p => p.kind === "pick" || p.kind === "puzzle").map(p => p.answer));
 assert.ok(new Set(pos).size === 3, `posisi jawaban pilihan harus bervariasi: ${pos}`);
@@ -37,7 +39,8 @@ for (const q of all) {
     }
     if (p.kind === "trace") { assert.equal(p.answer, catName[formCat[p.fig.f]]); assert.ok(!correct({ ...q, parts: [p] }, `|${p.answer}`), "harus disambung dulu"); checked++; }
     if (p.kind === "multi") { const target = Object.entries(catName).find(([, v]) => p.label.toLowerCase().startsWith(v.toLowerCase()))?.[0];
-      if (target) { assert.deepEqual(p.items.map((it, k) => (itemCat(it) === target ? k : -1)).filter(k => k >= 0), p.answers, q.prompt); checked++; }
+      if (p.ref) { assert.deepEqual(p.items.map((it, k) => (itemCat(it) === itemCat(p.ref) ? k : -1)).filter(k => k >= 0), p.answers, q.prompt); assert.ok(!p.items.includes(p.ref)); checked++; }
+      else if (target) { assert.deepEqual(p.items.map((it, k) => (itemCat(it) === target ? k : -1)).filter(k => k >= 0), p.answers, q.prompt); checked++; }
       else { const ref = q.scene.figs[0]; assert.deepEqual(p.items.map((it, k) => (formCat[it.f] === formCat[ref.f] && it.c === ref.c ? k : -1)).filter(k => k >= 0), p.answers, q.prompt); checked++; } }
     if (p.kind === "pick" && q.scene?.type === "group") {
       const g = q.scene.figs, rule = /warna/.test(q.prompt) ? "warna" : /ukuran/.test(q.prompt) ? "ukuran" : "bentuk";
@@ -61,7 +64,9 @@ for (const q of all) {
     if (p.kind === "slots") { const pic = pictures[p.picture]; assert.deepEqual([...p.order].sort((a, b) => a - b), pic.figs.map((_, k) => k), "keping = semua bentuk gambar");
       assert.ok(!correct({ ...q, parts: [p] }, pic.figs.map((_, k) => k).join("|")) || p.order.every((o, k) => o === k), "urutan keping tidak boleh sama dengan tempat");
       // Pasang keping salah ukuran harus ditolak.
-      const v = answerKey([p]).split("|"); [v[0], v[1]] = [v[1], v[0]]; if (!fits(pic.figs[p.order[Number(v[0])]], pic.figs[0])) assert.ok(!correct({ ...q, parts: [p] }, v.join("|"))); checked++; }
+      const v = answerKey([p]).split("|"); [v[0], v[1]] = [v[1], v[0]]; if (!fits(pic.figs[p.order[Number(v[0])]], pic.figs[0])) { assert.ok(!correct({ ...q, parts: [p] }, v.join("|")));
+        // Pembahasan harus menunjukkan tempat yang salah, bukan hanya jumlah keping.
+        assert.notEqual(formatAnswer({ ...q, parts: [p] }, v.join("|")), formatAnswer({ ...q, parts: [p] }, answerKey([p]))); assert.match(formatAnswer({ ...q, parts: [p] }, v.join("|")), /tidak pas/); } checked++; }
   }
 }
 // Gambar soal tidak membocorkan jawaban: kelompok rujukan "satu ukuran" semuanya besar atau semuanya kecil.
