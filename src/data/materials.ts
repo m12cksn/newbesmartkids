@@ -44,18 +44,6 @@ export const materials: MaterialItem[] = [
   },
 
   {
-    id: "kelas-1-operasi-20",
-    classId: 1,
-    chapter: 6,
-    slug: "penjumlahan-dan-pengurangan-sampai-dengan-20",
-    title: "Penjumlahan dan Pengurangan sampai dengan 20",
-    topic: "Operasi hitung",
-    description: "Mengenal konsep lebih dari, kurang dari, dan selisih melalui penjumlahan serta pengurangan sampai 20.",
-    videoStatus: "coming_soon",
-    summary: "Gunakan penjumlahan dan pengurangan untuk membandingkan dua bilangan dan menemukan selisih. Hasil operasi tetap harus diperiksa agar tidak lebih dari 20.",
-    questionIds: [],
-  },
-  {
     id: "kelas-1-panjang-benda",
     classId: 1,
     chapter: 7,
