@@ -44,18 +44,6 @@ export const materials: MaterialItem[] = [
   },
 
   {
-    id: "kelas-1-membilang-20",
-    classId: 1,
-    chapter: 5,
-    slug: "membilang-sampai-dengan-20",
-    title: "Ayo Membilang sampai dengan 20",
-    topic: "Bilangan",
-    description: "Menghitung, membaca, menulis, mengurutkan, dan membandingkan bilangan sampai 20.",
-    videoStatus: "coming_soon",
-    summary: "Setelah memahami bilangan sampai 10, kita melanjutkan membilang sampai 20. Perhatikan urutan bilangan dan gunakan benda untuk membantu menghitung dengan tepat.",
-    questionIds: [],
-  },
-  {
     id: "kelas-1-operasi-20",
     classId: 1,
     chapter: 6,
