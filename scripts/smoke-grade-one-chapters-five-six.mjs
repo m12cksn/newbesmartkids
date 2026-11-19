@@ -5,7 +5,8 @@ const root="http://127.0.0.1:3000/kelas/matematika-dasar-kelas-1/materi/";
 try {
  for(const width of [320,390,768,1280]){
   const page=await browser.newPage({viewport:{width,height:900},hasTouch:width<768});
-  for(const chapter of [5,6]){
+  // Bab 5 Membilang sampai 20 diuji oleh scripts/smoke-grade-one-count20-v2.mjs.
+  for(const chapter of [6]){
    await page.goto(root+(chapter===5?"membilang-sampai-dengan-20":"penjumlahan-dan-pengurangan-sampai-dengan-20"));
    await page.getByRole(chapter===5?"button":"tab",{name:chapter===5?/^D\. Membandingkan/:/^C\. Pengurangan/}).click();
    await page.getByRole("button",{name:new RegExp(`^Evaluasi Bab ${chapter}`)}).click();
