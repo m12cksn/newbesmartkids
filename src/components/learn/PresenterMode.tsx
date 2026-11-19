@@ -22,8 +22,10 @@ const TOOLS: { id: Tool; label: string; key: string; Icon: typeof Crosshair }[] 
 ];
 const INKS = [{ id: "merah", label: "Merah", c: "#d92d20" }, { id: "biru", label: "Biru", c: "#1d63c9" }, { id: "hitam", label: "Hitam", c: "#1f2420" }] as const;
 const LASER_MS = 650, INK_W = 4, ERASE_R = 14;
-/** Coretan tersentuh penghapus bila salah satu titiknya dekat dengan (x, y). */
-const touches = (s: InkStroke, x: number, y: number) => { for (let i = 0; i < s.p.length; i += 2) if (Math.hypot(s.p[i] - x, s.p[i + 1] - y) <= ERASE_R + INK_W / 2) return true; return false; };
+/** Jarak titik (x, y) ke ruas garis (ax, ay)–(bx, by). */
+const segDist = (x: number, y: number, ax: number, ay: number, bx: number, by: number) => { const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy, t = l ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / l)) : 0; return Math.hypot(x - (ax + t * dx), y - (ay + t * dy)); };
+/** Coretan tersentuh penghapus bila (x, y) dekat dengan garisnya, termasuk bagian di antara titik-titik sampel. */
+const touches = (s: InkStroke, x: number, y: number) => { const p = s.p, r = ERASE_R + INK_W / 2; if (p.length === 2) return Math.hypot(p[0] - x, p[1] - y) <= r; for (let i = 0; i + 3 < p.length; i += 2) if (segDist(x, y, p[i], p[i + 1], p[i + 2], p[i + 3]) <= r) return true; return false; };
 type Pt = { x: number; y: number; t: number };
 type InkStroke = { c: string; p: number[] }; // p = [x0, y0, x1, y1, …] dalam koordinat halaman (sudah ditambah scroll)
 

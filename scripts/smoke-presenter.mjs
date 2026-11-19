@@ -66,6 +66,11 @@ try {
     await page.keyboard.press("e"); assert.equal(await bar.getAttribute("data-tool"), "hapus");
     await page.mouse.move(100, 330 + 18); await page.mouse.down(); await page.mouse.move(110, 330 + 21, { steps: 4 }); await page.mouse.up(); await page.waitForTimeout(80);
     assert.equal(await cv.getAttribute("data-ink"), "1", "penghapus menghapus coretan yang tersentuh"); assert.equal(await inked(page, [29, 99, 201]), 0, "coretan biru hilang"); assert.ok(await inked(page, [217, 45, 32]) > 50, "coretan merah tetap");
+    // Garis panjang dengan titik sampel berjauhan: menghapus di tengah garis tetap kena.
+    await page.keyboard.press("p"); await page.mouse.move(60, 420); await page.mouse.down(); await page.mouse.move(260, 420); await page.mouse.up(); await page.waitForTimeout(80);
+    assert.equal(await cv.getAttribute("data-ink"), "2");
+    await page.keyboard.press("e"); await page.mouse.move(160, 424); await page.mouse.down(); await page.mouse.up(); await page.waitForTimeout(80);
+    assert.equal(await cv.getAttribute("data-ink"), "1", "penghapus mengenai bagian garis di antara titik sampel");
     await page.keyboard.press("p");
     // Coretan menempel pada halaman: ikut bergeser saat digulir.
     const top = () => cv.evaluate(c => { const x = c.getContext("2d"), d = x.getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) return Math.floor(i / 4 / c.width) / (devicePixelRatio || 1); return -1; });
