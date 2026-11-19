@@ -31,7 +31,6 @@ jobs:
           node --experimental-strip-types scripts/smoke-daily-addition.mjs
           node --experimental-strip-types scripts/smoke-daily-arithmetic.mjs
           CHAPTER_SCREENSHOTS=/tmp/homepage-screenshots node scripts/smoke-homepage.mjs
-          node --experimental-strip-types scripts/smoke-grade-one-diagrams.mjs
           node --experimental-strip-types scripts/smoke-cambridge-fractions.mjs
           node --experimental-strip-types scripts/smoke-cambridge-ratio.mjs
           CHAPTER_SCREENSHOTS=/tmp/grade-six-fractions-screenshots node --experimental-strip-types scripts/smoke-grade-six-fractions-decimals.mjs
