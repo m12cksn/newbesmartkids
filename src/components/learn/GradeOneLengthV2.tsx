@@ -248,14 +248,14 @@ function BandingLab() {
   const [lens, setLens] = useState([11, 8, 6]), [even, setEven] = useState(false);
   const [hs, setHs] = useState([8, 6, 10, 8]), [ys, setYs] = useState([5, 3, 7]);
   const upd = (arr: number[], f: (a: number[]) => void, k: number) => (v: number) => f(arr.map((x, j) => (j === k ? v : x)));
-  const shift = [0, 3, 1.5];
+  const shift = [0, 3, 1.5], maxLen = 12;
   const kupu: Color[] = ["merah", "kuning", "hijau"];
   return <div className="space-y-2.5"><Tabs tabs={bandingTabs} tab={tab} set={setTab} label="Yang dibandingkan" />
     {tab === "panjang" && <>
-      <svg viewBox="0 0 168 66" className={`${svgCls} max-w-md`} style={{ maxHeight: "26vh" }} role="img" aria-label={`Pensil biru ${lens[0]}, merah ${lens[1]}, hijau ${lens[2]} kotak`}>
+      <svg viewBox={`0 0 ${8 + Math.max(...shift) * 10 + maxLen * 12 + 4} 66`} className={`${svgCls} max-w-md`} style={{ maxHeight: "26vh" }} role="img" aria-label={`Pensil biru ${lens[0]}, merah ${lens[1]}, hijau ${lens[2]} kotak`}>
         <line x1={8} x2={8} y1={0} y2={66} stroke="#555" strokeWidth={0.7} strokeDasharray="3 2" />
         {lens.map((l, k) => <HArt key={k} obj="pensil" x={8 + (even ? 0 : shift[k] * 10)} y={10 + k * 22} len={l * 12} color={pencilColors[k]} />)}</svg>
-      <div className="grid grid-cols-3 gap-1.5">{lens.map((l, k) => <Stepper key={k} label={`Pensil ${colorName[pencilColors[k]]}`} value={l} set={upd(lens, setLens, k)} min={4} max={12} down="pendekkan" up="panjangkan" />)}</div>
+      <div className="grid grid-cols-3 gap-1.5">{lens.map((l, k) => <Stepper key={k} label={`Pensil ${colorName[pencilColors[k]]}`} value={l} set={upd(lens, setLens, k)} min={4} max={maxLen} down="pendekkan" up="panjangkan" />)}</div>
       <button type="button" className="btn btn-success btn-sm gap-1" onClick={() => setEven(!even)}>{even ? <><RotateCcw className="size-4" aria-hidden="true" />Geser lagi</> : "Ratakan ujung kiri"}</button>
       <Result value={`panjang:${lens.join(":")}:${even ? 1 : 0}`}>{even ? compare(pencilColors.map(c => `Pensil ${colorName[c]}`), lens, "panjang", "pendek", "sama panjang") : "Ujung kiri pensil belum rata. Ratakan dulu supaya perbandingannya adil."}</Result></>}
     {tab === "tinggi" && <>
