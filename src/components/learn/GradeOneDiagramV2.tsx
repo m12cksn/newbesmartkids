@@ -58,7 +58,7 @@ function PictoView({ s }: { s: Extract<Scene, { type: "picto" }> }) {
 }
 function SceneView({ scene }: { scene: Scene }) {
   switch (scene.type) {
-    case "scatter": return <div role="img" aria-label={`${scene.items.length} benda bercampur`} className="flex w-full justify-center"><Scatter items={scene.items} /></div>;
+    case "scatter": return <div role="img" aria-label={`${scene.items.length} benda bercampur: ${scene.items.map(itemName).join(", ")}`} className="flex w-full justify-center"><Scatter items={scene.items} /></div>;
     case "list": return <ListView s={scene} />;
     case "table": return <TableView title={scene.title} head={scene.head} orient={scene.orient} rows={scene.rows} cell={k => scene.rows[k].n} />;
     case "picto": return <PictoView s={scene} />;

@@ -59,6 +59,8 @@ try {
     await page.getByRole("heading", { name: "Mengenal Diagram", level: 1 }).waitFor();
     await page.getByText("Video pembelajaran segera hadir").waitFor();
     await fit("awal");
+    // Pembaca layar: setiap benda pada gambar bercampur disebut namanya.
+    const scatterLabel = scene => `${scene.items.length} benda bercampur: ${scene.items.map(itemName).join(", ")}`;
 
     const tab = name => page.getByRole("tab", { name, exact: true });
     const labChecks = {
@@ -103,6 +105,7 @@ try {
       await page.getByText(`Soal ${i + 1}/24`).waitFor();
       assert.equal(await button("Lanjut →").count(), 0, `evaluasi ${i + 1} terkunci sebelum dijawab`);
       await fitsScreen(quiz, `evaluasi ${i + 1} sebelum menjawab`);
+      if (q.scene?.type === "scatter") await page.getByRole("img", { name: scatterLabel(q.scene), exact: true }).waitFor();
       await answer(q, i === 0 ? wrong(q) : q.answer);
       await fit(`evaluasi ${i + 1}`); await fitsScreen(quiz, `evaluasi ${i + 1}`); await rightEdge(`evaluasi ${i + 1}`);
       await quiz.scrollIntoViewIfNeeded(); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
