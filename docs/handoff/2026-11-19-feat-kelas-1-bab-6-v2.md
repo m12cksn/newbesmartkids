@@ -17,6 +17,7 @@
 - verify: 66 kunci dihitung ulang (operasi di kalimat, pita bilangan, pemisahan bilangan, kolom tanpa menyimpan/meminjam, selisih dari gambar, tanda operasi, arah gambar dua kelompok).
 - eslint berkas bab, `npm run build`.
 - smoke mode ketat 320×640, 390×844, 768×1024, 1280×800 + 320×800 (tepi kanan saja): jalur klik dari halaman kelas, ketiga peraga, 12 latihan (1 salah disengaja), 24 evaluasi, muat di layar sebelum menjawab, tidak ada isi yang melewati tepi kanan, skor 96 dan pembahasan.
+- Temuan Codex diperbaiki: soal 18 dan 20 kini memberi pertanyaan untuk tiap operasi (a., b.); peraga "Dengan 10" memakai angka sendiri (merah 5–9, hijau cukup untuk melewati 10) dan bingkai dua warna.
 - Catatan: di 320×800 (tanpa zoom tinggi-layar) latihan A1, A3, dan evaluasi 10 sedikit lebih tinggi dari layar.
 
 ## Sisa

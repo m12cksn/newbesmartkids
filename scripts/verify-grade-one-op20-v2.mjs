@@ -45,6 +45,8 @@ for (const q of all) {
   // Kelompok yang ditanyakan ("?") tidak boleh tergambar jumlahnya; angka yang tergambar sesuai kalimat.
   if (g) for (const it of g) if (it.n !== null && /mempunyai|memiliki|Ada \d/.test(q.prompt)) assert.ok(nums(q.prompt).includes(it.n) || !/\d/.test(q.prompt), `${q.prompt}: gambar ${it.n} tidak ada di kalimat`);
 }
+// Soal dengan lebih dari satu operasi harus menyebutkan apa yang dihitung setiap operasi.
+for (const q of all) { const eqs = q.parts.filter(p => p.kind === "eq"); if (eqs.length > 1) assert.ok(eqs.every(p => p.label && p.label.endsWith("?")), `${q.prompt}: operasi tanpa pertanyaan`); }
 assert.notEqual(formatAnswer(Q[11], "1|2|3|4"), formatAnswer(Q[11], Q[11].answer), "pembahasan menunjukkan isian anak");
 assert.ok(checked >= 45, `kunci yang dihitung ulang ${checked}`);
 console.log(`Kelas 1 Bab 6 OK: ${topics.length} subtopik, ${practice.flat().length} latihan, ${Q.length} evaluasi (tingkat ${lv("Sedang")}/${lv("Menantang")}/${lv("Sangat menantang")}), ${action} soal beraksi, ${checked} kunci dihitung ulang, bentuk ${[...kinds].join(", ")}`);

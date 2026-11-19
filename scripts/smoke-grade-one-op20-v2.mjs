@@ -20,7 +20,6 @@ try {
     const errors = []; page.on("pageerror", e => errors.push(e.message)); page.on("console", m => { if (m.type() === "error" && !/401|Failed to load resource/.test(m.text())) errors.push(m.text()); });
     const button = name => page.getByRole("button", { name, exact: true });
     const box = name => page.getByRole("textbox", { name, exact: true });
-    const group = name => page.getByRole("group", { name, exact: true });
     const fit = async label => { const s = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth })); assert.ok(s.scroll <= s.inner, `overflow ${width} ${label}: ${JSON.stringify(s)}`); };
     const room = () => page.evaluate(() => innerHeight - document.querySelector("header").getBoundingClientRect().height);
     // 320×800 hanya untuk memeriksa tepi kanan; tinggi layar dinilai ketat di empat ukuran standar.
@@ -51,7 +50,9 @@ try {
     const tab = name => page.getByRole("tab", { name, exact: true });
     const labChecks = {
       selisih: async () => { assert.equal(await result(), "selisih:7:6"); for (let k = 0; k < 3; k++) await button("Tika tambah").click(); assert.equal(await result(), "selisih:7:9"); await page.getByTestId("lab-result").getByText("Selisihnya 9 − 7 = 2", { exact: false }).waitFor(); },
-      tambah: async () => { assert.equal(await result(), "maju:7:6"); await tab("Dengan 10").click(); assert.equal(await result(), "sepuluh:7:6:0"); await button("Penuhi bingkai 10").click(); assert.equal(await result(), "sepuluh:7:6:1"); await tab("Nilai tempat").click(); assert.equal(await result(), "tempat:12:3"); },
+      tambah: async () => { assert.equal(await result(), "maju:7:6"); await tab("Dengan 10").click(); assert.equal(await result(), "sepuluh:7:6:0"); await button("Penuhi bingkai 10").click(); assert.equal(await result(), "sepuluh:7:6:1");
+        // Biru selalu cukup untuk melewati 10: merah 9 memaksa minimal 2 biru, merah 5 minimal 6 biru.
+        for (let k = 0; k < 2; k++) await button("Merah kurangi").click(); assert.equal(await result(), "sepuluh:5:6:0"); assert.ok(await button("Hijau kurangi").isDisabled(), "biru tidak boleh kurang dari 6 saat merah 5"); await tab("Nilai tempat").click(); assert.equal(await result(), "tempat:12:3"); },
       kurang: async () => { assert.equal(await result(), "mundur:15:3"); await tab("Pasangan bilangan").click(); assert.equal(await result(), "pasangan:15:0"); await button("Apel satuan 2").click(); assert.equal(await result(), "pasangan:15:2"); },
     };
     for (const [t, set] of practice.entries()) {

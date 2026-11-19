@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Eraser, Minus, Plus, RotateCcw } from "lucide-re
 import { useRef, useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { Art } from "./GradeOneSub10Art";
-import { PvScene, TenFrames } from "./GradeOneCount20Art";
+import { PvScene } from "./GradeOneCount20Art";
 import { assessment, cells, columnValue, correct, formatAnswer, practice, ready, SEP, splitParts, topics, type Op, type Part, type Scene, type Slot, type SQuestion, type Thing } from "@/data/grade-one-op20-v2";
 import { thingName } from "@/data/grade-one-sub10-v2";
 
@@ -61,12 +61,12 @@ function Column({ p, x, put, disabled, i }: { p: Extract<Part, { kind: "column" 
       <tr className="border-t-4 border-neutral"><td className={`${td} border-b-2`}>{at("rt")}</td><td className={`${td} border-b-2`}>{at("ro")}</td></tr></tbody></table>
     <span className="text-4xl font-extrabold" aria-label={p.op === "+" ? "ditambah" : "dikurangi"}>{p.op}</span></div>;
 }
-function Eq({ x, put, disabled, i }: { x: string[]; put: (k: number, v: string) => void; disabled: boolean; i: number }) {
-  return <div className="flex flex-wrap items-center gap-1.5 text-3xl font-extrabold">
+function Eq({ x, put, disabled, i, label }: { x: string[]; put: (k: number, v: string) => void; disabled: boolean; i: number; label?: string }) {
+  return <div className="space-y-1">{label && <p className="text-lg font-bold">{label}</p>}<div className="flex flex-wrap items-center gap-1.5 text-3xl font-extrabold">
     <NumBox label={`Bagian ${i + 1} bilangan pertama`} value={x[0]} onChange={v => put(0, v)} disabled={disabled} />
     <span role="radiogroup" aria-label={`Bagian ${i + 1} tanda`} className="flex gap-1 rounded-2xl border-4 border-orange-400 p-0.5">{(["+", "−"] as Op[]).map(o => <button key={o} type="button" role="radio" aria-checked={x[1] === o} aria-label={o === "+" ? "tambah" : "kurang"} disabled={disabled} onClick={() => put(1, o)} className={`grid size-10 place-items-center rounded-xl border-2 ${sel(x[1] === o)}`}>{o}</button>)}</span>
     <NumBox label={`Bagian ${i + 1} bilangan kedua`} value={x[2]} onChange={v => put(2, v)} disabled={disabled} /><span>=</span>
-    <NumBox label={`Bagian ${i + 1} hasil`} value={x[3]} onChange={v => put(3, v)} disabled={disabled} /></div>;
+    <NumBox label={`Bagian ${i + 1} hasil`} value={x[3]} onChange={v => put(3, v)} disabled={disabled} /></div></div>;
 }
 function Draw({ p, x, put, disabled }: { p: Extract<Part, { kind: "draw" }>; x: string[]; put: (k: number, v: string) => void; disabled: boolean }) {
   return <div className="grid grid-cols-2 gap-2">{["A", "B"].map((g, k) => { const n = Number(x[k] || 0);
@@ -89,7 +89,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
     case "hop": return <Hop p={p} value={value} set={set} checked={checked} />;
     case "split": return <Split p={p} x={x} put={put} disabled={checked} />;
     case "column": return <Column p={p} x={x} put={put} disabled={checked} i={i} />;
-    case "eq": return <Eq x={x} put={put} disabled={checked} i={i} />;
+    case "eq": return <Eq x={x} put={put} disabled={checked} i={i} label={p.label} />;
     case "draw": return <Draw p={p} x={x} put={put} disabled={checked} />;
   }
 }
@@ -128,20 +128,27 @@ function SelisihLab() {
 const tambahTabs = [["maju", "Hitung maju"], ["sepuluh", "Dengan 10"], ["tempat", "Nilai tempat"]] as const;
 function TambahLab() {
   const [tab, setTab] = useState<(typeof tambahTabs)[number][0]>("maju");
-  const [a, setA] = useState(7), [b, setB] = useState(6), [moved, setMoved] = useState(false);
+  const [a, setA] = useState(7), [b, setB] = useState(6);
+  // Bingkai 10 punya angka sendiri: merah 5–9 dan biru cukup untuk melewati 10 (hasil 11–18).
+  const [r, setR] = useState(7), [u, setU] = useState(6), [moved, setMoved] = useState(false);
   const [c, setC] = useState(12), [d, setD] = useState(3);
-  const fill = Math.min(10 - a, b);
+  const fill = 10 - r;
   return <div className="space-y-3"><Tabs tabs={tambahTabs} tab={tab} set={setTab} label="Cara penjumlahan" />
     {tab === "maju" && <><div className="flex flex-wrap gap-3"><Stepper label="Mulai" value={a} set={setA} min={1} max={14} /><Stepper label="Maju" value={b} set={setB} min={1} max={Math.min(9, 20 - a)} /></div>
       <Track from={a} to={a + b} /><Result value={`maju:${a}:${b}`}>Dari {a} maju {b} langkah: {Array.from({ length: b }, (_, k) => a + k + 1).join(", ")}. Jadi {a} + {b} = {a + b}.</Result></>}
-    {tab === "sepuluh" && <><div className="flex flex-wrap gap-3"><Stepper label="Merah" value={a} set={v => { setA(v); setMoved(false); }} min={5} max={9} /><Stepper label="Biru" value={b} set={v => { setB(v); setMoved(false); }} min={2} max={9} /></div>
-      <div className="flex flex-wrap items-center justify-center gap-3"><TenFrames n={moved ? 10 : a} cell={26} />{!moved && <Group thing="kelereng" alt n={b} size={24} />}{moved && b - fill > 0 && <span className="text-sm font-bold">sisa {b - fill} di bingkai kedua</span>}</div>
+    {tab === "sepuluh" && <><div className="flex flex-wrap gap-3"><Stepper label="Merah" value={r} set={v => { setR(v); setU(Math.max(u, 11 - v)); setMoved(false); }} min={5} max={9} /><Stepper label="Hijau" value={u} set={v => { setU(v); setMoved(false); }} min={11 - r} max={9} /></div>
+      <div className="flex flex-wrap items-center justify-center gap-3"><MixedFrames red={r} blue={moved ? u : 0} />{!moved && <Group thing="kelereng" alt n={u} size={24} />}</div>
       <button type="button" className="btn btn-success gap-1" onClick={() => setMoved(!moved)}>{moved ? <><RotateCcw className="size-4" aria-hidden="true" />Pisahkan lagi</> : "Penuhi bingkai 10"}</button>
-      <Result value={`sepuluh:${a}:${b}:${moved ? 1 : 0}`}>{moved ? `${b} dipisah menjadi ${fill} dan ${b - fill}. ${a} + ${fill} = 10, lalu 10 + ${b - fill} = ${a + b}.` : `${a} merah dan ${b} biru. Ketuk Penuhi bingkai 10.`}</Result></>}
+      <Result value={`sepuluh:${r}:${u}:${moved ? 1 : 0}`}>{moved ? `${u} dipisah menjadi ${fill} dan ${u - fill}. ${r} + ${fill} = 10, lalu 10 + ${u - fill} = ${r + u}.` : `${r} merah dan ${u} hijau. Ketuk Penuhi bingkai 10.`}</Result></>}
     {tab === "tempat" && <><div className="flex flex-wrap gap-3"><Stepper label="Bilangan" value={c} set={setC} min={11} max={15} /><Stepper label="Tambah" value={d} set={setD} min={1} max={4} /></div>
       <Column p={{ kind: "column", a: c, op: "+", b: d, blanks: [] }} x={[]} put={() => undefined} disabled i={0} />
       <Result value={`tempat:${c}:${d}`}>Satuan: {c % 10} + {d} = {(c % 10) + d}. Puluhan tetap 1. Jadi {c} + {d} = {c + d}.</Result></>}
   </div>;
+}
+/** Dua bingkai 10: merah dulu, lalu biru mengisi sisa bingkai pertama dan berlanjut ke bingkai kedua. */
+function MixedFrames({ red, blue }: { red: number; blue: number }) {
+  const cell = (k: number) => <span key={k} className="grid size-7 place-items-center border border-neutral/20 sm:size-8">{k < red ? <Art thing="kelereng" className="size-[85%]" /> : k < red + blue ? <Art thing="kelereng" alt className="size-[85%]" /> : null}</span>;
+  return <span role="img" aria-label={`${red} kelereng merah dan ${blue} kelereng hijau dalam bingkai 10`} className="inline-flex flex-col gap-1">{[0, 1].map(f => <span key={f} className="grid grid-cols-5 border-2 border-neutral/40 bg-white">{Array.from({ length: 10 }, (_, j) => cell(f * 10 + j))}</span>)}</span>;
 }
 const kurangTabs = [["mundur", "Hitung mundur"], ["pasangan", "Pasangan bilangan"]] as const;
 function KurangLab() {

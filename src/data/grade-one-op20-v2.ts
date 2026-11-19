@@ -35,7 +35,7 @@ export type Part =
   /** Tabel nilai tempat bersusun. */
   | { kind: "column"; a: number; op: Op; b: number; blanks: Slot[] }
   /** Tulis operasi lengkap: … [tanda] … = … */
-  | { kind: "eq"; a: number; op: Op; b: number }
+  | { kind: "eq"; a: number; op: Op; b: number; label?: string }
   /** Gambar dua kelompok: A `diff` kurangnya (less = "A") atau lebihnya (less = "B") dari B. */
   | { kind: "draw"; diff: number; less: "A" | "B"; thing: Thing };
 export type SQuestion = Question & { topic: number; level?: Level; scene?: Scene; parts: Part[] };
@@ -104,7 +104,7 @@ export function formatAnswer(q: SQuestion, raw: string): string {
       case "hop": return `${p.start} ${p.op} ${p.steps} = ${v[i] || "…"}`;
       case "split": { let k = 0; const f = (n: number | null) => (n === null ? x[k++] || "…" : String(n)); return `${p.which ? p.b : p.a} dipisah menjadi ${f(p.parts[0])} dan ${f(p.parts[1])}`; }
       case "column": return p.blanks.map((s, k) => `${{ at: "puluhan bilangan pertama", ao: "satuan bilangan pertama", b: "bilangan kedua", rt: "puluhan hasil", ro: "satuan hasil" }[s]} ${x[k] || "…"}`).join(", ");
-      case "eq": return `${x[0] || "…"} ${x[1] || "□"} ${x[2] || "…"} = ${x[3] || "…"}`;
+      case "eq": return `${p.label ? `${p.label} ` : ""}${x[0] || "…"} ${x[1] || "□"} ${x[2] || "…"} = ${x[3] || "…"}`;
       case "draw": return `A ada ${x[0] || 0}, B ada ${x[1] || 0}`;
     }
   }).join(" | ");
@@ -144,7 +144,7 @@ const make = (topic: number) => (s: Spec): SQuestion => ({ ...s, topic, answer: 
 const [A, B, C] = [make(0), make(1), make(2)];
 const fill = (text: string, ...answers: number[]): Part => ({ kind: "fill", text, answers });
 const two = (t1: Thing, n1: number | null, l1: string, t2: Thing, n2: number | null, l2: string, alt2 = false): Scene => ({ type: "groups", items: [{ thing: t1, n: n1, label: l1 }, { thing: t2, n: n2, label: l2, alt: alt2 }] });
-const eq = (a: number, op: Op, b: number): Part => ({ kind: "eq", a, op, b });
+const eq = (a: number, op: Op, b: number, label?: string): Part => ({ kind: "eq", a, op, b, label });
 
 /* ---------- Latihan (4 soal per subtopik) ---------- */
 export const practice: SQuestion[][] = [
@@ -189,9 +189,9 @@ export const assessment: SQuestion[] = [
   A({ level: "Menantang", prompt: "Gambarlah dua kelompok benda. Banyak benda A 4 lebihnya dari banyak benda B.", parts: [{ kind: "draw", diff: 4, less: "B", thing: "kupu" }], explanation: "Kali ini A yang lebih banyak. Contohnya A ada 6 dan B ada 2, karena 6 − 2 = 4." }),
   B({ level: "Menantang", prompt: "Hitunglah 14 + 5 dengan tabel nilai tempat.", parts: [{ kind: "column", a: 14, op: "+", b: 5, blanks: ["rt", "ro"] }, fill("14 + 5 = □", 19)], explanation: "Satuan: 4 + 5 = 9. Puluhan tetap 1. Jadi 19." }),
 
-  C({ level: "Sangat menantang", prompt: "Wei mempunyai 12 pensil. Pensil Kira 4 kurangnya dari pensil Wei.", scene: two("pensil", 12, "Wei", "pensil", null, "Kira"), parts: [eq(12, "−", 4), eq(12, "+", 8)], explanation: "Kira: 12 − 4 = 8. Jumlah pensil mereka: 12 + 8 = 20." }),
+  C({ level: "Sangat menantang", prompt: "Wei mempunyai 12 pensil. Pensil Kira 4 kurangnya dari pensil Wei.", scene: two("pensil", 12, "Wei", "pensil", null, "Kira"), parts: [eq(12, "−", 4, "a. Berapa pensil Kira?"), eq(12, "+", 8, "b. Berapa jumlah pensil Wei dan Kira?")], explanation: "Kira: 12 − 4 = 8. Jumlah pensil mereka: 12 + 8 = 20." }),
   A({ level: "Sangat menantang", prompt: "Ada 9 kepik di taman. Banyak kupu-kupu 3 kurangnya dari kepik.", scene: two("kepik", 9, "kepik", "kupu", null, "kupu-kupu"), parts: [fill("Kupu-kupu ada □.", 6), fill("Jumlah kepik dan kupu-kupu ada □.", 15)], explanation: "3 kurangnya dari 9: 9 − 3 = 6 kupu-kupu. Jumlahnya 9 + 6 = 15." }),
-  B({ level: "Sangat menantang", prompt: "Upe memiliki 7 bola. Bola Kira 4 lebihnya dari bola Upe.", scene: two("bola", 7, "Upe", "bola", null, "Kira"), parts: [eq(7, "+", 4), eq(7, "+", 11)], explanation: "Kira: 7 + 4 = 11. Jika digabungkan: 7 + 11 = 18." }),
+  B({ level: "Sangat menantang", prompt: "Upe memiliki 7 bola. Bola Kira 4 lebihnya dari bola Upe.", scene: two("bola", 7, "Upe", "bola", null, "Kira"), parts: [eq(7, "+", 4, "a. Berapa bola Kira?"), eq(7, "+", 11, "b. Berapa jumlah bola Upe dan Kira jika digabungkan?")], explanation: "Kira: 7 + 4 = 11. Jika digabungkan: 7 + 11 = 18." }),
   C({ level: "Sangat menantang", prompt: "Hitunglah pengurangan berikut.", parts: [fill("18 − 6 = □", 12), fill("15 − 4 = □", 11), fill("19 − 5 = □", 14), fill("16 − 3 = □", 13)], explanation: "Kurangkan satuannya, puluhannya tetap 1: 8 − 6 = 2, 5 − 4 = 1, 9 − 5 = 4, 6 − 3 = 3." }),
   A({ level: "Sangat menantang", prompt: "Ada 12 balon merah. Balon kuning 3 kurangnya dari balon merah.", scene: two("balon", 12, "merah", "balon", null, "kuning", true), parts: [fill("12 − 3 = □", 9), fill("Balon kuning ada □.", 9)], explanation: "3 kurangnya dari 12: 12 − 3 = 9 balon kuning." }),
   B({ level: "Sangat menantang", prompt: "Hitunglah penjumlahan berikut.", parts: [fill("13 + 5 = □", 18), fill("11 + 6 = □", 17), fill("15 + 4 = □", 19), fill("12 + 3 = □", 15)], explanation: "Jumlahkan satuannya, puluhannya tetap 1: 3 + 5 = 8, 1 + 6 = 7, 5 + 4 = 9, 2 + 3 = 5." }),
