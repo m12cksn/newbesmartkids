@@ -44,18 +44,6 @@ export const materials: MaterialItem[] = [
   },
 
   {
-    id: "kelas-1-mengenal-bentuk",
-    classId: 1,
-    chapter: 4,
-    slug: "mengenal-bentuk",
-    title: "Mengenal Bentuk",
-    topic: "Geometri",
-    description: "Mendeskripsikan benda berdasarkan bentuk, mengelompokkan benda, serta menyusun dan mengurai bentuk bangun.",
-    videoStatus: "coming_soon",
-    summary: "Benda di sekitar memiliki bentuk yang berbeda. Kita dapat mengenali ciri bentuk, mengelompokkan benda yang bentuknya sama, dan menyusun beberapa bentuk menjadi bangun baru.",
-    questionIds: [],
-  },
-  {
     id: "kelas-1-membilang-20",
     classId: 1,
     chapter: 5,

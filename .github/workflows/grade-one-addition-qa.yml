@@ -15,7 +15,6 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm install --no-audit --no-fund
-      - run: node --test scripts/verify-grade-one-shapes.mjs
       - run: node --experimental-strip-types scripts/verify-cambridge-fractions.mjs
       - run: node --experimental-strip-types scripts/verify-cambridge-ratio.mjs
       - run: node --experimental-strip-types scripts/verify-grade-six-fractions-decimals.mjs
@@ -32,7 +31,6 @@ jobs:
           node --experimental-strip-types scripts/smoke-daily-addition.mjs
           node --experimental-strip-types scripts/smoke-daily-arithmetic.mjs
           CHAPTER_SCREENSHOTS=/tmp/homepage-screenshots node scripts/smoke-homepage.mjs
-          node scripts/smoke-grade-one-shapes.mjs
           node scripts/smoke-grade-one-chapters-five-six.mjs
           node scripts/smoke-grade-one-measurement.mjs
           node --experimental-strip-types scripts/smoke-grade-one-diagrams.mjs
