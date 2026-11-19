@@ -43,18 +43,6 @@ export const materials: MaterialItem[] = [
     videoStatus: "coming_soon", summary: "Add, subtract, multiply and divide fractions, and use fractions as operators.", questionIds: [],
   },
 
-  {
-    id: "kelas-1-mengenal-diagram",
-    classId: 1,
-    chapter: 8,
-    slug: "mengenal-diagram",
-    title: "Mengenal Diagram",
-    topic: "Data",
-    description: "Mengelompokkan data sederhana dan membaca informasi dari diagram gambar.",
-    videoStatus: "coming_soon",
-    summary: "Data dapat dikumpulkan dan dikelompokkan. Diagram gambar membantu kita melihat jumlah setiap kelompok dengan lebih mudah.",
-    questionIds: [],
-  },
 ];
 
 export function getMaterialsByClass(classId: number) {
