@@ -231,7 +231,7 @@ export const topics = [
       "KPK: kalikan semua faktor prima, yang berpasangan cukup ditulis sekali. FPB: kalikan faktor prima yang berpasangan saja.",
       "Jika tidak ada faktor prima yang berpasangan, FPB-nya 1. Contoh: 15 = 3 × 5 dan 28 = 2 × 2 × 7, jadi FPB dari 15 dan 28 adalah 1.",
     ],
-    demo: "Pilih bilangan, lalu ketuk bilangan prima untuk memecahnya pada pohon faktor sampai semua ujungnya prima.",
+    demo: "Pilih dua bilangan dan buat pohon faktor keduanya. Faktor prima yang berpasangan diberi warna sama, lalu KPK dan FPB dihitung dari situ.",
   },
   {
     code: "F", title: "Menentukan KPK dan FPB dengan Pembagian Berulang", short: "Pembagian berulang",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
-import { assessment, practice, topics, SEP, cells, primeFactors, factorsOf, months } from "../src/data/grade-five-kpk-fpb.ts";
+import { assessment, practice, topics, SEP, cells, factorsOf, months } from "../src/data/grade-five-kpk-fpb.ts";
 
 const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000";
 const folder = process.env.CHAPTER_SCREENSHOTS ?? "/tmp/grade-five-kpk-fpb-screenshots";
@@ -67,7 +67,15 @@ try {
         for (const [k, n] of [[1, 12], [2, 18]]) { await page.getByRole("radio", { name: `Biji pemain ${k}` }).click(); for (const h of factorsOf(n)) await button(`Lubang ${h}`).click(); }
         assert.equal(await result(), "4"); await page.getByTestId("lab-result").filter({ hasText: "FPB dari 12 dan 18 adalah 6" }).waitFor();
       }
-      if (t === 4) { await button("Bagi dengan 7").click(); await page.getByText("300 tidak habis dibagi 7. Coba bilangan prima lain.").waitFor(); for (const p of [2, 2, 3, 5]) await button(`Bagi dengan ${p}`).click(); assert.equal(await result(), primeFactors(300).join(",")); }
+      if (t === 4) {
+        // Dua bilangan seperti di buku: 72 dan 150, lalu pasangan tanpa faktor bersama.
+        await button("Pohon 72 bagi dengan 7").click(); await page.getByText("72 tidak habis dibagi 7. Coba bilangan prima lain.").waitFor();
+        for (const p of [2, 2, 2, 3]) await button(`Pohon 72 bagi dengan ${p}`).click(); assert.equal(await result(), "");
+        for (const p of [2, 3, 5]) await button(`Pohon 150 bagi dengan ${p}`).click();
+        assert.equal(await result(), "1800|6"); await page.getByTestId("lab-result").filter({ hasText: "KPK = 2 × 3 × 2 × 2 × 3 × 5 × 5 = 1800" }).waitFor(); await page.getByTestId("lab-result").filter({ hasText: "FPB = 2 × 3 = 6" }).waitFor();
+        await button("15 dan 28").click(); await button("Pohon 15 bagi dengan 3").click(); for (const p of [2, 2]) await button(`Pohon 28 bagi dengan ${p}`).click();
+        assert.equal(await result(), "420|1"); await page.getByTestId("lab-result").filter({ hasText: "Tidak ada faktor prima yang berpasangan, jadi FPB = 1." }).waitFor();
+      }
       if (t === 5) {
         assert.equal(await result(), ""); await button("Bagi dengan 5").click(); await page.getByText("Tidak ada bilangan yang habis dibagi 5. Coba prima lain.").waitFor();
         for (const p of [2, 2, 3, 3]) await button(`Bagi dengan ${p}`).click();

@@ -73,7 +73,8 @@ function Calendar({ month, marks, picked, onTap, label, disabled }: { month: key
 }
 
 /** Pohon faktor bertingkat: setiap tingkat memecah sisa dengan satu bilangan prima. */
-function FactorTree({ n, primes, onSplit, onUndo, disabled }: { n: number; primes: number[]; onSplit: (p: number) => void; onUndo: () => void; disabled?: boolean }) {
+/** Pohon faktor satu bilangan. `who` memberi nama tombol bila ada dua pohon berdampingan. */
+function FactorTree({ n, primes, onSplit, onUndo, disabled, who }: { n: number; primes: number[]; onSplit: (p: number) => void; onUndo: () => void; disabled?: boolean; who?: string }) {
   const [msg, setMsg] = useState("");
   const levels = primes.reduce<{ p: number; rest: number }[]>((acc, p) => [...acc, { p, rest: (acc.at(-1)?.rest ?? n) / p }], []);
   const cur = levels.at(-1)?.rest ?? n;
@@ -86,7 +87,7 @@ function FactorTree({ n, primes, onSplit, onUndo, disabled }: { n: number; prime
         <span className={`rounded px-2 py-0.5 font-bold ${l.rest > 1 && !isPrime(l.rest) ? "bg-sky-100 text-sky-900" : "bg-sky-700 text-white"}`}>{l.rest}</span></div>)}
     </div>
     {!done && <div role="group" aria-label={`Pecah ${cur}`} className="flex flex-wrap items-center gap-1.5"><span className="text-xs">Bagi {cur} dengan:</span>
-      {[2, 3, 5, 7, 11, 13].map(p => <button key={p} type="button" aria-label={`Bagi dengan ${p}`} disabled={disabled} className="btn btn-sm btn-outline" onClick={() => { if (cur % p) setMsg(`${cur} tidak habis dibagi ${p}. Coba bilangan prima lain.`); else { setMsg(""); onSplit(p); } }}>{p}</button>)}</div>}
+      {[2, 3, 5, 7, 11, 13].map(p => <button key={p} type="button" aria-label={who ? `${who} bagi dengan ${p}` : `Bagi dengan ${p}`} disabled={disabled} className="btn btn-sm btn-outline" onClick={() => { if (cur % p) setMsg(`${cur} tidak habis dibagi ${p}. Coba bilangan prima lain.`); else { setMsg(""); onSplit(p); } }}>{p}</button>)}</div>}
     <div className="flex flex-wrap items-center gap-2 text-sm">
       {primes.length > 0 && <button type="button" className="btn btn-xs btn-ghost gap-1" disabled={disabled} onClick={() => { setMsg(""); onUndo(); }}><Undo2 className="size-3.5" aria-hidden="true" />Batalkan</button>}
       {msg && <span className="text-warning-content">{msg}</span>}
@@ -161,14 +162,37 @@ function CongklakLab() {
     </output>
   </div>;
 }
-const treeNums = [60, 72, 84, 90, 96, 120, 150, 196, 300];
+const treePairs: [number, number][] = [[72, 150], [12, 18], [24, 36], [60, 84], [96, 120], [15, 28]];
+const pairTone = ["bg-pink-300", "bg-orange-300", "bg-lime-300", "bg-sky-300", "bg-violet-300", "bg-amber-300"];
+const countOf = (xs: number[], p: number) => xs.filter(x => x === p).length;
+/** Faktor prima dua bilangan: faktor yang berpasangan diberi warna yang sama. */
+function PairedFactors({ n, fs, other, primes }: { n: number; fs: number[]; other: number[]; primes: number[] }) {
+  const seen = new Map<number, number>();
+  return <p className="flex flex-wrap items-center gap-1 text-lg font-bold">{n} = {fs.map((f, i) => { const k = seen.get(f) ?? 0; seen.set(f, k + 1); const paired = k < Math.min(countOf(fs, f), countOf(other, f));
+    return <span key={i} className="flex items-center gap-1">{i > 0 && "×"}<span className={`rounded px-1.5 ${paired ? `${pairTone[primes.indexOf(f) % pairTone.length]} ring-2 ring-neutral/40` : "bg-base-100"}`}>{f}</span></span>; })}</p>;
+}
 function TreeLab() {
-  const [i, setI] = useState(8), [ps, setPs] = useState<number[]>([]);
-  const n = treeNums[i], rest = ps.reduce((m, p) => m / p, n), done = isPrime(rest) || rest === 1;
+  const [i, setI] = useState(0), [pa, setPa] = useState<number[]>([]), [pb, setPb] = useState<number[]>([]);
+  const [a, b] = treePairs[i];
+  const rest = (n: number, ps: number[]) => ps.reduce((m, p) => m / p, n);
+  const full = (n: number, ps: number[]) => { const r = rest(n, ps); return isPrime(r) || r === 1 ? [...ps, ...(r > 1 ? [r] : [])].sort((x, y) => x - y) : null; };
+  const fa = full(a, pa), fb = full(b, pb), done = fa !== null && fb !== null;
+  const primes = done ? [...new Set([...fa, ...fb])].sort((x, y) => x - y) : [];
+  const paired = primes.flatMap(p => Array.from({ length: Math.min(countOf(fa ?? [], p), countOf(fb ?? [], p)) }, () => p));
+  // KPK: yang berpasangan ditulis sekali, lalu semua yang tidak berpasangan.
+  const kpkList = [...paired, ...primes.flatMap(p => Array.from({ length: Math.max(countOf(fa ?? [], p), countOf(fb ?? [], p)) - Math.min(countOf(fa ?? [], p), countOf(fb ?? [], p)) }, () => p))];
+  const kpk = kpkList.reduce((x, y) => x * y, 1), fpb = paired.reduce((x, y) => x * y, 1);
   return <div className="space-y-3">
-    <div role="group" aria-label="Pilih bilangan" className="flex flex-wrap gap-1">{treeNums.map((x, k) => <button key={x} type="button" aria-pressed={k === i} className={`btn btn-xs ${k === i ? "btn-success" : "btn-outline"}`} onClick={() => { setI(k); setPs([]); }}>{x}</button>)}</div>
-    <div className="rounded-xl bg-base-100 p-3"><FactorTree n={n} primes={ps} onSplit={p => setPs([...ps, p])} onUndo={() => setPs(ps.slice(0, -1))} /></div>
-    <output data-testid="lab-result" data-value={done ? [...ps, ...(rest > 1 ? [rest] : [])].join(",") : ""} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-sm">{done ? `Semua ujung pohon sudah bilangan prima.` : `Ketuk bilangan prima yang habis membagi ${rest}.`}</output>
+    <div role="group" aria-label="Pilih pasangan bilangan" className="flex flex-wrap gap-1">{treePairs.map(([x, y], k) => <button key={k} type="button" aria-pressed={k === i} className={`btn btn-xs ${k === i ? "btn-success" : "btn-outline"}`} onClick={() => { setI(k); setPa([]); setPb([]); }}>{x} dan {y}</button>)}</div>
+    <div className="grid gap-2 sm:grid-cols-2">
+      <div className="rounded-xl bg-base-100 p-3"><FactorTree who={`Pohon ${a}`} n={a} primes={pa} onSplit={p => setPa([...pa, p])} onUndo={() => setPa(pa.slice(0, -1))} /></div>
+      <div className="rounded-xl bg-base-100 p-3"><FactorTree who={`Pohon ${b}`} n={b} primes={pb} onSplit={p => setPb([...pb, p])} onUndo={() => setPb(pb.slice(0, -1))} /></div>
+    </div>
+    {done && <div className="space-y-1 rounded-xl bg-base-100 p-3"><p className="text-xs">Faktor prima yang berpasangan diberi warna sama.</p><PairedFactors n={a} fs={fa} other={fb} primes={primes} /><PairedFactors n={b} fs={fb} other={fa} primes={primes} /></div>}
+    <output data-testid="lab-result" data-value={done ? `${kpk}|${fpb}` : ""} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-sm leading-6">{!done
+      ? `Buat pohon faktor ${a} dan ${b} sampai semua ujungnya bilangan prima.`
+      : <>KPK dari {a} dan {b}: yang berpasangan ditulis sekali, lalu semua yang tidak berpasangan. KPK = {kpkList.join(" × ")} = <strong>{kpk}</strong>.<br />
+        FPB dari {a} dan {b}: kalikan yang berpasangan saja. {paired.length ? <>FPB = {paired.join(" × ")} = <strong>{fpb}</strong>.</> : <>Tidak ada faktor prima yang berpasangan, jadi FPB = <strong>1</strong>.</>}</>}</output>
   </div>;
 }
 /** Alur ringkas pembagian berulang. */
