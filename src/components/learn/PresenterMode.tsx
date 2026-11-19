@@ -77,7 +77,8 @@ export function PresenterMode() {
     if (!isAdmin) return;
     const onKey = (e: KeyboardEvent) => {
       if (typing(e) || e.altKey) return;
-      if (on && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
+      // Ctrl+Z hanya untuk spidol saat spidol aktif; selain itu milik kertas coret.
+      if (on && tool === "spidol" && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
       if (e.ctrlKey || e.metaKey) return;
       if (e.key === "Escape" && on) { close(); return; }
       const t = TOOLS.find(x => x.key.toLowerCase() === e.key.toLowerCase());
@@ -85,7 +86,7 @@ export function PresenterMode() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isAdmin, on, close, undo]);
+  }, [isAdmin, on, tool, close, undo]);
 
   // Posisi penunjuk untuk laser (overlay tidak menangkap klik, peraga tetap bisa dipakai).
   useEffect(() => {
@@ -109,6 +110,12 @@ export function PresenterMode() {
     const html = document.documentElement, prev = [html.style.overscrollBehavior, html.style.touchAction];
     html.style.overscrollBehavior = "none"; html.style.touchAction = "none"; html.dataset.presenterLock = "";
     return () => { window.removeEventListener("touchstart", block); window.removeEventListener("touchmove", block); [html.style.overscrollBehavior, html.style.touchAction] = prev; delete html.dataset.presenterLock; };
+  }, [on, tool]);
+  // Tanda untuk kertas coret: selama spidol aktif, Ctrl+Z milik spidol.
+  useEffect(() => {
+    if (!on || tool !== "spidol") return;
+    document.documentElement.dataset.presenterPen = "";
+    return () => { delete document.documentElement.dataset.presenterPen; };
   }, [on, tool]);
 
   // Lapisan spidol mengikuti gulir dan ukuran layar.

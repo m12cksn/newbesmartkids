@@ -108,7 +108,8 @@ export function ScratchPad() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
-      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); }
+      // Saat spidol mode menjelaskan aktif, Ctrl+Z milik spidol.
+      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !("presenterPen" in document.documentElement.dataset)) { e.preventDefault(); undo(); }
     };
     addEventListener("keydown", onKey); return () => removeEventListener("keydown", onKey);
   }, [open, undo]);
