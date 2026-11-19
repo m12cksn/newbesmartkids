@@ -36,7 +36,7 @@
   - entri di `materials.ts`.
 
 ## Validasi (lokal)
-- verify: 48 kunci dihitung ulang dari gambar, mencakup:
+- verify: 49 kunci dihitung ulang dari gambar, mencakup:
   - paling, lebih, dan sama dari tinggi/panjang/posisi;
   - urutan, termasuk penolakan urutan terbalik;
   - hitungan alat ukur pas dengan panjang benda;
