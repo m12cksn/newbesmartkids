@@ -38,7 +38,7 @@ export function Plane({ polys = [], points = [], lines = [], arrows = [], r = 6,
 
 /* ---------- Pasangan bangun merah dan biru ---------- */
 function PairsView({ items }: { items: { a: Pt[]; b: Pt[]; caption: string }[] }) {
-  return <div className="grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-3">{items.map(it => { const s = 22, all = [...it.a, ...it.b], mx = Math.max(...all.map(p => p[0])) + 1, my = Math.max(...all.map(p => p[1])) + 1;
+  return <div className="grid w-full grid-cols-3 gap-1.5 sm:gap-2">{items.map(it => { const s = 22, all = [...it.a, ...it.b], mx = Math.max(...all.map(p => p[0])) + 1, my = Math.max(...all.map(p => p[1])) + 1;
     return <figure key={it.caption} className="flex flex-col items-center rounded-lg bg-base-100 p-1"><svg viewBox={`0 0 ${mx * s + 10} ${my * s + 10}`} className="w-full max-w-[10rem]" role="img" aria-label={`Pasangan ${it.caption}: bangun merah ${it.a.map(p => `(${p})`).join(" ")}, bangun biru ${it.b.map(p => `(${p})`).join(" ")}`}>
       {Array.from({ length: mx + 1 }, (_, k) => <line key={`v${k}`} x1={5 + k * s} x2={5 + k * s} y1={5} y2={5 + my * s} stroke="#e3ebe7" />)}{Array.from({ length: my + 1 }, (_, k) => <line key={`h${k}`} y1={5 + k * s} y2={5 + k * s} x1={5} x2={5 + mx * s} stroke="#e3ebe7" />)}
       {[it.a, it.b].map((ps, k) => <polygon key={k} points={ps.map(([x, y]) => `${5 + x * s},${5 + (my - y) * s}`).join(" ")} fill={k ? tones.bayangan.fill : tones.awal.fill} stroke={k ? tones.bayangan.stroke : tones.awal.stroke} strokeWidth="1.8" fillOpacity="0.8" />)}

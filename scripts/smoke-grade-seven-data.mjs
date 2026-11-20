@@ -30,7 +30,7 @@ try {
         else if (p.kind === "plot") { for (const [k, c] of x.entries()) await clicks(`Tambah X di ${p.min + k}`, Number(c)); }
         else if (p.kind === "bars") { for (const [k, c] of x.entries()) await clicks(`${p.cats[k]} naik`, Number(c) / p.step); }
         else if (p.kind === "select") { for (const k of v[i].split(",")) await group(p.label).getByRole("button", { name: p.options[Number(k)], exact: true }).click(); }
-        else if (p.kind === "classify") { for (const [k, r] of p.rows.entries()) await group(r.text).getByRole("button", { name: x[k], exact: true }).click(); }
+        else if (p.kind === "classify") { for (const [k, r] of p.rows.entries()) { if (p.options.length > 3) await page.getByRole("combobox", { name: r.text, exact: true }).selectOption(x[k]); else await group(r.text).getByRole("button", { name: x[k], exact: true }).click(); } }
         else if (p.kind === "tf") { for (const [k, c] of x.entries()) await group(`Pernyataan ${k + 1}`).getByRole("button", { name: c === "B" ? "Benar" : "Salah", exact: true }).click(); }
         else if (p.kind === "choice") await group(`Pilihan bagian ${i + 1}`).getByRole("button", { name: v[i], exact: true }).click();
       }

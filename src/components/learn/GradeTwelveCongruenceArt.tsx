@@ -114,6 +114,6 @@ export function SceneView({ scene }: { scene: Scene }): ReactNode {
     case "plane": return <PlaneView plane={scene} />;
     case "shadow": return <Shadow {...scene} />;
     case "grid": return <Grid head={scene.head} rows={scene.rows} title={scene.title} />;
-    case "multi": return <div className="flex flex-wrap justify-center gap-3">{scene.items.map((s, i) => <div key={i} className="w-full max-w-[15rem]"><SceneView scene={s} /></div>)}</div>;
+    case "multi": return <div className="grid w-full grid-cols-2 gap-2 sm:gap-3">{scene.items.map((s, i) => <div key={i} className="mx-auto w-full min-w-0 max-w-[15rem]"><SceneView scene={s} /></div>)}</div>;
   }
 }

@@ -13,9 +13,9 @@ import {
 /* ====================================================================== */
 /* Bagian kecil                                                            */
 /* ====================================================================== */
-function Box({ value, onChange, label, disabled = false, wide = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; wide?: boolean }) {
+function Box({ value, onChange, label, disabled = false, wide = false, small = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; wide?: boolean; small?: boolean }) {
   return <input aria-label={label} inputMode="numeric" value={value} disabled={disabled} placeholder="…" onChange={e => onChange(e.target.value.replace(/\D/g, "").slice(0, wide ? 8 : 4))}
-    className={`h-10 ${wide ? "w-32" : "w-16"} rounded-lg border-2 border-orange-400 bg-white text-center text-lg font-extrabold text-neutral focus:border-success focus:outline-none`} />;
+    className={`${small ? "h-8 w-14" : "h-10"} ${wide ? "w-32" : small ? "" : "w-16"} rounded-lg border-2 border-orange-400 bg-white text-center text-lg font-extrabold text-neutral focus:border-success focus:outline-none`} />;
 }
 const on = "btn-success disabled:bg-success! disabled:text-success-content!";
 const Result = ({ value, children }: { value: string; children: ReactNode }) => <output data-testid="lab-result" data-value={value} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-sm leading-6">{children}</output>;
@@ -127,13 +127,11 @@ function Cards({ items }: { items: { name: string; likes: string[] }[] }) {
   const count = items.reduce((a, c) => a + c.likes.length, 0);
   return <div className="w-full space-y-1.5">
     <p className="text-center text-sm font-extrabold">Sayuran favorit siswa kelas V</p>
-    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">{items.map(c => <div key={c.name} className="rounded-lg border border-base-300 bg-base-100 p-1.5">
-      <p className="text-xs font-extrabold text-success">{c.name}</p>
-      <div className="flex flex-wrap gap-1">{c.likes.map(l => { const k = `${c.name}-${l}`, d = done.includes(k);
+    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 sm:grid-cols-3">{items.map(c => <div key={c.name} className="flex flex-wrap items-center gap-0.5 border-b border-base-300 py-0.5">
+      <span className="me-0.5 text-xs font-extrabold text-success">{c.name}</span>{c.likes.map(l => { const k = `${c.name}-${l}`, d = done.includes(k);
         return <button key={l} type="button" aria-pressed={d} aria-label={`${c.name} menyukai ${l}`} onClick={() => setDone(x => (d ? x.filter(y => y !== k) : [...x, k]))}
-          className={`rounded px-1.5 py-0.5 text-xs font-semibold ${d ? "bg-success/15 text-base-content/45 line-through" : "bg-base-200"}`}>{l}</button>; })}</div>
-    </div>)}</div>
-    <p className="text-center text-xs text-base-content/60">Ketuk nama sayuran untuk mencoret yang sudah dihitung. Dicoret {done.length} dari {count}.</p>
+          className={`rounded px-1 text-[11px] font-semibold sm:text-xs ${d ? "bg-success/15 text-base-content/45 line-through" : "bg-base-200"}`}>{l}</button>; })}</div>)}</div>
+    <p className="text-center text-xs text-base-content/60">Ketuk sayuran untuk mencoretnya. Dicoret {done.length} dari {count}.</p>
   </div>;
 }
 function SceneView({ scene }: { scene: Scene }) {
@@ -158,25 +156,25 @@ function FreqTable({ p, x, put, checked }: { p: Extract<Part, { kind: "freq" }>;
   return <div className="overflow-x-auto"><table className="w-full border-collapse text-sm">
     <thead><tr className="bg-success/15"><th className="border border-base-300 px-2 py-1">{p.head}</th><th className="border border-base-300 px-2 py-1">Turus</th><th className="border border-base-300 px-2 py-1">Frekuensi</th></tr></thead>
     <tbody>{p.rows.map((r, k) => { const t = num(x[2 * k]);
-      return <tr key={r.label}><td className="border border-base-300 px-2 py-1 text-center font-bold">{r.label}</td>
-        <td className="border border-base-300 px-2 py-1"><div className="flex flex-wrap items-center gap-1.5">
+      return <tr key={r.label}><td className="border border-base-300 px-1.5 py-0.5 text-center font-bold">{r.label}</td>
+        <td className="border border-base-300 px-1.5 py-0.5"><div className="flex flex-wrap items-center gap-1">
           <Step label={`Turus ${r.label} kurangi`} disabled={checked || !t} onClick={() => put(2 * k, t > 1 ? String(t - 1) : "")}><Minus className="size-3.5" aria-hidden="true" /></Step>
           <Step label={`Turus ${r.label} tambah`} disabled={checked || t >= 30} onClick={() => put(2 * k, String(t + 1))}><Plus className="size-3.5" aria-hidden="true" /></Step>
           <Tally n={t} /></div></td>
-        <td className="border border-base-300 px-2 py-1 text-center"><Box label={`Frekuensi ${r.label}`} value={x[2 * k + 1]} onChange={v => put(2 * k + 1, v)} disabled={checked} /></td></tr>; })}</tbody>
+        <td className="border border-base-300 px-1.5 py-0.5 text-center"><Box label={`Frekuensi ${r.label}`} value={x[2 * k + 1]} onChange={v => put(2 * k + 1, v)} disabled={checked} small /></td></tr>; })}</tbody>
   </table></div>;
 }
 function PicBuild({ picto, x, put, checked }: { picto: Picto; x: string[]; put: (k: number, v: string) => void; checked: boolean }) {
-  return <div className="space-y-1.5">
+  return <div className="space-y-1">
     {picto.rows.map((r, k) => { const n = num(x[k]); const setN = (m: number) => put(k, m > 0 ? String(m) : "");
-      return <div key={r.label} className="rounded-lg border border-base-300 bg-base-100 p-2">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm"><span className="font-bold">{picto.head} {r.label}</span>
+      return <div key={r.label} className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-1.5 rounded-lg border border-base-300 bg-base-100 px-1.5 py-1 text-sm">
+        <span className="font-bold leading-tight">{picto.head} {r.label}<span className="block text-xs font-semibold text-base-content/60">{quarterText(n)} gambar</span></span>
+        <SymbolRow sym={picto.symbol} quarters={n} size={18} />
           <span className="flex gap-1">
             <Step label={`${r.label} kurangi seperempat`} disabled={checked || !n} onClick={() => setN(n - 1)}><Minus className="size-3.5" aria-hidden="true" />¼</Step>
             <Step label={`${r.label} tambah seperempat`} disabled={checked || n >= 80} onClick={() => setN(n + 1)}><Plus className="size-3.5" aria-hidden="true" />¼</Step>
             <Step label={`${r.label} tambah satu gambar`} disabled={checked || n >= 77} onClick={() => setN(n + 4)}><Plus className="size-3.5" aria-hidden="true" />1</Step>
-          </span></div>
-        <div className="mt-1 flex items-center gap-2"><SymbolRow sym={picto.symbol} quarters={n} size={22} /><span className="ms-auto shrink-0 text-xs font-bold text-base-content/60">{quarterText(n)} gambar</span></div>
+          </span>
       </div>; })}
     <p className="flex items-center gap-1 text-xs font-semibold"><PicSymbol sym={picto.symbol} size={18} /> = {picto.unitText}</p>
   </div>;
@@ -185,7 +183,7 @@ function BarBuild({ p, x, put, checked }: { p: Extract<Part, { kind: "barBuild" 
   const vals = p.bars.series[0].values.map((v, i) => { const f = p.fill.indexOf(i); return f < 0 ? v : num(x[f]) || null; });
   const { minor, major, max } = p.bars;
   return <div className="space-y-2">
-    <div className="grid place-items-center rounded-xl bg-base-200/60 p-2"><BarChart b={p.bars} override={vals} highlight={p.fill} /></div>
+    <div className="grid place-items-center rounded-xl bg-base-200/60 p-2 [&_svg]:max-h-[30vh] sm:[&_svg]:max-h-[42vh]"><BarChart b={p.bars} override={vals} highlight={p.fill} /></div>
     <div className="flex flex-wrap gap-2">{p.fill.map((c, k) => { const n = num(x[k]); const setN = (m: number) => put(k, m > 0 ? String(Math.min(max, m)) : "");
       return <div key={c} role="group" aria-label={`Batang ${p.bars.cats[c]}`} className="flex items-center gap-1 rounded-lg border border-base-300 bg-base-100 p-1.5 text-sm">
         <span className="me-1 font-bold">{p.bars.cats[c]}</span>
@@ -211,17 +209,17 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
         <ol className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg border-2 border-dashed border-orange-300 p-1.5" aria-label="Urutan yang dipilih">{seq.map((s, k) => <li key={s} className="badge badge-success badge-lg gap-1">{k + 1}. {s}</li>)}</ol>
         <div className="flex flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" disabled={checked || seq.includes(o)} onClick={() => set([...seq, o].join(";"))} className="btn btn-sm btn-outline">{o}</button>)}
           <button type="button" className="btn btn-sm btn-ghost gap-1" disabled={checked || !seq.length} onClick={() => set(seq.slice(0, -1).join(";"))}><Undo2 className="size-4" aria-hidden="true" />Batal satu</button></div></div>; }
-    case "tf": return <div className="space-y-2">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+    case "tf": return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-sm">
       <span>{s.text}</span><span className="join shrink-0">{(["B", "S"] as const).map(c => <button key={c} type="button" disabled={checked} aria-pressed={x[k] === c} onClick={() => put(k, c)} className={`btn join-item btn-sm ${x[k] === c ? on : "btn-outline"}`}>{c === "B" ? "Benar" : "Salah"}</button>)}</span></div>)}</div>;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
-      {p.charts ? <div className="grid gap-2 sm:grid-cols-2">{p.options.map((op, k) => <button key={op} type="button" aria-label={op} aria-pressed={value === op} disabled={checked} onClick={() => set(op)}
-        className={`flex flex-col items-center rounded-2xl border-4 p-2 text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><BarChart b={p.charts![k]} compact label={op} />{op}</button>)}</div>
-        : <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">{p.options.map(op => <button key={op} type="button" aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-2xl border-4 px-3 py-1.5 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>{op}</button>)}</div>}</div>;
+      {p.charts ? <div className="grid grid-cols-2 gap-2">{p.options.map((op, k) => <button key={op} type="button" aria-label={op} aria-pressed={value === op} disabled={checked} onClick={() => set(op)}
+        className={`flex min-w-0 flex-col items-center rounded-2xl border-4 p-1 text-sm font-bold [&_svg]:max-h-[26vh] ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><BarChart b={p.charts![k]} compact label={op} />{op}</button>)}</div>
+        : <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>{op}</button>)}</div>}</div>;
   }
 }
 function Answer({ q, value, record, checked }: { q: DQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeFiveData() {

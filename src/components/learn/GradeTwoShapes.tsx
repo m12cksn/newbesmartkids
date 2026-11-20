@@ -192,7 +192,7 @@ function SortPart({ p, value, set, checked }: { p: Extract<Part, { kind: "sort" 
     <div className={`grid gap-2 ${p.bins.length > 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}>
       {p.bins.map((b, bi) => <div key={b} className="flex min-w-0 flex-col rounded-xl border-2 border-dashed border-info/50 bg-info/5 p-2">
         <button type="button" disabled={checked || sel === null} aria-label={`Masukkan ke ${b}`} onClick={() => sel !== null && put(sel, String(bi))} className="btn btn-xs btn-info btn-outline h-auto min-h-7 whitespace-normal">{b}</button>
-        <div className="mt-2 flex min-h-12 flex-wrap gap-1">{p.items.map((it, k) => vals[k] === String(bi) && <button key={k} type="button" disabled={checked} aria-label={`Keluarkan ${it.name}`} onClick={() => put(k, "")} className="flex flex-col items-center rounded-lg bg-base-100 p-0.5 text-[11px] font-semibold"><FigView fig={it.fig} className="size-10" scale={0.35} />{it.name}</button>)}</div>
+        <div className="mt-1 flex min-h-10 flex-wrap gap-1">{p.items.map((it, k) => vals[k] === String(bi) && <button key={k} type="button" disabled={checked} aria-label={`Keluarkan ${it.name}`} onClick={() => put(k, "")} className="flex flex-col items-center rounded-lg bg-base-100 p-0.5 text-[11px] font-semibold"><FigView fig={it.fig} className="size-10" scale={0.35} />{it.name}</button>)}</div>
       </div>)}
     </div>
   </div>;
@@ -206,19 +206,19 @@ function MatchPart({ p, value, set, checked }: { p: Extract<Part, { kind: "match
   const hasFig = p.right.some(r => r.fig);
   return <div className="space-y-2">
     <p className="text-xs text-base-content/60">{sel === null ? "Ketuk gambar di kiri, lalu ketuk pasangannya di kanan." : `${p.left[sel].name} dipilih. Ketuk pasangannya di kanan.`}</p>
-    <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)]" style={{ minHeight: rows * (hasFig ? 88 : 76) }}>
-      <div className="grid gap-1" style={{ gridTemplateRows: `repeat(${nl}, minmax(0, 1fr))` }}>
+    <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)]" style={{ height: rows * (hasFig ? 76 : 56) }}>
+      <div className="grid min-h-0 gap-1" style={{ gridTemplateRows: `repeat(${nl}, minmax(0, 1fr))` }}>
         {p.left.map((it, k) => <button key={k} type="button" disabled={checked} aria-label={`Pilih ${it.name}`} aria-pressed={sel === k} onClick={() => setSel(sel === k ? null : k)}
-          className={`flex min-w-0 items-center justify-end gap-1 rounded-xl border-2 bg-base-100 px-1 ${sel === k ? "border-success ring-2 ring-success/40" : vals[k] !== "" ? "border-info/60" : "border-base-300"}`}>
-          <FigView fig={it.fig} className="size-16" scale={0.9} /><span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" /></button>)}
+          className={`flex min-h-0 min-w-0 items-center justify-end gap-1 overflow-hidden rounded-xl border-2 bg-base-100 px-1 [&_svg]:max-h-full [&_svg]:w-auto ${sel === k ? "border-success ring-2 ring-success/40" : vals[k] !== "" ? "border-info/60" : "border-base-300"}`}>
+          <FigView fig={it.fig} className="size-14" scale={0.9} /><span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" /></button>)}
       </div>
       <svg viewBox={`0 0 40 ${H}`} preserveAspectRatio="none" className="h-full w-full" aria-hidden="true">
         {vals.map((v, k) => v !== "" && <line key={k} x1="0" y1={((k + 0.5) / nl) * H} x2="40" y2={((Number(v) + 0.5) / nr) * H} stroke="#0f766e" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />)}
       </svg>
-      <div className="grid gap-1" style={{ gridTemplateRows: `repeat(${nr}, minmax(0, 1fr))` }}>
+      <div className="grid min-h-0 gap-1" style={{ gridTemplateRows: `repeat(${nr}, minmax(0, 1fr))` }}>
         {p.right.map((r, j) => <button key={j} type="button" disabled={checked || sel === null} aria-label={`Hubungkan ke ${r.name}`} onClick={() => link(j)}
-          className="flex min-w-0 items-center gap-1 rounded-xl border-2 border-base-300 bg-base-100 px-1 text-left text-xs font-semibold sm:text-sm">
-          <span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" />{r.fig ? <FigView fig={r.fig} scale={0.9} /> : <span className="py-2">{r.name}</span>}</button>)}
+          className="flex min-h-0 min-w-0 items-center gap-1 overflow-hidden rounded-xl border-2 border-base-300 bg-base-100 px-1 text-left text-xs font-semibold sm:text-sm [&_svg]:max-h-full [&_svg]:w-auto">
+          <span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" />{r.fig ? <FigView fig={r.fig} className="size-14" scale={0.9} /> : <span className="py-1">{r.name}</span>}</button>)}
       </div>
     </div>
     <button type="button" className="btn btn-ghost btn-xs gap-1" disabled={checked || vals.every(v => v === "")} onClick={() => set("")}><RotateCcw className="size-3.5" aria-hidden="true" />Hapus semua garis</button>
@@ -245,7 +245,7 @@ function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: st
 }
 function Answer({ q, value, record, checked }: { q: SQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} p={p} i={i} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} p={p} i={i} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeTwoShapes() {
