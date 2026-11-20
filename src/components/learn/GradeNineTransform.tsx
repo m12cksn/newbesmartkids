@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Eraser, FlipHorizontal2, Minus, Plus, RotateCcw, RotateCw } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout } from "./QuizFitLayout";
 import { M, Plane, plainMath, SceneView } from "./GradeNineTransformArt";
 import {
   assessment, cells, correct, dilate, formatAnswer, idn, pickPoints, practice, ptText, ready, reflect, rotate, sections, SEP, splitParts, topics, translate,
@@ -215,10 +216,10 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
     case "vec": return <div className="flex flex-wrap items-center gap-2"><span className="font-bold"><M text={p.label} /></span>
       <span className="inline-flex items-center"><span className="text-5xl font-light leading-none">(</span><span className="flex flex-col gap-1"><In label={`${plainMath(p.label)} mendatar`} value={x[0]} set={s => put(0, s)} disabled={checked} /><In label={`${plainMath(p.label)} tegak`} value={x[1]} set={s => put(1, s)} disabled={checked} /></span><span className="text-5xl font-light leading-none">)</span></span></div>;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
-      <div className="flex flex-wrap gap-2">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-2xl border-4 px-3 py-1.5 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
-    case "classify": return <div className="space-y-2">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 sm:flex-row sm:items-center sm:justify-between">
-      <span className="font-bold"><M text={r.text} /></span><span className="flex flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" role="radio" aria-checked={x[k] === o} disabled={checked} onClick={() => put(k, o)} className={`btn btn-sm ${x[k] === o ? "btn-success" : "btn-outline"}`}>{o}</button>)}</span></div>)}</div>;
-    case "tf": return <div className="space-y-2">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
+    case "classify": return <div className="space-y-1.5">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-wrap items-center justify-between gap-1.5 rounded-lg border border-base-300 p-1.5">
+      <span className="font-bold"><M text={r.text} /></span><span className="flex flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" role="radio" aria-checked={x[k] === o} disabled={checked} onClick={() => put(k, o)} className={`btn btn-sm px-2 ${x[k] === o ? "btn-success" : "btn-outline"}`}>{o}</button>)}</span></div>)}</div>;
+    case "tf": return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-sm">
       <span><M text={s.text} /></span><span className="join shrink-0">{(["B", "S"] as const).map(c => <button key={c} type="button" disabled={checked} aria-pressed={x[k] === c} onClick={() => put(k, c)} className={`btn join-item btn-sm ${x[k] === c ? "btn-success" : "btn-outline"}`}>{c === "B" ? "Benar" : "Salah"}</button>)}</span></div>)}</div>;
     case "eq": return <div className="space-y-1"><div className="flex flex-wrap items-center gap-1.5"><span className="font-bold"><M text={p.label} /></span>
       <In label={`${plainMath(p.label)} koefisien x`} value={x[0]} set={s => put(0, s)} disabled={checked} /><span className="text-lg font-extrabold">x +</span>
@@ -236,7 +237,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
 }
 function Answer({ q, value, record, checked }: { q: TQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
 export default function GradeNineTransform() {
@@ -297,8 +298,7 @@ export default function GradeNineTransform() {
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderText={text => <M text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

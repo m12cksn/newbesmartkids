@@ -28,7 +28,7 @@ try {
         else if (p.kind === "frac") { await box(`${l} kiri`).fill(x[0]); await box(`${l} kanan`).fill(x[1]); }
         else if (p.kind === "match") { for (const [k, r] of x.entries()) { await button(`Kiri ${p.left[k]}`).click(); await button(`Kanan ${r}`).click(); } }
         else if (p.kind === "choice") await group(`Pilihan bagian ${i + 1}`).getByRole("button", { name: plain(v[i]), exact: true }).click();
-        else if (p.kind === "classify") { for (const [k, r] of p.rows.entries()) await page.getByRole("radiogroup", { name: `Baris ${plain(r.text)}`, exact: true }).getByRole("radio", { name: x[k], exact: true }).click(); }
+        else if (p.kind === "classify") { for (const [k, r] of p.rows.entries()) { if (p.options.length > 3) await page.getByRole("combobox", { name: `Baris ${plain(r.text)}`, exact: true }).selectOption(x[k]); else await page.getByRole("radiogroup", { name: `Baris ${plain(r.text)}`, exact: true }).getByRole("radio", { name: x[k], exact: true }).click(); } }
         else if (p.kind === "tf") { for (const [k, c] of x.entries()) await group(`Pernyataan ${k + 1}`).getByRole("button", { name: c === "B" ? "Benar" : "Salah", exact: true }).click(); }
       }
     }

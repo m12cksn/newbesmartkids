@@ -33,8 +33,13 @@ try {
           for (const [k, l] of [[1, `Satuan dari ${p.a}`], [3, `Satuan dari ${p.b}`], [4, "Hasil puluhan"], [5, "Hasil satuan"], [6, "Jadi"]]) await fill(l, x[k]);
         } else if (p.kind === "story") {
           const k = p.known.length;
+          const tab = name => page.getByRole("tab", { name, exact: true });
+          await tab("Diketahui").click();
           for (const [j, kn] of p.known.entries()) await fill(kn.text.replace("___", "…"), x[j]);
+          await page.getByRole("button", { name: "Lanjut ke Ditanya", exact: true }).click();
+          assert.equal(await tab("Ditanya").getAttribute("aria-selected"), "true");
           await page.getByRole("group", { name: "Ditanya" }).getByRole("button", { name: x[k], exact: true }).click();
+          await tab("Solusi").click();
           for (const [j, st] of p.steps.entries()) {
             const [a, op, b, c] = x[k + 1 + j].split(",");
             await fill(`${st.label} bilangan pertama`, a);

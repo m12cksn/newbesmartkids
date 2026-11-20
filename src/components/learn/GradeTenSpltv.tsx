@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Check, ChevronRight, Minus, Plus, RotateCcw, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout } from "./QuizFitLayout";
 import { M, plainMath, Sack, SceneView, SystemView } from "./GradeTenSpltvArt";
 import {
   assessment, cells, ciriSystems, ciriTriples, correct, det3, detMatrix, elimPresets, eqText, fertilizer, fmt, formatAnswer, idn, kindOf, num, practice,
@@ -195,12 +196,12 @@ function In({ value, set, label, disabled, w = "w-20" }: { value: string; set: (
 }
 function SystemInput({ p, value, set, checked }: { p: Extract<Part, { kind: "system" }>; value: string; set: (v: string) => void; checked: boolean }) {
   const x = cells(p, value), put = (k: number, v: string) => { const a = [...x]; a[k] = v; set(a.join("|")); };
-  return <div role="group" aria-label={plainMath(p.label)} className="space-y-2"><p className="font-bold"><M text={p.label} /></p>
+  return <div role="group" aria-label={plainMath(p.label)} className="space-y-1.5"><p className="font-bold"><M text={p.label} /></p>
     {[0, 1, 2].map(r => { const nums = x.slice(r * 4, r * 4 + 4).map(num), full = nums.every(v => !Number.isNaN(v));
-      return <div key={r} className="space-y-0.5"><div className="flex flex-wrap items-center gap-1 text-base"><span className="w-8 text-xs text-base-content/50">({r + 1})</span>
-        {[0, 1, 2].map(j => <span key={j} className="inline-flex items-center gap-1">{j > 0 && <span>+</span>}<In label={`Persamaan ${r + 1} koefisien ${p.vars[j]}`} value={x[r * 4 + j]} set={v => put(r * 4 + j, v)} disabled={checked} w="w-14" /><span className="italic">{p.vars[j]}</span></span>)}
-        <span>=</span><In label={`Persamaan ${r + 1} konstanta`} value={x[r * 4 + 3]} set={v => put(r * 4 + 3, v)} disabled={checked} w="w-16" /></div>
-        {full && <p className="ps-9 text-xs text-base-content/60">Terbaca: <M text={`${side(nums, p.vars)} = ${idn(nums[3])}`} /></p>}</div>; })}
+      return <div key={r} className="space-y-0.5"><div className="flex flex-wrap items-center gap-0.5 text-base sm:gap-1"><span className="w-6 text-xs text-base-content/50">({r + 1})</span>
+        {[0, 1, 2].map(j => <span key={j} className="inline-flex items-center gap-0.5 sm:gap-1">{j > 0 && <span>+</span>}<In label={`Persamaan ${r + 1} koefisien ${p.vars[j]}`} value={x[r * 4 + j]} set={v => put(r * 4 + j, v)} disabled={checked} w="w-11 sm:w-14" /><span className="italic">{p.vars[j]}</span></span>)}
+        <span>=</span><In label={`Persamaan ${r + 1} konstanta`} value={x[r * 4 + 3]} set={v => put(r * 4 + 3, v)} disabled={checked} w="w-14 sm:w-16" /></div>
+        {full && <p className="ps-7 text-xs text-base-content/60">Terbaca: <M text={`${side(nums, p.vars)} = ${idn(nums[3])}`} /></p>}</div>; })}
     <p className="text-xs text-base-content/60">Variabel yang tidak ada diisi 0. Koefisien negatif ditulis dengan minus, misalnya −2.</p>
   </div>;
 }
@@ -210,19 +211,19 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
   switch (p.kind) {
     case "num": return <div className="flex flex-wrap items-center gap-2"><span className="font-bold"><M text={p.label} /></span><In label={plainMath(p.label)} value={value} set={set} disabled={checked} w="w-28" />{p.unit && <span className="font-semibold">{p.unit}</span>}</div>;
     case "triple": return <div role="group" aria-label={plainMath(p.label)} className="space-y-1"><p className="font-bold"><M text={p.label} /></p>
-      <div className="flex flex-wrap items-end gap-2">{p.names.map((nm, k) => <label key={nm} className="flex flex-col items-center gap-0.5 text-xs font-semibold"><span>{nm}</span><In label={`${plainMath(p.label)} ${nm}`} value={x[k]} set={v => put(k, v)} disabled={checked} w="w-24" /></label>)}{p.unit && <span className="pb-2 font-semibold">{p.unit}</span>}</div></div>;
+      <div className="flex flex-wrap items-end gap-2">{p.names.map((nm, k) => <label key={nm} className="flex flex-col items-center gap-0.5 text-xs font-semibold"><span>{nm}</span><In label={`${plainMath(p.label)} ${nm}`} value={x[k]} set={v => put(k, v)} disabled={checked} w="w-20" /></label>)}{p.unit && <span className="pb-2 font-semibold">{p.unit}</span>}</div></div>;
     case "system": return <SystemInput p={p} value={value} set={set} checked={checked} />;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
-      <div className="flex flex-wrap gap-2">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-2xl border-4 px-3 py-1.5 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
-    case "classify": return <div className="space-y-2">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 sm:flex-row sm:items-center sm:justify-between">
-      <span className="font-bold"><M text={r.text} /></span><span className="flex flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" role="radio" aria-checked={x[k] === o} disabled={checked} onClick={() => put(k, o)} className={`btn btn-sm ${x[k] === o ? "btn-success" : "btn-outline"}`}>{o}</button>)}</span></div>)}</div>;
-    case "tf": return <div className="space-y-2">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
+    case "classify": return <div className="space-y-1.5">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-wrap items-center justify-between gap-1.5 rounded-lg border border-base-300 p-1.5">
+      <span className="font-bold"><M text={r.text} /></span><span className="flex flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" role="radio" aria-checked={x[k] === o} disabled={checked} onClick={() => put(k, o)} className={`btn btn-sm px-2 ${x[k] === o ? "btn-success" : "btn-outline"}`}>{o}</button>)}</span></div>)}</div>;
+    case "tf": return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-sm">
       <span><M text={s.text} /></span><span className="join shrink-0">{(["B", "S"] as const).map(c => <button key={c} type="button" disabled={checked} aria-pressed={x[k] === c} onClick={() => put(k, c)} className={`btn join-item btn-sm ${x[k] === c ? "btn-success" : "btn-outline"}`}>{c === "B" ? "Benar" : "Salah"}</button>)}</span></div>)}</div>;
   }
 }
 function Answer({ q, value, record, checked }: { q: PQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
 export default function GradeTenSpltv() {
@@ -283,8 +284,7 @@ export default function GradeTenSpltv() {
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderText={text => <M text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

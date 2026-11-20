@@ -27,7 +27,7 @@ try {
         if (p.kind === "number") await fill(p.label, v[i]);
         else if (p.kind === "items") { for (const [k, it] of p.items.entries()) await fill(it.label, x[k]); }
         else if (p.kind === "straws") { for (let k = 0; k < p.rows.length; k++) { await group(`Percobaan ${k + 1} membentuk segitiga`).getByRole("button", { name: x[4 * k], exact: true }).click(); for (const [j, l] of ["b+c", "a+c", "a+b"].entries()) await fill(`Percobaan ${k + 1} ${l}`, x[4 * k + 1 + j]); } }
-        else if (p.kind === "classify") { for (const [k, r] of p.rows.entries()) await group(r.text).getByRole("button", { name: x[k], exact: true }).click(); }
+        else if (p.kind === "classify") { for (const [k, r] of p.rows.entries()) { if (p.options.length > 3) await page.getByRole("combobox", { name: r.text, exact: true }).selectOption(x[k]); else await group(r.text).getByRole("button", { name: x[k], exact: true }).click(); } }
         else if (p.kind === "select") { for (const k of v[i].split(",").filter(Boolean)) await group(p.label).getByRole("button", { name: `Bangun ${String.fromCharCode(65 + Number(k))}`, exact: true }).click(); }
         else if (p.kind === "tf") { const [y, n] = p.labels ?? ["Benar", "Salah"]; for (const [k, c] of x.entries()) await group(`Pernyataan ${k + 1}`).getByRole("button", { name: c === "B" ? y : n, exact: true }).click(); }
         else if (p.kind === "choice") await group(`Pilihan bagian ${i + 1}`).getByRole("button", { name: v[i], exact: true }).click();

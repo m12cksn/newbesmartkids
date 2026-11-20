@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Check, Minus, Plus, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout, RowSelect } from "./QuizFitLayout";
 import { ShapeFig, Straw } from "./GradeFiveShapeTraitsArt";
 import {
   assessment, bestName, canForm, cells, correct, formatAnswer, interiorAngles, practice, quadInfo, quadNames, ready, SEP, splitParts, topics, triAngleKind, triFromSides, triSideKind,
@@ -83,7 +84,7 @@ const labs = [TriLab, QuadLab];
 /* ====================================================================== */
 function SceneView({ scene }: { scene: Scene }) {
   if (scene.type === "fig") return <ShapeFig fig={scene.fig} className="w-full max-w-64" />;
-  return <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3">{scene.items.map(it => <figure key={it.label} className="flex flex-col items-center text-xs font-bold"><ShapeFig fig={it.fig} className="w-full max-w-40" />{it.label}</figure>)}</div>;
+  return <div className={`grid w-full gap-2 [&_svg]:max-h-[20vh] sm:[&_svg]:max-h-[30vh] ${scene.items.length <= 4 ? "grid-cols-4 sm:grid-cols-2" : "grid-cols-3"}`}>{scene.items.map(it => <figure key={it.label} className="flex min-w-0 flex-col items-center text-center text-xs font-bold"><ShapeFig fig={it.fig} className="w-full max-w-40" />{it.label}</figure>)}</div>;
 }
 
 /* ====================================================================== */
@@ -102,8 +103,10 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
         <span role="group" aria-label={`Percobaan ${k + 1} membentuk segitiga`} className="join">{["Bisa", "Tidak"].map(o => <button key={o} type="button" disabled={checked} aria-pressed={x[4 * k] === o} onClick={() => put(4 * k, o)} className={`btn join-item btn-sm ${x[4 * k] === o ? on : "btn-outline"}`}>{o}</button>)}</span>
         {["b+c", "a+c", "a+b"].map((l, j) => <label key={l} className="flex items-center gap-1 text-sm font-bold">{l} =<Box label={`Percobaan ${k + 1} ${l}`} value={x[4 * k + 1 + j]} onChange={v => put(4 * k + 1 + j, v)} disabled={checked} w="w-12" /></label>)}
       </div></div>)}</div>;
-    case "classify": return <div className="space-y-2">{p.rows.map((r, k) => <div key={r.text} role="group" aria-label={r.text} className="flex flex-col gap-2 rounded-lg border border-base-300 p-2 sm:flex-row sm:items-center">
-      <div className="flex items-center gap-2 sm:w-44">{r.fig && <ShapeFig fig={r.fig} className="size-20 shrink-0" />}<span className="text-sm font-semibold">{r.text}</span></div>
+    case "classify": if (p.options.length > 3) return <div className="grid gap-1.5">{p.rows.map((r, k) => <label key={r.text} className="flex items-center gap-2 rounded-lg border border-base-300 p-1.5">
+      {r.fig && <ShapeFig fig={r.fig} className="size-14 shrink-0" />}<span className="w-20 shrink-0 text-sm font-semibold">{r.text}</span><RowSelect label={r.text} options={p.options} value={x[k]} set={v => put(k, v)} disabled={checked} /></label>)}</div>;
+      return <div className="space-y-1.5">{p.rows.map((r, k) => <div key={r.text} role="group" aria-label={r.text} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-1.5 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-2 sm:w-44">{r.fig && <ShapeFig fig={r.fig} className="size-14 shrink-0" />}<span className="text-sm font-semibold">{r.text}</span></div>
       <div className="flex flex-wrap gap-1">{p.options.map(o => <button key={o} type="button" disabled={checked} aria-pressed={x[k] === o} onClick={() => put(k, o)} className={`btn btn-xs h-8 ${x[k] === o ? on : "btn-outline"}`}>{o}</button>)}</div></div>)}</div>;
     case "select": { const sel = value ? value.split(",").map(Number) : [];
       return <div className="space-y-1"><div role="group" aria-label={p.label} className="grid grid-cols-3 gap-2">{p.figs.map((f, k) => { const s = sel.includes(k);
@@ -111,15 +114,15 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
           className={`flex flex-col items-center rounded-xl border-4 p-1.5 text-sm font-bold ${s ? "border-success bg-success/10" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><ShapeFig fig={f} className="w-full max-w-24" label={`Bangun ${letter(k)}`} />{letter(k)}</button>; })}</div>
         <p className="text-xs text-base-content/60">Ketuk semua yang benar. Ketuk lagi untuk membatalkan. Dipilih {sel.length} bangun.</p></div>; }
     case "tf": { const [y, n] = p.labels ?? ["Benar", "Salah"];
-      return <div className="space-y-2">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+      return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-sm">
         <span>{s.text}</span><span className="join shrink-0">{(["B", "S"] as const).map(c => <button key={c} type="button" disabled={checked} aria-pressed={x[k] === c} onClick={() => put(k, c)} className={`btn join-item btn-sm ${x[k] === c ? on : "btn-outline"}`}>{c === "B" ? y : n}</button>)}</span></div>)}</div>; }
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">{p.options.map(op => <button key={op} type="button" aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-2xl border-4 px-3 py-1.5 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>{op}</button>)}</div></div>;
+      <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>{op}</button>)}</div></div>;
   }
 }
 function Answer({ q, value, record, checked }: { q: SQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeFiveShapeTraits() {
@@ -170,8 +173,7 @@ export default function GradeFiveShapeTraits() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 7"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt + q.answer} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt + q.answer} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Minus, Plus, RotateCcw, Scissors } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Minus, Plus, RotateCcw, Scissors } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout } from "./QuizFitLayout";
 import { Abacus, Bird, Bunny, FlowerPot, ShapeArt, ThingArt } from "./GradeTwoAddSubArt";
 import {
   assessment, cells, correct, formatAnswer, practice, ready, SEP, splitParts, topics,
@@ -174,6 +175,34 @@ function SceneView({ scene }: { scene: Scene }) {
 /* ====================================================================== */
 /* Cara menjawab                                                           */
 /* ====================================================================== */
+const STORY_STEPS = ["Diketahui", "Ditanya", "Solusi"] as const;
+/** Soal cerita dikerjakan per langkah (Diketahui, Ditanya, Solusi) agar muat satu layar. */
+function StoryPart({ p, x, put, checked }: { p: Extract<Part, { kind: "story" }>; x: string[]; put: (k: number, v: string) => void; checked: boolean }) {
+  const [step, setStep] = useState(0);
+  const k = p.known.length, s0 = k + 1, c0 = s0 + p.steps.length;
+  const done = [x.slice(0, k).every(Boolean), Boolean(x[k]), x.slice(s0, c0).every(r => r.split(",").every(Boolean) && r.split(",").length === 4) && x.slice(c0).every(Boolean)];
+  const fill = (text: string, idx: number) => { const [l, r] = text.split("___"); return <p key={idx} className="flex flex-wrap items-center gap-1">{l}<Box label={text.replace("___", "…")} value={x[idx]} onChange={v => put(idx, v)} disabled={checked} />{r}</p>; };
+  return <div className="w-full space-y-2 text-sm">
+    <div role="tablist" aria-label="Langkah soal cerita" className="grid grid-cols-3 gap-1">{STORY_STEPS.map((n, i) => <button key={n} type="button" role="tab" aria-label={n} aria-selected={step === i} onClick={() => setStep(i)}
+      className={`flex items-center justify-center gap-1 rounded-lg border-2 px-1 py-1.5 text-xs font-bold sm:text-sm ${step === i ? "border-purple-500 bg-purple-50 text-purple-800" : "border-base-300 bg-base-100"}`}>
+      {done[i] ? <Check className="size-4 text-success" aria-hidden="true" /> : <span aria-hidden="true">{i + 1}.</span>}{n}</button>)}</div>
+    <section className="rounded-xl border-2 border-purple-300 p-2">
+      {step === 0 && <div className="flex flex-wrap gap-x-3 gap-y-1.5">{p.known.map((kn, i) => fill(kn.text, i))}</div>}
+      {step === 1 && <div role="group" aria-label="Ditanya" className="flex flex-wrap gap-1">{p.ask.options.map(op => <button key={op} type="button" disabled={checked} aria-pressed={x[k] === op} onClick={() => put(k, op)} className={`btn btn-sm h-auto min-h-9 justify-start whitespace-normal py-1 text-left ${x[k] === op ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{op}</button>)}</div>}
+      {step === 2 && <div className="space-y-1.5">
+        {p.steps.map((st, j) => { const idx = s0 + j, [a = "", op = "", b = "", c = ""] = x[idx].split(","); const setRow = (i: number, v: string) => { const r = [a, op, b, c]; r[i] = v; put(idx, r.join(",")); };
+          return <div key={st.label} className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-xs font-bold">{st.label}</span><div className="flex flex-wrap items-center gap-1 text-lg font-bold">
+            <Box label={`${st.label} bilangan pertama`} value={a} onChange={v => setRow(0, v)} disabled={checked} />
+            <span role="group" aria-label={`Operasi ${st.label}`} className="join">{(["+", "-"] as const).map(o => <button key={o} type="button" disabled={checked} aria-label={o === "+" ? "tambah" : "kurang"} aria-pressed={op === o} onClick={() => setRow(1, o)} className={`btn join-item btn-sm w-9 text-lg ${op === o ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{sym(o)}</button>)}</span>
+            <Box label={`${st.label} bilangan kedua`} value={b} onChange={v => setRow(2, v)} disabled={checked} />=
+            <Box label={`${st.label} hasil`} value={c} onChange={v => setRow(3, v)} disabled={checked} /></div></div>; })}
+        <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-dashed border-base-300 pt-1.5">{p.conclude.map((c, i) => fill(c.text, c0 + i))}</div>
+      </div>}
+      {step < 2 && <button type="button" className="btn btn-sm btn-ghost mt-1.5 gap-1 text-purple-800" onClick={() => setStep(step + 1)}>Lanjut ke {STORY_STEPS[step + 1]}<ArrowRight className="size-4" aria-hidden="true" /></button>}
+    </section>
+  </div>;
+}
+
 function PartView({ p, value, set, checked }: { p: Part; value: string; set: (v: string) => void; checked: boolean }) {
   const x = cells(p, value);
   const put = (k: number, v: string, fixed: number[] = []) => { const a = [...x]; a[k] = v; fixed.forEach(f => (a[f] = "10")); set(a.join("|")); };
@@ -238,26 +267,7 @@ function PartView({ p, value, set, checked }: { p: Part; value: string; set: (v:
         </div>
       </div>;
     }
-    case "story": {
-      const k = p.known.length, s0 = k + 1, c0 = s0 + p.steps.length;
-      const fill = (text: string, idx: number) => { const [l, r] = text.split("___"); return <p key={idx} className="flex flex-wrap items-center gap-1.5">{l}<Box label={text.replace("___", "…")} value={x[idx]} onChange={v => put(idx, v)} disabled={checked} />{r}</p>; };
-      return <div className="w-full space-y-3 text-sm">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <section className="rounded-xl border-2 border-purple-300 p-3"><h4 className="mb-1 font-bold">Diketahui:</h4><div className="space-y-1.5">{p.known.map((kn, i) => fill(kn.text, i))}</div></section>
-          <section role="group" aria-label="Ditanya" className="rounded-xl border-2 border-purple-300 p-3"><h4 className="mb-1 font-bold">Ditanya:</h4>
-            <div className="flex flex-col gap-1.5">{p.ask.options.map(op => <button key={op} type="button" disabled={checked} aria-pressed={x[k] === op} onClick={() => put(k, op)} className={`btn btn-sm h-auto min-h-8 justify-start whitespace-normal py-1 text-left ${x[k] === op ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{op}</button>)}</div></section>
-        </div>
-        <section className="space-y-2 rounded-xl border-2 border-purple-300 p-3"><h4 className="font-bold">Solusi:</h4>
-          {p.steps.map((st, j) => { const idx = s0 + j, [a = "", op = "", b = "", c = ""] = x[idx].split(","); const setRow = (i: number, v: string) => { const r = [a, op, b, c]; r[i] = v; put(idx, r.join(",")); };
-            return <div key={st.label} className="space-y-1"><span className="block text-sm font-bold">{st.label}</span><div className="flex flex-wrap items-center gap-1 text-lg font-bold">
-              <Box label={`${st.label} bilangan pertama`} value={a} onChange={v => setRow(0, v)} disabled={checked} />
-              <span role="group" aria-label={`Operasi ${st.label}`} className="join">{(["+", "-"] as const).map(o => <button key={o} type="button" disabled={checked} aria-label={o === "+" ? "tambah" : "kurang"} aria-pressed={op === o} onClick={() => setRow(1, o)} className={`btn join-item btn-sm w-9 text-lg ${op === o ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{sym(o)}</button>)}</span>
-              <Box label={`${st.label} bilangan kedua`} value={b} onChange={v => setRow(2, v)} disabled={checked} />=
-              <Box label={`${st.label} hasil`} value={c} onChange={v => setRow(3, v)} disabled={checked} /></div></div>; })}
-          <div className="space-y-1.5 border-t border-dashed border-base-300 pt-2">{p.conclude.map((c, i) => fill(c.text, c0 + i))}</div>
-        </section>
-      </div>;
-    }
+    case "story": return <StoryPart p={p} x={x} put={put} checked={checked} />;
     case "choice": return <div role="group" aria-label="Pilihan" className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
       <div className="flex flex-wrap gap-2">{p.options.map((op, k) => <button key={op} type="button" aria-label={op} aria-pressed={value === op} disabled={checked} onClick={() => set(op)}
         className={`flex flex-col items-center gap-1 rounded-2xl border-4 p-2 font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>
@@ -266,7 +276,7 @@ function PartView({ p, value, set, checked }: { p: Part; value: string; set: (v:
 }
 function Answer({ q, value, record, checked }: { q: AQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  return <div className="space-y-3">{q.parts.map((p, i) => <PartView key={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeTwoAddSub() {
@@ -317,8 +327,7 @@ export default function GradeTwoAddSub() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 2"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Layers, Minus, Plus, RotateCcw } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout, RowSelect } from "./QuizFitLayout";
 import { FigView, Grid, M, PlaneView, plainMath, SceneView, Shadow } from "./GradeTwelveCongruenceArt";
 import {
   angleAt, assessment, cells, correct, cosRuleAngle, cosRuleSide, dist, formatAnswer, idn, move, practice, ready, sections, SEP, splitParts, topics, triSAS, triSSS,
@@ -215,40 +216,43 @@ function In({ value, set, label, disabled, w = "w-20" }: { value: string; set: (
     className={`h-10 ${w} rounded-lg border-2 border-orange-400 bg-white text-center text-lg font-bold text-neutral focus:border-success focus:outline-none`} />;
 }
 function MatchView({ p, x, put, checked }: { p: Extract<Part, { kind: "match" }>; x: string[]; put: (k: number, v: string) => void; checked: boolean }) {
-  const [sel, setSel] = useState<number | null>(null), H = 48;
+  const [sel, setSel] = useState<number | null>(null), H = 40;
   return <div className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
-    <p className="text-xs text-base-content/60">Ketuk sisi di kiri, lalu pasangannya di kanan. Garis akan menghubungkan keduanya.</p>
+    <p className="text-xs text-base-content/60">Ketuk sisi di kiri, lalu pasangannya di kanan.</p>
     <div className="grid grid-cols-[auto_5rem_auto] items-start gap-x-1">
-      <div className="flex flex-col gap-2">{p.left.map((l, i) => <button key={l} type="button" aria-label={`Kiri ${l}`} aria-pressed={sel === i} disabled={checked} onClick={() => setSel(i)} className={`btn h-10 min-h-10 normal-case ${sel === i ? "btn-success" : "btn-outline"}`}>{l}</button>)}</div>
-      <svg viewBox={`0 0 80 ${p.left.length * H - 8}`} className="h-full w-20" aria-hidden="true" preserveAspectRatio="none">
-        {x.map((v, i) => { const j = p.right.indexOf(v); return j < 0 ? null : <line key={i} x1="2" y1={i * H + 20} x2="78" y2={j * H + 20} stroke="#f59f00" strokeWidth="2.5" />; })}
+      <div className="flex flex-col gap-1">{p.left.map((l, i) => <button key={l} type="button" aria-label={`Kiri ${l}`} aria-pressed={sel === i} disabled={checked} onClick={() => setSel(i)} className={`btn h-9 min-h-9 normal-case ${sel === i ? "btn-success" : "btn-outline"}`}>{l}</button>)}</div>
+      <svg viewBox={`0 0 80 ${p.left.length * H - 4}`} className="h-full w-20" aria-hidden="true" preserveAspectRatio="none">
+        {x.map((v, i) => { const j = p.right.indexOf(v); return j < 0 ? null : <line key={i} x1="2" y1={i * H + 18} x2="78" y2={j * H + 18} stroke="#f59f00" strokeWidth="2.5" />; })}
       </svg>
-      <div className="flex flex-col gap-2">{p.right.map(r => <button key={r} type="button" aria-label={`Kanan ${r}`} disabled={checked || sel === null} onClick={() => { if (sel !== null) { put(sel, r); setSel(null); } }} className={`btn h-10 min-h-10 normal-case ${x.includes(r) ? "btn-outline btn-info" : "btn-outline"}`}>{r}</button>)}</div>
+      <div className="flex flex-col gap-1">{p.right.map(r => <button key={r} type="button" aria-label={`Kanan ${r}`} disabled={checked || sel === null} onClick={() => { if (sel !== null) { put(sel, r); setSel(null); } }} className={`btn h-9 min-h-9 normal-case ${x.includes(r) ? "btn-outline btn-info" : "btn-outline"}`}>{r}</button>)}</div>
     </div>
   </div>;
 }
-function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: (v: string) => void; checked: boolean; i: number }) {
+function PartView({ p, value, set, checked, i, hint = true }: { p: Part; value: string; set: (v: string) => void; checked: boolean; i: number; hint?: boolean }) {
   const x = cells(p, value);
   const put = (k: number, v: string) => { const a = [...x]; a[k] = v; set(a.join("|")); };
   switch (p.kind) {
     case "num": return <div className="flex flex-wrap items-center gap-2"><span className="font-bold"><M text={p.label} /></span><In label={plainMath(p.label)} value={value} set={set} disabled={checked} w="w-28" />{p.unit && <span className="font-semibold">{p.unit}</span>}</div>;
     case "frac": return <div role="group" aria-label={plainMath(p.label)} className="flex flex-wrap items-center gap-2"><span className="font-bold"><M text={p.label} /></span>
       <In label={`${plainMath(p.label)} kiri`} value={x[0]} set={v => put(0, v)} disabled={checked} /><span className="text-xl font-bold">:</span><In label={`${plainMath(p.label)} kanan`} value={x[1]} set={v => put(1, v)} disabled={checked} />
-      <span className="basis-full text-xs text-base-content/60">Rasio yang senilai juga diterima, misalnya 2 : 4 untuk 1 : 2.</span></div>;
+      {hint && <span className="basis-full text-xs text-base-content/60">Rasio yang senilai juga diterima, misalnya 2 : 4 untuk 1 : 2.</span>}</div>;
     case "row": return <div role="group" aria-label={plainMath(p.label)} className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
       <div className="flex flex-wrap gap-2">{p.cells.map((c, k) => <label key={c} className="flex flex-col items-center gap-1 rounded-lg bg-base-100 p-1.5 text-xs font-semibold ring-1 ring-base-300"><M text={c} /><In label={`${plainMath(p.label)} ${plainMath(c)}`} value={x[k]} set={v => put(k, v)} disabled={checked} w="w-24" /></label>)}</div></div>;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
-      <div className="flex flex-wrap gap-2">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-2xl border-4 px-3 py-1.5 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
+      <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
     case "match": return <MatchView p={p} x={x} put={put} checked={checked} />;
-    case "classify": return <div className="space-y-2">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 lg:flex-row lg:items-center lg:justify-between">
-      <span className="text-sm font-bold"><M text={r.text} /></span><span className="flex shrink-0 flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" role="radio" aria-checked={x[k] === o} disabled={checked} onClick={() => put(k, o)} className={`btn btn-sm h-auto min-h-8 ${x[k] === o ? "btn-success" : "btn-outline"}`}>{o}</button>)}</span></div>)}</div>;
-    case "tf": return <div className="space-y-2">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="flex flex-col gap-1.5 rounded-lg border border-base-300 p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+    case "classify": if (p.options.length > 3) return <div className="grid gap-1.5">{p.rows.map((r, k) => <label key={r.text} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-lg border border-base-300 p-1.5">
+      <span className="text-sm font-bold"><M text={r.text} /></span><RowSelect label={`Baris ${plainMath(r.text)}`} options={p.options} value={x[k]} set={v => put(k, v)} disabled={checked} /></label>)}</div>;
+      return <div className="space-y-1.5">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-wrap items-center justify-between gap-1.5 rounded-lg border border-base-300 p-1.5">
+      <span className="text-sm font-bold"><M text={r.text} /></span><span className="flex shrink-0 flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" role="radio" aria-checked={x[k] === o} disabled={checked} onClick={() => put(k, o)} className={`btn btn-sm h-auto min-h-8 px-2 text-xs sm:text-sm ${x[k] === o ? "btn-success" : "btn-outline"}`}>{o}</button>)}</span></div>)}</div>;
+    case "tf": return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-sm">
       <span><M text={s.text} /></span><span className="join shrink-0">{(["B", "S"] as const).map(c => <button key={c} type="button" disabled={checked} aria-pressed={x[k] === c} onClick={() => put(k, c)} className={`btn join-item btn-sm ${x[k] === c ? "btn-success" : "btn-outline"}`}>{c === "B" ? "Benar" : "Salah"}</button>)}</span></div>)}</div>;
   }
 }
 function Answer({ q, value, record, checked }: { q: PQuestion; value: string; record: (v: string) => void; checked: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
+  const firstFrac = q.parts.findIndex(p => p.kind === "frac");
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} hint={i === firstFrac} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => (j === i ? x : y)).join(SEP))} />)}</div>;
 }
 
 export default function GradeTwelveCongruence() {
@@ -309,8 +313,7 @@ export default function GradeTwelveCongruence() {
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderText={text => <M text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;
