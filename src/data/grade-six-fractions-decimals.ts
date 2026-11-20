@@ -152,7 +152,7 @@ export const topics = [
   {
     code: "A.1", group: 0, title: "Perkalian Bilangan Asli dengan Pecahan", short: "Bilangan asli × pecahan",
     steps: [
-      "Aturannya: n × a/b = (n × a)/b. Kalikan pembilang dengan bilangan asli, penyebut tetap.",
+      "Caranya: kalikan bilangan asli dengan pembilang. Penyebutnya tetap.",
       "Contoh: 3 × 3/4 = (3 × 3)/4 = 9/4.",
       "Jika pembilang lebih besar dari penyebut, ubah ke pecahan campuran: 9/4 = 2 1/4.",
     ],
@@ -161,29 +161,29 @@ export const topics = [
   {
     code: "A.2", group: 0, title: "Perkalian Pecahan dengan Bilangan Asli", short: "Pecahan × bilangan asli",
     steps: [
-      "Aturannya sama: a/b × n = (a × n)/b. Kalikan pembilang dengan bilangan asli, penyebut tetap.",
+      "Caranya sama: kalikan pembilang dengan bilangan asli. Penyebutnya tetap.",
       "Contoh: 2/3 × 12 = (2 × 12)/3 = 24/3 = 8.",
-      "Hasilnya sama dengan n × a/b. Bedanya hanya cara membacanya: a/b bagian dari n benda.",
+      "Artinya 2/3 bagian dari 12 benda, yaitu 8 benda.",
     ],
     demo: "Bagi benda menjadi kelompok sebanyak penyebut, lalu ketuk kelompok sebanyak pembilang.",
   },
   {
     code: "B.1", group: 1, title: "Pembagian Pecahan dengan Bilangan Asli", short: "Pecahan ÷ bilangan asli",
     steps: [
-      "Aturannya: a/b ÷ n = a/(b × n). Pembilang tetap, penyebut dikalikan bilangan asli.",
+      "Caranya: pembilangnya tetap. Kalikan penyebut dengan bilangan asli.",
       "Contoh: 2/3 ÷ 4 = 2/(3 × 4) = 2/12 = 1/6.",
-      "Hasil pembagian selalu lebih kecil dari pecahan semula.",
+      "Hasilnya lebih kecil dari pecahan semula.",
     ],
-    demo: "Tekan Langkah berikutnya dan lihat penyebutnya menjadi b × n.",
+    demo: "Tekan Langkah berikutnya dan lihat penyebutnya dikalikan dengan bilangan pembagi.",
   },
   {
     code: "B.2", group: 1, title: "Pembagian Bilangan Asli dengan Pecahan", short: "Bilangan asli ÷ pecahan",
     steps: [
-      "Aturannya: n ÷ a/b = n × b/a = (n × b)/a. Balik pecahannya, lalu kalikan.",
-      "Contoh: 3 ÷ 2/5 = 3 × 5/2 = 15/2 = 7 1/2.",
+      "Caranya: balik pecahannya (pembilang dan penyebut bertukar tempat), lalu ubah ÷ menjadi ×.",
+      "Contoh: 3 ÷ 2/5 = 3 × 5/2 = (3 × 5)/2 = 15/2 = 7 1/2.",
       "Artinya 2/5 muat 7 1/2 kali di dalam 3.",
     ],
-    demo: "Tekan Lompat sampai tidak cukup, lalu cocokkan dengan hasil n × b/a.",
+    demo: "Tekan Lompat sampai tidak cukup, lalu cocokkan banyak lompatan dengan hasil cara membalik pecahan.",
   },
   {
     code: "C.1", group: 2, title: "Mengubah Pecahan Menjadi Desimal", short: "Pecahan → desimal",

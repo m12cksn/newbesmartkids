@@ -13,11 +13,15 @@ export function Fr({ n, d, className = "" }: { n: number | string; d: number | s
   </span>;
 }
 /** Mengubah "3/4" di dalam kalimat menjadi pecahan bertumpuk. */
+/** Mengubah "3/4", "(3 × 3)/4", "2/(3 × 4)" di dalam kalimat menjadi pecahan bertumpuk tanpa garis miring. */
+const fracPart = String.raw`(?:\d+|\([^()]+\))`;
+const fracRe = new RegExp(`(${fracPart}\\/${fracPart})`, "g");
 export function MathText({ text }: { text: string }): ReactNode {
-  const parts = text.split(/(\d+\/\d+)/g);
+  const parts = text.split(fracRe);
+  const bare = (x: string) => x.replace(/^\((.*)\)$/, "$1");
   return <>{parts.map((part, i) => {
-    const m = part.match(/^(\d+)\/(\d+)$/);
-    return m ? <Fr key={i} n={m[1]} d={m[2]} className="mx-0.5" /> : <Fragment key={i}>{part}</Fragment>;
+    const m = part.match(new RegExp(`^(${fracPart})\\/(${fracPart})$`));
+    return m ? <Fr key={i} n={bare(m[1])} d={bare(m[2])} className="mx-0.5" /> : <Fragment key={i}>{part}</Fragment>;
   })}</>;
 }
 
