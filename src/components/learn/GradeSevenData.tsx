@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, BarChart3, Check, ChartLine, ChartPie, Minus, Plus, RotateCcw, Undo2, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout } from "./QuizFitLayout";
 import { BarChart } from "./GradeFiveDataArt";
 import { MathText } from "./GradeSevenRationalArt";
 import { AxisBars, LinePlot, LineChart, MiniCharts, PieChart } from "./GradeSevenDataArt";
@@ -341,8 +342,7 @@ export default function GradeSevenData() {
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderText={text => <MathText text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt + q.answer} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt + q.answer} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

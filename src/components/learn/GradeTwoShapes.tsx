@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, RotateCcw, RotateCw, Undo2 } from "lucide-react";
 import { useState } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout } from "./QuizFitLayout";
 import { FigView, fillOf, ink, ObjArt, SolidArt, curvePath } from "./ShapeVisuals";
 import {
   applyCuts, assessment, corners, correct, cutShapes, describePieces, formatAnswer, P, parseCuts, pieceCorners, practice, ready, SEP, sideName,
@@ -295,8 +296,7 @@ export default function GradeTwoShapes() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 3"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.fig ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><FigView fig={q.fig} className={q.fig.t === "stack" ? "w-44" : "size-36"} scale={1.6} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.fig ? <FigView fig={q.fig} className={q.fig.t === "stack" ? "w-44" : "size-36"} scale={1.6} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

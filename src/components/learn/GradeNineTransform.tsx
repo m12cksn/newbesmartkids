@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Eraser, FlipHorizontal2, Minus, Plus, RotateCcw, RotateCw } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
+import { QuizFitLayout } from "./QuizFitLayout";
 import { M, Plane, plainMath, SceneView } from "./GradeNineTransformArt";
 import {
   assessment, cells, correct, dilate, formatAnswer, idn, pickPoints, practice, ptText, ready, reflect, rotate, sections, SEP, splitParts, topics, translate,
@@ -297,8 +298,7 @@ export default function GradeNineTransform() {
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderText={text => <M text={text} />}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;
