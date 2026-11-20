@@ -90,8 +90,8 @@ function MultiplyLab() {
     <Steps titles={["Buat kelompok", "Hitung potongan", "Susun ulang"]} stage={stage} setStage={setStage} />
     <div className="space-y-1.5 rounded-xl bg-base-100 p-3">{rows}</div>
     <Result value={fracText([total, b])} tone={stage === 2 ? "success" : "info"}>
-      {stage === 0 && <>Ada {n} kelompok yang sama, masing-masing <Fr n={a} d={b} />. Perkalian adalah penjumlahan berulang: <MathText text={Array.from({ length: n }, () => `${a}/${b}`).join(" + ")} />.</>}
-      {stage === 1 && <>{n} kelompok × {a} potongan = <strong>{total} potongan</strong>. Setiap potongan berukuran <Fr n={1} d={b} />, jadi hasilnya <Fr n={total} d={b} />. Penyebut tidak dikalikan karena ukuran potongan tidak berubah.</>}
+      {stage === 0 && <>{n} kelompok, masing-masing <Fr n={a} d={b} />: <MathText text={Array.from({ length: n }, () => `${a}/${b}`).join(" + ")} />.</>}
+      {stage === 1 && <>Kalikan pembilangnya: {n} × {a} = <strong>{total} potongan</strong>. Penyebut tetap {b}, jadi hasilnya <Fr n={total} d={b} />.</>}
       {stage === 2 && <><strong>{n} × <Fr n={a} d={b} /> = <Fr n={`${n} × ${a}`} d={b} /> = <Fr n={total} d={b} /></strong>{total >= b && total % b !== 0 && <> = <FracNode f={[total, b]} mixed /></>}{total % b === 0 && <> = {total / b}</>}. Potongan yang sama disusun menjadi {Math.floor(total / b)} utuh{total % b ? <> dan <Fr n={total % b} d={b} /></> : ""}.</>}
     </Result>
     <TryFraction key={`${a}-${b}-${n}`} prompt={<>Berapa {n} × <Fr n={a} d={b} />?</>} answer={[total, b]}
@@ -131,10 +131,10 @@ function PartOfLab() {
       })}
     </div>}
     <Result value={String(count)} tone={done ? "success" : picked.length > a ? "warning" : "info"}>
-      {!grouped ? <>Penyebut {b} berarti kumpulan {total} benda dibagi menjadi {b} kelompok sama banyak. Tekan tombol untuk membaginya.</>
-        : done ? <><strong><Fr n={a} d={b} /> × {total} = <Fr n={`${a} × ${total}`} d={b} /> = {count}</strong>. Satu kelompok berisi {total} : {b} = {per} benda, diambil {a} kelompok. Bandingkan: {total} × <Fr n={a} d={b} /> juga {count}, tetapi artinya {total} kelompok berisi <Fr n={a} d={b} />.</>
-        : picked.length > a ? <>Terlalu banyak. Pembilang {a} berarti ambil {a} kelompok saja.</>
-        : <>Setiap kelompok berisi {per} benda. Pembilang {a}: ketuk {a} kelompok. Sekarang terpilih {count} benda.</>}
+      {!grouped ? <>Bagi {total} benda menjadi {b} kelompok sama banyak (sesuai penyebut {b}).</>
+        : done ? <><strong><Fr n={a} d={b} /> × {total} = <Fr n={`${a} × ${total}`} d={b} /> = {count}</strong>. Bandingkan: {total} × <Fr n={a} d={b} /> juga {count}.</>
+        : picked.length > a ? <>Terlalu banyak. Ambil {a} kelompok saja (sesuai pembilang).</>
+        : <>Ketuk {a} kelompok (sesuai pembilang). Terpilih {count} benda.</>}
     </Result>
   </div>;
 }
@@ -165,9 +165,9 @@ function DivideLab() {
       <figcaption className="mt-1 text-center text-xs font-bold">1 utuh</figcaption>
     </figure>
     <Result value={fracText(share)} tone={stage === 2 ? "success" : "info"}>
-      {stage === 0 && <><Fr n={a} d={b} /> berarti {a} kolom dari {b} kolom diarsir. Arsiran ini akan dibagi menjadi {n} bagian sama besar.</>}
-      {stage === 1 && <>Setiap kolom dipotong menjadi {n}. Satu utuh sekarang berisi {b} × {n} = <strong>{small} potongan kecil</strong>, masing-masing <Fr n={1} d={small} />.</>}
-      {stage === 2 && <>Satu bagian (merah) berisi {a} potongan kecil: <strong><Fr n={a} d={b} /> ÷ {n} = <Fr n={a} d={b} /> × <Fr n={1} d={n} /> = <Fr n={a} d={small} /></strong>{share[1] !== small && <> = <FracNode f={share} /></>}. Hasilnya lebih kecil dari <Fr n={a} d={b} />.</>}
+      {stage === 0 && <><Fr n={a} d={b} /> diarsir. Arsiran ini akan dibagi {n}.</>}
+      {stage === 1 && <>Penyebut menjadi {b} × {n} = <strong>{small} potongan kecil</strong>.</>}
+      {stage === 2 && <>Satu bagian (merah) berisi {a} potongan kecil: <strong><Fr n={a} d={b} /> ÷ {n} = <Fr n={a} d={`${b} × ${n}`} /> = <Fr n={a} d={small} /></strong>{share[1] !== small && <> = <FracNode f={share} /></>}. Hasilnya lebih kecil dari <Fr n={a} d={b} />.</>}
     </Result>
     <TryFraction key={`${a}-${b}-${n}`} prompt={<>Berapa <Fr n={a} d={b} /> ÷ {n}?</>} answer={[a, small]}
       hint={<>Pembilang tetap {a}. Penyebut menjadi {b} × {n}.</>} />
@@ -207,8 +207,8 @@ function MeasureLab() {
       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setJumps(0)}>Ulangi</button>
     </div>
     <Result value={String(jumps)} tone={can ? "info" : "success"}>
-      {can ? <>Sudah {jumps} lompatan. Masih tersisa <FracNode f={[left, b]} /> dari {n}. Terus lompat sampai tidak cukup.</>
-        : <><strong>{jumps} lompatan penuh</strong>{left > 0 && <> dan sisa <Fr n={left} d={b} />, yaitu <Fr n={left} d={a} /> lompatan</>}. Jadi <strong>{n} ÷ <Fr n={a} d={b} /> = {n} × <Fr n={b} d={a} /> = <FracNode f={[units, a]} /></strong>{units % a !== 0 && units > a && <> = <FracNode f={[units, a]} mixed /></>}. {n} utuh = {units} garis kecil, dibagi {a} garis per lompatan.</>}
+      {can ? <>Sudah {jumps} lompatan. Terus lompat sampai tidak cukup.</>
+        : <><strong>{jumps} lompatan penuh</strong>{left > 0 && <> dan sisa <Fr n={left} d={b} />, yaitu <Fr n={left} d={a} /> lompatan</>}. Jadi <strong>{n} ÷ <Fr n={a} d={b} /> = {n} × <Fr n={b} d={a} /> = <FracNode f={[units, a]} /></strong>{units % a !== 0 && units > a && <> = <FracNode f={[units, a]} mixed /></>}.</>}
     </Result>
     <TryFraction key={`${n}-${a}-${b}`} prompt={<>Berapa {n} ÷ <Fr n={a} d={b} />?</>} answer={[units, a]}
       hint={<>Ubah {n} menjadi potongan <Fr n={1} d={b} />: ada {n} × {b} potongan. Bagi dengan {a}.</>} />
