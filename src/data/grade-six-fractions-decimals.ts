@@ -156,7 +156,7 @@ export const topics = [
       "Contoh: 3 × 3/4 = (3 × 3)/4 = 9/4.",
       "Jika pembilang lebih besar dari penyebut, ubah ke pecahan campuran: 9/4 = 2 1/4.",
     ],
-    demo: "Tekan Langkah berikutnya sampai hasilnya muncul, lalu ganti angkanya dan hitung sendiri.",
+    demo: "Pilih pecahan dan angka pengalinya. Hitung potongan berwarna, lalu cocokkan dengan caranya di bawah gambar.",
   },
   {
     code: "A.2", group: 0, title: "Perkalian Pecahan dengan Bilangan Asli", short: "Pecahan × bilangan asli",
@@ -165,7 +165,7 @@ export const topics = [
       "Contoh: 2/3 × 12 = (2 × 12)/3 = 24/3 = 8.",
       "Artinya 2/3 bagian dari 12 benda, yaitu 8 benda.",
     ],
-    demo: "Bagi benda menjadi kelompok sebanyak penyebut, lalu ketuk kelompok sebanyak pembilang.",
+    demo: "Pilih pecahan dan banyak benda per kelompok. Kelompok yang diambil berwarna merah.",
   },
   {
     code: "B.1", group: 1, title: "Pembagian Pecahan dengan Bilangan Asli", short: "Pecahan ÷ bilangan asli",
@@ -174,7 +174,7 @@ export const topics = [
       "Contoh: 2/3 ÷ 4 = 2/(3 × 4) = 2/12 = 1/6.",
       "Hasilnya lebih kecil dari pecahan semula.",
     ],
-    demo: "Tekan Langkah berikutnya dan lihat penyebutnya dikalikan dengan bilangan pembagi.",
+    demo: "Pilih pecahan dan pembaginya. Bagian merah adalah hasilnya.",
   },
   {
     code: "B.2", group: 1, title: "Pembagian Bilangan Asli dengan Pecahan", short: "Bilangan asli ÷ pecahan",
@@ -183,7 +183,7 @@ export const topics = [
       "Contoh: 3 ÷ 2/5 = 3 × 5/2 = (3 × 5)/2 = 15/2 = 7 1/2.",
       "Artinya 2/5 muat 7 1/2 kali di dalam 3.",
     ],
-    demo: "Tekan Lompat sampai tidak cukup, lalu cocokkan banyak lompatan dengan hasil cara membalik pecahan.",
+    demo: "Pilih bilangan dan pecahan pembaginya. Garis bilangan menunjukkan berapa kali pecahan itu muat.",
   },
   {
     code: "C.1", group: 2, title: "Mengubah Pecahan Menjadi Desimal", short: "Pecahan → desimal",

@@ -1,5 +1,6 @@
 "use client";
 
+import { Minus, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { decimalText, fracText, parseDecimal, parseFraction, simplify, type Frac } from "@/data/grade-six-fractions-decimals";
 import { Fr, HundredGrid, MathText, PlaceChart, placeNames } from "./GradeSixVisuals";
@@ -15,28 +16,10 @@ function Chips({ label, items, value, onChange }: { label: string; items: Frac[]
     {items.map(item => <button key={item.join("/")} type="button" className={chip(same(item, value))} aria-pressed={same(item, value)} onClick={() => onChange(item)}><Fr n={item[0]} d={item[1]} /></button>)}
   </div>;
 }
-function Range({ label, value, min, max, step = 1, onChange }: { label: string; value: number; min: number; max: number; step?: number; onChange: (v: number) => void }) {
-  return <label className="block text-sm font-bold">{label}: <output className="tabular-nums">{value}</output>
-    <input type="range" aria-label={label} className="range range-info range-sm mt-1 w-full" min={min} max={max} step={step} value={value} onChange={e => onChange(Number(e.target.value))} />
-  </label>;
-}
 const FracNode = ({ f, mixed = false }: { f: Frac; mixed?: boolean }) => <MathText text={fracText(f, mixed)} />;
 function Result({ value, children, tone = "info" }: { value: string; children: ReactNode; tone?: "success" | "info" | "warning" }) {
   return <output data-testid="lab-result" data-value={value} aria-live="polite"
     className={`block rounded-lg p-3 text-sm leading-7 ${tone === "success" ? "bg-success/10" : tone === "warning" ? "bg-warning/20" : "bg-base-100"}`}>{children}</output>;
-}
-/** Penunjuk langkah peraga: siswa maju/mundur sendiri. */
-function Steps({ titles, stage, setStage }: { titles: string[]; stage: number; setStage: (s: number) => void }) {
-  return <div className="space-y-2">
-    <ol className="flex flex-wrap gap-1 text-xs font-bold" aria-label="Langkah peraga">
-      {titles.map((t, i) => <li key={t} aria-current={i === stage ? "step" : undefined}
-        className={`rounded-full px-2.5 py-1 ${i === stage ? "bg-success text-white" : i < stage ? "bg-success/20" : "bg-base-200 text-base-content/60"}`}>{i + 1}. {t}</li>)}
-    </ol>
-    <div className="flex flex-wrap gap-2">
-      <button type="button" className="btn btn-outline btn-sm" disabled={stage === 0} onClick={() => setStage(stage - 1)}>Langkah sebelumnya</button>
-      <button type="button" className="btn btn-success btn-sm" disabled={stage === titles.length - 1} onClick={() => setStage(stage + 1)}>Langkah berikutnya</button>
-    </div>
-  </div>;
 }
 /** "Coba sendiri": siswa menghitung dulu, peraga membuktikan. */
 function TryFraction({ prompt, answer, hint }: { prompt: ReactNode; answer: Frac; hint: ReactNode }) {
@@ -67,151 +50,115 @@ function Strip({ parts, color, label, numbers }: { parts: number; color: (i: num
     </div>
   </div>;
 }
-const palette = ["#059669", "#0ea5e9", "#f97316", "#8b5cf6", "#e11d48", "#ca8a04"];
 
 /* ====================================================================== */
-/* A.1  n × a/b — kelompok potongan yang sama                             */
+/* Peraga perkalian dan pembagian: atur angka, gambar dan caranya langsung  */
+/* terlihat. Tidak ada langkah tersembunyi.                                 */
 /* ====================================================================== */
+function Stepper({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
+  return <span role="group" aria-label={label} className="flex items-center gap-2">
+    <span className="text-sm font-bold">{label}</span>
+    <button type="button" aria-label={`${label} kurangi`} className="btn btn-circle btn-sm btn-outline" disabled={value <= min} onClick={() => onChange(value - 1)}><Minus className="size-4" aria-hidden="true" /></button>
+    <span className="min-w-6 text-center text-xl font-extrabold tabular-nums">{value}</span>
+    <button type="button" aria-label={`${label} tambah`} className="btn btn-circle btn-sm btn-outline" disabled={value >= max} onClick={() => onChange(value + 1)}><Plus className="size-4" aria-hidden="true" /></button>
+  </span>;
+}
+/** Hasil akhir: pecahan biasa, lalu bilangan bulat atau pecahan campuran bila ada. */
+function Answer({ f }: { f: Frac }) {
+  const d = f[1], s = simplify(f);
+  return <>
+    {s[1] !== d && s[1] !== 1 && <> = <Fr n={s[0]} d={s[1]} /></>}
+    {s[1] === 1 ? <> = {s[0]}</> : s[0] > s[1] && <> = <FracNode f={s} mixed /></>}
+  </>;
+}
+/** Baris cara: ditulis besar, pecahan bertumpuk. */
+const Way = ({ children }: { children: ReactNode }) => <p data-testid="lab-way" className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-base-100 p-3 text-2xl font-extrabold leading-none sm:text-3xl">{children}</p>;
+const shadeA = "#059669", shadeB = "#38bdf8", red = "#e11d48";
+
+/* ---------- A.1  n × a/b ---------- */
+const multFracs: Frac[] = [[1, 2], [2, 3], [3, 4], [2, 5], [3, 5]];
 function MultiplyLab() {
-  const [b, setB] = useState(4), [a, setA] = useState(3), [n, setN] = useState(3), [stage, setStage] = useState(0);
-  const total = n * a, wholes = Math.ceil(total / b);
-  const reset = (f: () => void) => { f(); setStage(0); };
-  const rows = stage < 2
-    ? Array.from({ length: n }, (_, r) => <Strip key={r} parts={b} label={<>Kel. {r + 1}</>} color={i => i < a ? palette[r % palette.length] : undefined} numbers={i => stage === 1 && i < a ? r * a + i + 1 : undefined} />)
-    : Array.from({ length: wholes }, (_, r) => <Strip key={r} parts={b} label={r * b + b <= total ? "1 utuh" : <FracNode f={[total - r * b, b]} />}
-        color={i => r * b + i < total ? palette[Math.floor((r * b + i) / a) % palette.length] : undefined} numbers={i => r * b + i < total ? r * b + i + 1 : undefined} />);
-  return <div className="space-y-4">
-    <div className="grid gap-3 sm:grid-cols-3">
-      <Range label="Penyebut" value={b} min={2} max={8} onChange={v => reset(() => { setB(v); setA(x => Math.min(x, v - 1)); })} />
-      <Range label="Pembilang" value={a} min={1} max={b - 1} onChange={v => reset(() => setA(v))} />
-      <Range label="Banyak kelompok" value={n} min={1} max={6} onChange={v => reset(() => setN(v))} />
+  const [f, setF] = useState<Frac>([3, 4]), [n, setN] = useState(3);
+  const [a, b] = f, total = n * a;
+  return <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2"><Chips label="Pecahan" items={multFracs} value={f} onChange={setF} /><Stepper label="Dikali" value={n} min={1} max={5} onChange={setN} /></div>
+    <div className="space-y-1.5 rounded-xl bg-base-100 p-3">
+      {Array.from({ length: n }, (_, r) => <Strip key={r} parts={b} label={<Fr n={a} d={b} />} color={i => (i < a ? shadeA : undefined)} numbers={i => (i < a ? r * a + i + 1 : undefined)} />)}
     </div>
-    <p className="text-2xl font-extrabold">{n} × <Fr n={a} d={b} /></p>
-    <Steps titles={["Buat kelompok", "Hitung potongan", "Susun ulang"]} stage={stage} setStage={setStage} />
-    <div className="space-y-1.5 rounded-xl bg-base-100 p-3">{rows}</div>
-    <Result value={fracText([total, b])} tone={stage === 2 ? "success" : "info"}>
-      {stage === 0 && <>{n} kelompok, masing-masing <Fr n={a} d={b} />: <MathText text={Array.from({ length: n }, () => `${a}/${b}`).join(" + ")} />.</>}
-      {stage === 1 && <>Kalikan pembilangnya: {n} × {a} = <strong>{total} potongan</strong>. Penyebut tetap {b}, jadi hasilnya <Fr n={total} d={b} />.</>}
-      {stage === 2 && <><strong>{n} × <Fr n={a} d={b} /> = <Fr n={`${n} × ${a}`} d={b} /> = <Fr n={total} d={b} /></strong>{total >= b && total % b !== 0 && <> = <FracNode f={[total, b]} mixed /></>}{total % b === 0 && <> = {total / b}</>}. Potongan yang sama disusun menjadi {Math.floor(total / b)} utuh{total % b ? <> dan <Fr n={total % b} d={b} /></> : ""}.</>}
-    </Result>
+    <Way>{n} × <Fr n={a} d={b} /> = <Fr n={`${n} × ${a}`} d={b} /> = <Fr n={total} d={b} /><Answer f={[total, b]} /></Way>
+    <Result value={fracText([total, b])} tone="success">Kalikan pembilangnya: {n} × {a} = <strong>{total} potongan</strong> berwarna. Penyebutnya tetap {b}.</Result>
     <TryFraction key={`${a}-${b}-${n}`} prompt={<>Berapa {n} × <Fr n={a} d={b} />?</>} answer={[total, b]}
-      hint={<>Hitung potongannya: {n} × {a} = ?, lalu tulis di atas penyebut {b}.</>} />
+      hint={<>Kalikan pembilangnya: {n} × {a} = ?, penyebutnya tetap {b}.</>} />
   </div>;
 }
 
-/* ====================================================================== */
-/* A.2  a/b × n — bagian dari kumpulan                                     */
-/* ====================================================================== */
+/* ---------- A.2  a/b × n ---------- */
 const partFracs: Frac[] = [[2, 3], [3, 4], [1, 2], [2, 5], [5, 6]];
 function PartOfLab() {
-  const [f, setF] = useState<Frac>([2, 3]);
-  const [per, setPer] = useState(4);
-  const [grouped, setGrouped] = useState(false);
-  const [picked, setPicked] = useState<number[]>([]);
-  const [a, b] = f, total = b * per, count = picked.length * per, done = picked.length === a;
-  const reset = () => { setGrouped(false); setPicked([]); };
-  return <div className="space-y-4">
-    <Chips label="Pecahan" items={partFracs} value={f} onChange={v => { setF(v); reset(); }} />
-    <Range label="Benda per kelompok" value={per} min={1} max={5} onChange={v => { setPer(v); reset(); }} />
-    <p className="text-2xl font-extrabold"><Fr n={a} d={b} /> × {total}</p>
-    {!grouped ? <div className="space-y-3">
-      <div className="flex max-w-sm flex-wrap gap-1.5 rounded-xl bg-base-100 p-3" role="img" aria-label={`${total} benda`}>
-        {Array.from({ length: total }, (_, i) => <span key={i} className="size-6 rounded-full border-2 border-sky-700 bg-sky-300" />)}
-      </div>
-      <button type="button" className="btn btn-success btn-sm" onClick={() => setGrouped(true)}>Bagi menjadi {b} kelompok</button>
-    </div> : <div className="space-y-1.5 rounded-xl bg-base-100 p-3">
-      {Array.from({ length: b }, (_, g) => {
-        const on = picked.includes(g);
-        return <button key={g} type="button" aria-pressed={on} aria-label={`Kelompok ${g + 1}, ${per} benda`}
-          className={`flex w-full items-center gap-1.5 rounded-lg border-2 p-1.5 transition ${on ? "border-rose-500 bg-rose-50" : "border-dashed border-base-300 hover:border-success"}`}
-          onClick={() => setPicked(p => on ? p.filter(x => x !== g) : [...p, g])}>
-          <span className="w-16 text-left text-xs font-bold">Kel. {g + 1}</span>
-          {Array.from({ length: per }, (_, i) => <span key={i} className={`size-6 rounded-full border-2 ${on ? "border-rose-700 bg-rose-400" : "border-sky-700 bg-sky-300"}`} />)}
-        </button>;
-      })}
-    </div>}
-    <Result value={String(count)} tone={done ? "success" : picked.length > a ? "warning" : "info"}>
-      {!grouped ? <>Bagi {total} benda menjadi {b} kelompok sama banyak (sesuai penyebut {b}).</>
-        : done ? <><strong><Fr n={a} d={b} /> × {total} = <Fr n={`${a} × ${total}`} d={b} /> = {count}</strong>. Bandingkan: {total} × <Fr n={a} d={b} /> juga {count}.</>
-        : picked.length > a ? <>Terlalu banyak. Ambil {a} kelompok saja (sesuai pembilang).</>
-        : <>Ketuk {a} kelompok (sesuai pembilang). Terpilih {count} benda.</>}
-    </Result>
+  const [f, setF] = useState<Frac>([2, 3]), [per, setPer] = useState(4);
+  const [a, b] = f, total = b * per, count = a * per;
+  return <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2"><Chips label="Pecahan" items={partFracs} value={f} onChange={setF} /><Stepper label="Benda per kelompok" value={per} min={1} max={5} onChange={setPer} /></div>
+    <div className="space-y-1 rounded-xl bg-base-100 p-3" role="img" aria-label={`${total} benda dalam ${b} kelompok, ${a} kelompok diambil`}>
+      {Array.from({ length: b }, (_, g) => { const on = g < a;
+        return <div key={g} className={`flex items-center gap-1.5 rounded-lg border-2 p-1 ${on ? "border-rose-500 bg-rose-50" : "border-dashed border-base-300"}`}>
+          <span className="w-14 text-xs font-bold">Kel. {g + 1}</span>
+          {Array.from({ length: per }, (_, i) => <span key={i} className={`size-5 rounded-full border-2 ${on ? "border-rose-700 bg-rose-400" : "border-sky-700 bg-sky-200"}`} />)}
+        </div>; })}
+    </div>
+    <Way><Fr n={a} d={b} /> × {total} = <Fr n={`${a} × ${total}`} d={b} /> = <Fr n={a * total} d={b} /> = {count}</Way>
+    <Result value={String(count)} tone="success">{total} benda dibagi menjadi {b} kelompok (penyebut). Ambil {a} kelompok (pembilang): <strong>{count} benda</strong>.</Result>
   </div>;
 }
 
-/* ====================================================================== */
-/* B.1  a/b ÷ n — potong setiap bagian                                     */
-/* ====================================================================== */
+/* ---------- B.1  a/b ÷ n ---------- */
 const divFracs: Frac[] = [[2, 3], [1, 2], [3, 4], [3, 5], [1, 3]];
 function DivideLab() {
-  const [f, setF] = useState<Frac>([2, 3]);
-  const [n, setN] = useState(4);
-  const [stage, setStage] = useState(0);
-  const [a, b] = f, rows = stage === 0 ? 1 : n, small = b * n, share = simplify([a, small]);
-  return <div className="space-y-4">
-    <Chips label="Pecahan" items={divFracs} value={f} onChange={v => { setF(v); setStage(0); }} />
-    <Range label="Dibagi menjadi" value={n} min={2} max={5} onChange={v => { setN(v); setStage(0); }} />
-    <p className="text-2xl font-extrabold"><Fr n={a} d={b} /> ÷ {n}</p>
-    <Steps titles={["Arsir pecahan", "Potong", "Ambil satu bagian"]} stage={stage} setStage={setStage} />
-    <figure className="max-w-xs">
-      <div className="grid aspect-square gap-px overflow-hidden rounded border-2 border-slate-700 bg-slate-500" role="img"
-        aria-label={`Satu utuh, ${b} kolom${stage ? ` dan ${n} baris` : ""}`}
-        style={{ gridTemplateColumns: `repeat(${b}, minmax(0,1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0,1fr))` }}>
-        {Array.from({ length: rows * b }, (_, k) => {
-          const r = Math.floor(k / b), c = k % b, shaded = c < a, mine = stage === 2 && r === 0 && shaded;
-          return <span key={k} className="transition-colors duration-300" style={{ background: mine ? "#e11d48" : shaded ? (stage === 2 ? "#bae6fd" : "#38bdf8") : "#fff" }} />;
-        })}
-      </div>
-      <figcaption className="mt-1 text-center text-xs font-bold">1 utuh</figcaption>
-    </figure>
-    <Result value={fracText(share)} tone={stage === 2 ? "success" : "info"}>
-      {stage === 0 && <><Fr n={a} d={b} /> diarsir. Arsiran ini akan dibagi {n}.</>}
-      {stage === 1 && <>Penyebut menjadi {b} × {n} = <strong>{small} potongan kecil</strong>.</>}
-      {stage === 2 && <>Satu bagian (merah) berisi {a} potongan kecil: <strong><Fr n={a} d={b} /> ÷ {n} = <Fr n={a} d={`${b} × ${n}`} /> = <Fr n={a} d={small} /></strong>{share[1] !== small && <> = <FracNode f={share} /></>}. Hasilnya lebih kecil dari <Fr n={a} d={b} />.</>}
-    </Result>
+  const [f, setF] = useState<Frac>([2, 3]), [n, setN] = useState(4);
+  const [a, b] = f, small = b * n;
+  return <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2"><Chips label="Pecahan" items={divFracs} value={f} onChange={setF} /><Stepper label="Dibagi" value={n} min={2} max={5} onChange={setN} /></div>
+    <div className="flex flex-wrap items-center gap-4 rounded-xl bg-base-100 p-3">
+      <figure className="w-36 sm:w-44">
+        <div className="grid aspect-square gap-px overflow-hidden rounded border-2 border-slate-700 bg-slate-500" role="img" aria-label={`Satu utuh: ${b} kolom, ${a} diarsir, dipotong ${n} baris, satu baris merah`}
+          style={{ gridTemplateColumns: `repeat(${b}, minmax(0,1fr))`, gridTemplateRows: `repeat(${n}, minmax(0,1fr))` }}>
+          {Array.from({ length: n * b }, (_, k) => { const r = Math.floor(k / b), c = k % b;
+            return <span key={k} style={{ background: c < a ? (r === 0 ? red : "#bae6fd") : "#fff" }} />; })}
+        </div>
+        <figcaption className="mt-1 text-center text-xs font-bold">1 utuh = {small} potongan kecil</figcaption>
+      </figure>
+      <p className="max-w-[14rem] text-sm"><Fr n={a} d={b} /> (biru) dibagi {n}. Satu bagian adalah yang <strong className="text-rose-600">merah</strong>: {a} potongan dari {small}.</p>
+    </div>
+    <Way><Fr n={a} d={b} /> ÷ {n} = <Fr n={a} d={`${b} × ${n}`} /> = <Fr n={a} d={small} /><Answer f={[a, small]} /></Way>
+    <Result value={fracText([a, small])} tone="success">Pembilangnya tetap {a}. Penyebutnya dikali {n}: {b} × {n} = {small}. Hasilnya lebih kecil dari <Fr n={a} d={b} />.</Result>
     <TryFraction key={`${a}-${b}-${n}`} prompt={<>Berapa <Fr n={a} d={b} /> ÷ {n}?</>} answer={[a, small]}
-      hint={<>Pembilang tetap {a}. Penyebut menjadi {b} × {n}.</>} />
+      hint={<>Pembilang tetap {a}. Penyebutnya {b} × {n}.</>} />
   </div>;
 }
 
-/* ====================================================================== */
-/* B.2  n ÷ a/b — berapa kali muat (lompatan pada garis bilangan)          */
-/* ====================================================================== */
+/* ---------- B.2  n ÷ a/b ---------- */
 const jumpFracs: Frac[] = [[1, 2], [1, 4], [2, 5], [2, 3], [3, 4]];
 function MeasureLab() {
-  const [n, setN] = useState(3);
-  const [f, setF] = useState<Frac>([2, 5]);
-  const [jumps, setJumps] = useState(0);
-  const [a, b] = f, units = n * b, used = jumps * a, left = units - used, can = left >= a;
-  const W = 300, x = (u: number) => 10 + (W - 20) * u / units;
-  return <div className="space-y-4">
-    <Range label="Banyak utuh" value={n} min={1} max={4} onChange={v => { setN(v); setJumps(0); }} />
-    <Chips label="Ukuran lompatan" items={jumpFracs} value={f} onChange={v => { setF(v); setJumps(0); }} />
-    <p className="text-2xl font-extrabold">{n} ÷ <Fr n={a} d={b} /></p>
+  const [n, setN] = useState(3), [f, setF] = useState<Frac>([2, 5]);
+  const [a, b] = f, units = n * b, full = Math.floor(units / a), left = units - full * a;
+  const W = 300, x = (u: number) => 10 + (W - 20) * u / units, arc = (s: number, e: number) => Math.min(30, (e - s) * 0.9);
+  return <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2"><Stepper label="Bilangan" value={n} min={1} max={4} onChange={setN} /><Chips label="Dibagi" items={jumpFracs} value={f} onChange={setF} /></div>
     <div className="rounded-xl bg-base-100 p-3">
-      <svg viewBox={`0 0 ${W} 80`} className="w-full" role="img" aria-label={`Garis bilangan 0 sampai ${n}, ${jumps} lompatan`}>
-        {Array.from({ length: jumps }, (_, j) => {
-          const s = x(j * a), e = x((j + 1) * a);
-          return <g key={j}><path d={`M${s} 50 Q${(s + e) / 2} ${50 - Math.min(36, (e - s) * .9)} ${e} 50`} fill="none" stroke={palette[j % palette.length]} strokeWidth="2.5" />
-            <text x={(s + e) / 2} y={Math.max(10, 44 - Math.min(36, (e - s) * .9) / 2)} fontSize="9" textAnchor="middle" fontWeight="700" fill={palette[j % palette.length]}>{j + 1}</text></g>;
-        })}
-        {left > 0 && jumps > 0 && !can && <rect x={x(used)} y="46" width={x(units) - x(used)} height="8" fill="#fde68a" />}
-        <path d={`M10 50H${W - 10}`} stroke="#334155" strokeWidth="2" />
-        {Array.from({ length: units + 1 }, (_, u) => <g key={u}><path d={`M${x(u)} ${u % b ? 46 : 42}V${u % b ? 54 : 58}`} stroke="#334155" strokeWidth={u % b ? 1 : 2} />
-          {u % b === 0 && <text x={x(u)} y="72" fontSize="11" textAnchor="middle" fontWeight="700">{u / b}</text>}</g>)}
+      <svg viewBox={`0 0 ${W} 74`} className="w-full" role="img" aria-label={`Garis bilangan 0 sampai ${n}, ${full} lompatan ${a}/${b}`}>
+        {Array.from({ length: full }, (_, j) => { const s = x(j * a), e = x((j + 1) * a);
+          return <path key={j} d={`M${s} 46 Q${(s + e) / 2} ${46 - arc(s, e)} ${e} 46`} fill="none" stroke={j % 2 ? shadeB : shadeA} strokeWidth="2.5" />; })}
+        {left > 0 && <rect x={x(full * a)} y="42" width={x(units) - x(full * a)} height="8" fill="#fde68a" />}
+        <path d={`M10 46H${W - 10}`} stroke="#334155" strokeWidth="2" />
+        {Array.from({ length: units + 1 }, (_, u) => <g key={u}><path d={`M${x(u)} ${u % b ? 42 : 38}V${u % b ? 50 : 54}`} stroke="#334155" strokeWidth={u % b ? 1 : 2} />
+          {u % b === 0 && <text x={x(u)} y="68" fontSize="11" textAnchor="middle" fontWeight="700">{u / b}</text>}</g>)}
       </svg>
-      <p className="text-xs text-base-content/70">Garis kecil = <Fr n={1} d={b} />. Satu lompatan = {a} garis kecil.</p>
+      <p className="text-sm">Lompatan <Fr n={a} d={b} /> muat <strong>{full} kali</strong>{left > 0 && <> dan sisa <Fr n={left} d={a} /> lompatan (kuning)</>}.</p>
     </div>
-    <div className="flex flex-wrap gap-2">
-      <button type="button" className="btn btn-success btn-sm" disabled={!can} onClick={() => setJumps(j => j + 1)}>Lompat <Fr n={a} d={b} /></button>
-      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setJumps(0)}>Ulangi</button>
-    </div>
-    <Result value={String(jumps)} tone={can ? "info" : "success"}>
-      {can ? <>Sudah {jumps} lompatan. Terus lompat sampai tidak cukup.</>
-        : <><strong>{jumps} lompatan penuh</strong>{left > 0 && <> dan sisa <Fr n={left} d={b} />, yaitu <Fr n={left} d={a} /> lompatan</>}. Jadi <strong>{n} ÷ <Fr n={a} d={b} /> = {n} × <Fr n={b} d={a} /> = <FracNode f={[units, a]} /></strong>{units % a !== 0 && units > a && <> = <FracNode f={[units, a]} mixed /></>}.</>}
-    </Result>
+    <Way>{n} ÷ <Fr n={a} d={b} /> = {n} × <Fr n={b} d={a} /> = <Fr n={`${n} × ${b}`} d={a} /> = <Fr n={units} d={a} /><Answer f={[units, a]} /></Way>
+    <Result value={fracText([units, a])} tone="success">Balik pecahannya: <Fr n={a} d={b} /> menjadi <Fr n={b} d={a} />, lalu ubah ÷ menjadi ×.</Result>
     <TryFraction key={`${n}-${a}-${b}`} prompt={<>Berapa {n} ÷ <Fr n={a} d={b} />?</>} answer={[units, a]}
-      hint={<>Ubah {n} menjadi potongan <Fr n={1} d={b} />: ada {n} × {b} potongan. Bagi dengan {a}.</>} />
+      hint={<>Balik pecahannya menjadi <Fr n={b} d={a} />, lalu kalikan dengan {n}.</>} />
   </div>;
 }
 
