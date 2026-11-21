@@ -229,14 +229,14 @@ function Sheet({ op, level, setOp, setLevel, carry, setCarry, loading = false }:
       </div>
     </header>
     <div className="mx-auto max-w-5xl px-4 pt-5">
-      <h1 className="text-2xl font-extrabold sm:text-3xl">Berhitung <span className="text-[var(--c)]">bersusun</span></h1>
+      <h1 className="text-2xl font-extrabold sm:text-3xl">Berhitung bersusun</h1>
       <p className="mt-1 max-w-2xl text-sm leading-6 text-[#4b5f57]">Isi setiap kotak dengan satu angka. Kerjakan dari kanan ke kiri (pembagian dari kiri ke kanan); setelah mengetik, kursor pindah sendiri ke kotak berikutnya. Soal baru setiap hari pukul 00.00 WIB.</p>
       <div className="mt-4 lg:grid lg:grid-cols-[15.5rem_minmax(0,1fr)] lg:items-start lg:gap-6">
       <aside aria-label="Pengaturan latihan" className={`${card} p-3 lg:sticky lg:top-4`}>{controls}
         {save && <div className="mt-3 border-t border-[#dbe7e1] pt-3 max-lg:hidden" aria-hidden="true"><p className="text-sm font-bold">{right} dari {COUNT} benar</p><progress className="progress mt-1 h-2 w-full text-[var(--c)] [&::-webkit-progress-value]:bg-[var(--c)] [&::-moz-progress-bar]:bg-[var(--c)]" value={right} max={COUNT} /></div>}
       </aside>
       <section aria-label="Lembar soal" className="max-lg:mt-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 className="flex items-center gap-2 text-lg font-bold"><span className="flex size-7 items-center justify-center rounded-full bg-[var(--c)] text-white" aria-hidden="true">{OP_ICON[op]}</span>{opName}, {lv.name}</h2><p className="text-sm text-[#4b5f57]">{dateText}{save && save.date !== today ? " (paket kemarin)" : ""}</p></div>
+      <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 className="flex items-center gap-2 text-lg font-bold">{opName}, {lv.name}</h2><p className="text-sm text-[#4b5f57]">{dateText}{save && save.date !== today ? " (paket kemarin)" : ""}</p></div>
       {save && save.date !== today && <div role="status" className="mt-2 rounded-lg border-s-4 border-[#f0b429] bg-[#fff8e1] p-3 text-sm">Paket hari baru sudah tersedia. <button type="button" className="link font-bold" onClick={() => setSave(emptyColumn(wibDate()))}>Buka soal hari ini</button></div>}
       {!stored && <p role="status" className="mt-2 text-sm text-[#c92a2a]">Penyimpanan perangkat tidak tersedia. Jawaban tidak tersimpan setelah halaman ditutup.</p>}
 
