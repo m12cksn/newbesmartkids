@@ -22,7 +22,7 @@ const OP_ICON: Record<ColOp, ReactNode> = {
 const THEME: Record<ColOp, { c: string; s: string; g: string; p: string }> = {
   tambah: { c: "#0b7a75", s: "#dcf5f1", g: "#c4e8e2", p: "#effaf8" },
   kurang: { c: "#c2255c", s: "#fde7ef", g: "#f6cddc", p: "#fdf3f7" },
-  kali: { c: "#c2410c", s: "#ffead9", g: "#f9d4b7", p: "#fff6ee" },
+  kali: { c: "#b53a0a", s: "#ffead9", g: "#f9d4b7", p: "#fff6ee" },
   bagi: { c: "#3b5bdb", s: "#e5eafd", g: "#cbd5f8", p: "#f2f5fe" },
   cerita: { c: "#7048e8", s: "#eee7fd", g: "#dacdf8", p: "#f6f2fe" },
 };

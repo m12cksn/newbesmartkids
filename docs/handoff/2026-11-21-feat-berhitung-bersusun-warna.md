@@ -9,7 +9,7 @@ Mr Iwan ingin halaman tetap penuh warna, tetapi tidak persis seperti produk lain
 - `THEME` memberi setiap jenis soal warna sendiri:
   - tambah: teal #0b7a75
   - kurang: merah muda #c2255c
-  - kali: oranye #c2410c
+  - kali: oranye #b53a0a
   - bagi: biru #3b5bdb
   - soal cerita: ungu #7048e8
 - Warna dipasang sebagai variabel CSS (`--c`, `--s`, `--g`, `--p`) dan dipakai di:
