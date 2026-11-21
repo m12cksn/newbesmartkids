@@ -15,12 +15,12 @@ import {
 /* ====================================================================== */
 function Box({ value, onChange, label, disabled = false, wide = false, small = false }: { value: string; onChange: (v: string) => void; label: string; disabled?: boolean; wide?: boolean; small?: boolean }) {
   return <input aria-label={label} inputMode="numeric" value={value} disabled={disabled} placeholder="…" onChange={e => onChange(e.target.value.replace(/\D/g, "").slice(0, wide ? 8 : 4))}
-    className={`${small ? "h-8 w-14" : "h-10"} ${wide ? "w-32" : small ? "" : "w-16"} rounded-lg border-2 border-orange-400 bg-white text-center text-lg font-extrabold text-neutral focus:border-success focus:outline-none`} />;
+    className={`${small ? "h-7 w-14 text-base" : "h-10 text-lg"} ${wide ? "w-32" : small ? "" : "w-16"} rounded-lg border-2 border-orange-400 bg-white text-center font-extrabold text-neutral focus:border-success focus:outline-none`} />;
 }
 const on = "btn-success disabled:bg-success! disabled:text-success-content!";
 const Result = ({ value, children }: { value: string; children: ReactNode }) => <output data-testid="lab-result" data-value={value} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-sm leading-6">{children}</output>;
-function Step({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: ReactNode }) {
-  return <button type="button" aria-label={label} className="btn btn-xs h-8 min-w-8 btn-outline px-1.5" disabled={disabled} onClick={onClick}>{children}</button>;
+function Step({ label, onClick, disabled, children, small = false }: { label: string; onClick: () => void; disabled?: boolean; children: ReactNode; small?: boolean }) {
+  return <button type="button" aria-label={label} className={`btn btn-xs btn-outline px-1.5 ${small ? "h-7 min-h-7 min-w-7" : "h-8 min-w-8"}`} disabled={disabled} onClick={onClick}>{children}</button>;
 }
 const quarterText = (n: number) => { const w = Math.floor(n / 4), r = n % 4; return `${w}${r ? ` ${["", "¼", "½", "¾"][r]}` : ""}`; };
 const num = (s: string) => (/^\d+$/.test(s) ? Number(s) : 0);
@@ -125,13 +125,13 @@ function RawData({ title, items }: { title: string; items: number[] }) {
 function Cards({ items }: { items: { name: string; likes: string[] }[] }) {
   const [done, setDone] = useState<string[]>([]);
   const count = items.reduce((a, c) => a + c.likes.length, 0);
-  return <div className="w-full space-y-1.5">
-    <p className="text-center text-sm font-extrabold">Sayuran favorit siswa kelas V</p>
-    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 sm:grid-cols-3">{items.map(c => <div key={c.name} className="flex flex-wrap items-center gap-0.5 border-b border-base-300 py-0.5">
+  return <div className="w-full space-y-1">
+    <p className="text-center text-sm font-extrabold leading-tight">Sayuran favorit siswa kelas V</p>
+    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 sm:grid-cols-3">{items.map(c => <div key={c.name} className="flex flex-wrap items-center gap-x-1 border-b border-base-300 leading-5">
       <span className="me-0.5 text-xs font-extrabold text-success">{c.name}</span>{c.likes.map(l => { const k = `${c.name}-${l}`, d = done.includes(k);
         return <button key={l} type="button" aria-pressed={d} aria-label={`${c.name} menyukai ${l}`} onClick={() => setDone(x => (d ? x.filter(y => y !== k) : [...x, k]))}
-          className={`rounded px-1 text-[11px] font-semibold sm:text-xs ${d ? "bg-success/15 text-base-content/45 line-through" : "bg-base-200"}`}>{l}</button>; })}</div>)}</div>
-    <p className="text-center text-xs text-base-content/60">Ketuk sayuran untuk mencoretnya. Dicoret {done.length} dari {count}.</p>
+          className={`rounded px-0.5 text-[11px] font-semibold sm:text-xs ${d ? "bg-success/15 text-base-content/45 line-through" : ""}`}>{l}</button>; })}</div>)}</div>
+    <p className="text-center text-xs text-base-content/60">Ketuk sayuran untuk mencoret. Dicoret {done.length} dari {count}.</p>
   </div>;
 }
 function SceneView({ scene }: { scene: Scene }) {
@@ -158,18 +158,19 @@ function FreqTable({ p, x, put, checked }: { p: Extract<Part, { kind: "freq" }>;
     <tbody>{p.rows.map((r, k) => { const t = num(x[2 * k]);
       return <tr key={r.label}><td className="border border-base-300 px-1.5 py-0.5 text-center font-bold">{r.label}</td>
         <td className="border border-base-300 px-1.5 py-0.5"><div className="flex flex-wrap items-center gap-1">
-          <Step label={`Turus ${r.label} kurangi`} disabled={checked || !t} onClick={() => put(2 * k, t > 1 ? String(t - 1) : "")}><Minus className="size-3.5" aria-hidden="true" /></Step>
-          <Step label={`Turus ${r.label} tambah`} disabled={checked || t >= 30} onClick={() => put(2 * k, String(t + 1))}><Plus className="size-3.5" aria-hidden="true" /></Step>
+          <Step label={`Turus ${r.label} kurangi`} disabled={checked || !t} onClick={() => put(2 * k, t > 1 ? String(t - 1) : "")} small><Minus className="size-3.5" aria-hidden="true" /></Step>
+          <Step label={`Turus ${r.label} tambah`} disabled={checked || t >= 30} onClick={() => put(2 * k, String(t + 1))} small><Plus className="size-3.5" aria-hidden="true" /></Step>
           <Tally n={t} /></div></td>
         <td className="border border-base-300 px-1.5 py-0.5 text-center"><Box label={`Frekuensi ${r.label}`} value={x[2 * k + 1]} onChange={v => put(2 * k + 1, v)} disabled={checked} small /></td></tr>; })}</tbody>
   </table></div>;
 }
-function PicBuild({ picto, x, put, checked }: { picto: Picto; x: string[]; put: (k: number, v: string) => void; checked: boolean }) {
+function PicBuild({ picto, x, put, checked, table }: { picto: Picto; x: string[]; put: (k: number, v: string) => void; checked: boolean; table?: { title: string; head: string } }) {
   return <div className="space-y-1">
+    {table && <p className="text-center text-sm font-extrabold">{table.title}</p>}
     {picto.rows.map((r, k) => { const n = num(x[k]); const setN = (m: number) => put(k, m > 0 ? String(m) : "");
-      return <div key={r.label} className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-1.5 rounded-lg border border-base-300 bg-base-100 px-1.5 py-1 text-sm">
-        <span className="font-bold leading-tight">{picto.head} {r.label}<span className="block text-xs font-semibold text-base-content/60">{quarterText(n)} gambar</span></span>
-        <SymbolRow sym={picto.symbol} quarters={n} size={18} />
+      return <div key={r.label} className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-x-1.5 rounded-lg border border-base-300 bg-base-100 px-1.5 py-1 text-sm">
+        <span className="font-bold leading-tight">{picto.head} {r.label}{table && <span className="ms-1 text-success">{r.value}<span className="sr-only"> {table.head}</span></span>}<span className="block text-xs font-semibold text-base-content/60">{quarterText(n)} gambar</span></span>
+        <SymbolRow sym={picto.symbol} quarters={n} size={15} />
           <span className="flex gap-1">
             <Step label={`${r.label} kurangi seperempat`} disabled={checked || !n} onClick={() => setN(n - 1)}><Minus className="size-3.5" aria-hidden="true" />¼</Step>
             <Step label={`${r.label} tambah seperempat`} disabled={checked || n >= 80} onClick={() => setN(n + 1)}><Plus className="size-3.5" aria-hidden="true" />¼</Step>
@@ -183,7 +184,7 @@ function BarBuild({ p, x, put, checked }: { p: Extract<Part, { kind: "barBuild" 
   const vals = p.bars.series[0].values.map((v, i) => { const f = p.fill.indexOf(i); return f < 0 ? v : num(x[f]) || null; });
   const { minor, major, max } = p.bars;
   return <div className="space-y-2">
-    <div className="grid place-items-center rounded-xl bg-base-200/60 p-2 [&_svg]:max-h-[30vh] sm:[&_svg]:max-h-[42vh]"><BarChart b={p.bars} override={vals} highlight={p.fill} /></div>
+    <div className="grid place-items-center rounded-xl bg-base-200/60 p-1.5 [&_svg]:max-h-[24vh] sm:[&_svg]:max-h-[42vh]"><BarChart b={p.bars} override={vals} highlight={p.fill} /></div>
     <div className="flex flex-wrap gap-2">{p.fill.map((c, k) => { const n = num(x[k]); const setN = (m: number) => put(k, m > 0 ? String(Math.min(max, m)) : "");
       return <div key={c} role="group" aria-label={`Batang ${p.bars.cats[c]}`} className="flex items-center gap-1 rounded-lg border border-base-300 bg-base-100 p-1.5 text-sm">
         <span className="me-1 font-bold">{p.bars.cats[c]}</span>
@@ -195,21 +196,21 @@ function BarBuild({ p, x, put, checked }: { p: Extract<Part, { kind: "barBuild" 
       </div>; })}</div>
   </div>;
 }
-function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: (v: string) => void; checked: boolean; i: number }) {
+function PartView({ p, value, set, checked, i, table }: { p: Part; value: string; set: (v: string) => void; checked: boolean; i: number; table?: { title: string; head: string } }) {
   const x = cells(p, value);
   const put = (k: number, v: string) => { const a = [...x]; a[k] = v; set(a.join("|")); };
   switch (p.kind) {
     case "number": return <label className="flex flex-wrap items-center gap-2 text-lg font-bold">{p.label}<Box label={p.label} value={value} onChange={set} disabled={checked} wide={p.answer >= 1000} />{p.unit}</label>;
     case "items": return <div className="space-y-2">{p.items.map((it, k) => <label key={it.label} className="flex flex-wrap items-center gap-2 font-bold">{it.label}<Box label={it.label} value={x[k]} onChange={v => put(k, v)} disabled={checked} wide={it.answer >= 1000} /></label>)}</div>;
     case "freq": return <FreqTable p={p} x={x} put={put} checked={checked} />;
-    case "picBuild": return <PicBuild picto={p.picto} x={x} put={put} checked={checked} />;
+    case "picBuild": return <PicBuild picto={p.picto} x={x} put={put} checked={checked} table={table} />;
     case "barBuild": return <BarBuild p={p} x={x} put={put} checked={checked} />;
     case "order": { const seq = value ? value.split(";") : [];
       return <div className="space-y-2"><p className="text-sm font-bold">{p.label}: ketuk berurutan</p>
         <ol className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg border-2 border-dashed border-orange-300 p-1.5" aria-label="Urutan yang dipilih">{seq.map((s, k) => <li key={s} className="badge badge-success badge-lg gap-1">{k + 1}. {s}</li>)}</ol>
         <div className="flex flex-wrap gap-1.5">{p.options.map(o => <button key={o} type="button" disabled={checked || seq.includes(o)} onClick={() => set([...seq, o].join(";"))} className="btn btn-sm btn-outline">{o}</button>)}
           <button type="button" className="btn btn-sm btn-ghost gap-1" disabled={checked || !seq.length} onClick={() => set(seq.slice(0, -1).join(";"))}><Undo2 className="size-4" aria-hidden="true" />Batal satu</button></div></div>; }
-    case "tf": return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-sm">
+    case "tf": return <div className="space-y-1.5">{p.statements.map((s, k) => <div key={k} role="group" aria-label={`Pernyataan ${k + 1}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-base-300 p-1.5 text-[13px] leading-snug sm:text-sm">
       <span>{s.text}</span><span className="join shrink-0">{(["B", "S"] as const).map(c => <button key={c} type="button" disabled={checked} aria-pressed={x[k] === c} onClick={() => put(k, c)} className={`btn join-item btn-sm ${x[k] === c ? on : "btn-outline"}`}>{c === "B" ? "Benar" : "Salah"}</button>)}</span></div>)}</div>;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
       {p.charts ? <div className="grid grid-cols-2 gap-2">{p.options.map((op, k) => <button key={op} type="button" aria-label={op} aria-pressed={value === op} disabled={checked} onClick={() => set(op)}
@@ -217,9 +218,11 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
         : <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>{op}</button>)}</div>}</div>;
   }
 }
+/** Soal membuat piktogram dari tabel: angka tabel ditulis langsung di setiap baris, jadi tabel tidak perlu ditampilkan dua kali. */
+const mergedTable = (q: DQuestion) => (q.scene?.type === "table" && q.parts.length === 1 && q.parts[0].kind === "picBuild" ? { title: q.scene.title, head: q.scene.head[1] } : undefined);
 function Answer({ q, value, record, checked }: { q: DQuestion; value: string; record: (v: string) => void; checked: boolean }) {
-  const v = splitParts(value, q.parts.length);
-  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  const v = splitParts(value, q.parts.length), table = mergedTable(q);
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} i={i} table={table} p={p} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeFiveData() {
@@ -271,7 +274,7 @@ export default function GradeFiveData() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 8"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt + q.answer} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene && !mergedTable(q) ? <SceneView key={q.prompt + q.answer} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

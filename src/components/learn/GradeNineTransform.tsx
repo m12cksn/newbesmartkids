@@ -187,10 +187,10 @@ const labs: Record<string, () => ReactNode> = { translate: TranslateLab, reflAxi
 /* ====================================================================== */
 /* Cara menjawab                                                           */
 /* ====================================================================== */
-function In({ value, set, label, disabled, w = "w-20" }: { value: string; set: (v: string) => void; label: string; disabled?: boolean; w?: string }) {
+function In({ value, set, label, disabled, w = "w-20", small = false }: { value: string; set: (v: string) => void; label: string; disabled?: boolean; w?: string; small?: boolean }) {
   return <input aria-label={label} value={value} disabled={disabled} placeholder="…" inputMode="decimal" autoCapitalize="none" spellCheck={false}
     onChange={e => set(e.target.value.replace(/[^0-9,./\-−]/g, "").slice(0, 10))}
-    className={`h-10 ${w} rounded-lg border-2 border-orange-400 bg-white text-center text-lg font-extrabold text-neutral focus:border-success focus:outline-none`} />;
+    className={`${small ? "h-8 text-base" : "h-10 text-lg"} ${w} rounded-lg border-2 border-orange-400 bg-white text-center font-extrabold text-neutral focus:border-success focus:outline-none`} />;
 }
 function MatchPart({ p, x, set, checked }: { p: Extract<Part, { kind: "match" }>; x: string[]; set: (v: string) => void; checked: boolean }) {
   const [sel, setSel] = useState<number | null>(null);
@@ -214,7 +214,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
     case "pts": return <div className="space-y-2">{p.names.map((nm, k) => <div key={nm} className="flex flex-wrap items-center gap-1"><span className="min-w-8 font-bold">{nm}</span><span className="text-2xl">(</span>
       <In label={`${nm} x`} value={x[2 * k]} set={s => put(2 * k, s)} disabled={checked} /><span className="text-2xl">,</span><In label={`${nm} y`} value={x[2 * k + 1]} set={s => put(2 * k + 1, s)} disabled={checked} /><span className="text-2xl">)</span></div>)}</div>;
     case "vec": return <div className="flex flex-wrap items-center gap-2"><span className="font-bold"><M text={p.label} /></span>
-      <span className="inline-flex items-center"><span className="text-5xl font-light leading-none">(</span><span className="flex flex-col gap-1"><In label={`${plainMath(p.label)} mendatar`} value={x[0]} set={s => put(0, s)} disabled={checked} /><In label={`${plainMath(p.label)} tegak`} value={x[1]} set={s => put(1, s)} disabled={checked} /></span><span className="text-5xl font-light leading-none">)</span></span></div>;
+      <span className="inline-flex items-center"><span className="text-4xl font-light leading-none">(</span><span className="flex flex-col gap-0.5"><In label={`${plainMath(p.label)} mendatar`} value={x[0]} set={s => put(0, s)} disabled={checked} w="w-16" small /><In label={`${plainMath(p.label)} tegak`} value={x[1]} set={s => put(1, s)} disabled={checked} w="w-16" small /></span><span className="text-4xl font-light leading-none">)</span></span></div>;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
       <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
     case "classify": return <div className="space-y-1.5">{p.rows.map((r, k) => <div key={r.text} role="radiogroup" aria-label={`Baris ${plainMath(r.text)}`} className="flex flex-wrap items-center justify-between gap-1.5 rounded-lg border border-base-300 p-1.5">
