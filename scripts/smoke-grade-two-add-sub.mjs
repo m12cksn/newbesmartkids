@@ -79,9 +79,21 @@ try {
       let wrong = 0;
       for (const [k, q] of set.entries()) {
         assert.ok(await button("Periksa jawaban").isDisabled(), `gating ${t}-${k}`);
-        const miss = t === 1 && k === 0;
-        await answer(q, miss ? "11|12" : q.answer); if (miss) wrong++;
+        // Soal cerita pertama sengaja salah di Diketahui (angka ditukar): tab Diketahui harus ditandai salah dan langsung dibuka.
+        const storyMiss = t === 2 && k === 0 && q.parts[0].kind === "story";
+        const miss = (t === 1 && k === 0) || storyMiss;
+        let val = q.answer;
+        if (t === 1 && k === 0) val = "11|12";
+        if (storyMiss) { const c = cells(q.parts[0], q.answer.split(SEP)[0]); [c[0], c[1]] = [c[1], c[0]]; val = [c.join("|"), ...q.answer.split(SEP).slice(1)].join(SEP); }
+        await answer(q, val); if (miss) wrong++;
         await button("Periksa jawaban").click(); await page.getByText(miss ? "Belum tepat." : "Tepat!", { exact: true }).waitFor();
+        if (storyMiss) {
+          const tab = name => page.getByRole("tab", { name, exact: true });
+          assert.equal(await tab("Diketahui salah").getAttribute("data-state"), "salah");
+          assert.equal(await tab("Diketahui salah").getAttribute("aria-selected"), "true");
+          assert.equal(await tab("Ditanya benar").getAttribute("data-state"), "benar");
+          assert.equal(await tab("Solusi benar").getAttribute("data-state"), "benar");
+        }
         await fit(`latihan ${t}-${k}`); await shot(`practice-${topics[t].code}-${k + 1}`);
         await button(k === set.length - 1 ? "Lihat hasil" : "Lanjut →").click();
       }

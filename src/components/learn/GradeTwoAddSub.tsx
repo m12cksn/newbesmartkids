@@ -1,12 +1,12 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, Minus, Plus, RotateCcw, Scissors } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Minus, Plus, RotateCcw, Scissors, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { QuizFitLayout } from "./QuizFitLayout";
 import { Abacus, Bird, Bunny, FlowerPot, ShapeArt, ThingArt } from "./GradeTwoAddSubArt";
 import {
-  assessment, cells, correct, formatAnswer, practice, ready, SEP, splitParts, topics,
+  assessment, cells, correct, formatAnswer, practice, ready, SEP, splitParts, storySections, topics,
   type AQuestion, type Op, type Part, type Scene,
 } from "@/data/grade-two-add-sub";
 
@@ -181,11 +181,17 @@ function StoryPart({ p, x, put, checked }: { p: Extract<Part, { kind: "story" }>
   const [step, setStep] = useState(0);
   const k = p.known.length, s0 = k + 1, c0 = s0 + p.steps.length;
   const done = [x.slice(0, k).every(Boolean), Boolean(x[k]), x.slice(s0, c0).every(r => r.split(",").every(Boolean) && r.split(",").length === 4) && x.slice(c0).every(Boolean)];
+  const right = storySections(p, x), firstWrong = checked ? right.indexOf(false) : -1;
+  // Setelah diperiksa, buka langkah pertama yang salah agar anak langsung melihatnya.
+  const [seen, setSeen] = useState(checked);
+  if (seen !== checked) { setSeen(checked); if (firstWrong >= 0) setStep(firstWrong); }
   const fill = (text: string, idx: number) => { const [l, r] = text.split("___"); return <p key={idx} className="flex flex-wrap items-center gap-1">{l}<Box label={text.replace("___", "…")} value={x[idx]} onChange={v => put(idx, v)} disabled={checked} />{r}</p>; };
   return <div className="w-full space-y-2 text-sm">
-    <div role="tablist" aria-label="Langkah soal cerita" className="grid grid-cols-3 gap-1">{STORY_STEPS.map((n, i) => <button key={n} type="button" role="tab" aria-label={n} aria-selected={step === i} onClick={() => setStep(i)}
-      className={`flex items-center justify-center gap-1 rounded-lg border-2 px-1 py-1.5 text-xs font-bold sm:text-sm ${step === i ? "border-purple-500 bg-purple-50 text-purple-800" : "border-base-300 bg-base-100"}`}>
-      {done[i] ? <Check className="size-4 text-success" aria-hidden="true" /> : <span aria-hidden="true">{i + 1}.</span>}{n}</button>)}</div>
+    <div role="tablist" aria-label="Langkah soal cerita" className="grid grid-cols-3 gap-1">{STORY_STEPS.map((n, i) => <button key={n} type="button" role="tab" aria-label={checked ? `${n} ${right[i] ? "benar" : "salah"}` : n} aria-selected={step === i} onClick={() => setStep(i)}
+      data-state={checked ? (right[i] ? "benar" : "salah") : done[i] ? "terisi" : "kosong"}
+      className={`flex items-center justify-center gap-1 rounded-lg border-2 px-1 py-1.5 text-xs font-bold sm:text-sm ${checked && !right[i] ? "border-error bg-error/10 text-error" : step === i ? "border-purple-500 bg-purple-50 text-purple-800" : "border-base-300 bg-base-100"}`}>
+      {checked ? (right[i] ? <Check className="size-4 text-success" aria-hidden="true" /> : <X className="size-4" aria-hidden="true" />)
+        : <span aria-hidden="true" className={`grid size-5 place-items-center rounded-full text-[11px] ${done[i] ? "bg-purple-600 text-white" : "bg-base-200"}`}>{i + 1}</span>}{n}</button>)}</div>
     <section className="rounded-xl border-2 border-purple-300 p-2">
       {step === 0 && <div className="flex flex-wrap gap-x-3 gap-y-1.5">{p.known.map((kn, i) => fill(kn.text, i))}</div>}
       {step === 1 && <div role="group" aria-label="Ditanya" className="flex flex-wrap gap-1">{p.ask.options.map(op => <button key={op} type="button" disabled={checked} aria-pressed={x[k] === op} onClick={() => put(k, op)} className={`btn btn-sm h-auto min-h-9 justify-start whitespace-normal py-1 text-left ${x[k] === op ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{op}</button>)}</div>}
