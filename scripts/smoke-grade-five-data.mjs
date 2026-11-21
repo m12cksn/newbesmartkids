@@ -67,7 +67,7 @@ try {
       await page.getByText(`Soal ${i + 1}/24`).waitFor();
       assert.equal(await button("Lanjut →").count(), 0, `gating evaluasi ${i + 1}`);
       if (q.scene?.type === "raw") { const chips = group("Data, ketuk untuk menandai").getByRole("button"); await chips.first().click(); assert.equal(await chips.first().getAttribute("aria-pressed"), "true"); }
-      if (q.scene?.type === "cards") { await button("Asep menyukai Bayam").click(); await page.getByText(/Dicoret 1 dari 36/).waitFor(); }
+      if (q.scene?.type === "cards") { await button("Asep menyukai Bayam").click(); await page.getByText(/Dicoret 1 dari 26/).waitFor(); }
       await answer(q, i === 1 ? "18000" : q.answer);
       await fit(`evaluasi ${i + 1}`); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
       await button(i === 23 ? "Lihat hasil" : "Lanjut →").click();

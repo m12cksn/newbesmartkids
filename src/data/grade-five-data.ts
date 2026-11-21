@@ -98,8 +98,7 @@ const freqRows = (items: number[], cats: number[]) => cats.map(c => ({ label: St
 export const veg = [
   { name: "Asep", likes: ["Kangkung", "Wortel", "Bayam"] }, { name: "Nisa", likes: ["Bayam", "Sawi"] }, { name: "Yohana", likes: ["Wortel", "Kol"] }, { name: "Lukas", likes: ["Buncis", "Wortel", "Tomat"] },
   { name: "Komang", likes: ["Tomat", "Bayam"] }, { name: "Ahmad", likes: ["Kol", "Wortel"] }, { name: "Meli", likes: ["Kangkung", "Buncis"] }, { name: "Tiara", likes: ["Bayam", "Sawi"] },
-  { name: "Randi", likes: ["Sawi", "Tomat"] }, { name: "Kinanti", likes: ["Bayam", "Kol", "Wortel"] }, { name: "Anggi", likes: ["Buncis", "Bayam"] }, { name: "Tomi", likes: ["Wortel", "Tomat"] },
-  { name: "Robert", likes: ["Sawi", "Kangkung", "Bayam"] }, { name: "Ucok", likes: ["Buncis", "Tomat"] }, { name: "Lina", likes: ["Wortel", "Kangkung"] }, { name: "Farah", likes: ["Bayam", "Tomat"] },
+  { name: "Randi", likes: ["Sawi", "Tomat"] }, { name: "Anggi", likes: ["Buncis", "Bayam"] }, { name: "Tomi", likes: ["Wortel", "Tomat"] }, { name: "Farah", likes: ["Bayam", "Kangkung"] },
 ];
 const vegNames = ["Bayam", "Kangkung", "Wortel", "Tomat", "Buncis", "Sawi", "Kol"];
 const vegCount = (v: string) => veg.filter(k => k.likes.includes(v)).length;
@@ -202,7 +201,7 @@ export const practice: DQuestion[][] = [
 export const assessment: DQuestion[] = [
   // Sedang (1-8)
   q(0, "Setiap anak menuliskan sayuran favoritnya. Lengkapi tabel frekuensi sayuran favorit: buat turus, lalu tulis frekuensinya.", [{ kind: "freq", head: "Nama sayuran", rows: vegNames.map(v => ({ label: v, count: vegCount(v) })) }],
-    "Hitung satu per satu dan tandai kartu yang sudah dihitung: bayam 8, kangkung 4, wortel 7, tomat 6, buncis 4, sawi 4, kol 3.", { level: "Sedang", scene: { type: "cards", items: veg } }),
+    "Hitung satu per satu dan tandai kartu yang sudah dihitung: bayam 6, kangkung 3, wortel 5, tomat 4, buncis 3, sawi 3, kol 2.", { level: "Sedang", scene: { type: "cards", items: veg } }),
   q(1, "Perhatikan piktogram tabungan Nisa. Berapa tabungan Nisa pada minggu ke-3?", [{ kind: "number", label: "Minggu ke-3: Rp", answer: 19000 }],
     "Minggu ke-3 ada 4 gambar utuh dan ¾ gambar. 4 × 4.000 + 3.000 = 19.000.", { level: "Sedang", scene: { type: "picto", picto: tabungan } }),
   q(2, "Perhatikan diagram batang hasil panen lele. Berapa hasil panen kolam 2 dan kolam 4?", [{ kind: "items", items: [{ label: "Kolam 2 (kg):", answer: 26 }, { label: "Kolam 4 (kg):", answer: 14 }] }],
@@ -215,7 +214,7 @@ export const assessment: DQuestion[] = [
   q(2, "Perhatikan diagram batang kalori. Makanan apa yang kalorinya paling tinggi?", [{ kind: "choice", label: "Kalori tertinggi", options: ["Tahu goreng", "Daging ayam", "Daging sapi", "Tempe goreng"], answer: "Daging sapi" }],
     "Batang daging sapi paling panjang, 290 kkal.", { level: "Sedang", scene: { type: "bars", bars: kalori } }),
   q(0, "Perhatikan tabel frekuensi sayuran favorit. Sayuran apa yang paling banyak disukai?", [{ kind: "choice", label: "Paling banyak disukai", options: ["Bayam", "Wortel", "Tomat", "Kangkung"], answer: "Bayam" }],
-    "Frekuensi bayam 8, paling besar. Wortel 7, tomat 6.", { level: "Sedang", scene: vegTable }),
+    "Frekuensi bayam 6, paling besar. Wortel 5, tomat 4.", { level: "Sedang", scene: vegTable }),
   q(1, "Pada minggu ke berapa Nisa menabung paling banyak?", [{ kind: "choice", label: "Minggu", options: ["Minggu ke-2", "Minggu ke-4", "Minggu ke-5", "Minggu ke-3"], answer: "Minggu ke-4" }],
     "Baris minggu ke-4 paling panjang: 6½ gambar = 26.000.", { level: "Sedang", scene: { type: "picto", picto: tabungan } }),
   // Menantang (9-17)
@@ -237,7 +236,7 @@ export const assessment: DQuestion[] = [
     { text: "Siswa yang menyukai tomat lebih banyak daripada yang menyukai bayam.", answer: false },
     { text: "Sayuran yang paling sedikit disukai adalah kol.", answer: true },
     { text: "Kangkung, buncis, dan sawi disukai oleh banyak siswa yang sama.", answer: true },
-  ] }], "Tomat 6, bayam 8. Kol 3 paling sedikit. Kangkung, buncis, sawi sama-sama 4.", { level: "Menantang", scene: vegTable }),
+  ] }], "Tomat 4, bayam 6. Kol 2 paling sedikit. Kangkung, buncis, sawi sama-sama 3.", { level: "Menantang", scene: vegTable }),
   q(1, "Satu kue apem dibeli seharga Rp1.200,00 dan dijual Rp1.500,00. Berapa keuntungan dari penjualan seminggu?", [{ kind: "number", label: "Keuntungan: Rp", answer: 58200 }],
     "Kue terjual 36 + 30 + 33 + 41 + 26 + 28 = 194. Untung setiap kue 300 rupiah. 194 × 300 = 58.200.", { level: "Menantang", scene: { type: "picto", picto: apem } }),
   // Sangat menantang (18-24)
