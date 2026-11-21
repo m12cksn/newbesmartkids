@@ -4,7 +4,7 @@ import { authEnabled, rpc } from "@/lib/supabase-rpc";
 
 export type SavedResult = { path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string };
 /** Halaman yang boleh menyimpan nilai: bab materi dan latihan harian. */
-export const RESULT_PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian|jarimatika|pembagian-garis)\/level-[1-3]$/;
+export const RESULT_PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian|jarimatika|pembagian-garis)\/level-[1-3]$|^\/kelas\/[a-z0-9-]+\/ujian-akhir-tahun$/;
 const noStore = { "Cache-Control": "no-store" };
 
 /** Riwayat nilai akun yang sedang masuk. */
