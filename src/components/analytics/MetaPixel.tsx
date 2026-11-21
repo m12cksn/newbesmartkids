@@ -29,14 +29,15 @@ function loadPixel(): Fbq {
  */
 export function MetaPixel() {
   const pathname = usePathname();
-  const { loading, session } = useAccess();
+  const { loading, anonymous } = useAccess();
   useEffect(() => {
-    if (loading || session || !isProductionHost(window.location.hostname)) return;
+    // Hanya bila sudah pasti belum masuk; bila pemeriksaan sesi gagal atau ada kuki sesi, pixel tidak dimuat.
+    if (loading || !anonymous || !isProductionHost(window.location.hostname)) return;
     const page = pixelPage(pathname, slug => freeMaterialSlugs.has(slug));
     if (!page) return;
     const fbq = loadPixel();
     fbq("track", "PageView");
     if (page.kind === "trial") fbq("track", "StartTrial", { content_name: page.slug });
-  }, [pathname, loading, session]);
+  }, [pathname, loading, anonymous]);
   return null;
 }

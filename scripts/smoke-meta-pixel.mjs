@@ -38,8 +38,17 @@ try {
   assert.equal(await page.evaluate(() => typeof window.fbq), "undefined", "halaman masuk tanpa pixel");
   assert.ok(scriptLoads >= 1, "skrip Meta dimuat di beranda");
   assert.deepEqual(errors, []);
+  // Status masuk tidak pasti: ada kuki sesi, atau pemeriksaan sesi gagal. Pixel tidak boleh dimuat.
+  const withCookie = await browser.newContext(); await withCookie.addCookies([{ name: "bsk_sesi", value: "x", domain: "www.besmartkids.id", path: "/" }]);
+  const pc = await withCookie.newPage(); await pc.route("https://connect.facebook.net/**", r => r.fulfill({ contentType: "application/javascript", body: "" }));
+  await pc.goto(`${origin}/`); await pc.waitForLoadState("networkidle"); await pc.waitForTimeout(500);
+  assert.equal(await pc.evaluate(() => typeof window.fbq), "undefined", "ada kuki sesi: tanpa pixel");
+  const failing = await browser.newPage(); await failing.route("**/api/sesi", r => r.fulfill({ status: 500, body: "" }));
+  await failing.route("https://connect.facebook.net/**", r => r.fulfill({ contentType: "application/javascript", body: "" }));
+  await failing.goto(`${origin}/`); await failing.waitForLoadState("networkidle"); await failing.waitForTimeout(500);
+  assert.equal(await failing.evaluate(() => typeof window.fbq), "undefined", "sesi gagal diperiksa: tanpa pixel");
   // Domain lain (pratinjau/lokal): tidak pernah memuat pixel.
   const local = await browser.newPage(); await local.goto((process.env.TEST_ORIGIN ?? "http://127.0.0.1:3000") + "/"); await local.waitForLoadState("networkidle");
   assert.equal(await local.evaluate(() => typeof window.fbq), "undefined", "bukan domain produksi");
-  console.log("PASS meta pixel: hanya beranda, halaman kelas, dan Bab 1 gratis di domain produksi; StartTrial hanya membawa nama bab; tidak ada di latihan harian, halaman masuk, maupun domain lain");
+  console.log("PASS meta pixel: hanya beranda, halaman kelas, dan Bab 1 gratis di domain produksi; StartTrial hanya membawa nama bab; tidak ada di latihan harian, halaman masuk, domain lain, saat ada kuki sesi, maupun saat pemeriksaan sesi gagal");
 } finally { await browser.close(); }

@@ -12,6 +12,9 @@ Branch: `feat/meta-pixel-orang-tua`. Disetujui Mr Iwan sebagai langkah 1 rencana
   - Mengirim `PageView` di halaman yang diizinkan.
   - Mengirim `StartTrial {content_name: slug}` saat Bab 1 gratis dibuka.
   - Tidak pernah berjalan bila pengguna sudah masuk (siswa atau admin).
+  - Pixel hanya dimuat bila `useAccess().anonymous` bernilai true, yaitu pemeriksaan `/api/sesi` berhasil, tidak ada sesi, dan tidak ada kuki `bsk_sesi`. Bila pemeriksaan gagal atau statusnya tidak pasti, pixel tidak dimuat (temuan Codex).
+- `src/app/api/sesi`: respons menambahkan `hasCookie`.
+- `src/components/auth/AccessProvider.tsx`: menyediakan `anonymous`, dan respons gagal (non-200) tidak lagi dianggap "belum masuk".
 - `src/app/layout.tsx`: `<MetaPixel />` dipasang di dalam `Suspense`, karena memakai `usePathname`.
 - `next.config.ts`: CSP mengizinkan `connect.facebook.net` (skrip dan koneksi) serta `www.facebook.com` (gambar dan koneksi).
 - `src/app/kebijakan-privasi`:
@@ -32,7 +35,7 @@ Branch: `feat/meta-pixel-orang-tua`. Disetujui Mr Iwan sebagai langkah 1 rencana
 - `smoke-berhitung-bersusun` lulus di 4 lebar layar (cek regresi CSP).
 
 ## Belum diuji / perlu tindakan
-- Status "sudah masuk" tidak bisa diuji lokal tanpa Supabase. Logikanya sederhana: bila `session` ada, pixel tidak dimuat. Uji di produksi dengan akun admin.
+- Sesi asli tidak bisa diuji lokal tanpa Supabase. Smoke sudah menguji kasus ada kuki sesi dan kasus `/api/sesi` gagal: keduanya tanpa pixel. Uji di produksi dengan akun admin.
 - Setelah digabung, cek di Meta Events Manager bahwa `PageView` dan `StartTrial` masuk dari `besmartkids.id`.
 - Di Scalev: kosongkan Test Event Code pada pengaturan pixel bila uji sudah selesai.
 - Di Scalev: pastikan event Purchase masuk lewat satu pembelian uji.

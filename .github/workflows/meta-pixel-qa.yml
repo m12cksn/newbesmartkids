@@ -16,7 +16,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm install --no-audit --no-fund
-      - run: npx eslint src/lib/meta-pixel.ts src/components/analytics src/app/layout.tsx src/app/kebijakan-privasi next.config.ts scripts/smoke-meta-pixel.mjs
+      - run: npx eslint src/lib/meta-pixel.ts src/components/analytics src/app/layout.tsx src/app/kebijakan-privasi src/components/auth/AccessProvider.tsx src/app/api/sesi next.config.ts scripts/smoke-meta-pixel.mjs
       - run: npm run build
       - run: npm install --no-save playwright
       - run: npx playwright install chromium
