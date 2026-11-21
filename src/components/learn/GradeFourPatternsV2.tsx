@@ -60,11 +60,11 @@ function SceneView({ scene }: { scene: Scene }) {
 /* Bagian kecil                                                            */
 /* ====================================================================== */
 const Result = ({ value, children }: { value: string; children: ReactNode }) => <output data-testid="lab-result" data-value={value} aria-live="polite" className="block rounded-lg bg-success/10 p-3 text-base leading-7">{children}</output>;
-function Stepper({ label, value, set, min, max, skip }: { label: string; value: number; set: (n: number) => void; min: number; max: number; skip?: number }) {
+function Stepper({ label, value, set, min, max, skip, plus }: { label: string; value: number; set: (n: number) => void; min: number; max: number; skip?: number; plus?: boolean }) {
   const step = (d: number) => { let x = value + d; if (x === skip) x += d; if (x >= min && x <= max) set(x); };
   return <span role="group" aria-label={label} className="flex flex-col items-center gap-0.5"><span className="text-xs font-bold">{label}</span>
     <span className="flex items-center gap-1"><button type="button" aria-label={`${label} kurangi`} className="btn btn-sm btn-square btn-outline" disabled={value - 1 < min || (value - 1 === skip && value - 2 < min)} onClick={() => step(-1)}><Minus className="size-4" aria-hidden="true" /></button>
-      <span className="min-w-8 text-center text-xl font-extrabold tabular-nums">{value > 0 && min < 0 ? `+${value}` : value}</span>
+      <span className="min-w-8 text-center text-xl font-extrabold tabular-nums">{value > 0 && (min < 0 || plus) ? `+${value}` : value}</span>
       <button type="button" aria-label={`${label} tambah`} className="btn btn-sm btn-square btn-outline" disabled={value + 1 > max} onClick={() => step(1)}><Plus className="size-4" aria-hidden="true" /></button></span>
   </span>;
 }
@@ -102,13 +102,16 @@ function PictureLab() {
 }
 function NumberLab() {
   const [a, setA] = useState(3), [d, setD] = useState(2), [guess, setGuess] = useState("");
-  const shown = Array.from({ length: 5 }, (_, i) => a + i * d), next = a + 5 * d, valid = next >= 0;
+  // Bilangan berikutnya (a + 5d) tidak boleh kurang dari 0, jadi batas bilangan awal dan selisih saling menjaga.
+  const shown = Array.from({ length: 5 }, (_, i) => a + i * d), next = a + 5 * d;
   const state = guess === "" ? "" : Number(guess) === next ? "ok" : "no";
   const reset = () => setGuess("");
+  const pick = (a2: number, d2: number) => { setA(a2); setD(d2); reset(); };
   return <div className="space-y-2.5">
-    <div className="flex flex-wrap justify-around gap-2"><Stepper label="Bilangan awal" value={a} set={x => { setA(x); reset(); }} min={1} max={60} /><Stepper label="Selisih" value={d} set={x => { setD(x); reset(); }} min={-9} max={9} skip={0} /></div>
-    <div className="rounded-xl bg-base-100 p-2 [@media(max-height:700px)]:[zoom:0.8]"><Shelf items={[...shown, null]} steps={Array(5).fill(signed(d))} render={() => valid ? <input aria-label="Tebak bilangan berikutnya" inputMode="numeric" value={guess} placeholder="?" onChange={e => setGuess(e.target.value.replace(/\D/g, "").slice(0, 3))} className="size-11 rounded bg-white text-center text-xl font-extrabold focus:outline-success" /> : "–"} /></div>
-    <Result value={`${a}:${d}:${state}`}>{!valid ? "Bilangannya sudah kurang dari 0. Kecilkan selisih atau besarkan bilangan awal." : state === "" ? `Selisih setiap bilangan ${signed(d)}, jadi polanya ${d > 0 ? "membesar" : "mengecil"}. Tebak bilangan berikutnya.` : state === "ok" ? `Tepat! ${shown[4]} ${signed(d)} = ${next}.` : `Belum tepat. Coba hitung ${shown[4]} ${signed(d)}.`}</Result>
+    <div className="flex flex-wrap justify-center gap-1.5">{([["Pola membesar", 3, 2, d > 0], ["Pola mengecil", 30, -5, d < 0]] as const).map(([name, a2, d2, on]) => <button key={name} type="button" aria-pressed={on} onClick={() => pick(a2, d2)} className={`btn btn-sm ${on ? "btn-success" : "btn-outline"}`}>{name}</button>)}</div>
+    <div className="flex flex-wrap justify-around gap-2"><Stepper label="Bilangan awal" value={a} set={x => { setA(x); reset(); }} min={d < 0 ? -5 * d : 1} max={60} /><Stepper label="Selisih" value={d} set={x => { setD(x); reset(); }} min={Math.max(-9, -Math.floor(a / 5))} max={9} skip={0} plus /></div>
+    <div className="rounded-xl bg-base-100 p-2 [@media(max-height:700px)]:[zoom:0.8]"><Shelf items={[...shown, null]} steps={Array(5).fill(signed(d))} render={() => <input aria-label="Tebak bilangan berikutnya" inputMode="numeric" value={guess} placeholder="?" onChange={e => setGuess(e.target.value.replace(/\D/g, "").slice(0, 3))} className="size-11 rounded bg-white text-center text-xl font-extrabold focus:outline-success" />} /></div>
+    <Result value={`${a}:${d}:${state}`}>{state === "" ? <>Selisih setiap bilangan {signed(d)}, jadi polanya <strong>{d > 0 ? "membesar" : "mengecil"}</strong>. Tebak bilangan berikutnya.</> : state === "ok" ? `Tepat! ${shown[4]} ${signed(d)} = ${next}.` : `Belum tepat. Coba hitung ${shown[4]} ${signed(d)}.`}</Result>
   </div>;
 }
 const labs: Record<string, () => ReactNode> = { picture: PictureLab, number: NumberLab };
