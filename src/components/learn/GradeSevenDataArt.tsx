@@ -76,11 +76,11 @@ export function AxisBars({ title, cats, values, from, to, step }: { title: strin
 export function MiniCharts() {
   const one: Line = { title: "Diagram 1", cats: ["1", "2", "3", "4", "5", "6", "7"], series: [{ name: "a", color: "#33413b", values: [2, 4, 3, 5, 6, 9, 8] }], max: 10, step: 2, valueLabel: "" };
   const two: Line = { title: "Diagram 3", cats: ["1", "2", "3", "4", "5", "6", "7"], series: [{ name: "a", color: "#33413b", values: [2, 5, 7, 8, 6, 4, 9] }, { name: "b", color: "#2f86d6", values: [1, 3, 6, 7, 8, 5, 7] }], max: 10, step: 2, valueLabel: "" };
-  return <div className="grid w-full grid-cols-2 gap-3">
-    <figure className="rounded-lg bg-base-100 p-2"><LineChart line={one} compact /><figcaption className="text-center text-sm font-bold">Diagram 1</figcaption></figure>
-    <figure className="rounded-lg bg-base-100 p-2"><svg viewBox="0 0 120 80" className="w-full" role="img" aria-label="Diagram batang dengan tiga batang"><line x1="10" y1="72" x2="115" y2="72" stroke="#33413b" /><line x1="10" y1="5" x2="10" y2="72" stroke="#33413b" />
-      {[20, 34, 58].map((h, i) => <rect key={i} x={24 + i * 30} y={72 - h} width="16" height={h} fill="#f7a8c4" stroke="#b5476e" />)}</svg><figcaption className="text-center text-sm font-bold">Diagram 2</figcaption></figure>
-    <figure className="rounded-lg bg-base-100 p-2"><LineChart line={two} compact /><figcaption className="text-center text-sm font-bold">Diagram 3</figcaption></figure>
-    <figure className="rounded-lg bg-base-100 p-2"><PieChart size={110} pie={{ title: "", show: "percent", parts: [{ name: "A", value: 20, color: "#a9d18e" }, { name: "B", value: 30, color: "#8cc06c" }, { name: "C", value: 15, color: "#b8dba0" }, { name: "D", value: 10, color: "#9ccb7c" }, { name: "E", value: 25, color: "#c7e3b4" }] }} /><figcaption className="text-center text-sm font-bold">Diagram 4</figcaption></figure>
+  return <div className="grid w-full grid-cols-4 gap-1.5 sm:grid-cols-2 sm:gap-3">
+    <figure className="min-w-0 rounded-lg bg-base-100 p-1 sm:p-2"><LineChart line={one} compact /><figcaption className="text-center text-xs font-bold sm:text-sm">Diagram 1</figcaption></figure>
+    <figure className="min-w-0 rounded-lg bg-base-100 p-1 sm:p-2"><svg viewBox="0 0 120 80" className="w-full" role="img" aria-label="Diagram batang dengan tiga batang"><line x1="10" y1="72" x2="115" y2="72" stroke="#33413b" /><line x1="10" y1="5" x2="10" y2="72" stroke="#33413b" />
+      {[20, 34, 58].map((h, i) => <rect key={i} x={24 + i * 30} y={72 - h} width="16" height={h} fill="#f7a8c4" stroke="#b5476e" />)}</svg><figcaption className="text-center text-xs font-bold sm:text-sm">Diagram 2</figcaption></figure>
+    <figure className="min-w-0 rounded-lg bg-base-100 p-1 sm:p-2"><LineChart line={two} compact /><figcaption className="text-center text-xs font-bold sm:text-sm">Diagram 3</figcaption></figure>
+    <figure className="min-w-0 rounded-lg bg-base-100 p-1 sm:p-2"><PieChart size={110} pie={{ title: "", show: "percent", parts: [{ name: "A", value: 20, color: "#a9d18e" }, { name: "B", value: 30, color: "#8cc06c" }, { name: "C", value: 15, color: "#b8dba0" }, { name: "D", value: 10, color: "#9ccb7c" }, { name: "E", value: 25, color: "#c7e3b4" }] }} /><figcaption className="text-center text-xs font-bold sm:text-sm">Diagram 4</figcaption></figure>
   </div>;
 }

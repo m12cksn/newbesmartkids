@@ -189,13 +189,13 @@ function StoryPart({ p, x, put, checked }: { p: Extract<Part, { kind: "story" }>
     <section className="rounded-xl border-2 border-purple-300 p-2">
       {step === 0 && <div className="flex flex-wrap gap-x-3 gap-y-1.5">{p.known.map((kn, i) => fill(kn.text, i))}</div>}
       {step === 1 && <div role="group" aria-label="Ditanya" className="flex flex-wrap gap-1">{p.ask.options.map(op => <button key={op} type="button" disabled={checked} aria-pressed={x[k] === op} onClick={() => put(k, op)} className={`btn btn-sm h-auto min-h-9 justify-start whitespace-normal py-1 text-left ${x[k] === op ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{op}</button>)}</div>}
-      {step === 2 && <div className="space-y-1.5">
+      {step === 2 && <div className="space-y-1">
         {p.steps.map((st, j) => { const idx = s0 + j, [a = "", op = "", b = "", c = ""] = x[idx].split(","); const setRow = (i: number, v: string) => { const r = [a, op, b, c]; r[i] = v; put(idx, r.join(",")); };
-          return <div key={st.label} className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-xs font-bold">{st.label}</span><div className="flex flex-wrap items-center gap-1 text-lg font-bold">
-            <Box label={`${st.label} bilangan pertama`} value={a} onChange={v => setRow(0, v)} disabled={checked} />
-            <span role="group" aria-label={`Operasi ${st.label}`} className="join">{(["+", "-"] as const).map(o => <button key={o} type="button" disabled={checked} aria-label={o === "+" ? "tambah" : "kurang"} aria-pressed={op === o} onClick={() => setRow(1, o)} className={`btn join-item btn-sm w-9 text-lg ${op === o ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{sym(o)}</button>)}</span>
-            <Box label={`${st.label} bilangan kedua`} value={b} onChange={v => setRow(2, v)} disabled={checked} />=
-            <Box label={`${st.label} hasil`} value={c} onChange={v => setRow(3, v)} disabled={checked} /></div></div>; })}
+          return <div key={st.label} className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-[11px] font-bold">{st.label}</span><div className="flex flex-wrap items-center gap-1 text-lg font-bold">
+            <Box label={`${st.label} bilangan pertama`} value={a} onChange={v => setRow(0, v)} disabled={checked} w="w-11" />
+            <span role="group" aria-label={`Operasi ${st.label}`} className="join">{(["+", "-"] as const).map(o => <button key={o} type="button" disabled={checked} aria-label={o === "+" ? "tambah" : "kurang"} aria-pressed={op === o} onClick={() => setRow(1, o)} className={`btn join-item btn-sm w-8 px-0 text-lg ${op === o ? "btn-success disabled:bg-success! disabled:text-success-content!" : "btn-outline"}`}>{sym(o)}</button>)}</span>
+            <Box label={`${st.label} bilangan kedua`} value={b} onChange={v => setRow(2, v)} disabled={checked} w="w-11" />=
+            <Box label={`${st.label} hasil`} value={c} onChange={v => setRow(3, v)} disabled={checked} w="w-11" /></div></div>; })}
         <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-dashed border-base-300 pt-1.5">{p.conclude.map((c, i) => fill(c.text, c0 + i))}</div>
       </div>}
       {step < 2 && <button type="button" className="btn btn-sm btn-ghost mt-1.5 gap-1 text-purple-800" onClick={() => setStep(step + 1)}>Lanjut ke {STORY_STEPS[step + 1]}<ArrowRight className="size-4" aria-hidden="true" /></button>}

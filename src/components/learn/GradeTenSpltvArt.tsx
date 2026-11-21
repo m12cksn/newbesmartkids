@@ -36,7 +36,7 @@ function TriangleFig({ labels, caption }: { labels: [string, string, string]; ca
   const s = 20, A = [20, 150], B = [20 + 10 * s, 150], cx = (100 + 81 - 25) / 20, cy = Math.sqrt(81 - cx * cx), C = [20 + cx * s, 150 - cy * s];
   const mid = (P: number[], Q: number[], dx: number, dy: number) => [(P[0] + Q[0]) / 2 + dx, (P[1] + Q[1]) / 2 + dy];
   const [zx, zy] = mid(A, B, 0, 18), [yx, yy] = mid(A, C, -12, -4), [xx, xy] = mid(B, C, 12, -4);
-  return <figure className="flex flex-col items-center gap-1"><svg viewBox="0 0 240 180" className="w-full max-w-xs" role="img" aria-label={`Segitiga dengan sisi ${labels.join(", ")}`}>
+  return <figure className="flex flex-col items-center gap-1"><svg viewBox="0 0 240 180" className="w-full max-w-xs max-sm:max-h-[17vh]!" role="img" aria-label={`Segitiga dengan sisi ${labels.join(", ")}`}>
     <path d={`M${A} L${B} L${C} Z`} fill="#e7f5ec" stroke={ink} strokeWidth="2" strokeLinejoin="round" />
     <text x={zx} y={zy} textAnchor="middle" fontSize="15" fontStyle="italic" fill={warm}>{labels[2]}</text>
     <text x={yx} y={yy} textAnchor="end" fontSize="15" fontStyle="italic" fill={accent}>{labels[1]}</text>

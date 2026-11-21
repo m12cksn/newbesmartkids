@@ -201,8 +201,8 @@ function SystemInput({ p, value, set, checked }: { p: Extract<Part, { kind: "sys
       return <div key={r} className="space-y-0.5"><div className="flex flex-wrap items-center gap-0.5 text-base sm:gap-1"><span className="w-6 text-xs text-base-content/50">({r + 1})</span>
         {[0, 1, 2].map(j => <span key={j} className="inline-flex items-center gap-0.5 sm:gap-1">{j > 0 && <span>+</span>}<In label={`Persamaan ${r + 1} koefisien ${p.vars[j]}`} value={x[r * 4 + j]} set={v => put(r * 4 + j, v)} disabled={checked} w="w-11 sm:w-14" /><span className="italic">{p.vars[j]}</span></span>)}
         <span>=</span><In label={`Persamaan ${r + 1} konstanta`} value={x[r * 4 + 3]} set={v => put(r * 4 + 3, v)} disabled={checked} w="w-14 sm:w-16" /></div>
-        {full && <p className="ps-7 text-xs text-base-content/60">Terbaca: <M text={`${side(nums, p.vars)} = ${idn(nums[3])}`} /></p>}</div>; })}
-    <p className="text-xs text-base-content/60">Variabel yang tidak ada diisi 0. Koefisien negatif ditulis dengan minus, misalnya −2.</p>
+        {full && <p className="hidden ps-7 text-xs text-base-content/60 sm:block">Terbaca: <M text={`${side(nums, p.vars)} = ${idn(nums[3])}`} /></p>}</div>; })}
+    <p className="text-xs text-base-content/60">Variabel yang tidak ada diisi 0. Koefisien negatif pakai minus, misalnya −2.</p>
   </div>;
 }
 function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: (v: string) => void; checked: boolean; i: number }) {
@@ -211,7 +211,7 @@ function PartView({ p, value, set, checked, i }: { p: Part; value: string; set: 
   switch (p.kind) {
     case "num": return <div className="flex flex-wrap items-center gap-2"><span className="font-bold"><M text={p.label} /></span><In label={plainMath(p.label)} value={value} set={set} disabled={checked} w="w-28" />{p.unit && <span className="font-semibold">{p.unit}</span>}</div>;
     case "triple": return <div role="group" aria-label={plainMath(p.label)} className="space-y-1"><p className="font-bold"><M text={p.label} /></p>
-      <div className="flex flex-wrap items-end gap-2">{p.names.map((nm, k) => <label key={nm} className="flex flex-col items-center gap-0.5 text-xs font-semibold"><span>{nm}</span><In label={`${plainMath(p.label)} ${nm}`} value={x[k]} set={v => put(k, v)} disabled={checked} w="w-20" /></label>)}{p.unit && <span className="pb-2 font-semibold">{p.unit}</span>}</div></div>;
+      <div className="flex flex-wrap items-center gap-2">{p.names.map((nm, k) => <label key={nm} className="flex items-center gap-1 text-sm font-semibold"><span>{nm}</span><In label={`${plainMath(p.label)} ${nm}`} value={x[k]} set={v => put(k, v)} disabled={checked} w="w-16 sm:w-20" /></label>)}{p.unit && <span className="font-semibold">{p.unit}</span>}</div></div>;
     case "system": return <SystemInput p={p} value={value} set={set} checked={checked} />;
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><span className="font-bold"><M text={p.label} /></span>
       <div className="flex flex-wrap gap-1.5">{p.options.map(op => <button key={op} type="button" aria-label={plainMath(op)} aria-pressed={value === op} disabled={checked} onClick={() => set(op)} className={`rounded-xl border-2 px-2.5 py-1 text-left text-sm font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}><M text={op} /></button>)}</div></div>;
