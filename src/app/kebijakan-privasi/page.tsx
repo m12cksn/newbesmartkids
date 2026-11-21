@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/legal/LegalPage";
 export const metadata: Metadata = { title: "Kebijakan Privasi", description: "Data apa yang disimpan BeSmartKids, untuk apa, berapa lama, dan cara meminta penghapusannya." };
 
 export default function Page() {
-  return <LegalPage title="Kebijakan Privasi" updated="13 November 2026"
+  return <LegalPage title="Kebijakan Privasi" updated="21 November 2026"
     intro="Halaman ini menjelaskan data apa yang disimpan BeSmartKids saat anak belajar di situs ini, untuk apa data itu dipakai, berapa lama disimpan, dan bagaimana orang tua dapat melihat, mengubah, atau menghapusnya. Sebagian besar pengguna kami adalah anak-anak, jadi kami menyimpan data sesedikit mungkin."
     sections={[
       { id: "tanpa-akun", title: "Belajar tanpa akun", body: <>
@@ -22,8 +22,14 @@ export default function Page() {
       { id: "berbagi", title: "Siapa yang dapat melihat data", body: <>
         <ul><li>Siswa dan orang tua melalui akun siswa.</li><li>Orang yang menerima tautan laporan belajar. Tautan ini dibuat sendiri dari akun siswa, hanya dapat dibaca, berlaku 30 hari, dan dapat dinonaktifkan kapan saja.</li>
           <li>Admin BeSmartKids, untuk mengelola akun dan paket.</li></ul>
-        <p>Kami tidak menjual data, tidak memasang iklan, dan tidak membagikan data kepada pihak lain untuk pemasaran. Situs ini dijalankan di Vercel dan datanya disimpan di Supabase (pusat data di Mumbai, India); kedua layanan itu hanya menyimpan dan memproses data atas nama kami.</p></> },
-      { id: "kuki", title: "Kuki", body: <p>Kami memakai satu kuki bernama bsk_sesi untuk menjaga status masuk selama 30 hari. Kuki ini tidak dipakai untuk melacak kunjungan ke situs lain. Kami tidak memakai kuki iklan atau pelacak pihak ketiga.</p> },
+        <p>Kami tidak menjual data, tidak menampilkan iklan di dalam situs, dan tidak membagikan data akun atau hasil belajar kepada pihak lain untuk pemasaran. Situs ini dijalankan di Vercel dan datanya disimpan di Supabase (pusat data di Mumbai, India); kedua layanan itu hanya menyimpan dan memproses data atas nama kami.</p></> },
+      { id: "kuki", title: "Kuki", body: <p>Kami memakai satu kuki bernama bsk_sesi untuk menjaga status masuk selama 30 hari. Kuki ini tidak dipakai untuk melacak kunjungan ke situs lain.</p> },
+      { id: "pixel-meta", title: "Pengukuran iklan (Pixel Meta)", body: <>
+        <p>Kami beriklan di Facebook dan Instagram. Untuk mengetahui iklan mana yang berguna bagi orang tua, kami memasang Pixel Meta hanya di halaman untuk orang tua: beranda, halaman kelas, dan saat Bab 1 gratis dibuka oleh pengunjung yang belum masuk.</p>
+        <ul><li>Yang dikirim ke Meta: kunjungan ke halaman tersebut dan kejadian &quot;Bab 1 gratis dibuka&quot; beserta nama babnya, ditambah data teknis yang dikirim peramban seperti alamat IP dan jenis peramban. Meta dapat memakai kuki miliknya (misalnya _fbp).</li>
+          <li>Yang tidak dikirim: nama, username, PIN, nomor WhatsApp, jawaban, skor, dan semua aktivitas di halaman belajar lain, latihan harian, evaluasi, akun, dan laporan.</li>
+          <li>Pixel tidak berjalan sama sekali setelah siswa atau admin masuk ke akun.</li></ul>
+        <p>Pengunjung dapat menolak pelacakan ini dengan pengaturan peramban (memblokir kuki pihak ketiga atau memakai pemblokir pelacak) atau melalui pengaturan iklan di akun Facebook/Instagram. Data yang diterima Meta tunduk pada kebijakan privasi Meta.</p></> },
       { id: "lama-simpan", title: "Berapa lama data disimpan", body: <ul>
         <li>Sesi masuk berakhir setelah 30 hari, atau segera saat keluar atau saat PIN diganti.</li><li>Tautan laporan untuk orang tua berakhir setelah 30 hari.</li>
         <li>Akun dan riwayat belajar disimpan selama akun masih dipakai. Jika orang tua meminta penghapusan, akun beserta riwayatnya dihapus dalam 14 hari kerja.</li></ul> },
