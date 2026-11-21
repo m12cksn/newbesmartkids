@@ -68,14 +68,20 @@ const rowOk = (step: StoryStep, raw: string) => {
   const [a, op, b, c] = raw.split(","); const A = int(a), B = int(b), C = int(c);
   return step.accept.some(([x, o, y, z]) => o === op && C === z && ((A === x && B === y) || (o === "+" && A === y && B === x)));
 };
+/** Benar atau tidaknya tiap langkah soal cerita: [Diketahui, Ditanya, Solusi]. */
+export function storySections(p: Extract<Part, { kind: "story" }>, x: string[]): [boolean, boolean, boolean] {
+  const k = p.known.length;
+  return [
+    p.known.every((kn, i) => int(x[i]) === kn.answer),
+    x[k] === p.ask.answer,
+    p.steps.every((s, i) => rowOk(s, x[k + 1 + i])) && p.conclude.every((c, i) => int(x[k + 1 + p.steps.length + i]) === c.answer),
+  ];
+}
 function partCorrect(p: Part, v: string): boolean {
   const x = cells(p, v), want = fields(p);
   switch (p.kind) {
     case "column": { const r = calc(p.a, p.op, p.b); return int(x[1]) === r % 10 && (r < 10 ? x[0] === "" || int(x[0]) === 0 : int(x[0]) === Math.floor(r / 10)); }
-    case "story": {
-      const k = p.known.length;
-      return p.known.every((kn, i) => int(x[i]) === kn.answer) && x[k] === p.ask.answer && p.steps.every((s, i) => rowOk(s, x[k + 1 + i])) && p.conclude.every((c, i) => int(x[k + 1 + p.steps.length + i]) === c.answer);
-    }
+    case "story": return storySections(p, x).every(Boolean);
     case "choice": return v === p.answer;
     default: return want.every((w, i) => int(x[i]) === Number(w));
   }
