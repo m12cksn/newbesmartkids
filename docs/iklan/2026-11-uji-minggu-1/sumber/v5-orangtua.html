@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link rel="stylesheet" href="file:///home/user/newbesmartkids/.claude/skills/bsk-iklan-motion/kit/kit.css">
+<style>
+  /* V5 Orang tua bukan guru. Konsep: latar peach, kutipan besar suara orang tua, lalu tiga HP masuk berurutan dari kanan. */
+  :root { --jg: #c2410c; --jg-muda: #fff1e6; }
+  .stage { background: var(--jg-muda); }
+  .kutip-tanda { position: absolute; left: 70px; top: 330px; width: 200px; height: 200px; }
+  .kutip { font-size: 100px; font-weight: 900; line-height: 1.08; color: var(--tinta); }
+  .kutip em { font-style: normal; color: var(--jg); }
+  .sedang { font-size: 78px; font-weight: 800; line-height: 1.15; }
+  .sedang em { font-style: normal; color: var(--jg); }
+  .hp { border-width: 12px; border-radius: 52px; border-color: var(--tinta); }
+  .label { margin-top: 26px; text-align: center; font-size: 44px; font-weight: 800; line-height: 1.2; }
+  .label .n { display: inline-flex; width: 64px; height: 64px; border-radius: 50%; background: var(--jg); color: #fff; align-items: center; justify-content: center; margin-right: 14px; font-size: 38px; vertical-align: middle; }
+  .akhir { position: absolute; inset: 0; background: var(--jg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; color: #fff; text-align: center; padding: 0 90px 160px; }
+  .akhir .harga { font-size: 50px; font-weight: 700; line-height: 1.35; }
+  .akhir .situs { font-size: 60px; font-weight: 900; }
+</style></head>
+<body data-detik="15.5">
+<div class="stage">
+  <!-- Adegan 1: kutipan orang tua (0–3.2 s) -->
+  <svg class="kutip-tanda m" data-in="pop" data-out="fade" style="--d:0s;--o:3.1s" viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></svg>
+  <div class="posisi" style="left:90px;right:110px;top:600px"><div class="m kutip" data-in="up" data-out="fade" style="--d:.2s;--o:3.1s">{{HOOK}}</div></div>
+
+  <!-- Adegan 2: penghubung (3.2–5.4 s) -->
+  <div class="posisi" style="left:90px;right:110px;top:700px">
+    <div class="m sedang" data-in="left" data-out="fade" style="--d:3.35s;--o:5.3s">Tidak apa-apa.</div>
+    <div class="m sedang" data-in="left" data-out="fade" style="--d:3.8s;--o:5.3s;margin-top:30px">Anak bisa belajar dari <em>langkahnya</em>.</div>
+  </div>
+
+  <!-- Adegan 3: tiga HP (5.4–11.4 s) -->
+  <div class="posisi" style="left:40px;width:320px;top:360px"><div class="m" data-in="right" data-out="fade" style="--d:5.5s;--o:11.3s"><div class="hp"><img src="../aset/mockup-pecahan.webp"></div><div class="label"><span class="n">1</span>Lihat<br>peraga</div></div></div>
+  <div class="posisi" style="left:380px;width:320px;top:460px"><div class="m" data-in="right" data-out="fade" style="--d:6.8s;--o:11.3s"><div class="hp"><img src="../aset/app-bagi.png"></div><div class="label"><span class="n">2</span>Latihan<br>berpetunjuk</div></div></div>
+  <div class="posisi" style="left:720px;width:320px;top:560px"><div class="m" data-in="right" data-out="fade" style="--d:8.1s;--o:11.3s"><div class="hp"><img src="../aset/app-cerita.png"></div><div class="label"><span class="n">3</span>Tahu<br>salahnya</div></div></div>
+  <div class="posisi tengah" style="top:180px;padding:0 90px"><div class="m sedang" data-in="down" data-out="fade" style="--d:5.4s;--o:11.3s;font-size:68px">Satu bab, tiga langkah</div></div>
+
+  <!-- Adegan 4: penegasan (11.4–13.2 s) -->
+  <div class="posisi tengah" style="top:760px;padding:0 90px"><div class="m kutip" data-in="pop" data-out="fade" style="--d:11.4s;--o:13.1s;font-size:92px">Orang tua cukup<br><em>mendampingi.</em></div></div>
+
+  <!-- Adegan 5: penutup (13.2–15.5 s) -->
+  <div class="m akhir" data-in="wipe" style="--d:13.2s">
+    <span class="logo-chip"><img src="https://cdn.scalev.id/uploads/1770351441/0bmLuAafT-8qSTnfBVxh5A/1770351441636-logo_horizontal_transparent.webp"></span>
+    <div class="judul">Matematika SD,<br>SMP, dan SMA</div>
+    <div class="tombol">Coba Bab 1 gratis</div>
+    <div class="situs">besmartkids.id</div>
+    <div class="harga">Paket SD, SMP, atau SMA Rp79.000<br>akses 1 tahun</div>
+  </div>
+</div>
+</body></html>

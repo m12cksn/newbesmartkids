@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* A5 Paket Keluarga (A6). Konsep: latar kuning hangat, dua kartu akun berdampingan, harga di pita gelap. */
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; }
+  body { font-family: Poppins, sans-serif; color: #17352a; background: #ffd34f; position: relative; }
+  .logo { position: absolute; left: 70px; top: 60px; background: #fff; border-radius: 22px; padding: 14px 24px; }
+  .logo img { width: 300px; display: block; }
+  h1 { position: absolute; left: 70px; right: 70px; top: 190px; font-size: 80px; font-weight: 900; line-height: 1.08; letter-spacing: -1px; }
+  .akun { position: absolute; top: 470px; width: 440px; background: #fff; border-radius: 40px; padding: 40px 36px; box-shadow: 0 16px 0 #d9a91c; }
+  .akun .ikon { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
+  .akun .nama { font-size: 54px; font-weight: 800; }
+  .akun .jenjang { font-size: 40px; font-weight: 600; color: #4b5f57; margin-top: 6px; }
+  .akun .no { position: absolute; right: 30px; top: 30px; font-size: 30px; font-weight: 800; color: #4b5f57; }
+  ul { position: absolute; left: 70px; right: 70px; top: 880px; list-style: none; font-size: 44px; font-weight: 700; line-height: 1.5; }
+  li { display: flex; align-items: center; gap: 18px; }
+  .harga { position: absolute; left: 0; right: 0; bottom: 0; height: 200px; background: #17352a; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 70px; }
+  .harga .angka { font-size: 74px; font-weight: 900; color: #ffd34f; line-height: 1; }
+  .harga .ket { font-size: 34px; font-weight: 600; opacity: .9; }
+  .harga .cta { background: #ffd34f; color: #3f3210; font-weight: 800; font-size: 40px; border-radius: 28px; padding: 22px 34px; }
+</style></head>
+<body>
+  <span class="logo"><img src="https://cdn.scalev.id/uploads/1770351441/0bmLuAafT-8qSTnfBVxh5A/1770351441636-logo_horizontal_transparent.webp"></span>
+  <h1>{{JUDUL}}</h1>
+  <div class="akun" style="left:70px"><span class="no">Akun 1</span>
+    <div class="ikon" style="background:#e5eafd"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></div>
+    <div class="nama">Kakak</div><div class="jenjang">Kelas 8, SMP</div></div>
+  <div class="akun" style="right:70px"><span class="no">Akun 2</span>
+    <div class="ikon" style="background:#dcf5f1"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0b7a75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></div>
+    <div class="nama">Adik</div><div class="jenjang">Kelas 3, SD</div></div>
+  <ul>
+    <li><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#17352a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Semua jenjang: SD, SMP, dan SMA</li>
+    <li><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#17352a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>2 akun untuk 2 anak</li>
+    <li><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#17352a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Sekali bayar, akses 1 tahun</li>
+  </ul>
+  <div class="harga"><div><div class="angka">Rp129.000</div><div class="ket">Paket Keluarga</div></div><span class="cta">Coba Bab 1 gratis</span></div>
+</body></html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link rel="stylesheet" href="file:///home/user/newbesmartkids/.claude/skills/bsk-iklan-motion/kit/kit.css">
+<style>
+  /* V1 Pinjam (A4). Konsep: kertas petak merah muda, hitung bersusun besar di tengah, langkah pinjam dianimasikan. */
+  :root { --pk: #c2255c; --pk-muda: #fde7ef; --pk-garis: #f6cddc; }
+  .stage { background-color: #fff; background-image: linear-gradient(var(--pk-garis) 3px, transparent 3px), linear-gradient(90deg, var(--pk-garis) 3px, transparent 3px); background-size: 90px 90px; }
+  .hook { font-size: 92px; font-weight: 900; line-height: 1.08; letter-spacing: -1px; }
+  .hook em { font-style: normal; color: var(--pk); }
+  .kolom { position: absolute; left: 0; right: 0; top: 560px; height: 900px; }
+  .d { position: absolute; width: 190px; text-align: center; font-size: 230px; font-weight: 800; line-height: 1; color: var(--tinta); }
+  .kecil { position: absolute; width: 190px; text-align: center; font-size: 110px; font-weight: 800; color: var(--pk); }
+  .kotak { display: inline-block; border: 8px solid var(--pk); border-radius: 26px; padding: 0 24px; background: #fff; }
+  .garis { position: absolute; left: 300px; width: 560px; height: 16px; background: var(--tinta); border-radius: 8px; }
+  .coret { position: absolute; height: 16px; background: var(--pk); border-radius: 8px; transform-origin: left center; transform: rotate(-28deg) scaleX(0); animation: coret .35s var(--d) forwards ease-out; }
+  @keyframes coret { to { transform: rotate(-28deg) scaleX(1); } }
+  .hasil { color: #2b8a3e; }
+  .tanda { position: absolute; left: 180px; font-size: 200px; font-weight: 800; color: var(--pk); }
+  .cap { font-size: 70px; font-weight: 800; line-height: 1.2; }
+  .cap .pita { font-size: 64px; background: var(--pk); }
+  .hp { border-color: var(--tinta); }
+  .akhir { position: absolute; inset: 0; background: var(--pk); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; color: #fff; text-align: center; padding: 0 90px 160px; }
+  .akhir .harga { font-size: 50px; font-weight: 700; line-height: 1.35; }
+  .akhir .situs { font-size: 60px; font-weight: 900; letter-spacing: .5px; }
+</style></head>
+<body data-detik="15.5">
+<div class="stage">
+  <!-- Adegan 1: hook (0–3 s) -->
+  <div class="posisi tengah" style="top:170px;padding:0 80px"><div class="m hook" data-in="down" data-out="fade" style="--d:0s;--o:2.9s">{{HOOK}}</div></div>
+
+  <!-- Kolom hitung: tetap tampil 0–10 s -->
+  <div class="m kolom" data-in="fade" data-out="fade" style="--d:0s;--o:9.9s">
+    <!-- kotak pinjaman -->
+    <div class="kecil m" data-in="pop" style="--d:4.2s;left:330px;top:0px"><span class="kotak">6</span></div>
+    <div class="kecil m" data-in="pop" style="--d:5.0s;left:520px;top:0px"><span class="kotak">11</span></div>
+    <!-- 71 -->
+    <div class="d" style="left:330px;top:170px">7</div><div class="d" style="left:520px;top:170px">1</div>
+    <div class="coret" style="--d:4.0s;left:360px;top:300px;width:150px"></div>
+    <div class="coret" style="--d:4.8s;left:555px;top:300px;width:130px"></div>
+    <!-- − 46 -->
+    <div class="tanda" style="top:390px">−</div>
+    <div class="d" style="left:330px;top:400px">4</div><div class="d" style="left:520px;top:400px">6</div>
+    <div class="garis" style="top:660px"></div>
+    <!-- hasil -->
+    <div class="d hasil m" data-in="pop" style="--d:7.0s;left:520px;top:700px">5</div>
+    <div class="d hasil m" data-in="pop" style="--d:8.0s;left:330px;top:700px">2</div>
+  </div>
+
+  <!-- Adegan 2: pinjam (3–6.8 s) -->
+  <div class="posisi tengah" style="top:230px;padding:0 80px"><div class="m cap" data-in="up" data-out="fade" style="--d:3.1s;--o:6.6s">1 lebih kecil dari 6.<br><span class="pita">Pinjam 1 puluhan dari 7.</span></div></div>
+  <div class="posisi tengah" style="top:1500px;padding:0 80px"><div class="m teks" data-in="up" data-out="fade" style="--d:5.2s;--o:6.6s;font-weight:800;font-size:66px">7 jadi <b style="color:var(--pk)">6</b>, 1 jadi <b style="color:var(--pk)">11</b></div></div>
+
+  <!-- Adegan 3: kurangkan (6.8–10 s) -->
+  <div class="posisi tengah" style="top:230px;padding:0 80px"><div class="m cap" data-in="up" data-out="fade" style="--d:6.8s;--o:9.9s"><span class="pita">11 − 6 = 5</span><br><span class="pita" style="display:inline-block;margin-top:24px">6 − 4 = 2</span></div></div>
+  <div class="posisi tengah" style="top:1500px"><div class="m judul" data-in="pop" data-out="fade" style="--d:8.6s;--o:9.9s">71 − 46 = <span style="color:#2b8a3e">25</span></div></div>
+
+  <!-- Adegan 4: bukti aplikasi (10–13 s) -->
+  <div class="posisi tengah" style="top:150px;padding:0 90px"><div class="m judul" data-in="down" data-out="fade" style="--d:10s;--o:12.9s;font-size:68px">Kotak pinjaman menuntun<br>setiap langkah</div></div>
+  <div class="posisi" style="left:200px;top:400px;width:680px"><div class="m hp kamera" data-in="up" data-out="fade" style="--d:10.1s;--o:12.9s;--lama:2.8s;--skala:1.05"><img src="../aset/app-kurang.png"></div></div>
+
+  <!-- Adegan 5: penutup (13–15.5 s) -->
+  <div class="m akhir" data-in="wipe" style="--d:13s">
+    <span class="logo-chip"><img src="https://cdn.scalev.id/uploads/1770351441/0bmLuAafT-8qSTnfBVxh5A/1770351441636-logo_horizontal_transparent.webp"></span>
+    <div class="judul">Latihan bersusun<br>tiap hari</div>
+    <div class="tombol">Coba Bab 1 gratis</div>
+    <div class="situs">besmartkids.id</div>
+    <div class="harga">Paket SD, SMP, atau SMA Rp79.000<br>akses 1 tahun</div>
+  </div>
+</div>
+</body></html>
