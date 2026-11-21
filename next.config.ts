@@ -5,11 +5,11 @@ import type { NextConfig } from "next";
 const dev = process.env.NODE_ENV !== "production";
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://vercel.live`,
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://vercel.live https://connect.facebook.net`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://vercel.live https://vercel.com",
+  "img-src 'self' data: blob: https://vercel.live https://vercel.com https://www.facebook.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://vercel.live wss://ws-us3.pusher.com",
+  "connect-src 'self' https://vercel.live wss://ws-us3.pusher.com https://www.facebook.com https://connect.facebook.net",
   "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://drive.google.com https://vercel.live",
   "media-src 'self' blob:",
   "object-src 'none'",

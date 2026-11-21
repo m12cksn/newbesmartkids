@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { AccessProvider } from "@/components/auth/AccessProvider";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
@@ -16,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return <html lang="id" data-theme="besmartkids" className="h-full antialiased"><body className="min-h-full flex flex-col"><AccessProvider>{children}</AccessProvider></body></html>;
+  return <html lang="id" data-theme="besmartkids" className="h-full antialiased"><body className="min-h-full flex flex-col"><AccessProvider>{children}<Suspense fallback={null}><MetaPixel /></Suspense></AccessProvider></body></html>;
 }
