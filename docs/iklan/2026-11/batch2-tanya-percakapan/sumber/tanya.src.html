@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link rel="stylesheet" href="/home/user/newbesmartkids/.claude/skills/bsk-iklan-motion/kit/kit.css">
+<style>
+  /* Konsep: percakapan. Latar biru muda polos, gelembung chat, garis gambar, daftar langkah. */
+  .stage { background: #dcefff; }
+  .gelembung { position: relative; display: inline-block; border-radius: 48px; padding: 40px 54px; font-size: 76px; font-weight: 800; line-height: 1.12; max-width: 860px; }
+  .anak { background: #fff; color: var(--tinta); border-bottom-left-radius: 10px; box-shadow: 0 14px 0 rgba(23,53,42,.10); }
+  .ortu { background: var(--biru); color: #fff; border-bottom-right-radius: 10px; box-shadow: 0 14px 0 rgba(23,53,42,.12); }
+  .titik { display: inline-flex; gap: 18px; padding: 34px 46px; }
+  .titik i { width: 26px; height: 26px; border-radius: 50%; background: currentColor; opacity: .55; }
+  .label { font-size: 34px; font-weight: 700; color: #4f6b8a; margin: 0 0 14px 12px; }
+  .langkah { display: flex; align-items: center; gap: 30px; background: #fff; border-radius: 36px; padding: 28px 36px; font-size: 52px; font-weight: 800; box-shadow: 0 10px 0 rgba(23,53,42,.08); }
+  .langkah .ik { flex: none; width: 96px; height: 96px; border-radius: 28px; display: flex; align-items: center; justify-content: center; background: var(--biru-muda); }
+  .langkah svg { width: 58px; height: 58px; stroke: var(--biru); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .akhir { position: absolute; inset: 0; background: var(--biru); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; color: #fff; text-align: center; padding: 0 80px; }
+</style></head>
+<body data-detik="18">
+<div class="stage">
+
+  <!-- 1. Pertanyaan anak (0–5.6) -->
+  <div class="posisi" style="left:80px;top:480px"><div class="m label" data-in="fade" data-out="fade" style="--d:0s;--o:5.5s">Anak</div>
+    <div class="m gelembung anak titik" data-in="pop" data-out="fade" style="--d:0s;--o:.75s"><i class="berdenyut" style="--d:0s"></i><i class="berdenyut" style="--d:.15s"></i><i class="berdenyut" style="--d:.3s"></i></div></div>
+  <div class="posisi" style="left:80px;top:542px"><div class="m gelembung anak" data-in="pop" data-out="fade" style="--d:.7s;--o:5.5s">{{SAPAAN}}</div></div>
+
+  <!-- 2. Orang tua ragu (2.2–5.6) -->
+  <div class="posisi" style="right:80px;top:1000px;text-align:right"><div class="m label" data-in="fade" data-out="fade" style="--d:2.2s;--o:5.5s">{{ORTU}}</div>
+    <div class="m gelembung ortu titik" data-in="pop" data-out="fade" style="--d:2.2s;--o:5.5s"><i class="berdenyut" style="--d:2.2s"></i><i class="berdenyut" style="--d:2.35s"></i><i class="berdenyut" style="--d:2.5s"></i></div></div>
+  <div class="posisi tengah" style="top:1300px;padding:0 90px"><div class="m judul" data-in="up" data-out="fade" style="--d:3s;--o:5.5s;font-size:68px">Tahu jawabannya belum tentu mudah <span class="sorot">menjelaskan prosesnya</span>.</div></div>
+
+  <!-- 3. Mulai dari yang bisa dilihat (5.6–9.4) -->
+  <div class="posisi tengah" style="top:420px;padding:0 90px"><div class="m judul" data-in="down" data-out="fade" style="--d:5.6s;--o:9.3s;font-size:70px">Mulai dari sesuatu yang bisa <span class="sorot">dilihat bersama</span>.</div></div>
+  <div class="posisi tengah" style="top:820px"><div class="m" data-in="up" data-out="fade" style="--d:6.2s;--o:9.3s">
+    <svg width="900" height="420" viewBox="0 0 450 210">
+      <rect x="15" y="20" width="420" height="110" rx="14" fill="#fff" stroke="#17352a" stroke-width="5"/>
+      <rect x="15" y="20" width="210" height="110" rx="14" class="isi" style="--d:6.6s;--dari:#fff;--ke:#1c7ed6"/>
+      <rect x="15" y="20" width="420" height="110" rx="14" fill="none" stroke="#17352a" stroke-width="5"/>
+      <line x1="225" y1="20" x2="225" y2="130" stroke="#17352a" stroke-width="5"/>
+      <line x1="120" y1="20" x2="120" y2="130" stroke="#17352a" stroke-width="4" class="gores" style="--panjang:110;--d:7.6s"/>
+      <line x1="330" y1="20" x2="330" y2="130" stroke="#17352a" stroke-width="4" class="gores" style="--panjang:110;--d:7.75s"/>
+      <text x="225" y="185" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="40" fill="#17352a" class="m" data-in="fade" style="--d:6.9s">1/2</text>
+    </svg></div></div>
+  <div class="posisi tengah" style="top:1340px"><div class="m judul" data-in="pop" data-out="fade" style="--d:8.1s;--o:9.3s;font-size:72px">1/2 = <span class="sorot">2/4</span>. Apa yang berubah?</div></div>
+
+  <!-- 4. Tiga langkah dengan aplikasi (9.4–14.2) -->
+  <div class="posisi" style="left:310px;top:150px;width:460px"><div class="m hp kamera" data-in="up" data-out="fade" style="--d:9.4s;--o:14.1s;--lama:4.6s;--skala:1.04;border-width:12px;border-radius:54px"><img src="mockup-pecahan.webp"></div></div>
+  <div class="posisi" style="left:90px;right:90px;top:1150px;display:flex;flex-direction:column;gap:22px">
+    <div class="m langkah" data-in="left" data-out="fade" style="--d:10.1s;--o:14.1s"><span class="ik"><svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span>Gunakan peraganya</div>
+    <div class="m langkah" data-in="left" data-out="fade" style="--d:11.1s;--o:14.1s"><span class="ik"><svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>Ceritakan apa yang berubah</div>
+    <div class="m langkah" data-in="left" data-out="fade" style="--d:12.1s;--o:14.1s"><span class="ik"><svg viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></span>Coba latihannya</div>
+  </div>
+
+  <!-- 5. Pesan utama (14.2–16.2) -->
+  <div class="posisi tengah" style="top:640px;padding:0 90px"><div class="m judul-besar" data-in="zoom" data-out="fade" style="--d:14.45s;--o:16.1s;font-size:96px">Bahan untuk menemani <span class="sorot">percakapan belajar</span> di rumah.</div></div>
+
+  <!-- 6. Penutup (16.2–18) -->
+  <div class="m akhir" data-in="wipe" style="--d:16.2s">
+    <span class="logo-chip"><img src="https://cdn.scalev.id/uploads/1770351441/0bmLuAafT-8qSTnfBVxh5A/1770351441636-logo_horizontal_transparent.webp"></span>
+    <div class="judul">Paket SD <span style="color:var(--kuning)">Rp79.000</span></div>
+    <div class="teks">Akses 1 tahun. Buka di HP, tablet, atau laptop.</div>
+    <div class="tombol">Lihat contoh materinya</div>
+  </div>
+</div>
+</body></html>
