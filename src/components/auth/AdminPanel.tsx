@@ -38,7 +38,7 @@ function PackagePicker({ value, set, idPrefix }: { value: Pkg; set: (p: Pkg) => 
 function Credentials({ c, close }: { c: { username: string; pin: string; name: string; phone: string; paket: string }; close: () => void }) {
   const [copied, setCopied] = useState(false);
   const url = typeof window === "undefined" ? "" : `${window.location.origin}/masuk`;
-  const text = `Halo ${c.name || ""}, terima kasih sudah bergabung dengan BeSmartKids.\n\nMasuk di: ${url}\nUsername: ${c.username}\nPIN: ${c.pin}\nPaket: ${c.paket}\n\nSatu akun dapat dipakai di 2 perangkat. Simpan PIN ini dan jangan dibagikan.`;
+  const text = `Halo ${c.name || ""}, terima kasih sudah bergabung dengan BeSmartKids.\n\nMasuk di: ${url}\nUsername: ${c.username}\nPIN: ${c.pin}\nPaket: ${c.paket}\n\nCara memakai: ${url.replace(/\/masuk$/, "/panduan")}\n\nSatu akun dapat dipakai di 2 perangkat. Simpan PIN ini dan jangan dibagikan.`;
   return <div role="status" className="space-y-3 rounded-xl border-2 border-success bg-success/5 p-4">
     <p className="font-bold">Akun siap. Kirim data ini ke pembeli.</p>
     <p className="text-sm">Username <strong data-testid="new-username">{c.username}</strong>, PIN <strong data-testid="new-pin" className="tracking-widest">{c.pin}</strong></p>
