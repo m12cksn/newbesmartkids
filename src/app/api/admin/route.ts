@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       case "bundle": return NextResponse.json(await createBundle(token, b));
       case "list": return NextResponse.json(await rpc("bsk_admin_list", { p_token: token }));
       case "create": return NextResponse.json(await rpc("bsk_admin_create", { p_token: token, p_username: str(b.username, 32).toLowerCase(), p_display_name: str(b.displayName), p_phone: str(b.phone, 30), p_note: str(b.note, 200), p_package: pkg(b.package), p_class: pkg(b.package) === "kelas" ? cls(b.classId) : null }));
+      case "update": return NextResponse.json(await rpc("bsk_admin_update_account", { p_token: token, p_account: id, p_username: str(b.username, 32).toLowerCase(), p_display_name: str(b.displayName), p_phone: str(b.phone, 30), p_note: str(b.note, 200) }));
       case "extend": return NextResponse.json(await rpc("bsk_admin_extend", { p_token: token, p_account: id, p_package: pkg(b.package), p_class: pkg(b.package) === "kelas" ? cls(b.classId) : null }));
       case "reset": return NextResponse.json(await rpc("bsk_admin_reset_pin", { p_token: token, p_account: id }));
       case "disable": return NextResponse.json(await rpc("bsk_admin_set_disabled", { p_token: token, p_account: id, p_disabled: b.disabled === true }));

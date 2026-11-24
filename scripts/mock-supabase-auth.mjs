@@ -53,6 +53,10 @@ const fns = {
     if (!/^[a-z0-9._-]{3,32}$/.test(p_username)) return { error: "bad_username" }; if (accounts.has(p_username)) return { error: "taken" };
     const p = pin(); add(p_username, p, { displayName: p_display_name, entitlements: [ent(p_package, p_class)] }); Object.assign(accounts.get(p_username), { phone: p_phone, note: p_note });
     return { username: p_username, pin: p, account: pub(accounts.get(p_username)) }; },
+  bsk_admin_update_account: ({ p_token, p_account, p_username, p_display_name, p_phone, p_note }) => { admin(p_token); const a = byId(p_account); if (!a) return { error: "not_found" };
+    const u = String(p_username ?? "").trim().toLowerCase(); if (!/^[a-z0-9._-]{3,32}$/.test(u)) return { error: "bad_username" }; if (accounts.has(u) && accounts.get(u) !== a) return { error: "taken" };
+    if (u !== a.username) { accounts.delete(a.username); for (const s of sessions.values()) if (s.username === a.username) s.username = u; a.username = u; accounts.set(u, a); }
+    Object.assign(a, { displayName: p_display_name ?? "", phone: p_phone ?? "", note: p_note ?? "" }); return pub(a); },
   bsk_admin_extend: ({ p_token, p_account, p_package, p_class }) => { admin(p_token); const a = byId(p_account); a.entitlements.unshift(ent(p_package, p_class)); return pub(a); },
   bsk_admin_reset_pin: ({ p_token, p_account }) => { admin(p_token); const a = byId(p_account); a.pin = pin(); for (const [t, s] of sessions) if (s.username === a.username) sessions.delete(t); return { username: a.username, pin: a.pin }; },
   bsk_admin_set_disabled: ({ p_token, p_account, p_disabled }) => { admin(p_token); const a = byId(p_account); a.disabled = p_disabled; return pub(a); },

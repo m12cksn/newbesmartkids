@@ -23,9 +23,10 @@ try {
       await box.getByRole("button", { name: `Buat ${names.length} akun` }).click();
       const res = page.getByTestId("order-result"); await res.waitFor();
       const msg = await res.locator("pre").textContent();
-      const creds = [...msg.matchAll(/Username: (\S+)\nPIN: (\d{6})/g)].map(m => [m[1], m[2]]);
+      const creds = [...msg.matchAll(/Username: `?([a-z0-9._-]+)`?\nPIN: `?(\d{6})`?/g)].map(m => [m[1], m[2]]);
       assert.equal(creds.length, names.length, msg);
       for (const n of names) assert.ok(msg.includes(n), `nama ${n} di pesan`);
+      assert.ok(msg.includes(`Halo Ayah/Bunda ${buyer}`) && msg.includes("https://www.besmartkids.id/masuk") && msg.includes("*Detail Paket*"), "template pesan");
       assert.ok(decodeURIComponent(await res.getByRole("link", { name: "Kirim lewat WhatsApp" }).getAttribute("href")).includes(creds[0][0]));
       await res.getByRole("button", { name: "Tutup" }).click();
       return creds;
@@ -34,6 +35,16 @@ try {
     const sd = await order("Paket Jenjang SD", `Ibu Rina ${width}`, ["Dika"]);
     assert.match(sd[0][0], /^dika\d{3}$/); // username dari nama anak, bukan pembeli
     await page.getByText(sd[0][0]).first().waitFor();
+    // Ubah data akun: perbaiki nama dan username yang salah ketik.
+    const row = page.locator("li", { hasText: `@${sd[0][0]}` }).first();
+    await row.getByRole("button", { name: "Ubah data", exact: true }).click();
+    const edit = page.getByRole("form", { name: `Ubah data ${sd[0][0]}` });
+    await edit.getByLabel("Username").fill("admin"); await edit.getByRole("button", { name: "Simpan perubahan" }).click();
+    await page.getByRole("alert").filter({ hasText: "Username sudah dipakai" }).waitFor();
+    const newUser = `dikapratama${width}`;
+    await edit.getByLabel("Nama anak").fill("Dika Pratama"); await edit.getByLabel("Username").fill(newUser); await edit.getByRole("button", { name: "Simpan perubahan" }).click();
+    await page.getByText(`@${newUser}`).waitFor(); await page.getByText("Dika Pratama").first().waitFor();
+    sd[0][0] = newUser;
     await fit("admin"); await page.screenshot({ path: `${folder}/${width}-admin-pesanan.png`, fullPage: true });
     const all = await order("Paket Keluarga", `Ibu Sari ${width}`, ["Rafi", "Alya"]);
     assert.match(all[0][0], /^rafi\d{3}$/); assert.match(all[1][0], /^alya\d{3}$/);
@@ -53,6 +64,6 @@ try {
     assert.ok(/^https:\/\//.test(await page.getByRole("link", { name: "Dapatkan akses" }).getAttribute("href")));
     await fit("masuk");
     assert.deepEqual(errors, []); await ctx.close();
-    console.log(`PASS paket ${width}px: pesanan SD 1 akun dan Paket Keluarga 2 akun, username dari nama anak, akses per jenjang, pesan WhatsApp, tombol Dapatkan akses`);
+    console.log(`PASS paket ${width}px: pesanan SD 1 akun dan Paket Keluarga 2 akun, username dari nama anak, ubah nama/username, akses per jenjang, pesan WhatsApp, tombol Dapatkan akses`);
   }
 } finally { await browser.close(); }

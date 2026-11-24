@@ -41,7 +41,7 @@ try {
     const user = `siswa${width}`;
     const single = page.locator("details").filter({ hasText: "Buat satu akun dengan paket per kelas" });
     await single.locator("summary").click();
-    await single.getByLabel("Nama siswa atau orang tua").fill(`Siswa ${width}`);
+    await single.getByLabel("Nama anak").fill(`Siswa ${width}`); await single.getByLabel("Nama orang tua (untuk sapaan pesan)").fill("Ibu Uji");
     await single.getByLabel("Nomor WhatsApp").fill("081234567890");
     await single.getByLabel("Username").fill(user);
     await single.getByLabel("Kelas", { exact: true }).selectOption("7");
@@ -50,7 +50,7 @@ try {
     assert.equal(await page.getByTestId("new-username").textContent(), user);
     await page.getByText(`Kelas 7 s.d.`).first().waitFor();
     await fit("admin"); await shot("admin");
-    await single.getByLabel("Nama siswa atau orang tua").fill("Ganda"); await single.getByLabel("Username").fill(user); await single.getByRole("button", { name: "Buat akun dan PIN" }).click();
+    await single.getByLabel("Nama anak").fill("Ganda"); await single.getByLabel("Username").fill(user); await single.getByRole("button", { name: "Buat akun dan PIN" }).click();
     await page.getByText("Username sudah dipakai").waitFor();
 
     // 3. Keluar, masuk sebagai siswa: Kelas 7 terbuka, Kelas 5 tidak.
