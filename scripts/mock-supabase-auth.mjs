@@ -7,7 +7,7 @@ const sessions = new Map(); // token -> { username, at }
 const add = (username, pin, extra = {}) => accounts.set(username, { id: randomUUID(), username, pin, displayName: extra.displayName ?? "", phone: "", note: "", role: extra.role ?? "student", disabled: false, createdAt: new Date().toISOString(), entitlements: extra.entitlements ?? [], fails: 0 });
 add("admin", "111111", { role: "admin", displayName: "Admin" });
 const months = n => new Date(Date.now() + n * 30 * 864e5).toISOString();
-const ent = (pkg, classId) => ({ id: randomUUID(), package: pkg, classId: pkg === "kelas" ? classId : null, startsAt: new Date().toISOString(), expiresAt: months(pkg === "semua" ? 24 : 12) });
+const ent = (pkg, classId) => ({ id: randomUUID(), package: pkg, classId: pkg === "kelas" ? classId : null, startsAt: new Date().toISOString(), expiresAt: months(12) });
 // Akun contoh untuk pengingat perpanjangan: satu paket hampir habis, satu sudah habis, satu masih lama.
 const days = n => new Date(Date.now() + n * 864e5).toISOString();
 add("hampirhabis", "222222", { displayName: "Rara", entitlements: [{ id: randomUUID(), package: "kelas", classId: 3, startsAt: days(-360), expiresAt: days(5) }] });

@@ -9,7 +9,7 @@ export const offers: Offer[] = [
   { id: "smp", name: "Paket Jenjang SMP", short: "SMP (Kelas 7–9)", price: 79000, accounts: 2, months: 12, classes: range(7, 9), onSale: true },
   // Bab SMA belum ada: tidak dijual di halaman depan, tetapi admin tetap bisa membuatnya.
   { id: "sma", name: "Paket Jenjang SMA", short: "SMA (Kelas 10–12)", price: 79000, accounts: 2, months: 12, classes: range(10, 12), onSale: false },
-  { id: "semua", name: "Paket Keluarga", short: "Semua kelas (1–12)", price: 129000, accounts: 2, months: 24, classes: "all", onSale: true },
+  { id: "semua", name: "Paket Keluarga", short: "Semua kelas (1–12)", price: 129000, accounts: 2, months: 12, classes: "all", onSale: true },
 ];
 export const offerById = (id: unknown) => offers.find(o => o.id === id) ?? null;
 export const rupiah = (n: number) => `Rp${n.toLocaleString("id-ID")}`;
