@@ -1,5 +1,5 @@
 /** Video panduan pemakaian BeSmartKids. Tempel alamat YouTube di sini (watch, youtu.be, atau shorts). Kosong = panel "video sedang disiapkan". */
-export const TUTORIAL_VIDEO_URL = "";
+export const TUTORIAL_VIDEO_URL = "https://youtube.com/shorts/Kfl2a4fu568?feature=share";
 /** Video panduan direkam tegak (9:16, seperti Shorts). Ubah ke false bila video mendatar. */
 export const TUTORIAL_VIDEO_VERTICAL = true;
 

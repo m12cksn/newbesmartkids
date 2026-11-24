@@ -6,4 +6,4 @@
 - Tata letak: HP/tablet video di atas lalu langkah; layar lebar video menempel di kiri (sticky, tinggi menyesuaikan layar) dan langkah di kanan.
 - Jalur ke halaman: menu utama (layar lebar), footer semua halaman, halaman Masuk ("Lihat panduan"), halaman Akun saya, sitemap, serta pesan akun untuk pembeli di panel admin (baris "Cara memakai: …/panduan").
 - Uji: `scripts/verify-panduan.mjs` (pengurai alamat YouTube), `scripts/smoke-panduan.mjs` di 320/390/768/1280 (tanpa geser samping, video/panel muat, 12 langkah, pertanyaan, tautan dari footer/masuk/menu); workflow `.github/workflows/panduan-qa.yml`. Lokal: tsc, eslint, build, verify dan smoke lulus.
-- Sisa: isi `TUTORIAL_VIDEO_URL` setelah pemilik mengunggah video ke YouTube.
+- Video: https://youtube.com/shorts/Kfl2a4fu568 (diunggah pemilik 24 Nov 2026).
