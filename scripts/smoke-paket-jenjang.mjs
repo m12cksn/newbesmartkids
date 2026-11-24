@@ -33,9 +33,11 @@ try {
     await login("admin", "111111"); await page.goto(`${origin}/admin`);
     const sd = await order("Paket Jenjang SD", `Ibu Rina ${width}`, ["Dika", "Nara"]);
     assert.notEqual(sd[0][0], sd[1][0]);
+    assert.match(sd[0][0], /^dika\d{3}$/); assert.match(sd[1][0], /^nara\d{3}$/); // username dari nama anak, bukan pembeli
     await page.getByText(sd[0][0]).first().waitFor();
     await fit("admin"); await page.screenshot({ path: `${folder}/${width}-admin-pesanan.png`, fullPage: true });
-    const all = await order("Paket Semua Kelas", `Pak Budi ${width}`, ["A", "B", "C"]);
+    const all = await order("Paket Keluarga", `Ibu Sari ${width}`, ["Rafi", "Alya"]);
+    assert.match(all[0][0], /^rafi\d{3}$/); assert.match(all[1][0], /^alya\d{3}$/);
     await logout();
     // Akun SD: kelas 3 terbuka, kelas 7 tidak.
     await login(sd[1][0], sd[1][1]);
@@ -44,7 +46,7 @@ try {
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 1, Kelas 2, Kelas 3, Kelas 4, Kelas 5, Kelas 6").waitFor();
     await logout();
     // Akun semua kelas: kelas 9 terbuka.
-    await login(all[2][0], all[2][1]);
+    await login(all[1][0], all[1][1]);
     await page.goto(`${origin}${K9}`); assert.ok(page.url().endsWith(K9), "semua kelas membuka kelas 9");
     await logout();
     // Tombol "Dapatkan akses" muncul di halaman Masuk dan saat kelas belum dibeli.
@@ -52,6 +54,6 @@ try {
     assert.ok(/^https:\/\//.test(await page.getByRole("link", { name: "Dapatkan akses" }).getAttribute("href")));
     await fit("masuk");
     assert.deepEqual(errors, []); await ctx.close();
-    console.log(`PASS paket ${width}px: pesanan SD 2 akun dan semua kelas 3 akun, akses per jenjang, pesan WhatsApp, tombol Dapatkan akses`);
+    console.log(`PASS paket ${width}px: pesanan SD 2 akun dan Paket Keluarga 2 akun, username dari nama anak, akses per jenjang, pesan WhatsApp, tombol Dapatkan akses`);
   }
 } finally { await browser.close(); }
