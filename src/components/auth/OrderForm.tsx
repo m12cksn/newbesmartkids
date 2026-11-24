@@ -3,6 +3,7 @@
 import { Copy, MessageCircle, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { offers, rupiah, type OfferId } from "@/lib/packages";
+import { welcomeMessage } from "@/lib/welcome-message";
 
 type Created = { username: string; pin: string; displayName: string };
 const waPhone = (p: string) => { const d = p.replace(/\D/g, ""); return d.startsWith("0") ? `62${d.slice(1)}` : d; };
@@ -29,8 +30,7 @@ export function OrderForm({ onCreated }: { onCreated: () => void }) {
     setBusy(false);
   }
 
-  const url = typeof window === "undefined" ? "" : `${window.location.origin}/masuk`;
-  const message = done ? `Halo ${done.buyer}, terima kasih sudah membeli ${done.offer.name} BeSmartKids.\n\nMasuk di: ${url}\n\n${done.created.map(c => `${c.displayName}\nUsername: ${c.username}\nPIN: ${c.pin}`).join("\n\n")}\n\nIsi paket: ${done.offer.short}, aktif ${done.offer.months} bulan.\n\nCara memakai: ${url.replace(/\/masuk$/, "/panduan")}\n\nSetiap akun untuk satu anak dan bisa dipakai di 2 perangkat. Simpan PIN dan jangan dibagikan.` : "";
+  const message = done ? welcomeMessage({ buyer: done.buyer, packageName: `${done.offer.name.replace(/^Paket Jenjang /, "Paket ")} BeSmartKids`, access: done.offer.access, months: done.offer.months, accounts: done.created }) : "";
 
   return <section aria-labelledby="pesanan" className="space-y-4 rounded-xl border-2 border-success/40 bg-base-100 p-5">
     <div><h2 id="pesanan" className="flex items-center gap-2 text-xl font-bold"><ShoppingBag className="size-5 text-success" aria-hidden="true" />Buat akun dari pesanan Scalev</h2>
@@ -54,7 +54,7 @@ export function OrderForm({ onCreated }: { onCreated: () => void }) {
     </form>
     {done && <div role="status" className="space-y-3 rounded-lg bg-success/5 p-4" data-testid="order-result">
       <p className="font-bold">{done.created.length} akun siap. Kirim pesan ini ke pembeli.</p>
-      <pre className="whitespace-pre-wrap rounded-lg bg-base-100 p-3 text-xs">{message}</pre>
+      <pre className="whitespace-pre-wrap rounded-lg bg-base-100 p-3 text-xs [overflow-wrap:anywhere]">{message}</pre>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn btn-sm btn-success gap-1" onClick={() => { void navigator.clipboard?.writeText(message); setCopied(true); }}><Copy className="size-4" aria-hidden="true" />{copied ? "Tersalin" : "Salin pesan"}</button>
         {done.phone && <a className="btn btn-sm btn-outline gap-1" target="_blank" rel="noreferrer" href={`https://wa.me/${waPhone(done.phone)}?text=${encodeURIComponent(message)}`}><MessageCircle className="size-4" aria-hidden="true" />Kirim lewat WhatsApp</a>}
