@@ -56,5 +56,6 @@ export function LoginForm({ next, reason, classId }: { next: string; reason: "pa
       <button type="submit" className="btn btn-success h-12 w-full rounded-xl text-base" disabled={busy}>{busy ? "Memeriksa…" : "Masuk Sekarang"}</button>
     </form>
     <p className="mt-6 text-center text-sm text-base-content/70">Belum punya akun? <a href={accessUrl()} target="_blank" rel="noopener noreferrer" className="link text-success">Dapatkan akses</a>, lalu username dan PIN dikirim lewat WhatsApp. Bab pertama setiap kelas bisa <Link href="/#kelas" className="link text-success">dicoba gratis</Link>.</p>
+    <p className="mt-3 text-center text-sm text-base-content/70">Belum tahu caranya? <Link href="/panduan" className="link text-success">Lihat panduan</Link>.</p>
   </section>;
 }

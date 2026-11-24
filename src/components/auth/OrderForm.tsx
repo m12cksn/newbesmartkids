@@ -30,7 +30,7 @@ export function OrderForm({ onCreated }: { onCreated: () => void }) {
   }
 
   const url = typeof window === "undefined" ? "" : `${window.location.origin}/masuk`;
-  const message = done ? `Halo ${done.buyer}, terima kasih sudah membeli ${done.offer.name} BeSmartKids.\n\nMasuk di: ${url}\n\n${done.created.map(c => `${c.displayName}\nUsername: ${c.username}\nPIN: ${c.pin}`).join("\n\n")}\n\nIsi paket: ${done.offer.short}, aktif ${done.offer.months} bulan. Setiap akun untuk satu anak dan bisa dipakai di 2 perangkat. Simpan PIN dan jangan dibagikan.` : "";
+  const message = done ? `Halo ${done.buyer}, terima kasih sudah membeli ${done.offer.name} BeSmartKids.\n\nMasuk di: ${url}\n\n${done.created.map(c => `${c.displayName}\nUsername: ${c.username}\nPIN: ${c.pin}`).join("\n\n")}\n\nIsi paket: ${done.offer.short}, aktif ${done.offer.months} bulan.\n\nCara memakai: ${url.replace(/\/masuk$/, "/panduan")}\n\nSetiap akun untuk satu anak dan bisa dipakai di 2 perangkat. Simpan PIN dan jangan dibagikan.` : "";
 
   return <section aria-labelledby="pesanan" className="space-y-4 rounded-xl border-2 border-success/40 bg-base-100 p-5">
     <div><h2 id="pesanan" className="flex items-center gap-2 text-xl font-bold"><ShoppingBag className="size-5 text-success" aria-hidden="true" />Buat akun dari pesanan Scalev</h2>

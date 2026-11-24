@@ -29,7 +29,7 @@ export function AccountPanel() {
       <div><dt className="text-base-content/60">Berlaku sampai</dt><dd className="font-bold">{session.role === "admin" ? "Admin" : fmtDate(session.expiresAt)}</dd></div>
     </dl>
     <RenewNotice expiresAt={session.role === "admin" ? undefined : session.expiresAt} username={session.username} />
-    <p className="mt-3 text-xs text-base-content/60">Satu akun dapat dipakai di 2 perangkat. Jika masuk di perangkat ketiga, perangkat yang paling lama otomatis keluar.</p>
+    <p className="mt-3 text-xs text-base-content/60">Butuh bantuan memakai BeSmartKids? <Link href="/panduan" className="link text-success">Lihat panduan</Link>. Satu akun dapat dipakai di 2 perangkat. Jika masuk di perangkat ketiga, perangkat yang paling lama otomatis keluar.</p>
     <ChangePin />
     <div className="mt-5 flex flex-wrap gap-2">
       <Link href="/akun/laporan" className="btn btn-success gap-1"><FileText className="size-4" aria-hidden="true" />Laporan belajar</Link>
