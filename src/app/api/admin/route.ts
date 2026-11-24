@@ -10,28 +10,28 @@ const cls = (v: unknown) => { const n = Number(v); return Number.isInteger(n) &&
 type Created = { error?: string; username: string; pin: string; account: unknown };
 const baseName = (s: string) => (s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "").slice(0, 10) || "siswa").padEnd(3, "x");
 
-/** Satu pesanan = beberapa akun dengan paket yang sama (jenjang: beberapa kelas; semua kelas). */
+/** Satu pesanan = beberapa akun dengan paket yang sama (jenjang: beberapa kelas; keluarga: semua kelas).
+ *  Username dibuat dari nama anak di setiap akun (bukan nama pembeli, yang biasanya orang tuanya). */
 async function createBundle(token: string, b: Record<string, unknown>) {
   const offer = offerById(b.offer);
   if (!offer) return { error: "bad_offer" };
-  const buyer = str(b.buyer), phone = str(b.phone, 30), note = str(b.note, 200);
+  const phone = str(b.phone, 30), note = str(b.note, 200);
   const names = Array.isArray(b.names) ? b.names.map(x => str(x)).slice(0, offer.accounts) : [];
+  if (names.length < offer.accounts || names.some(n => !/[a-z0-9]/i.test(n.normalize("NFD")))) return { error: "bad_name" };
   const [first, ...rest] = offer.classes === "all" ? [null] : offer.classes;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const stem = `${baseName(buyer)}${Math.floor(100 + Math.random() * 900)}`;
-    const out: { username: string; pin: string; displayName: string }[] = [];
-    for (let i = 0; i < offer.accounts; i++) {
-      const displayName = names[i] || (offer.accounts > 1 ? `${buyer} (${i + 1})` : buyer);
-      const r = await rpc<Created>("bsk_admin_create", { p_token: token, p_username: `${stem}${String.fromCharCode(97 + i)}`, p_display_name: displayName, p_phone: phone, p_note: note || offer.name, p_package: offer.classes === "all" ? "semua" : "kelas", p_class: first });
-      if (r.error === "taken" && i === 0) break; // coba awalan lain
-      if (r.error) return { error: r.error, created: out };
-      const id = (r.account as { id: string }).id;
-      for (const c of rest) await rpc("bsk_admin_extend", { p_token: token, p_account: id, p_package: "kelas", p_class: c });
-      out.push({ username: r.username, pin: r.pin, displayName });
+  const out: { username: string; pin: string; displayName: string }[] = [];
+  for (const displayName of names) {
+    let r: Created | null = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      r = await rpc<Created>("bsk_admin_create", { p_token: token, p_username: `${baseName(displayName)}${Math.floor(100 + Math.random() * 900)}`, p_display_name: displayName, p_phone: phone, p_note: note || offer.name, p_package: offer.classes === "all" ? "semua" : "kelas", p_class: first });
+      if (r.error !== "taken") break; // username sudah dipakai: coba angka lain
     }
-    if (out.length === offer.accounts) return { offer: offer.id, created: out };
+    if (!r || r.error) return { error: r?.error ?? "taken", created: out };
+    const id = (r.account as { id: string }).id;
+    for (const c of rest) await rpc("bsk_admin_extend", { p_token: token, p_account: id, p_package: "kelas", p_class: c });
+    out.push({ username: r.username, pin: r.pin, displayName });
   }
-  return { error: "taken" };
+  return { offer: offer.id, created: out };
 }
 
 export async function POST(request: NextRequest) {
