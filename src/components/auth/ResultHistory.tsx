@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpenCheck, ClipboardCheck, PencilLine } from "lucide-react";
+import { BookOpenCheck, ChevronDown, ClipboardCheck, PencilLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { SavedResult } from "@/app/api/hasil/route";
@@ -45,9 +45,33 @@ export function ResultHistory() {
           <p className="mt-2 text-xs text-base-content/60">{last ? `Evaluasi terakhir ${fmtDate(last.at)}: ${last.score}/100 (${g.evals.length}× dikerjakan).` : "Evaluasi belum dikerjakan."} Latihan selesai {g.practices.length}×.</p>
         </li>; })}</ul>
       <h3 className="mt-8 flex items-center gap-1.5 text-lg font-bold"><BookOpenCheck className="size-5 text-success" aria-hidden="true" />Aktivitas terbaru</h3>
-      <ol className="mt-2 divide-y divide-base-300 rounded-md border border-base-300 bg-base-100 text-sm">{results.slice(0, 10).map((r, i) => <li key={i} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
-        <span><span className="font-semibold">{r.part || (r.kind === "evaluasi" ? "Evaluasi" : r.kind === "harian" ? "Latihan harian" : "Latihan")}</span><span className="block text-xs text-base-content/60">{r.title}, {fmtDate(r.at)}</span></span>
-        <span className={`font-extrabold ${tone(r.score)}`}>{r.correct}/{r.total} benar, skor {r.score}</span></li>)}</ol>
+      <ol className="mt-2 divide-y divide-base-300 rounded-md border border-base-300 bg-base-100 text-sm">{results.slice(0, 10).map((r, i) => <li key={i}>
+        <details className="group">
+          <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 px-4 py-2.5 hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-success [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0 break-words">
+              <span className="font-semibold">{r.part || (r.kind === "evaluasi" ? "Evaluasi" : r.kind === "harian" ? "Latihan harian" : "Latihan")}</span>
+              <span className="block text-xs text-base-content/60">{r.title}, {fmtDate(r.at)}</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className={`font-extrabold ${tone(r.score)}`}>{r.correct}/{r.total} benar, skor {r.score}</span>
+              <ChevronDown className="size-4 text-success group-open:rotate-180" aria-hidden="true" />
+            </span>
+          </summary>
+          <div className="space-y-2 border-t border-base-300 px-4 py-3 break-words">
+            {r.correct === r.total ? <p>Semua jawaban benar.</p> : r.incorrect?.length ? <>
+              <p className="font-bold">Pembahasan jawaban yang salah</p>
+              <ol className="divide-y divide-base-300">
+                {r.incorrect.map(q => <li key={q.number} className="space-y-1 py-2">
+                  <p className="font-semibold">Soal {q.number}. {q.prompt}</p>
+                  <p>Jawabanmu <span className="font-semibold text-error">{q.submitted || "Kosong"}</span></p>
+                  <p>Jawaban benar <span className="font-semibold text-success">{q.expected}</span></p>
+                  <p className="whitespace-pre-line">{q.explanation}</p>
+                </li>)}
+              </ol>
+            </> : <p>Rincian jawaban belum tersedia untuk hasil ini.</p>}
+          </div>
+        </details>
+      </li>)}</ol>
     </>}
   </section>;
 }

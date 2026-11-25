@@ -44,7 +44,14 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
   const answer = answers[index] ?? "";
   const selected = answer ? answer.split("|") : [];
   const ready = question && isReady ? isReady(question, answer) : question?.mode === "order" ? selected.length === question.options?.length : Boolean(answer.trim());
-  const score = questions.filter((q, i) => checkAnswer(q, answers[i])).length;
+  const incorrect = question ? [] : questions.flatMap((q, i) => checkAnswer(q, answers[i]) ? [] : [{
+    number: i + 1,
+    prompt: q.prompt,
+    submitted: formatAnswer ? formatAnswer(q, answers[i] ?? "") : (answers[i] ?? "").replaceAll("|", ", "),
+    expected: formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", "),
+    explanation: q.explanation,
+  }]);
+  const score = questions.length - incorrect.length;
   const record = (value: string) => setAnswers(old => ({ ...old, [index]: value }));
   const go = (i: number) => { setChecked(false); setIndex(i); };
   useEffect(() => { heading.current?.focus(); }, [index]);
@@ -86,7 +93,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     </> : <>
       <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? label("Latihan selesai", "Practice complete") : label("Hasil evaluasi", "Assessment results")}</h2>
       <p className="font-bold">{label("Benar", "Correct")} {score} · {label("Salah", "Incorrect")} {questions.length - score} · {label("Skor", "Score")} {Math.round(score / questions.length * 100)}/100</p>
-      <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} />
+      <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} incorrect={incorrect} />
       {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
         <summary className="cursor-pointer font-bold">{label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
         <ol className="mt-2 space-y-3 text-sm">{questions.map((q, i) => !checkAnswer(q, answers[i]) &&
