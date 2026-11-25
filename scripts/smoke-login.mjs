@@ -70,7 +70,7 @@ try {
     await page.goto(`${origin}/admin`); await page.waitForURL(/alasan=admin/);
     await page.goto(`${origin}/akun`); await page.getByText("Kelas 7", { exact: true }).waitFor();
     // Riwayat nilai: kosong dulu, lalu dua hasil disimpan lewat API dan tampil per bab.
-    for (const body of [{ kind: "latihan", part: "Latihan A. Bilangan bulat", correct: 3, total: 4 }, { kind: "evaluasi", part: "Evaluasi Bab 1", correct: 21, total: 24 }]) {
+    for (const body of [{ kind: "latihan", part: "Latihan A. Bilangan bulat", correct: 3, total: 4, incorrect: [{ number: 2, prompt: "Berapakah 2 + 3?", submitted: "4", expected: "5", explanation: "Dua ditambah tiga sama dengan lima." }] }, { kind: "evaluasi", part: "Evaluasi Bab 1", correct: 21, total: 24 }]) {
       const r = await page.evaluate(b => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/kelas/logika-dan-aljabar-kelas-7/materi/bilangan-bulat", title: "Bilangan Bulat", ...b }) }).then(x => x.status), body);
       assert.equal(r, 200);
     }
@@ -79,6 +79,13 @@ try {
     await page.reload(); await page.getByRole("heading", { name: "Riwayat belajar" }).waitFor();
     await page.getByRole("link", { name: "Bilangan Bulat" }).waitFor(); await page.getByText("88/100").first().waitFor(); await page.getByText("75/100").first().waitFor();
     await page.getByText("21/24 benar, skor 88").waitFor(); const hist = page.getByRole("region", { name: "Riwayat belajar" }); await hist.getByText("Latihan harian", { exact: true }).first().waitFor(); await hist.getByText("Mastering Perkalian & Pembagian").first().waitFor(); await page.getByText("6/7 benar, skor 86").waitFor();
+    const practice = hist.locator("details").filter({ hasText: "Latihan A. Bilangan bulat" });
+    await practice.locator("summary").click();
+    await practice.getByText("Soal 2. Berapakah 2 + 3?", { exact: true }).waitFor();
+    await practice.getByText("Dua ditambah tiga sama dengan lima.").waitFor();
+    const legacy = hist.locator("details").filter({ hasText: "Evaluasi Bab 1" });
+    await legacy.locator("summary").click();
+    await legacy.getByText("Rincian jawaban belum tersedia untuk hasil ini.").waitFor();
     await fit("akun"); await shot("akun");
     // Laporan orang tua: ringkasan bab, tautan baca-saja tanpa login, lalu tautan dicabut.
     await page.getByRole("link", { name: "Laporan belajar" }).click(); await page.waitForURL(/\/akun\/laporan$/);
