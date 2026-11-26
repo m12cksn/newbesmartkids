@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpenCheck, ChevronDown, ClipboardCheck, PencilLine } from "lucide-react";
+import { BookOpenCheck, ChevronDown, ChevronRight, ClipboardCheck, PencilLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { SavedResult } from "@/app/api/hasil/route";
@@ -45,7 +45,14 @@ export function ResultHistory() {
           <p className="mt-2 text-xs text-base-content/60">{last ? `Evaluasi terakhir ${fmtDate(last.at)}: ${last.score}/100 (${g.evals.length}× dikerjakan).` : "Evaluasi belum dikerjakan."} Latihan selesai {g.practices.length}×.</p>
         </li>; })}</ul>
       <h3 className="mt-8 flex items-center gap-1.5 text-lg font-bold"><BookOpenCheck className="size-5 text-success" aria-hidden="true" />Aktivitas terbaru</h3>
-      <ol className="mt-2 divide-y divide-base-300 rounded-md border border-base-300 bg-base-100 text-sm">{results.slice(0, 10).map((r, i) => <li key={i}>
+      <ol className="mt-2 divide-y divide-base-300 rounded-md border border-base-300 bg-base-100 text-sm">{results.slice(0, 10).map((r, i) => <li key={r.id ?? i}>
+        {r.kind === "evaluasi" && r.id ? <Link href={`/akun/hasil/${r.id}`} prefetch={false} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-success">
+          <span className="min-w-0 break-words">
+            <span className="font-semibold">{r.part || "Evaluasi"}</span>
+            <span className="block text-xs text-base-content/60">{r.title}, {fmtDate(r.at)}</span>
+          </span>
+          <span className="flex items-center gap-2"><span className={`font-extrabold ${tone(r.score)}`}>{r.correct}/{r.total} benar, skor {r.score}</span><ChevronRight className="size-4 text-success" aria-hidden="true" /></span>
+        </Link> :
         <details className="group">
           <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 px-4 py-2.5 hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-success [&::-webkit-details-marker]:hidden">
             <span className="min-w-0 break-words">
@@ -70,7 +77,7 @@ export function ResultHistory() {
               </ol>
             </> : <p>Rincian jawaban belum tersedia untuk hasil ini.</p>}
           </div>
-        </details>
+        </details>}
       </li>)}</ol>
     </>}
   </section>;

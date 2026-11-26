@@ -21,6 +21,7 @@ const admin = t => { const a = who(t); if (!a || a.role !== "admin") { const e =
 const pin = () => String(Math.floor(Math.random() * 1e6)).padStart(6, "0");
 
 const links = new Map(); // code -> { id, expiresAt }
+let resultId = 0;
 const report = a => ({ name: a.displayName || a.username, generatedAt: new Date().toISOString(), results: (a.results ?? []).slice(0, 300) });
 const fns = {
   bsk_login: ({ p_username, p_pin }) => {
@@ -36,8 +37,9 @@ const fns = {
   bsk_logout: ({ p_token }) => { sessions.delete(p_token); return null; },
   bsk_save_result: ({ p_token, p_path, p_title, p_kind, p_part, p_correct, p_total, p_incorrect }) => { const a = who(p_token); if (!a) return { error: "session" };
     if (!["latihan", "evaluasi", "harian"].includes(p_kind) || !(p_total >= 1 && p_total <= 100) || !(p_correct >= 0 && p_correct <= p_total) || !/^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian)\/level-[1-3]$/.test(p_path)) return { error: "invalid" };
-    (a.results ??= []).unshift({ path: p_path, title: p_title ?? "", kind: p_kind, part: p_part ?? "", correct: p_correct, total: p_total, incorrect: p_incorrect, score: Math.round(p_correct * 100 / p_total), at: new Date().toISOString() }); return { ok: true }; },
-  bsk_my_results: ({ p_token }) => { const a = who(p_token); return a ? (a.results ?? []).slice(0, 300) : null; },
+    (a.results ??= []).unshift({ id: String(++resultId), path: p_path, title: p_title ?? "", kind: p_kind, part: p_part ?? "", correct: p_correct, total: p_total, incorrect: p_incorrect, score: Math.round(p_correct * 100 / p_total), at: new Date().toISOString() }); return { ok: true }; },
+  bsk_my_results: ({ p_token }) => { const a = who(p_token); return a ? (a.results ?? []).slice(0, 300).map(r => r.kind === "evaluasi" ? { ...r, incorrect: null } : r) : null; },
+  bsk_my_evaluation: ({ p_token, p_result_id }) => who(p_token)?.results?.find(r => r.id === p_result_id && r.kind === "evaluasi") ?? null,
   bsk_my_report: ({ p_token }) => { const a = who(p_token); return a ? report(a) : null; },
   bsk_report_link: ({ p_token }) => { const a = who(p_token); if (!a) return { error: "session" }; for (const [c, l] of links) if (l.id === a.id) links.delete(c);
     const code = randomBytes(12).toString("hex"), expiresAt = months(1); links.set(code, { id: a.id, expiresAt }); return { code, expiresAt }; },

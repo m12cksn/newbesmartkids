@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { Question } from "@/data/grade-four-whole-numbers";
 import { EvaluationGate } from "@/components/auth/EvaluationGate";
 import { SaveResult } from "@/components/auth/SaveResult";
+import { EvaluationQuestionMap, EvaluationSummary, questionCircle, questionTone } from "@/components/report/EvaluationSummary";
 
 function isCorrect(question: Question, answer: string | undefined) {
   if (!answer) return false;
@@ -22,9 +23,10 @@ export default function GradeFourQuiz<Q extends Question>(props: QuizProps<Q>) {
   return <EvaluationGate close={props.close}><QuizBody {...props} /></EvaluationGate>;
 }
 
-function QuizBody<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false, expanded = false }: {
+function QuizBody<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false, expanded = false, retry = false }: {
   english?: boolean;
   expanded?: boolean;
+  retry?: boolean;
   questions: Q[]; title: string; practiceMode: boolean; close: () => void;
   renderVisual?: (question: Q) => ReactNode;
   renderAnswer?: (question: Q, answer: string, record: (value: string) => void, checked: boolean) => ReactNode;
@@ -41,6 +43,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [checked, setChecked] = useState(false);
   const [reviewNumber, setReviewNumber] = useState<number | null>(null);
+  const [retrying, setRetrying] = useState(false);
   const reviewId = useId();
   const review = useRef<HTMLDetailsElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -78,12 +81,14 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
   }, []);
 
-  return <section className={`group/quiz mx-auto rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6 ${expanded && !practiceMode ? "max-w-3xl space-y-4 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base" : "max-w-2xl space-y-3"}`} data-evaluation={!practiceMode || undefined}>
-    <div className="flex flex-wrap items-center justify-between gap-2">
+  const evaluationFinished = !question && !practiceMode;
+  return <>
+  <section hidden={retrying} className={`group/quiz mx-auto rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6 ${evaluationFinished ? "max-w-3xl space-y-5" : expanded && !practiceMode ? "max-w-3xl space-y-4 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base" : "max-w-2xl space-y-3"}`} data-evaluation={!practiceMode || undefined}>
+    {!evaluationFinished && <><div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-sm font-bold text-success">{title}{question && ` · ${label("Soal", "Question")} ${index + 1}/${questions.length}`}</p>
       <button className="btn btn-ghost btn-sm" onClick={close}>{label('Tutup', 'Close')}</button>
     </div>
-    <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/>
+    <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/></>}
     {question ? <>
       {renderMeta?.(question)}
       <h2 ref={heading} tabIndex={-1} className={expanded && !practiceMode ? "break-words text-xl leading-snug font-extrabold sm:text-2xl" : "text-lg font-extrabold"}>{renderText(question.prompt)}</h2>
@@ -117,15 +122,14 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
           : !checked && ready && <button className="btn btn-success ms-auto" onClick={checkEvaluation}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>}
       </div>
     </> : <>
-      <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? label("Latihan selesai", "Practice complete") : label("Hasil evaluasi", "Assessment results")}</h2>
-      <p className="font-bold">{label("Benar", "Correct")} {score} · {label("Salah", "Incorrect")} {questions.length - score} · {label("Skor", "Score")} {Math.round(score / questions.length * 100)}/100</p>
-      {!practiceMode && <div className="space-y-2">
-        <p>{label("Ketuk nomor untuk melihat soal dan pembahasannya.", "Select a question number to see the question and explanation.")}</p>
-        <ol aria-label={label("Hasil tiap soal", "Results by question")} className="flex flex-wrap gap-2">
+      {evaluationFinished
+        ? <EvaluationSummary title={title} correct={score} total={questions.length} english={english} heading={heading} />
+        : <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{label("Latihan selesai", "Practice complete")}</h2>}
+      <p className={evaluationFinished ? "sr-only" : "font-bold"}>{label("Benar", "Correct")} {score} · {label("Salah", "Incorrect")} {questions.length - score} · {label("Skor", "Score")} {Math.round(score / questions.length * 100)}/100</p>
+      {!practiceMode && <EvaluationQuestionMap english={english}>
           {results.map(({ number, correct }) => {
             const wrong = !correct;
             const name = label(`Soal ${number}, ${wrong ? "salah" : "benar"}`, `Question ${number}, ${wrong ? "incorrect" : "correct"}`);
-            const circle = "grid size-11 place-items-center rounded-full border-2 text-base font-bold";
             return <li key={number}><button type="button" aria-label={name} aria-controls={reviewId} aria-pressed={reviewNumber === number}
                   onClick={() => {
                     setReviewNumber(number);
@@ -134,11 +138,10 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
                       review.current.scrollIntoView({ block: "nearest" });
                     }
                   }}
-                  className={`${circle} focus-visible:outline-2 focus-visible:outline-offset-2 aria-pressed:ring-2 ${wrong ? "border-red-300 bg-red-100 text-red-900 aria-pressed:ring-red-700" : "border-green-300 bg-green-100 text-green-900 aria-pressed:ring-green-700"}`}>{number}</button></li>;
+                  className={`${questionCircle} ${questionTone(correct)}`}>{number}</button></li>;
           })}
-        </ol>
-      </div>}
-      <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} incorrect={incorrect} />
+      </EvaluationQuestionMap>}
+      {!retry && <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} incorrect={incorrect} />}
       {showReview && <details id={reviewId} ref={review} hidden={incorrect.length === 0 && !selectedResult} onToggle={event => {
         if (!event.currentTarget.open) setReviewNumber(null);
       }} className="scroll-mt-24 rounded-lg bg-base-200 p-3">
@@ -154,7 +157,17 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
             <p>{label('Jawabanmu ', 'Your answer: ')}{item.submitted}. {label("Jawaban benar ", "Correct answer: ")}{item.expected}.</p><p>{renderText(item.explanation)}</p>
           </li>)}</ol>
       </details>}
-      <button className="btn btn-success" onClick={close}>{label('Kembali ke materi', 'Back to lesson')}</button>
+      <div className="flex flex-wrap gap-2">
+        {evaluationFinished && incorrect.length > 0 && <button className="btn btn-success" onClick={() => setRetrying(true)}>{label("Ulangi soal yang salah", "Retry incorrect questions")}</button>}
+        <button className={evaluationFinished && incorrect.length ? "btn btn-outline" : "btn btn-success"} onClick={close}>
+          {retry ? label("Kembali ke hasil evaluasi", "Back to assessment results") : label("Kembali ke materi", "Back to lesson")}
+        </button>
+      </div>
     </>}
-  </section>;
+  </section>
+  {retrying && <QuizBody questions={incorrect.map(item => questions[item.number - 1])} title={label("Ulangi soal yang salah", "Retry incorrect questions")}
+    practiceMode retry close={() => { setRetrying(false); requestAnimationFrame(() => heading.current?.focus()); }}
+    renderVisual={renderVisual} renderAnswer={renderAnswer} checkAnswer={checkAnswer} isReady={isReady} formatAnswer={formatAnswer}
+    renderText={renderText} renderMeta={renderMeta} english={english} />}
+  </>;
 }
