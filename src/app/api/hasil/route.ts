@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   if (!authEnabled || !token) return NextResponse.json({ results: null }, { headers: noStore });
   try {
-    const results = await rpc<SavedResult[] | null>("bsk_my_results", { p_token: token });
+    const results = await rpc<SavedResult[] | null>("bsk_my_result_summaries", { p_token: token });
     return NextResponse.json({ results }, { headers: noStore });
   } catch { return NextResponse.json({ error: "server" }, { status: 502, headers: noStore }); }
 }

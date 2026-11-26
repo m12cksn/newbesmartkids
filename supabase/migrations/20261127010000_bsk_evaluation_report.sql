@@ -1,4 +1,4 @@
-create or replace function public.bsk_my_results(p_token text)
+create function public.bsk_my_result_summaries(p_token text)
 returns jsonb language plpgsql volatile security definer set search_path = '' as $$
 declare a bsk.accounts;
 begin
@@ -32,6 +32,6 @@ begin
   );
 end $$;
 
-revoke all on function public.bsk_my_evaluation(text, bigint) from public;
-grant execute on function public.bsk_my_evaluation(text, bigint) to anon, authenticated;
+revoke all on function public.bsk_my_evaluation(text, bigint), public.bsk_my_result_summaries(text) from public;
+grant execute on function public.bsk_my_evaluation(text, bigint), public.bsk_my_result_summaries(text) to anon, authenticated;
 notify pgrst, 'reload schema';
