@@ -77,15 +77,44 @@ try {
     assert.equal(await page.evaluate(() => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/admin", kind: "latihan", correct: 1, total: 1 }) }).then(x => x.status)), 400);
     assert.equal(await page.evaluate(() => fetch("/api/hasil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/mastering-perkalian-pembagian/level-2", title: "Mastering Perkalian & Pembagian", kind: "harian", part: "Level 2", correct: 6, total: 7 }) }).then(x => x.status)), 200);
     await page.reload(); await page.getByRole("heading", { name: "Riwayat belajar" }).waitFor();
-    await page.getByRole("link", { name: "Bilangan Bulat" }).waitFor(); await page.getByText("88/100").first().waitFor(); await page.getByText("75/100").first().waitFor();
+    await page.getByRole("link", { name: "Bilangan Bulat", exact: true }).waitFor(); await page.getByText("88/100").first().waitFor(); await page.getByText("75/100").first().waitFor();
     await page.getByText("21/24 benar, skor 88").waitFor(); const hist = page.getByRole("region", { name: "Riwayat belajar" }); await hist.getByText("Latihan harian", { exact: true }).first().waitFor(); await hist.getByText("Mastering Perkalian & Pembagian").first().waitFor(); await page.getByText("6/7 benar, skor 86").waitFor();
     const practice = hist.locator("details").filter({ hasText: "Latihan A. Bilangan bulat" });
     await practice.locator("summary").click();
     await practice.getByText("Soal 2. Berapakah 2 + 3?", { exact: true }).waitFor();
     await practice.getByText("Dua ditambah tiga sama dengan lima.").waitFor();
-    const legacy = hist.locator("details").filter({ hasText: "Evaluasi Bab 1" });
-    await legacy.locator("summary").click();
-    await legacy.getByText("Rincian jawaban belum tersedia untuk hasil ini.").waitFor();
+    await hist.getByRole("link", { name: /Evaluasi Bab 1/ }).click();
+    await page.waitForURL(/\/akun\/hasil\/\d+$/);
+    await page.getByRole("heading", { name: "Hasil evaluasi" }).waitFor();
+    await page.getByText("Rincian jawaban belum tersedia untuk hasil ini.").filter({ visible: true }).waitFor();
+    await page.getByText("87,5%", { exact: true }).waitFor();
+    await page.getByText("12,5%", { exact: true }).waitFor();
+    await page.getByText("Grafik ringkasan jawaban").click();
+    await page.getByRole("img", { name: "Benar 21, Salah 3" }).waitFor();
+    await fit("hasil evaluasi");
+    await shot("hasil-evaluasi");
+    await page.getByRole("link", { name: "Kembali ke riwayat belajar" }).click();
+    await page.waitForURL(/\/akun#riwayat$/);
+    const detailStatus = await page.evaluate(() => fetch("/api/hasil", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        path: "/kelas/logika-dan-aljabar-kelas-7/materi/bilangan-bulat", title: "Bilangan Bulat",
+        kind: "evaluasi", part: "Evaluasi dengan pembahasan", correct: 2, total: 3,
+        incorrect: [{ number: 2, prompt: "Berapakah 2 + 3?", submitted: "4", expected: "5", explanation: "Dua ditambah tiga sama dengan lima." }],
+      }),
+    }).then(r => r.status));
+    assert.equal(detailStatus, 200);
+    await page.goto(`${origin}/akun`);
+    await hist.getByRole("link", { name: /Evaluasi dengan pembahasan/ }).click();
+    await page.getByRole("button", { name: "Soal 1, benar" }).waitFor();
+    await page.getByRole("button", { name: "Soal 2, salah" }).click();
+    await page.getByText("Berapakah 2 + 3?", { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Soal 3, benar" }).click();
+    await page.getByText("Jawabanmu benar.", { exact: true }).waitFor();
+    assert.equal(await page.getByText("Berapakah 2 + 3?", { exact: true }).count(), 0);
+    await fit("pembahasan evaluasi");
+    await page.getByRole("link", { name: "Kembali ke riwayat belajar" }).click();
+    await page.waitForURL(/\/akun#riwayat$/);
     await fit("akun"); await shot("akun");
     // Laporan orang tua: ringkasan bab, tautan baca-saja tanpa login, lalu tautan dicabut.
     await page.getByRole("link", { name: "Laporan belajar" }).click(); await page.waitForURL(/\/akun\/laporan$/);

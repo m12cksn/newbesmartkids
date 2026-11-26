@@ -86,6 +86,14 @@ try {
     await page.getByText("Bahas jawaban yang salah", { exact: true }).click();
     await page.getByText(/Jawaban benar Bingkai kiri: 7/).waitFor();
     await fit("hasil"); await shot("result");
+    await button("Ulangi soal yang salah").click();
+    await page.getByText("Soal 1/1", { exact: false }).waitFor();
+    await answer(assessment[0]);
+    await button("Periksa jawaban").click();
+    await button("Lihat hasil").click();
+    await page.getByText("Benar 1 · Salah 0 · Skor 100/100", { exact: true }).waitFor();
+    await button("Kembali ke hasil evaluasi").click();
+    await page.getByRole("heading", { name: "Hasil evaluasi" }).waitFor();
     assert.deepEqual(errors, []); await page.close();
     console.log(`PASS kelas 1 bab 1 at ${width}px: 8 peraga, 16 latihan (1 salah disengaja), 24 evaluasi (tarik garis, warnai, daun, ulat, titik, pasangan bilangan), skor dan pembahasan`);
   }

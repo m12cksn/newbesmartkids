@@ -6,6 +6,8 @@ Perubahan Riwayat Belajar: [Pembahasan jawaban di Aktivitas terbaru](handoff/202
 
 Perubahan evaluasi: [Umpan balik benar atau salah saat evaluasi](handoff/2026-11-26-feat-evaluation-correct-wrong-feedback.md).
 
+Laporan evaluasi: [Ringkasan hasil dan laporan dari aktivitas terbaru](handoff/2026-11-27-feat-evaluation-report.md).
+
 Pratinjau lokal: [Teks evaluasi yang lebih besar dan ilustrasi berdimensi untuk Kelas 2 Bab 2 dan Bab 3](handoff/2026-11-26-preview-tampilan-evaluasi-kelas-2.md).
 
 Pratinjau lanjutan: [Ilustrasi evaluasi Kelas 2 Bab 4](handoff/2026-11-26-preview-evaluasi-posisi-benda-dan-pola.md).

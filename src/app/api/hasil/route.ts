@@ -4,7 +4,7 @@ import { authEnabled, rpc } from "@/lib/supabase-rpc";
 
 export type IncorrectAnswer = { number: number; prompt: string; submitted: string; expected: string; explanation: string };
 
-export type SavedResult = { path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string; incorrect?: IncorrectAnswer[] | null };
+export type SavedResult = { id?: string; path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string; incorrect?: IncorrectAnswer[] | null };
 /** Halaman yang boleh menyimpan nilai: bab materi dan latihan harian. */
 export const RESULT_PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian|jarimatika|pembagian-garis)\/level-[1-3]$/;
 const noStore = { "Cache-Control": "no-store" };
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   if (!authEnabled || !token) return NextResponse.json({ results: null }, { headers: noStore });
   try {
-    const results = await rpc<SavedResult[] | null>("bsk_my_results", { p_token: token });
+    const results = await rpc<SavedResult[] | null>("bsk_my_result_summaries", { p_token: token });
     return NextResponse.json({ results }, { headers: noStore });
   } catch { return NextResponse.json({ error: "server" }, { status: 502, headers: noStore }); }
 }
