@@ -29,7 +29,7 @@ function Scatter({ items, frame, onTap, marked: markedOuter }: { items: { thing:
   const marked = markedOuter ?? own;
   const { cols, rows, items: pos } = layout(items.flatMap(x => Array.from({ length: x.n }, () => x.thing)));
   const toggle = (i: number, t: Thing) => { const on = !marked.includes(i); if (!markedOuter) setOwn(m => on ? [...m, i] : m.filter(z => z !== i)); onTap?.(t, on); };
-  return <div className="w-full max-w-lg space-y-1">
+  return <div className="w-full max-w-2xl space-y-1 group-data-[evaluation=true]/quiz:max-w-none">
     <div className={`relative w-full ${frame ? frames[frame] : "rounded-xl bg-lime-50"}`} style={{ aspectRatio: `${cols + 0.6} / ${rows + 0.6}` }}>
       {pos.map((p, i) => { const on = marked.includes(i); return <button key={i} type="button" aria-label={`${things[p.t]} nomor ${i + 1}`} aria-pressed={on} onClick={() => toggle(i, p.t)}
         className={`absolute grid place-items-center rounded-full transition ${on ? "bg-white/70 ring-2 ring-success" : "hover:bg-white/60"}`}
@@ -43,16 +43,16 @@ function Scatter({ items, frame, onTap, marked: markedOuter }: { items: { thing:
 }
 
 const NameCell = ({ r }: { r: Row }) => <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
-  {r.thing && <ThingArt t={r.thing} className="size-7 shrink-0 sm:size-9" />}
+  {r.thing && <ThingArt t={r.thing} className="size-8 shrink-0 sm:size-10 group-data-[evaluation=true]/quiz:sm:size-12" />}
   {r.color && <span className="size-5 shrink-0 rounded-full border border-black/20" style={{ background: swatchHex[r.color] }} aria-hidden="true" />}
   <span className={/^\d+$/.test(r.name) ? "text-lg font-extrabold" : "min-w-0 text-xs font-semibold [overflow-wrap:anywhere] sm:text-sm"}>{r.name}</span>
 </span>;
 
 function DataTable({ title, head, children }: { title: string; head: string[]; children: ReactNode }) {
-  return <figure className="w-full max-w-xl">
+  return <figure className="w-full max-w-2xl group-data-[evaluation=true]/quiz:max-w-none">
     <figcaption className="mb-1 text-center text-xs font-semibold text-base-content/70">{title}</figcaption>
     <div className="overflow-hidden rounded-lg border border-purple-300">
-      <table className="w-full table-fixed border-collapse text-sm">
+      <table className="w-full table-fixed border-collapse text-sm [&_th]:[overflow-wrap:anywhere]">
         <thead><tr className="bg-purple-200/70">{head.map((h, i) => <th key={h} scope="col" className={`border-purple-300 px-2 py-1.5 font-semibold ${i ? "border-l" : "w-[34%]"}`}>{h}</th>)}</tr></thead>
         <tbody>{children}</tbody>
       </table>
@@ -68,11 +68,11 @@ function TallyView({ s }: { s: Extract<Scene, { type: "tally" }> }) {
   </DataTable>;
 }
 function SymbolRow({ n, s, color }: { n: number; s: PicSymbol; color?: Swatch }) {
-  return <span className="flex flex-wrap gap-0.5">{Array.from({ length: n }, (_, i) => <SymbolArt key={i} s={s} color={color} className="size-6 sm:size-7" />)}</span>;
+  return <span className="flex flex-wrap gap-0.5">{Array.from({ length: n }, (_, i) => <SymbolArt key={i} s={s} color={color} className="size-7 sm:size-8 group-data-[evaluation=true]/quiz:sm:size-10" />)}</span>;
 }
 function PictoView({ s }: { s: Extract<Scene, { type: "picto" }> }) {
   const unit = <SymbolArt s={s.symbol} color={s.color ?? "merah"} className="inline size-5 align-text-bottom" />;
-  return <div className="w-full max-w-xl space-y-1">
+  return <div className="w-full max-w-2xl space-y-1 group-data-[evaluation=true]/quiz:max-w-none">
     <DataTable title={s.title} head={[s.head[0], s.head[1]]}>
       {s.rows.map(r => <tr key={r.name}><td className="border-t border-purple-200 px-2 py-1.5"><NameCell r={r} /></td>
         <td className={td}><SymbolRow n={r.n} s={s.symbol} color={s.color ?? r.color} /></td></tr>)}
@@ -219,7 +219,7 @@ function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: st
     case "choice": return <div role="group" aria-label={`Pilihan bagian ${i + 1}`} className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
       <div className="flex flex-wrap gap-2">{p.options.map((op, k) => <button key={op} type="button" aria-label={op} aria-pressed={value === op} disabled={checked} onClick={() => set(op)}
         className={`flex flex-col items-center gap-1 rounded-2xl border-4 p-2 font-bold ${value === op ? "border-error bg-error/5" : "border-transparent bg-base-100 ring-1 ring-base-300"}`}>
-        {p.tallies ? <><Tally n={Number(op)} className="h-8" /><span className="text-xs">{"ABCD"[k]}</span></> : p.things ? <><ThingArt t={p.things[k]} className="size-12" /><span className="text-sm">{op.slice(0, 1)}</span></> : <span className="px-2 text-lg">{op}</span>}</button>)}</div></div>;
+        {p.tallies ? <><Tally n={Number(op)} className="h-8" /><span className="text-xs">{"ABCD"[k]}</span></> : p.things ? <><ThingArt t={p.things[k]} className="size-12 group-data-[evaluation=true]/quiz:size-16 sm:group-data-[evaluation=true]/quiz:size-20" /><span className="text-sm">{op.slice(0, 1)}</span></> : <span className="px-2 text-lg">{op}</span>}</button>)}</div></div>;
   }
 }
 function Answer({ q, value, record, checked }: { q: DQuestion; value: string; record: (v: string) => void; checked: boolean }) {
@@ -277,7 +277,7 @@ export default function GradeTwoDiagrams() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 8"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
+        renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-2 sm:p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { P, type CurveName, type Fig, type ObjName, type SolidName } from "@/data/grade-two-shapes";
 
 export const ink = "#1f3b30";
@@ -27,15 +27,24 @@ export function sectorPath(deg: number, rot: number) {
 }
 
 /* ---------- Bangun ruang (skema) ---------- */
-export function SolidArt({ s, className = "size-24", label }: { s: SolidName; className?: string; label?: string }) {
+export function SolidArt({ s, className = "size-24", label, dimensional = false }: { s: SolidName; className?: string; label?: string; dimensional?: boolean }) {
+  const light = useId();
+  const color = { kubus: "#f6d36b", balok: "#f3a0b8", tabung: "#c4a6e6", kerucut: "#8cc8ea", bola: "#9edb9a" }[s];
   const art: Record<SolidName, ReactNode> = {
-    kubus: <><path d="M20 38h40v40H20z" fill="#f6d36b" {...o} /><path d="M20 38l18-16h40L60 38z" fill="#fbe7a6" {...o} /><path d="M60 38l18-16v40L60 78z" fill="#e2b93f" {...o} /><path d="M20 78l18-16h40M38 62V22" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
-    balok: <><path d="M8 48h56v28H8z" fill="#f3a0b8" {...o} /><path d="M8 48l26-18h56L64 48z" fill="#f8c7d5" {...o} /><path d="M64 48l26-18v28L64 76z" fill="#de7a98" {...o} /><path d="M8 76l26-18h56M34 58V30" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
-    tabung: <><path d="M24 22v56c0 7 12 12 26 12s26-5 26-12V22" fill="#c4a6e6" {...o} /><ellipse cx="50" cy="22" rx="26" ry="10" fill="#dccaf1" {...o} /><path d="M24 78c0-7 12-12 26-12s26 5 26 12" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
-    kerucut: <><path d="M50 10L22 78c0 7 12 12 28 12s28-5 28-12z" fill="#8cc8ea" {...o} /><path d="M22 78c0-7 12-12 28-12s28 5 28 12" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
-    bola: <><circle cx="50" cy="50" r="38" fill="#9edb9a" {...o} /><path d="M12 50c0 10 17 16 38 16s38-6 38-16" fill="none" stroke={ink} strokeWidth="1.4" /><path d="M12 50c0-10 17-16 38-16s38 6 38 16" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /><circle cx="36" cy="34" r="6" fill="#fff" opacity=".5" /></>,
+    kubus: <><path d="M20 38h40v40H20z" fill={dimensional ? `url(#${light})` : "#f6d36b"} {...o} /><path d="M20 38l18-16h40L60 38z" fill="#fbe7a6" {...o} /><path d="M60 38l18-16v40L60 78z" fill="#e2b93f" {...o} /><path d="M20 78l18-16h40M38 62V22" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
+    balok: <><path d="M8 48h56v28H8z" fill={dimensional ? `url(#${light})` : "#f3a0b8"} {...o} /><path d="M8 48l26-18h56L64 48z" fill="#f8c7d5" {...o} /><path d="M64 48l26-18v28L64 76z" fill="#de7a98" {...o} /><path d="M8 76l26-18h56M34 58V30" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
+    tabung: <><path d="M24 22v56c0 7 12 12 26 12s26-5 26-12V22" fill={dimensional ? `url(#${light})` : "#c4a6e6"} {...o} /><ellipse cx="50" cy="22" rx="26" ry="10" fill="#dccaf1" {...o} /><path d="M24 78c0-7 12-12 26-12s26 5 26 12" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
+    kerucut: <><path d="M50 10L22 78c0 7 12 12 28 12s28-5 28-12z" fill={dimensional ? `url(#${light})` : "#8cc8ea"} {...o} /><path d="M22 78c0-7 12-12 28-12s28 5 28 12" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" /></>,
+    bola: <><circle cx="50" cy="50" r="38" fill={dimensional ? `url(#${light})` : "#9edb9a"} {...o} /><path d="M12 50c0 10 17 16 38 16s38-6 38-16" fill="none" stroke={ink} strokeWidth="1.4" /><path d="M12 50c0-10 17-16 38-16s38 6 38 16" fill="none" stroke={ink} strokeWidth="1.2" strokeDasharray="3 3" />{!dimensional && <circle cx="36" cy="34" r="6" fill="#fff" opacity=".5" />}</>,
   };
-  return <svg viewBox="0 0 100 100" className={className} {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}>{art[s]}</svg>;
+  return <svg viewBox="0 0 100 100" className={dimensional ? `${className} drop-shadow-md` : className} {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}>
+    {dimensional && <defs><radialGradient id={light} cx="33%" cy="25%" r="78%">
+      <stop stopColor={`color-mix(in srgb, ${color}, white 48%)`} />
+      <stop offset=".55" stopColor={color} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 32%)`} />
+    </radialGradient></defs>}
+    {art[s]}
+  </svg>;
 }
 
 /* ---------- Benda nyata ---------- */
@@ -58,25 +67,40 @@ const objArt: Record<ObjName, ReactNode> = {
   kardus: <>{iso(46, 88, 50, 34, 36, "#dcae74", "#c8955a", "#b9844a")}<path d="M28 58.5L71.5 33.5" stroke="#e9d3a8" strokeWidth="5" /><path d="M46 52l-4 18M54 48l4 18" stroke="#8a5a2b" strokeWidth="1" opacity=".4" /></>,
   kotakSusu: <>{iso(52, 92, 26, 18, 66, "#f5f7fa", "#e8eef5", "#2f86d6")}<path d="M56 60l14-7v14l-14 7z" fill="#fff" {...o} /><path d="M44 18l6-14" stroke="#e5484d" strokeWidth="3" strokeLinecap="round" /></>,
   kotakTisu: <>{iso(48, 88, 46, 30, 28, "#7cc6a8", "#5fb08f", "#4c9b7c")}<path d="M42 44c-2-12 6-18 12-16 4-8 14-6 14 2 6 0 8 8 2 12" fill="#fff" {...o} /></>,
-  kaleng: <><path d="M26 20v60c0 6 11 10 24 10s24-4 24-10V20" fill="#e5e9ee" {...o} /><path d="M26 34c0 6 11 10 24 10s24-4 24-10v30c0 6-11 10-24 10S26 70 26 64z" fill="#2f86d6" {...o} /><ellipse cx="50" cy="20" rx="24" ry="9" fill="#cfd6de" {...o} /><ellipse cx="50" cy="20" rx="18" ry="6" fill="none" stroke={ink} strokeWidth="1" /><text x="50" y="58" textAnchor="middle" fontSize="11" fontWeight="800" fill="#fff">SUSU</text></>,
+  kaleng: <><path d="M26 20v60c0 6 11 10 24 10s24-4 24-10V20" fill="var(--object-light, #e5e9ee)" {...o} /><path d="M26 34c0 6 11 10 24 10s24-4 24-10v30c0 6-11 10-24 10S26 70 26 64z" fill="#2f86d6" {...o} /><ellipse cx="50" cy="20" rx="24" ry="9" fill="#cfd6de" {...o} /><ellipse cx="50" cy="20" rx="18" ry="6" fill="none" stroke={ink} strokeWidth="1" /><text x="50" y="58" textAnchor="middle" fontSize="11" fontWeight="800" fill="#fff">SUSU</text></>,
   drum: <><path d="M18 30v42c0 7 14 12 32 12s32-5 32-12V30" fill="#e5484d" {...o} /><path d="M18 34l10 46M38 38l-10 44M38 38l14 46M62 38l-10 46M62 38l12 44M82 34l-8 46" stroke="#fff" strokeWidth="1.4" fill="none" /><ellipse cx="50" cy="30" rx="32" ry="11" fill="#f8f0e2" {...o} /><path d="M70 6l-12 22M84 10L64 30" stroke="#b7793f" strokeWidth="3" strokeLinecap="round" /></>,
-  topi: <><path d="M50 10L24 80c0 6 12 10 26 10s26-4 26-10z" fill="#8d63c7" {...o} />{[[44, 34], [56, 46], [40, 60], [58, 70], [48, 80]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="3.2" fill="#f5c542" />)}<circle cx="50" cy="9" r="6" fill="#f08bb0" {...o} /></>,
-  conEs: <><path d="M22 18c0-5 12-8 28-8s28 3 28 8L50 92z" fill="#e3b26a" {...o} /><ellipse cx="50" cy="18" rx="28" ry="8" fill="#f2d39b" {...o} /><path d="M30 30l26 32M40 26l22 28M60 26L42 52M70 28L46 60M26 26l8 10M66 38l-8 10" stroke="#b7793f" strokeWidth="1.2" fill="none" /></>,
+  topi: <><path d="M50 10L24 80c0 6 12 10 26 10s26-4 26-10z" fill="var(--object-light, #8d63c7)" {...o} />{[[44, 34], [56, 46], [40, 60], [58, 70], [48, 80]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="3.2" fill="#f5c542" />)}<circle cx="50" cy="9" r="6" fill="#f08bb0" {...o} /></>,
+  conEs: <><path d="M22 18c0-5 12-8 28-8s28 3 28 8L50 92z" fill="var(--object-light, #e3b26a)" {...o} /><ellipse cx="50" cy="18" rx="28" ry="8" fill="#f2d39b" {...o} /><path d="M30 30l26 32M40 26l22 28M60 26L42 52M70 28L46 60M26 26l8 10M66 38l-8 10" stroke="#b7793f" strokeWidth="1.2" fill="none" /></>,
   bola: <><circle cx="50" cy="50" r="38" fill="#fff" {...o} /><path d="M50 36l13 9-5 15H42l-5-15z" fill={ink} /><path d="M50 36V14M63 45l20-8M58 60l12 18M42 60L30 78M37 45l-20-8" fill="none" {...o} /></>,
-  jeruk: <><circle cx="50" cy="54" r="36" fill="#f59f00" {...o} />{[[36, 46], [60, 40], [42, 68], [64, 64], [52, 54]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.6" fill="#c77700" />)}<path d="M50 18c0-5 2-8 6-10" fill="none" {...o} /><path d="M54 14c6-6 16-5 18-2-4 6-12 6-18 2z" fill="#3fa16b" {...o} /></>,
-  kelereng: <><circle cx="50" cy="50" r="30" fill="#4fb3d9" {...o} /><path d="M30 50c8 10 26 12 40-4" fill="none" stroke="#e5484d" strokeWidth="4" strokeLinecap="round" /><circle cx="40" cy="38" r="6" fill="#fff" opacity=".7" /></>,
+  jeruk: <><circle cx="50" cy="54" r="36" fill="var(--object-light, #f59f00)" {...o} />{[[36, 46], [60, 40], [42, 68], [64, 64], [52, 54]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.6" fill="#c77700" />)}<path d="M50 18c0-5 2-8 6-10" fill="none" {...o} /><path d="M54 14c6-6 16-5 18-2-4 6-12 6-18 2z" fill="#3fa16b" {...o} /></>,
+  kelereng: <><circle cx="50" cy="50" r="30" fill="var(--object-light, #4fb3d9)" {...o} /><path d="M30 50c8 10 26 12 40-4" fill="none" stroke="#e5484d" strokeWidth="4" strokeLinecap="round" /><circle cx="40" cy="38" r="6" fill="#fff" opacity=".7" /></>,
   mur: <><path d="M92 50L71 86.4H29L8 50l21-36.4h42z" fill="#b8c2cc" {...o} /><circle cx="50" cy="50" r="18" fill="#fff" {...o} /><circle cx="50" cy="50" r="13" fill="none" stroke="#8e99a5" strokeWidth="2" strokeDasharray="3 3" /></>,
   tehCelup: <><path d="M50 4v14" stroke={ink} strokeWidth="1.2" /><path d="M50 4h20" stroke={ink} strokeWidth="1.2" /><rect x="66" y="0" width="16" height="12" fill="#e5484d" {...o} /><path d="M50 18L80 38v52H20V38z" fill="#f3e2c7" {...o} /><path d="M26 58c8-6 16 6 24 0s16 6 24 0v26H26z" fill="#b5651d" opacity=".75" /></>,
   rambu: <><path d="M47 60h6v38h-6z" fill="#8e99a5" {...o} /><path d="M50 6l42 70H8z" fill="#f5c542" {...o} /><path d="M50 16l33 54H17z" fill="none" stroke={ink} strokeWidth="2.4" /><path d="M50 32v20" stroke={ink} strokeWidth="5" strokeLinecap="round" /><circle cx="50" cy="61" r="3" fill={ink} /></>,
-  koin: <><circle cx="50" cy="50" r="38" fill="#d9b44a" {...o} /><circle cx="50" cy="50" r="31" fill="none" stroke="#a8862a" strokeWidth="2" /><text x="50" y="52" textAnchor="middle" fontSize="18" fontWeight="800" fill="#7a5f16">500</text><text x="50" y="66" textAnchor="middle" fontSize="8" fontWeight="700" fill="#7a5f16">Rupiah</text></>,
+  koin: <><circle cx="50" cy="50" r="38" fill="var(--object-light, #d9b44a)" {...o} /><circle cx="50" cy="50" r="31" fill="none" stroke="#a8862a" strokeWidth="2" /><text x="50" y="52" textAnchor="middle" fontSize="18" fontWeight="800" fill="#7a5f16">500</text><text x="50" y="66" textAnchor="middle" fontSize="8" fontWeight="700" fill="#7a5f16">Rupiah</text></>,
   rumahBurung: <><path d="M46 76h8v22h-8z" fill="#8a5a2b" {...o} /><path d="M50 6l36 30v42H14V36z" fill="#7fc36b" {...o} /><path d="M50 6l36 30" stroke="#c0392b" strokeWidth="5" strokeLinecap="round" /><path d="M50 6L14 36" stroke="#c0392b" strokeWidth="5" strokeLinecap="round" /><circle cx="50" cy="48" r="10" fill="#3b2a20" {...o} /><path d="M50 64v6" stroke="#8a5a2b" strokeWidth="3" strokeLinecap="round" /></>,
   stikerBulat: <><circle cx="50" cy="50" r="38" fill="#ffe08a" {...o} /><path d="M50 26l7 14 15 2-11 10 3 15-14-8-14 8 3-15-11-10 15-2z" fill="#e8963a" {...o} /></>,
   kartuSegitiga: <><path d="M50 10l42 76H8z" fill="#e0567a" {...o} /><path d="M50 30l22 42H28z" fill="none" stroke="#fff" strokeWidth="2" strokeDasharray="4 3" /></>,
   kertasPersegi: <><rect x="14" y="14" width="72" height="72" fill="#8fd0f0" {...o} /><path d="M14 14l72 72" stroke="#fff" strokeWidth="1.6" strokeDasharray="4 4" /></>,
   kotakPensil: <>{iso(30, 84, 64, 22, 18, "#6c8fe6", "#5577cc", "#4a68b8")}<path d="M34 59l40-23" stroke="#f5c542" strokeWidth="5" strokeLinecap="round" /><path d="M74 36l6-3" stroke="#f2d3a0" strokeWidth="5" strokeLinecap="round" /></>,
 };
-export function ObjArt({ o: name, className = "size-24", label }: { o: ObjName; className?: string; label?: string }) {
-  return <svg viewBox="0 0 100 100" className={className} {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}>{objArt[name]}</svg>;
+const materialColors: Partial<Record<ObjName, string>> = {
+  kaleng: "#e5e9ee", jeruk: "#f59f00", kelereng: "#4fb3d9",
+  koin: "#d9b44a", topi: "#8d63c7", conEs: "#e3b26a",
+};
+export function ObjArt({ o: name, className = "size-24", label, dimensional = false }: { o: ObjName; className?: string; label?: string; dimensional?: boolean }) {
+  const light = useId();
+  const color = dimensional ? materialColors[name] : undefined;
+  return <svg viewBox="0 0 100 100" className={className}
+    style={color ? { "--object-light": `url(#${light})` } as CSSProperties : undefined}
+    {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}>
+    {color && <defs><radialGradient id={light} cx="33%" cy="28%" r="76%">
+      <stop stopColor={`color-mix(in srgb, ${color}, white 52%)`} />
+      <stop offset=".54" stopColor={color} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 37%)`} />
+    </radialGradient></defs>}
+    {objArt[name]}
+  </svg>;
 }
 
 /* ---------- Susunan balok satuan (isometrik) ---------- */
@@ -98,11 +122,12 @@ export function Stack({ cubes, className = "w-48" }: { cubes: [number, number, n
 }
 
 /* ---------- Gambar umum ---------- */
-export function FigView({ fig, className = "size-20", label, scale = 1.1 }: { fig: Fig; className?: string; label?: string; scale?: number }) {
+export function FigView({ fig, className = "size-20", label, scale = 1.1, dimensional = false }: { fig: Fig; className?: string; label?: string; scale?: number; dimensional?: boolean }) {
   const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": true as const };
-  if (fig.t === "solid") return <SolidArt s={fig.s} className={className} label={label} />;
-  if (fig.t === "obj") return <ObjArt o={fig.o} className={className} label={label} />;
-  if (fig.t === "stack") return <Stack cubes={fig.cubes} className={className} />;
+  if (fig.t === "solid") return <SolidArt s={fig.s} className={className} label={label} dimensional={dimensional} />;
+  const objectClass = dimensional ? `${className} drop-shadow-md` : className;
+  if (fig.t === "obj") return <ObjArt o={fig.o} className={objectClass} label={label} dimensional={dimensional} />;
+  if (fig.t === "stack") return <Stack cubes={fig.cubes} className={objectClass} />;
   if (fig.t === "pieces") {
     const pts = fig.list.flatMap(p => p.pts), xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
     const minX = Math.min(...xs) - 3, minY = Math.min(...ys) - 3, w = Math.max(...xs) - minX + 3, h = Math.max(...ys) - minY + 3;

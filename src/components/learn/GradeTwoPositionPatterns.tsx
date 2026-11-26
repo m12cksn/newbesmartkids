@@ -9,11 +9,12 @@ import {
   type Fig, type Mover, type Part, type Pos, type PQuestion, type Ref, type Token,
 } from "@/data/grade-two-position-patterns";
 
-function FigView({ fig, size = "md" }: { fig: Fig; size?: "sm" | "md" | "lg" }) {
-  if (fig.t === "pair") return <PairView mover={fig.mover} target={fig.ref} pos={fig.pos} className={size === "sm" ? "w-28" : size === "md" ? "w-40" : "w-full max-w-64"} />;
-  if (fig.t === "scene") return <SceneView s={fig.s} />;
-  if (fig.t === "row") return <RowView items={fig.items} className={size === "sm" ? "size-6" : "size-9"} />;
-  return <TokenView tk={fig.tk} className={size === "sm" ? "size-8" : "size-12"} />;
+function FigView({ fig, size = "md", expanded = false }: { fig: Fig; size?: "sm" | "md" | "lg"; expanded?: boolean }) {
+  if (fig.t === "pair") return <PairView mover={fig.mover} target={fig.ref} pos={fig.pos} dimensional={expanded}
+    className={size === "sm" ? (expanded ? "w-36 max-w-full sm:w-44" : "w-28") : expanded ? "w-full max-w-lg" : size === "md" ? "w-40" : "w-full max-w-64"} />;
+  if (fig.t === "scene") return <SceneView s={fig.s} dimensional={expanded} className={expanded ? "w-full" : undefined} />;
+  if (fig.t === "row") return <RowView items={fig.items} className={expanded ? "size-10 sm:size-12" : size === "sm" ? "size-6" : "size-9"} />;
+  return <TokenView tk={fig.tk} className={expanded ? "size-14" : size === "sm" ? "size-8" : "size-12"} />;
 }
 
 /* ====================================================================== */
@@ -115,7 +116,7 @@ function FillPart({ p, value, set, checked }: { p: Extract<Part, { kind: "fill" 
         className={`mx-1 inline-block min-w-20 rounded-lg border-b-2 px-2 font-bold ${target === k && !checked ? "border-success bg-success/10" : "border-orange-400 bg-white"}`}>{vals[k] || "…"}</button>{b}</li>; })}</ol>
   </PartBox>;
 }
-function SortPart({ p, value, set, checked }: { p: Extract<Part, { kind: "sort" }>; value: string; set: (v: string) => void; checked: boolean }) {
+function SortPart({ p, value, set, checked, expanded }: { p: Extract<Part, { kind: "sort" }>; value: string; set: (v: string) => void; checked: boolean; expanded: boolean }) {
   const [sel, setSel] = useState<number | null>(null);
   const vals = Array.from({ length: p.items.length }, (_, k) => value.split(",")[k] ?? "");
   const put = (k: number, b: string) => { const v = [...vals]; v[k] = b; set(v.join(",")); setSel(null); };
@@ -123,14 +124,14 @@ function SortPart({ p, value, set, checked }: { p: Extract<Part, { kind: "sort" 
   return <PartBox>
     <div role="group" aria-label="Gambar yang belum dikelompokkan" className="flex min-h-16 flex-wrap gap-2 rounded-xl bg-base-200/60 p-2">
       {loose.length ? loose.map(k => <button key={k} type="button" disabled={checked} aria-label={`Ambil ${p.items[k].name}`} aria-pressed={sel === k} onClick={() => setSel(sel === k ? null : k)}
-        className={`flex flex-col items-center rounded-xl border-2 bg-base-100 p-1 text-xs font-semibold ${sel === k ? "border-success ring-2 ring-success/40" : "border-base-300"}`}><FigView fig={p.items[k].fig} size="sm" />{p.items[k].name}</button>)
+        className={`flex flex-col items-center rounded-xl border-2 bg-base-100 p-1 text-xs font-semibold ${sel === k ? "border-success ring-2 ring-success/40" : "border-base-300"}`}><FigView fig={p.items[k].fig} size="sm" expanded={expanded} />{p.items[k].name}</button>)
         : <p className="self-center px-2 text-sm text-base-content/60">Semua sudah dikelompokkan.</p>}
     </div>
     <p className="text-xs text-base-content/60">{sel === null ? "Ketuk satu gambar, lalu ketuk kotak tujuannya." : `${p.items[sel].name} dipilih. Ketuk kotak tujuannya.`}</p>
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
       {p.bins.map((b, bi) => <div key={b} className="flex min-w-0 flex-col rounded-xl border-2 border-dashed border-info/50 bg-info/5 p-2">
         <button type="button" disabled={checked || sel === null} aria-label={`Masukkan ke ${b}`} onClick={() => sel !== null && put(sel, String(bi))} className="btn btn-xs btn-info btn-outline h-auto min-h-7 whitespace-normal">{b}</button>
-        <div className="mt-2 flex min-h-12 flex-wrap gap-1">{p.items.map((it, k) => vals[k] === String(bi) && <button key={k} type="button" disabled={checked} aria-label={`Keluarkan ${it.name}`} onClick={() => put(k, "")} className="rounded-lg bg-base-100 p-0.5 text-[11px] font-semibold"><FigView fig={it.fig} size="sm" /></button>)}</div>
+        <div className="mt-2 flex min-h-12 flex-wrap gap-1">{p.items.map((it, k) => vals[k] === String(bi) && <button key={k} type="button" disabled={checked} aria-label={`Keluarkan ${it.name}`} onClick={() => put(k, "")} className="rounded-lg bg-base-100 p-0.5 text-[11px] font-semibold"><FigView fig={it.fig} size="sm" expanded={expanded} /></button>)}</div>
       </div>)}
     </div>
   </PartBox>;
@@ -142,10 +143,10 @@ function SeqPart({ p, value, set, checked }: { p: Extract<Part, { kind: "seq" }>
   let b = -1;
   return <PartBox>
     <p className="text-xs text-base-content/60">Ketuk gambar di bawah untuk mengisi kotak kosong. Ketuk kotak yang sudah terisi untuk mengubahnya.</p>
-    <div className="flex flex-wrap items-center gap-1">{p.items.map((t, i) => { if (t !== null) return <TokenView key={i} tk={t} className="size-10" />; b++; const k = b; return <button key={i} type="button" disabled={checked} aria-label={`${p.label} kosong ${k + 1}`} aria-pressed={target === k}
-      onClick={() => { const v = [...vals]; v[k] = ""; set(v.join(",")); setSel(k); }} className={`rounded-lg ${target === k && !checked ? "ring-2 ring-success" : ""}`}><TokenView tk={vals[k] || null} className="size-10" /></button>; })}</div>
+    <div className="flex flex-wrap items-center gap-1">{p.items.map((t, i) => { if (t !== null) return <TokenView key={i} tk={t} className="size-10 group-data-[evaluation=true]/quiz:size-12 sm:group-data-[evaluation=true]/quiz:size-14" />; b++; const k = b; return <button key={i} type="button" disabled={checked} aria-label={`${p.label} kosong ${k + 1}`} aria-pressed={target === k}
+      onClick={() => { const v = [...vals]; v[k] = ""; set(v.join(",")); setSel(k); }} className={`rounded-lg ${target === k && !checked ? "ring-2 ring-success" : ""}`}><TokenView tk={vals[k] || null} className="size-10 group-data-[evaluation=true]/quiz:size-12 sm:group-data-[evaluation=true]/quiz:size-14" /></button>; })}</div>
     <div role="group" aria-label="Pilihan gambar" className="flex flex-wrap gap-1.5">{p.palette.map(t => <button key={t} type="button" disabled={checked || target < 0} aria-label={`Isi ${tokenName(t)}`} className="btn btn-sm h-auto bg-base-100 px-1.5 py-1"
-      onClick={() => { const v = [...vals]; v[target] = t; set(v.join(",")); setSel(null); }}><TokenView tk={t} className="size-8" /></button>)}</div>
+      onClick={() => { const v = [...vals]; v[target] = t; set(v.join(",")); setSel(null); }}><TokenView tk={t} className="size-8 group-data-[evaluation=true]/quiz:size-11" /></button>)}</div>
   </PartBox>;
 }
 function CreatePart({ p, value, set, checked }: { p: Extract<Part, { kind: "create" }>; value: string; set: (v: string) => void; checked: boolean }) {
@@ -155,32 +156,32 @@ function CreatePart({ p, value, set, checked }: { p: Extract<Part, { kind: "crea
   return <PartBox>
     <div role="group" aria-label="Warna" className="flex flex-wrap gap-1.5">{p.colors.map(c => <button key={c} type="button" disabled={checked} aria-label={`Warna ${c}`} aria-pressed={brush === c} onClick={() => setBrush(c)}
       className={`flex items-center gap-1 rounded-full border-2 px-2 py-1 text-sm font-semibold ${brush === c ? "border-neutral" : "border-base-300"}`}><span className="size-4 rounded-full border border-neutral/40" style={{ background: colorHex[c] }} />{c}</button>)}</div>
-    <div className="flex flex-wrap gap-1">{vals.map((c, k) => <button key={k} type="button" disabled={checked} aria-label={`${p.label} ${k + 1}`} onClick={() => { const v = [...vals]; v[k] = brush; set(v.join(",")); }}><TokenView tk={c ? `${p.shape}:${c}` : `${p.shape}:putih`} className="size-10" /></button>)}</div>
+    <div className="flex flex-wrap gap-1">{vals.map((c, k) => <button key={k} type="button" disabled={checked} aria-label={`${p.label} ${k + 1}`} onClick={() => { const v = [...vals]; v[k] = brush; set(v.join(",")); }}><TokenView tk={c ? `${p.shape}:${c}` : `${p.shape}:putih`} className="size-10 group-data-[evaluation=true]/quiz:size-12 sm:group-data-[evaluation=true]/quiz:size-14" /></button>)}</div>
     {filled && <p className={`text-sm ${ok ? "text-success" : "text-warning-content"}`}>{ok ? "Warnamu membentuk pola." : "Warnanya belum berulang teratur."}</p>}
   </PartBox>;
 }
-function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: string; set: (v: string) => void; checked: boolean }) {
+function PartView({ p, i, value, set, checked, expanded }: { p: Part; i: number; value: string; set: (v: string) => void; checked: boolean; expanded: boolean }) {
   switch (p.kind) {
     case "choice": return <div role="group" aria-label={`Bagian ${i + 1}`} className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
       <div className={p.figs ? "grid grid-cols-2 gap-2 sm:grid-cols-4" : "flex flex-wrap gap-2"}>{p.options.map((o, k) => <button key={o} type="button" aria-label={o} aria-pressed={value === o} disabled={checked} onClick={() => set(o)}
         className={`flex flex-col items-center justify-center gap-1 rounded-xl border-2 p-2 font-bold ${value === o ? "border-success bg-success/10" : "border-base-300 bg-base-100 hover:border-success/40"}`}>
-        {p.figs && <FigView fig={p.figs[k]} size="sm" />}<span className={p.figs ? "text-sm" : "px-2 text-lg"}>{o}</span></button>)}</div></div>;
-    case "tap": return <div className="space-y-1"><p className="text-xs text-base-content/60">Ketuk benda pada gambar.</p><SceneView s={p.scene} tap={id => !checked && set(id)} picked={value} /></div>;
+        {p.figs && <FigView fig={p.figs[k]} size="sm" expanded={expanded} />}<span className={p.figs ? "text-sm" : "px-2 text-lg"}>{o}</span></button>)}</div></div>;
+    case "tap": return <div className="space-y-1"><p className="text-xs text-base-content/60">Ketuk benda pada gambar.</p><SceneView s={p.scene} dimensional={expanded} className={expanded ? "w-full" : undefined} tap={id => !checked && set(id)} picked={value} /></div>;
     case "fill": return <FillPart p={p} value={value} set={set} checked={checked} />;
-    case "sort": return <SortPart p={p} value={value} set={set} checked={checked} />;
+    case "sort": return <SortPart p={p} value={value} set={set} checked={checked} expanded={expanded} />;
     case "check": { const sel = value ? value.split(",").filter(Boolean).map(Number) : []; return <div className="space-y-2">{p.items.map((it, k) => { const on = sel.includes(k); return <div key={k} className="flex min-w-0 items-center gap-2 rounded-xl border border-base-300 bg-base-100 p-2">
-      <span className="w-5 font-bold">{it.name}.</span><div className="min-w-0 flex-1 overflow-x-auto"><FigView fig={it.fig} size="sm" /></div>
+      <span className="w-5 font-bold">{it.name}.</span><div className="min-w-0 flex-1 overflow-x-auto"><FigView fig={it.fig} size="sm" expanded={expanded} /></div>
       <button type="button" aria-label={`Centang ${it.name}`} aria-pressed={on} disabled={checked} onClick={() => set((on ? sel.filter(x => x !== k) : [...sel, k]).sort((a, b) => a - b).join(","))}
         className={`grid size-9 shrink-0 place-items-center rounded-lg border-2 ${on ? "border-success bg-success text-white" : "border-orange-400 bg-white"}`}>{on && <Check className="size-5" aria-hidden="true" />}</button></div>; })}</div>; }
     case "seq": return <SeqPart p={p} value={value} set={set} checked={checked} />;
     case "create": return <CreatePart p={p} value={value} set={set} checked={checked} />;
     case "odd": return <div className="space-y-1"><p className="text-xs text-base-content/60">Ketuk gambar yang tidak sesuai pola.</p><div className="flex flex-wrap gap-1">{p.items.map((t, k) => <button key={k} type="button" disabled={checked} aria-label={`Gambar ${k + 1}`} aria-pressed={value === String(k)} onClick={() => set(String(k))}
-      className={`rounded-lg p-0.5 ${value === String(k) ? "bg-warning/40 ring-2 ring-warning" : ""}`}><TokenView tk={t} className="size-10" /></button>)}</div></div>;
+      className={`rounded-lg p-0.5 ${value === String(k) ? "bg-warning/40 ring-2 ring-warning" : ""}`}><TokenView tk={t} className="size-10 group-data-[evaluation=true]/quiz:size-12 sm:group-data-[evaluation=true]/quiz:size-14" /></button>)}</div></div>;
   }
 }
-function Answer({ q, value, record, checked }: { q: PQuestion; value: string; record: (v: string) => void; checked: boolean }) {
+function Answer({ q, value, record, checked, expanded }: { q: PQuestion; value: string; record: (v: string) => void; checked: boolean; expanded: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} p={p} i={i} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  return <div className="space-y-4">{q.parts.map((p, i) => <PartView key={i} p={p} i={i} value={v[i]} checked={checked} expanded={expanded} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeTwoPositionPatterns() {
@@ -231,8 +232,8 @@ export default function GradeTwoPositionPatterns() {
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 4"}
         practiceMode={mode === "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderVisual={q => q.fig ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><FigView fig={q.fig} size="lg" /></div> : null}
-        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}
+        renderVisual={q => q.fig ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-2 sm:p-3" data-testid="quiz-visual"><FigView fig={q.fig} size="lg" expanded={mode === "assessment"} /></div> : null}
+        renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} expanded={mode === "assessment"} />}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

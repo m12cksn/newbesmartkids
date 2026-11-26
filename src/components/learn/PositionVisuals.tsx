@@ -1,5 +1,5 @@
 import { Hand } from "lucide-react";
-import type { ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { objectArtNodes } from "@/components/illustrations/ObjectArt";
 import { colorHex, scenes, type Art, type Mover, type Pos, type Ref, type SceneName, type SceneObj, type Token } from "@/data/grade-two-position-patterns";
 
@@ -14,40 +14,66 @@ const art: Record<Art, { vb: [number, number]; node: (c?: string, label?: string
   bingkai: { vb: [48, 48], node: () => objectArtNodes.frame },
   bola: { vb: [48, 48], node: () => objectArtNodes.ball },
   burung: { vb: [48, 48], node: () => objectArtNodes.bird },
-  buku: { vb: [36, 20], node: () => <><path d="M2 6h28l4 4v8H6l-4-4z" fill="#2f86d6" {...o} /><path d="M2 6v8l4 4" fill="none" {...o} /><path d="M6 10h26" stroke="#fff" strokeWidth="2" /><path d="M8 2h22l2 4H6z" fill="#e5484d" {...o} /></> },
-  lampu: { vb: [28, 44], node: () => <><path d="M6 40h16v3H6z" fill="#5b6470" {...o} /><path d="M14 40V22l-6-8" fill="none" stroke="#5b6470" strokeWidth="2.4" /><path d="M2 12L12 2l10 10-6 4z" fill="#f5c542" {...o} /></> },
-  meja: { vb: [112, 80], node: () => <><rect x="2" y="2" width="108" height="10" rx="2" fill="#b7793f" {...o} /><path d="M8 12v66M104 12v66M20 12v52M92 12v52" stroke="#8a5528" strokeWidth="5" strokeLinecap="round" /></> },
-  kursi: { vb: [46, 70], node: c => <><path d="M6 2h8v36H6z" fill={c ? colorHex[c] : "#c2783a"} {...o} /><rect x="4" y="34" width="38" height="8" rx="2" fill={c ? colorHex[c] : "#c2783a"} {...o} /><path d="M8 42v26M40 42v26M16 42v20M34 42v20" stroke={ink} strokeWidth="3" strokeLinecap="round" /></> },
-  kotak: { vb: [42, 40], node: () => <><rect x="2" y="10" width="38" height="28" fill="#dcae74" {...o} /><path d="M2 10l6-8h26l6 8" fill="#c8955a" {...o} /><path d="M14 18h14" stroke="#8a5a2b" strokeWidth="2" /></> },
-  kasur: { vb: [150, 72], node: () => <><path d="M138 4h8v66h-8zM4 26h6v44H4z" fill="#c2584a" {...o} /><rect x="8" y="24" width="132" height="22" rx="4" fill="#9ad8c0" {...o} /><rect x="8" y="44" width="132" height="8" fill="#c2584a" {...o} /><path d="M12 52v18M134 52v18" stroke="#8a3a2b" strokeWidth="4" /></> },
-  boneka: { vb: [40, 40], node: () => <><circle cx="9" cy="7" r="5" fill="#b7793f" {...o} /><circle cx="31" cy="7" r="5" fill="#b7793f" {...o} /><circle cx="20" cy="14" r="11" fill="#c98a4b" {...o} /><ellipse cx="20" cy="31" rx="12" ry="9" fill="#c98a4b" {...o} /><circle cx="16" cy="12" r="1.5" fill={ink} /><circle cx="24" cy="12" r="1.5" fill={ink} /><ellipse cx="20" cy="17" rx="4" ry="3" fill="#f2d3a0" /></> },
-  bantal: { vb: [44, 18], node: () => <path d="M3 4c12 3 26 3 38 0 2 4 2 8 0 12-12-3-26-3-38 0-2-4-2-8 0-12z" fill="#fdf6e3" {...o} /> },
-  mobil: { vb: [44, 22], node: () => <><path d="M2 14l4-6h10l6-6h12l6 8h2v6H2z" fill="#e5484d" {...o} /><path d="M24 4h8l4 5H24z" fill="#bfe3f7" {...o} /><circle cx="11" cy="17" r="4" fill={ink} /><circle cx="33" cy="17" r="4" fill={ink} /></> },
-  kucing: { vb: [36, 32], node: () => <><path d="M6 30c-2-8 0-14 8-16h12c4 2 6 8 4 16z" fill="#f2a64a" {...o} /><path d="M30 26c4 0 5-6 3-10" fill="none" stroke="#f2a64a" strokeWidth="3" strokeLinecap="round" /><circle cx="14" cy="12" r="9" fill="#f2a64a" {...o} /><path d="M6 8L5 1l6 4M22 8l1-7-6 4" fill="#f2a64a" {...o} /><circle cx="11" cy="11" r="1.4" fill={ink} /><circle cx="17" cy="11" r="1.4" fill={ink} /><path d="M12 15c1 1 3 1 4 0" fill="none" {...o} /></> },
-  rumah: { vb: [176, 150], node: () => <><path d="M14 60h148v88H14z" fill="#f3dcb0" {...o} /><path d="M2 64L88 4l86 60z" fill="#b5523b" {...o} /><rect x="74" y="92" width="30" height="56" fill="#8a5528" {...o} /><circle cx="98" cy="122" r="2" fill="#f5c542" /><rect x="28" y="84" width="32" height="26" fill="#bfe3f7" {...o} /><rect x="118" y="84" width="32" height="26" fill="#bfe3f7" {...o} /><path d="M44 84v26M134 84v26" stroke={ink} strokeWidth="1.2" /></> },
-  pohon: { vb: [120, 162], node: () => <><path d="M52 90h16v70H52z" fill="#8a5528" {...o} /><circle cx="60" cy="54" r="40" fill="#3fa16b" {...o} /><circle cx="30" cy="78" r="26" fill="#4bb179" {...o} /><circle cx="90" cy="78" r="26" fill="#4bb179" {...o} /></> },
+  buku: { vb: [36, 20], node: () => <><path d="M2 6h28l4 4v8H6l-4-4z" fill="var(--position-light, #2f86d6)" {...o} /><path d="M2 6v8l4 4" fill="none" {...o} /><path d="M6 10h26" stroke="#fff" strokeWidth="2" /><path d="M8 2h22l2 4H6z" fill="#e5484d" {...o} /></> },
+  lampu: { vb: [28, 44], node: () => <><path d="M6 40h16v3H6z" fill="#5b6470" {...o} /><path d="M14 40V22l-6-8" fill="none" stroke="#5b6470" strokeWidth="2.4" /><path d="M2 12L12 2l10 10-6 4z" fill="var(--position-light, #f5c542)" {...o} /></> },
+  meja: { vb: [112, 80], node: () => <><rect x="2" y="2" width="108" height="10" rx="2" fill="var(--position-light, #b7793f)" {...o} /><path d="M8 12v66M104 12v66M20 12v52M92 12v52" stroke="#8a5528" strokeWidth="5" strokeLinecap="round" /></> },
+  kursi: { vb: [46, 70], node: c => <><path d="M6 2h8v36H6z" fill={`var(--position-light, ${c ? colorHex[c] : "#c2783a"})`} {...o} /><rect x="4" y="34" width="38" height="8" rx="2" fill={`var(--position-light, ${c ? colorHex[c] : "#c2783a"})`} {...o} /><path d="M8 42v26M40 42v26M16 42v20M34 42v20" stroke={ink} strokeWidth="3" strokeLinecap="round" /></> },
+  kotak: { vb: [42, 40], node: () => <><rect x="2" y="10" width="38" height="28" fill="var(--position-light, #dcae74)" {...o} /><path d="M2 10l6-8h26l6 8" fill="#c8955a" {...o} /><path d="M14 18h14" stroke="#8a5a2b" strokeWidth="2" /></> },
+  kasur: { vb: [150, 72], node: () => <><path d="M138 4h8v66h-8zM4 26h6v44H4z" fill="#c2584a" {...o} /><rect x="8" y="24" width="132" height="22" rx="4" fill="var(--position-light, #9ad8c0)" {...o} /><rect x="8" y="44" width="132" height="8" fill="#c2584a" {...o} /><path d="M12 52v18M134 52v18" stroke="#8a3a2b" strokeWidth="4" /></> },
+  boneka: { vb: [40, 40], node: () => <><circle cx="9" cy="7" r="5" fill="#b7793f" {...o} /><circle cx="31" cy="7" r="5" fill="#b7793f" {...o} /><circle cx="20" cy="14" r="11" fill="var(--position-light, #c98a4b)" {...o} /><ellipse cx="20" cy="31" rx="12" ry="9" fill="var(--position-light, #c98a4b)" {...o} /><circle cx="16" cy="12" r="1.5" fill={ink} /><circle cx="24" cy="12" r="1.5" fill={ink} /><ellipse cx="20" cy="17" rx="4" ry="3" fill="#f2d3a0" /></> },
+  bantal: { vb: [44, 18], node: () => <path d="M3 4c12 3 26 3 38 0 2 4 2 8 0 12-12-3-26-3-38 0-2-4-2-8 0-12z" fill="var(--position-light, #fdf6e3)" {...o} /> },
+  mobil: { vb: [44, 22], node: () => <><path d="M2 14l4-6h10l6-6h12l6 8h2v6H2z" fill="var(--position-light, #e5484d)" {...o} /><path d="M24 4h8l4 5H24z" fill="#bfe3f7" {...o} /><circle cx="11" cy="17" r="4" fill={ink} /><circle cx="33" cy="17" r="4" fill={ink} /></> },
+  kucing: { vb: [36, 32], node: () => <><path d="M6 30c-2-8 0-14 8-16h12c4 2 6 8 4 16z" fill="var(--position-light, #f2a64a)" {...o} /><path d="M30 26c4 0 5-6 3-10" fill="none" stroke="#f2a64a" strokeWidth="3" strokeLinecap="round" /><circle cx="14" cy="12" r="9" fill="var(--position-light, #f2a64a)" {...o} /><path d="M6 8L5 1l6 4M22 8l1-7-6 4" fill="var(--position-light, #f2a64a)" {...o} /><circle cx="11" cy="11" r="1.4" fill={ink} /><circle cx="17" cy="11" r="1.4" fill={ink} /><path d="M12 15c1 1 3 1 4 0" fill="none" {...o} /></> },
+  rumah: { vb: [176, 150], node: () => <><path d="M14 60h148v88H14z" fill="#f3dcb0" {...o} /><path d="M2 64L88 4l86 60z" fill="var(--position-light, #b5523b)" {...o} /><rect x="74" y="92" width="30" height="56" fill="#8a5528" {...o} /><circle cx="98" cy="122" r="2" fill="#f5c542" /><rect x="28" y="84" width="32" height="26" fill="#bfe3f7" {...o} /><rect x="118" y="84" width="32" height="26" fill="#bfe3f7" {...o} /><path d="M44 84v26M134 84v26" stroke={ink} strokeWidth="1.2" /></> },
+  pohon: { vb: [120, 162], node: () => <><path d="M52 90h16v70H52z" fill="#8a5528" {...o} /><circle cx="60" cy="54" r="40" fill="var(--position-light, #3fa16b)" {...o} /><circle cx="30" cy="78" r="26" fill="#4bb179" {...o} /><circle cx="90" cy="78" r="26" fill="#4bb179" {...o} /></> },
   sepeda: { vb: [96, 62], node: () => <><circle cx="20" cy="42" r="17" fill="none" stroke={ink} strokeWidth="3" /><circle cx="76" cy="42" r="17" fill="none" stroke={ink} strokeWidth="3" /><path d="M20 42l18-24h30l8 24M38 18l12 24h-30M50 42l18-24M66 18l-4-12h10M34 12h10" fill="none" stroke="#8d63c7" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" /><path d="M32 10h12" stroke={ink} strokeWidth="4" strokeLinecap="round" /></> },
-  bangku: { vb: [104, 46], node: () => <><rect x="2" y="2" width="100" height="10" rx="2" fill="#c2783a" {...o} /><rect x="2" y="14" width="100" height="8" rx="2" fill="#b7793f" {...o} /><path d="M10 22v22M94 22v22" stroke="#5b6470" strokeWidth="5" strokeLinecap="round" /></> },
-  pot: { vb: [44, 52], node: c => <><path d="M22 26c-2-8-10-14-16-12 2 6 8 10 16 12zM22 26c2-8 10-14 16-12-2 6-8 10-16 12z" fill="#3fa16b" {...o} /><circle cx="22" cy="14" r="7" fill={c ? colorHex[c] : "#e5484d"} {...o} /><circle cx="22" cy="14" r="2.4" fill="#f5c542" /><path d="M6 28h32l-4 22H10z" fill="#c2584a" {...o} /><path d="M4 26h36v6H4z" fill="#a8473b" {...o} /></> },
+  bangku: { vb: [104, 46], node: () => <><rect x="2" y="2" width="100" height="10" rx="2" fill="var(--position-light, #c2783a)" {...o} /><rect x="2" y="14" width="100" height="8" rx="2" fill="#b7793f" {...o} /><path d="M10 22v22M94 22v22" stroke="#5b6470" strokeWidth="5" strokeLinecap="round" /></> },
+  pot: { vb: [44, 52], node: c => <><path d="M22 26c-2-8-10-14-16-12 2 6 8 10 16 12zM22 26c2-8 10-14 16-12-2 6-8 10-16 12z" fill="#3fa16b" {...o} /><circle cx="22" cy="14" r="7" fill={c ? colorHex[c] : "#e5484d"} {...o} /><circle cx="22" cy="14" r="2.4" fill="#f5c542" /><path d="M6 28h32l-4 22H10z" fill="var(--position-light, #c2584a)" {...o} /><path d="M4 26h36v6H4z" fill="#a8473b" {...o} /></> },
   anak: { vb: [60, 160], node: (c, label) => <><circle cx="30" cy="22" r="16" fill="#f2c094" {...o} /><path d="M14 20c0-12 8-18 16-18s16 6 16 18c-6-4-14-6-22-4z" fill="#3b2a20" {...o} /><circle cx="24" cy="24" r="1.8" fill={ink} /><circle cx="36" cy="24" r="1.8" fill={ink} /><path d="M25 30c3 3 7 3 10 0" fill="none" {...o} /><path d="M12 44c6-4 30-4 36 0l4 52H8z" fill={c ?? "#2f86d6"} {...o} /><path d="M22 96v52M38 96v52" stroke="#3b4a5a" strokeWidth="8" strokeLinecap="round" />{label && <text x="30" y="70" textAnchor="middle" fontSize="11" fontWeight="800" fill="#fff">{label}</text>}</> },
 };
 
-function Placed({ ob, tap, picked }: { ob: SceneObj; tap?: (id: string) => void; picked?: string }) {
+const materialColors: Partial<Record<Art, string>> = {
+  buku: "#2f86d6", lampu: "#f5c542", meja: "#b7793f", kotak: "#dcae74",
+  kasur: "#9ad8c0", boneka: "#c98a4b", bantal: "#fdf6e3", mobil: "#e5484d",
+  kucing: "#f2a64a", rumah: "#b5523b", pohon: "#3fa16b", bangku: "#c2783a",
+  pot: "#c2584a",
+};
+
+function ObjectView({ ob, dimensional, preserveAspectRatio = "none" }: {
+  ob: Pick<SceneObj, "art" | "x" | "y" | "w" | "h" | "color" | "label">;
+  dimensional: boolean;
+  preserveAspectRatio?: string;
+}) {
+  const light = useId();
   const a = art[ob.art];
-  const svg = <svg x={ob.x} y={ob.y} width={ob.w} height={ob.h} viewBox={`0 0 ${a.vb[0]} ${a.vb[1]}`} preserveAspectRatio="none" overflow="visible">{a.node(ob.color, ob.label)}</svg>;
+  const color = ob.art === "kursi" ? (ob.color ? colorHex[ob.color] : "#c2783a") : materialColors[ob.art];
+  return <svg x={ob.x} y={ob.y} width={ob.w} height={ob.h} viewBox={`0 0 ${a.vb[0]} ${a.vb[1]}`}
+    preserveAspectRatio={preserveAspectRatio} overflow="visible"
+    style={dimensional && color ? { "--position-light": `url(#${light})` } as CSSProperties : undefined}>
+    {dimensional && color && <defs><radialGradient id={light} cx="32%" cy="24%" r="82%">
+      <stop stopColor={`color-mix(in srgb, ${color}, white 42%)`} />
+      <stop offset=".48" stopColor={color} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 26%)`} />
+    </radialGradient></defs>}
+    {a.node(ob.color, ob.label)}
+  </svg>;
+}
+
+function Placed({ ob, tap, picked, dimensional }: { ob: SceneObj; tap?: (id: string) => void; picked?: string; dimensional: boolean }) {
+  const svg = <ObjectView ob={ob} dimensional={dimensional} />;
   if (!tap) return svg;
   return <g role="button" tabIndex={0} aria-label={ob.name} aria-pressed={picked === ob.id} className="cursor-pointer outline-none [&:focus-visible>rect]:stroke-[#0b5d44]" onClick={() => tap(ob.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(ob.id); } }}>
     <rect x={ob.x - 4} y={ob.y - 4} width={ob.w + 8} height={ob.h + 8} rx="8" fill={picked === ob.id ? "#fde68a" : "transparent"} fillOpacity=".55" stroke={picked === ob.id ? "#c2410c" : "transparent"} strokeWidth="2.5" strokeDasharray="5 3" />
     {svg}
   </g>;
 }
-export function SceneView({ s, tap, picked, className = "w-full max-w-lg" }: { s: SceneName; tap?: (id: string) => void; picked?: string; className?: string }) {
+export function SceneView({ s, tap, picked, dimensional = false, className = "w-full max-w-lg" }: { s: SceneName; tap?: (id: string) => void; picked?: string; dimensional?: boolean; className?: string }) {
   const sc = scenes[s], objs = [...sc.objs].sort((a, b) => a.z - b.z);
   const bg = s === "kamar" ? <><rect width="400" height="210" fill="#efe4f7" /><rect y="210" width="400" height="70" fill="#d8c3a5" /></>
     : s === "kursiWarna" ? <><rect width="400" height="220" fill="#eaf4fb" /><rect y="220" width="400" height="60" fill="#d8c3a5" /></>
       : <><rect width="400" height="200" fill="#dff1fb" /><rect y="200" width="400" height="80" fill="#a9d98b" /></>;
   return <svg viewBox="0 0 400 280" className={`rounded-xl ${className}`} role={tap ? "group" : "img"} aria-label={sc.title}>
-    {bg}{objs.map(ob => <Placed key={ob.id} ob={ob} tap={tap} picked={picked} />)}
+    {bg}{objs.map(ob => <Placed key={ob.id} ob={ob} tap={tap} picked={picked} dimensional={dimensional} />)}
   </svg>;
 }
 
@@ -58,14 +84,14 @@ const refBox: Record<Ref, { art: Art; x: number; y: number; w: number; h: number
   meja: { art: "meja", x: 50, y: 60, w: 100, h: 70 }, kursi: { art: "kursi", x: 78, y: 40, w: 46, h: 90 },
   kotak: { art: "kotak", x: 70, y: 76, w: 62, h: 56 }, sepeda: { art: "sepeda", x: 48, y: 70, w: 104, h: 64 },
 };
-export function PairView({ mover, target, pos, className = "w-full max-w-56" }: { mover: Mover; target: Ref; pos: Pos; className?: string }) {
+export function PairView({ mover, target, pos, dimensional = false, className = "w-full max-w-56" }: { mover: Mover; target: Ref; pos: Pos; dimensional?: boolean; className?: string }) {
   const r = refBox[target], m = mover === "bola" ? { art: "bola" as Art, w: 24, h: 24 } : { art: "kucing" as Art, w: 36, h: 32 };
   const cx = r.x + r.w / 2 - m.w / 2, floor = 134 - m.h;
   const top = target === "meja" ? r.y - m.h + 2 : target === "kursi" ? r.y + 36 - m.h : target === "sepeda" ? r.y + 6 - m.h : r.y + 10 - m.h;
   const p = { atas: { x: cx, y: top }, bawah: { x: cx, y: floor - 2 }, kanan: { x: r.x + r.w + 8, y: floor }, kiri: { x: r.x - m.w - 8, y: floor }, depan: { x: cx + 6, y: floor + 6 }, belakang: target === "kotak" ? { x: r.x + r.w - m.w * 0.9, y: r.y - m.h * 0.4 } : { x: cx - 4, y: r.y + r.h - m.h - 18 } }[pos];
   const scale = pos === "depan" ? 1.15 : pos === "belakang" ? 0.85 : 1;
-  const mv = <svg x={p.x} y={p.y} width={m.w * scale} height={m.h * scale} viewBox={`0 0 ${art[m.art].vb[0]} ${art[m.art].vb[1]}`} overflow="visible">{art[m.art].node()}</svg>;
-  const rf = <svg x={r.x} y={r.y} width={r.w} height={r.h} viewBox={`0 0 ${art[r.art].vb[0]} ${art[r.art].vb[1]}`} preserveAspectRatio="none" overflow="visible">{art[r.art].node()}</svg>;
+  const mv = <ObjectView ob={{ ...p, art: m.art, w: m.w * scale, h: m.h * scale }} dimensional={dimensional} preserveAspectRatio="xMidYMid meet" />;
+  const rf = <ObjectView ob={r} dimensional={dimensional} />;
   return <svg viewBox="0 0 200 150" className={className} role="img" aria-label={`${mover === "bola" ? "Bola" : "Kucing"} dan ${target}`}>
     <rect width="200" height="150" rx="10" fill="#f3f7f4" /><path d="M0 134h200" stroke="#c9d6cf" strokeWidth="2" />
     {pos === "belakang" ? <>{mv}{rf}</> : <>{rf}{mv}</>}

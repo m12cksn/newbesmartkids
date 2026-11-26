@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useId, useState, type CSSProperties, type ReactNode } from "react";
 import { TrainFront } from "lucide-react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { assessment, correct, formatAnswer, numberWords, practice, ready, SEP, splitParts, topics, type CQuestion, type Part, type Scene, type Thing } from "@/data/grade-two-counting-50";
@@ -11,33 +11,43 @@ const s = { stroke: ink, strokeWidth: 1.4, strokeLinejoin: "round" as const };
 /* ====================================================================== */
 /* Ilustrasi (SVG buatan sendiri)                                          */
 /* ====================================================================== */
+const materialColors: Record<Thing, string> = { mango: "#facc15", mangosteen: "#6b213f", strawberry: "#ef4444", ladybug: "#ef4444", butterfly: "#4ade80", star: "#84cc16", candy: "#06b6d4", bee: "#facc15", apple: "#ef4444", marble: "#22c55e" };
+
 export function ThingIcon({ thing, className = "size-7" }: { thing: Thing; className?: string }) {
+  const light = useId(), color = materialColors[thing];
   const body: Record<Thing, ReactNode> = {
-    mango: <><path d="M6 14c0-6 8-10 14-7 5 3 3 13-5 14-5 1-9-3-9-7z" fill="#facc15" {...s} /><path d="M17 6c1-2 4-3 5-2" stroke="#16a34a" strokeWidth="2" fill="none" /></>,
-    mangosteen: <><circle cx="12" cy="14" r="8" fill="#6b213f" {...s} /><path d="M8 6c1.5 1.5 2.5 1.5 4 0 1.5 1.5 2.5 1.5 4 0l-1 4H9z" fill="#4d7c0f" {...s} /></>,
-    strawberry: <><path d="M5 9c0-3 14-3 14 0 0 6-4 12-7 13-3-1-7-7-7-13z" fill="#ef4444" {...s} /><path d="M7 7l5 3 5-3-3-2-2 2-2-2z" fill="#16a34a" {...s} /></>,
-    ladybug: <><circle cx="12" cy="13" r="8" fill="#ef4444" {...s} /><path d="M12 5v16" stroke={ink} /><circle cx="12" cy="5" r="3" fill={ink} /><circle cx="8.5" cy="11" r="1.4" fill={ink} /><circle cx="15.5" cy="11" r="1.4" fill={ink} /><circle cx="9" cy="16" r="1.4" fill={ink} /><circle cx="15" cy="16" r="1.4" fill={ink} /></>,
-    butterfly: <><path d="M12 12C8 3 2 5 3 10s6 4 9 2zM12 12c4-9 10-7 9-2s-6 4-9 2zM12 13c-3 6-8 7-8 3s5-4 8-3zM12 13c3 6 8 7 8 3s-5-4-8-3z" fill="#4ade80" {...s} /><path d="M12 8v10" stroke={ink} strokeWidth="2" /></>,
-    star: <path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7-6.3-3.6-6.3 3.6 1.5-7L2 9.3l7-.8z" fill="#84cc16" {...s} />,
-    candy: <><path d="M3 8l5 4-5 4zM21 8l-5 4 5 4z" fill="#a5f3fc" {...s} /><rect x="7" y="8" width="10" height="8" rx="4" fill="#06b6d4" {...s} /></>,
-    bee: <><ellipse cx="12" cy="14" rx="7" ry="5" fill="#facc15" {...s} /><path d="M10 9.5v9M14 9.5v9" stroke={ink} strokeWidth="2" /><ellipse cx="9" cy="7" rx="3" ry="4" fill="#e0f2fe" {...s} /><ellipse cx="15" cy="7" rx="3" ry="4" fill="#e0f2fe" {...s} /></>,
-    apple: <><path d="M12 7c-4-3-9 0-8 6 1 6 5 9 8 7 3 2 7-1 8-7 1-6-4-9-8-6z" fill="#ef4444" {...s} /><path d="M12 7c0-2 1-4 3-5" stroke="#16a34a" strokeWidth="2" fill="none" /></>,
-    marble: <><circle cx="12" cy="12" r="8" fill="#22c55e" {...s} /><circle cx="9" cy="9" r="2.4" fill="#fff" opacity=".7" /></>,
+    mango: <><path d="M6 14c0-6 8-10 14-7 5 3 3 13-5 14-5 1-9-3-9-7z" fill="var(--object-art-light, #facc15)" {...s} /><path d="M17 6c1-2 4-3 5-2" stroke="#16a34a" strokeWidth="2" fill="none" /></>,
+    mangosteen: <><circle cx="12" cy="14" r="8" fill="var(--object-art-light, #6b213f)" {...s} /><path d="M8 6c1.5 1.5 2.5 1.5 4 0 1.5 1.5 2.5 1.5 4 0l-1 4H9z" fill="#4d7c0f" {...s} /></>,
+    strawberry: <><path d="M5 9c0-3 14-3 14 0 0 6-4 12-7 13-3-1-7-7-7-13z" fill="var(--object-art-light, #ef4444)" {...s} /><path d="M7 7l5 3 5-3-3-2-2 2-2-2z" fill="#16a34a" {...s} /></>,
+    ladybug: <><circle cx="12" cy="13" r="8" fill="var(--object-art-light, #ef4444)" {...s} /><path d="M12 5v16" stroke={ink} /><circle cx="12" cy="5" r="3" fill={ink} /><circle cx="8.5" cy="11" r="1.4" fill={ink} /><circle cx="15.5" cy="11" r="1.4" fill={ink} /><circle cx="9" cy="16" r="1.4" fill={ink} /><circle cx="15" cy="16" r="1.4" fill={ink} /></>,
+    butterfly: <><path d="M12 12C8 3 2 5 3 10s6 4 9 2zM12 12c4-9 10-7 9-2s-6 4-9 2zM12 13c-3 6-8 7-8 3s5-4 8-3zM12 13c3 6 8 7 8 3s-5-4-8-3z" fill="var(--object-art-light, #4ade80)" {...s} /><path d="M12 8v10" stroke={ink} strokeWidth="2" /></>,
+    star: <path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7-6.3-3.6-6.3 3.6 1.5-7L2 9.3l7-.8z" fill="var(--object-art-light, #84cc16)" {...s} />,
+    candy: <><path d="M3 8l5 4-5 4zM21 8l-5 4 5 4z" fill="#a5f3fc" {...s} /><rect x="7" y="8" width="10" height="8" rx="4" fill="var(--object-art-light, #06b6d4)" {...s} /></>,
+    bee: <><ellipse cx="12" cy="14" rx="7" ry="5" fill="var(--object-art-light, #facc15)" {...s} /><path d="M10 9.5v9M14 9.5v9" stroke={ink} strokeWidth="2" /><ellipse cx="9" cy="7" rx="3" ry="4" fill="#e0f2fe" {...s} /><ellipse cx="15" cy="7" rx="3" ry="4" fill="#e0f2fe" {...s} /></>,
+    apple: <><path d="M12 7c-4-3-9 0-8 6 1 6 5 9 8 7 3 2 7-1 8-7 1-6-4-9-8-6z" fill="var(--object-art-light, #ef4444)" {...s} /><path d="M12 7c0-2 1-4 3-5" stroke="#16a34a" strokeWidth="2" fill="none" /></>,
+    marble: <><circle cx="12" cy="12" r="8" fill="var(--object-art-light, #22c55e)" {...s} /><circle cx="9" cy="9" r="2.4" fill="#fff" opacity=".7" /></>,
   };
-  return <svg viewBox="0 0 24 24" className={className} aria-hidden="true">{body[thing]}</svg>;
+  return <svg viewBox="0 0 24 24" className={className} aria-hidden="true"
+    style={{ "--object-art-light": `url(#${light})` } as CSSProperties}>
+    <defs><radialGradient id={light} cx="32%" cy="26%" r="80%">
+      <stop stopColor={`color-mix(in srgb, ${color}, white 44%)`} /><stop offset=".5" stopColor={color} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 31%)`} />
+    </radialGradient></defs>
+    {body[thing]}
+  </svg>;
 }
 
 /** Kumpulan benda. Pada susunan acak, siswa boleh mengetuk benda untuk menandai yang sudah dihitung. */
 function Objects({ thing, n, layout }: { thing: Thing; n: number; layout: "rows" | "scatter" }) {
   const [marked, setMarked] = useState<number[]>([]);
-  if (layout === "rows") return <div className="space-y-1" role="img" aria-label={`Kumpulan ${n} benda tersusun per baris sepuluh`}>
-    {Array.from({ length: Math.ceil(n / 10) }, (_, r) => <div key={r} className="flex gap-0.5">{Array.from({ length: Math.min(10, n - r * 10) }, (_, k) => <ThingIcon key={k} thing={thing} className="size-6 sm:size-7" />)}</div>)}
+  if (layout === "rows") return <div className="space-y-1 group-data-[evaluation=true]/quiz:w-full" role="img" aria-label={`Kumpulan ${n} benda tersusun per baris sepuluh`}>
+    {Array.from({ length: Math.ceil(n / 10) }, (_, r) => <div key={r} className="flex gap-0.5 group-data-[evaluation=true]/quiz:grid group-data-[evaluation=true]/quiz:grid-cols-10">{Array.from({ length: Math.min(10, n - r * 10) }, (_, k) => <ThingIcon key={k} thing={thing} className="size-6 sm:size-7 group-data-[evaluation=true]/quiz:size-full" />)}</div>)}
   </div>;
   // Acak deterministik: sel kisi 10 × ⌈n/7⌉ diambil dengan urutan loncat.
   const cols = 10, rows = Math.ceil((n * 1.4) / cols), cells = cols * rows;
   const pos = Array.from({ length: n }, (_, i) => (i * 7 + 3) % cells).map((c, i) => [(c % cols) * 10 + 1 + ((i * 37) % 3), Math.floor(c / cols) * 11 + 1 + ((i * 53) % 4)]);
-  return <div className="space-y-1">
-    <div className="relative w-full max-w-sm" style={{ aspectRatio: `${cols * 10 + 6} / ${rows * 11 + 6}` }}>
+  return <div className="space-y-1 group-data-[evaluation=true]/quiz:w-full">
+    <div className="relative w-full max-w-sm group-data-[evaluation=true]/quiz:max-w-none" style={{ aspectRatio: `${cols * 10 + 6} / ${rows * 11 + 6}` }}>
       {pos.map(([x, y], i) => <button key={i} type="button" aria-label={`Tandai benda ${i + 1}`} aria-pressed={marked.includes(i)} onClick={() => setMarked(m => m.includes(i) ? m.filter(z => z !== i) : [...m, i])}
         className={`absolute grid -translate-x-0 place-items-center rounded-full ${marked.includes(i) ? "bg-warning/50 ring-2 ring-warning" : ""}`} style={{ left: `${(x / (cols * 10 + 6)) * 100}%`, top: `${(y / (rows * 11 + 6)) * 100}%`, width: "7%", aspectRatio: "1" }}>
         <ThingIcon thing={thing} className="size-full" /></button>)}
@@ -47,20 +57,20 @@ function Objects({ thing, n, layout }: { thing: Thing; n: number; layout: "rows"
 }
 
 function Rod({ small = false }: { small?: boolean }) {
-  return <span className={`inline-flex flex-col gap-px rounded-sm border border-red-900 bg-red-900 ${small ? "w-2.5" : "w-3.5"}`}>{Array.from({ length: 10 }, (_, i) => <span key={i} className={`${small ? "h-1.5" : "h-2.5"} bg-red-500`} />)}</span>;
+  return <span className={`inline-flex flex-col gap-px rounded-sm border border-red-900 bg-red-900 ${small ? "w-2.5" : "w-3.5"}`}>{Array.from({ length: 10 }, (_, i) => <span key={i} className={`${small ? "h-1.5" : "h-2.5"} bg-red-500 bg-linear-to-br from-red-300 to-red-700`} />)}</span>;
 }
-const Unit = () => <span className="inline-block size-3.5 rounded-sm border border-red-900 bg-red-500" />;
+const Unit = () => <span className="inline-block size-3.5 group-data-[evaluation=true]/quiz:size-5 rounded-sm border border-red-900 bg-red-500 bg-linear-to-br from-red-300 to-red-700" />;
 export function Blocks({ tens, ones }: { tens: number; ones: number }) {
   return <div className="flex flex-wrap items-end gap-3" role="img" aria-label={`${tens} batang puluhan dan ${ones} balok satuan`}>
     <div className="flex gap-1">{Array.from({ length: tens }, (_, i) => <Rod key={i} />)}</div>
-    <div className="grid max-w-24 grid-cols-5 gap-0.5">{Array.from({ length: ones }, (_, i) => <Unit key={i} />)}</div>
+    <div className="grid grid-cols-5 gap-0.5">{Array.from({ length: ones }, (_, i) => <Unit key={i} />)}</div>
   </div>;
 }
 
 function SceneView({ scene }: { scene: Scene }) {
   if (scene.type === "objects") return <Objects thing={scene.thing} n={scene.n} layout={scene.layout} />;
   if (scene.type === "blocks") return <Blocks tens={scene.tens} ones={scene.ones} />;
-  return <div className="flex gap-2">{scene.nums.map(n => <span key={n} className="grid h-14 w-10 place-items-center rounded-lg border-2 border-neutral bg-warning/40 text-2xl font-extrabold">{n}</span>)}</div>;
+  return <div className="flex gap-2">{scene.nums.map(n => <span key={n} className="grid h-14 w-10 group-data-[evaluation=true]/quiz:w-14 place-items-center rounded-lg border-2 border-neutral bg-warning/40 text-2xl font-extrabold">{n}</span>)}</div>;
 }
 
 /* ====================================================================== */
@@ -84,8 +94,8 @@ function PlaceTable({ tens, ones, children }: { tens: ReactNode; ones: ReactNode
 /* ====================================================================== */
 function Pencils({ n }: { n: number }) {
   return <div className="flex min-h-20 flex-wrap items-end gap-2" role="img" aria-label={`${Math.floor(n / 10)} ikat pensil berisi 10 dan ${n % 10} pensil`}>
-    {Array.from({ length: Math.floor(n / 10) }, (_, i) => <span key={i} className="relative flex gap-px rounded border-2 border-amber-700 bg-amber-100 p-0.5">{Array.from({ length: 10 }, (_, k) => <span key={k} className="h-14 w-1.5 rounded-t-full bg-purple-500" />)}<span className="absolute inset-x-0 top-7 h-1.5 bg-amber-600" /></span>)}
-    {Array.from({ length: n % 10 }, (_, i) => <span key={`s${i}`} className="h-14 w-1.5 rounded-t-full bg-purple-500" />)}
+    {Array.from({ length: Math.floor(n / 10) }, (_, i) => <span key={i} className="relative flex gap-px rounded border-2 border-amber-700 bg-amber-100 p-0.5">{Array.from({ length: 10 }, (_, k) => <span key={k} className="h-16 w-1.5 rounded-t-full bg-linear-to-r from-violet-300 via-violet-500 to-violet-700 sm:h-20 sm:w-2" />)}<span className="absolute inset-x-0 top-7 h-1.5 bg-amber-600" /></span>)}
+    {Array.from({ length: n % 10 }, (_, i) => <span key={`s${i}`} className="h-16 w-1.5 rounded-t-full bg-linear-to-r from-violet-300 via-violet-500 to-violet-700 sm:h-20 sm:w-2" />)}
   </div>;
 }
 function CountLab() {

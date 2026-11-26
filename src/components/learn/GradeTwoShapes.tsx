@@ -177,7 +177,7 @@ const labs = [SidesLab, CutLab, SolidLab];
 /* ====================================================================== */
 /* Cara menjawab                                                           */
 /* ====================================================================== */
-function SortPart({ p, value, set, checked }: { p: Extract<Part, { kind: "sort" }>; value: string; set: (v: string) => void; checked: boolean }) {
+function SortPart({ p, value, set, checked, expanded }: { p: Extract<Part, { kind: "sort" }>; value: string; set: (v: string) => void; checked: boolean; expanded: boolean }) {
   const [sel, setSel] = useState<number | null>(null);
   const vals = Array.from({ length: p.items.length }, (_, k) => value.split(",")[k] ?? "");
   const put = (k: number, b: string) => { const v = [...vals]; v[k] = b; set(v.join(",")); setSel(null); };
@@ -185,20 +185,20 @@ function SortPart({ p, value, set, checked }: { p: Extract<Part, { kind: "sort" 
   return <div className="space-y-3">
     <div role="group" aria-label="Benda yang belum dikelompokkan" className="flex min-h-16 flex-wrap gap-2 rounded-xl bg-base-200/60 p-2">
       {loose.length ? loose.map(k => <button key={k} type="button" disabled={checked} aria-label={`Ambil ${p.items[k].name}`} aria-pressed={sel === k} onClick={() => setSel(sel === k ? null : k)}
-        className={`flex flex-col items-center rounded-xl border-2 bg-base-100 p-1 text-xs font-semibold ${sel === k ? "border-success ring-2 ring-success/40" : "border-base-300"}`}><FigView fig={p.items[k].fig} className="size-14" scale={0.5} />{p.items[k].name}</button>)
+        className={`flex flex-col items-center rounded-xl border-2 bg-base-100 p-1 text-xs font-semibold ${sel === k ? "border-success ring-2 ring-success/40" : "border-base-300"}`}><FigView fig={p.items[k].fig} className={expanded ? "size-20 max-w-full" : "size-14"} scale={expanded ? 0.8 : 0.5} dimensional={expanded} />{p.items[k].name}</button>)
         : <p className="self-center px-2 text-sm text-base-content/60">Semua sudah dikelompokkan.</p>}
     </div>
     <p className="text-xs text-base-content/60">{sel === null ? "Ketuk satu benda, lalu ketuk kotak tujuannya." : `${p.items[sel].name} dipilih. Ketuk kotak tujuannya.`}</p>
     <div className={`grid gap-2 ${p.bins.length > 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}>
       {p.bins.map((b, bi) => <div key={b} className="flex min-w-0 flex-col rounded-xl border-2 border-dashed border-info/50 bg-info/5 p-2">
         <button type="button" disabled={checked || sel === null} aria-label={`Masukkan ke ${b}`} onClick={() => sel !== null && put(sel, String(bi))} className="btn btn-xs btn-info btn-outline h-auto min-h-7 whitespace-normal">{b}</button>
-        <div className="mt-1 flex min-h-10 flex-wrap gap-1">{p.items.map((it, k) => vals[k] === String(bi) && <button key={k} type="button" disabled={checked} aria-label={`Keluarkan ${it.name}`} onClick={() => put(k, "")} className="flex flex-col items-center rounded-lg bg-base-100 p-0.5 text-[11px] font-semibold"><FigView fig={it.fig} className="size-10" scale={0.35} />{it.name}</button>)}</div>
+        <div className="mt-1 flex min-h-10 flex-wrap gap-1">{p.items.map((it, k) => vals[k] === String(bi) && <button key={k} type="button" disabled={checked} aria-label={`Keluarkan ${it.name}`} onClick={() => put(k, "")} className="flex flex-col items-center rounded-lg bg-base-100 p-0.5 text-[11px] font-semibold"><FigView fig={it.fig} className={expanded ? "size-14 max-w-full" : "size-10"} scale={expanded ? 0.5 : 0.35} dimensional={expanded} />{it.name}</button>)}</div>
       </div>)}
     </div>
   </div>;
 }
 
-function MatchPart({ p, value, set, checked }: { p: Extract<Part, { kind: "match" }>; value: string; set: (v: string) => void; checked: boolean }) {
+function MatchPart({ p, value, set, checked, expanded }: { p: Extract<Part, { kind: "match" }>; value: string; set: (v: string) => void; checked: boolean; expanded: boolean }) {
   const [sel, setSel] = useState<number | null>(null);
   const vals = Array.from({ length: p.left.length }, (_, k) => value.split(",")[k] ?? "");
   const nl = p.left.length, nr = p.right.length, rows = Math.max(nl, nr), H = 1000;
@@ -206,11 +206,11 @@ function MatchPart({ p, value, set, checked }: { p: Extract<Part, { kind: "match
   const hasFig = p.right.some(r => r.fig);
   return <div className="space-y-2">
     <p className="text-xs text-base-content/60">{sel === null ? "Ketuk gambar di kiri, lalu ketuk pasangannya di kanan." : `${p.left[sel].name} dipilih. Ketuk pasangannya di kanan.`}</p>
-    <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)]" style={{ height: rows * (hasFig ? 76 : 56) }}>
+    <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)]" style={{ height: rows * (expanded ? 88 : hasFig ? 76 : 56) }}>
       <div className="grid min-h-0 gap-1" style={{ gridTemplateRows: `repeat(${nl}, minmax(0, 1fr))` }}>
         {p.left.map((it, k) => <button key={k} type="button" disabled={checked} aria-label={`Pilih ${it.name}`} aria-pressed={sel === k} onClick={() => setSel(sel === k ? null : k)}
           className={`flex min-h-0 min-w-0 items-center justify-end gap-1 overflow-hidden rounded-xl border-2 bg-base-100 px-1 [&_svg]:max-h-full [&_svg]:w-auto ${sel === k ? "border-success ring-2 ring-success/40" : vals[k] !== "" ? "border-info/60" : "border-base-300"}`}>
-          <FigView fig={it.fig} className="size-14" scale={0.9} /><span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" /></button>)}
+          <FigView fig={it.fig} className={expanded ? "size-18 max-w-full sm:size-24" : "size-14"} scale={expanded ? 1.3 : 0.9} dimensional={expanded} /><span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" /></button>)}
       </div>
       <svg viewBox={`0 0 40 ${H}`} preserveAspectRatio="none" className="h-full w-full" aria-hidden="true">
         {vals.map((v, k) => v !== "" && <line key={k} x1="0" y1={((k + 0.5) / nl) * H} x2="40" y2={((Number(v) + 0.5) / nr) * H} stroke="#0f766e" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />)}
@@ -218,34 +218,34 @@ function MatchPart({ p, value, set, checked }: { p: Extract<Part, { kind: "match
       <div className="grid min-h-0 gap-1" style={{ gridTemplateRows: `repeat(${nr}, minmax(0, 1fr))` }}>
         {p.right.map((r, j) => <button key={j} type="button" disabled={checked || sel === null} aria-label={`Hubungkan ke ${r.name}`} onClick={() => link(j)}
           className="flex min-h-0 min-w-0 items-center gap-1 overflow-hidden rounded-xl border-2 border-base-300 bg-base-100 px-1 text-left text-xs font-semibold sm:text-sm [&_svg]:max-h-full [&_svg]:w-auto">
-          <span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" />{r.fig ? <FigView fig={r.fig} className="size-14" scale={0.9} /> : <span className="py-1">{r.name}</span>}</button>)}
+          <span className="size-2.5 shrink-0 rounded-full bg-info" aria-hidden="true" />{r.fig ? <FigView fig={r.fig} className={expanded ? "size-18 max-w-full sm:size-24" : "size-14"} scale={expanded ? 1.3 : 0.9} dimensional={expanded} /> : <span className="py-1">{r.name}</span>}</button>)}
       </div>
     </div>
     <button type="button" className="btn btn-ghost btn-xs gap-1" disabled={checked || vals.every(v => v === "")} onClick={() => set("")}><RotateCcw className="size-3.5" aria-hidden="true" />Hapus semua garis</button>
   </div>;
 }
 
-function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: string; set: (v: string) => void; checked: boolean }) {
+function PartView({ p, i, value, set, checked, expanded }: { p: Part; i: number; value: string; set: (v: string) => void; checked: boolean; expanded: boolean }) {
   switch (p.kind) {
     case "number": return <label className="flex flex-wrap items-center gap-2 font-bold">{p.label} <input aria-label={p.label} inputMode="numeric" value={value} disabled={checked} placeholder="…" onChange={e => set(e.target.value.replace(/\D/g, "").slice(0, 2))}
       className="h-11 w-20 rounded-xl border-2 border-orange-400 bg-white text-center text-xl font-extrabold text-neutral focus:border-success focus:outline-none" /></label>;
     case "choice": return <div role="group" aria-label={`Bagian ${i + 1}`} className="space-y-1"><p className="text-sm font-bold">{p.label}</p>
       <div className={p.figs ? "grid grid-cols-2 gap-2 sm:grid-cols-4" : "flex flex-wrap gap-2"}>{p.options.map((o, k) => <button key={o} type="button" aria-label={o} aria-pressed={value === o} disabled={checked} onClick={() => set(o)}
         className={`flex flex-col items-center justify-center gap-1 rounded-xl border-2 p-2 font-bold ${value === o ? "border-success bg-success/10" : "border-base-300 bg-base-100 hover:border-success/40"}`}>
-        {p.figs && <FigView fig={p.figs[k]} className="size-16" scale={0.6} />}<span className={p.figs ? "text-sm" : "px-2 text-lg"}>{o}</span></button>)}</div></div>;
+        {p.figs && <FigView fig={p.figs[k]} className={expanded ? "size-24 max-w-full" : "size-16"} scale={expanded ? 1.1 : 0.6} dimensional={expanded} />}<span className={p.figs ? "text-sm" : "px-2 text-lg"}>{o}</span></button>)}</div></div>;
     case "check": { const sel = value ? value.split(",").filter(Boolean).map(Number) : []; return <div className="space-y-1"><p className="text-xs text-base-content/60">Ketuk untuk mewarnai. Ketuk lagi untuk membatalkan.</p>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{p.items.map((it, k) => { const on = sel.includes(k); return <button key={k} type="button" aria-pressed={on} aria-label={`Pilih ${it.name}`} disabled={checked}
         onClick={() => set((on ? sel.filter(x => x !== k) : [...sel, k]).sort((a, b) => a - b).join(","))}
         className={`relative flex flex-col items-center rounded-xl border-2 p-1 text-xs font-semibold ${on ? "border-success bg-success/15" : "border-base-300 bg-base-100"}`}>
-        <span className={on ? "" : "grayscale-[85%] opacity-80"}><FigView fig={it.fig} className="size-14" /></span>{it.name}</button>; })}</div></div>; }
-    case "sort": return <SortPart p={p} value={value} set={set} checked={checked} />;
-    case "match": return <MatchPart p={p} value={value} set={set} checked={checked} />;
+        <span className={on ? "" : "grayscale-[85%] opacity-80"}><FigView fig={it.fig} className={expanded ? "size-18 max-w-full sm:size-22" : "size-14"} dimensional={expanded} /></span>{it.name}</button>; })}</div></div>; }
+    case "sort": return <SortPart p={p} value={value} set={set} checked={checked} expanded={expanded} />;
+    case "match": return <MatchPart p={p} value={value} set={set} checked={checked} expanded={expanded} />;
     case "cut": return <CutBoard shape={p.shape} value={value} onChange={set} disabled={checked} />;
   }
 }
-function Answer({ q, value, record, checked }: { q: SQuestion; value: string; record: (v: string) => void; checked: boolean }) {
+function Answer({ q, value, record, checked, expanded }: { q: SQuestion; value: string; record: (v: string) => void; checked: boolean; expanded: boolean }) {
   const v = splitParts(value, q.parts.length);
-  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} p={p} i={i} value={v[i]} checked={checked} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
+  return <div className="space-y-2.5">{q.parts.map((p, i) => <PartView key={i} p={p} i={i} value={v[i]} checked={checked} expanded={expanded} set={x => record(v.map((y, j) => j === i ? x : y).join(SEP))} />)}</div>;
 }
 
 export default function GradeTwoShapes() {
@@ -294,9 +294,9 @@ export default function GradeTwoShapes() {
       </> : <GradeFourQuiz<SQuestion> key={`${mode}-${topic}`}
         questions={mode === "practice" ? practice[topic] : assessment}
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 3"}
-        practiceMode={mode === "practice"} close={() => setMode("learn")}
+        practiceMode={mode === "practice"} expanded={mode !== "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.fig ? <FigView fig={q.fig} className={q.fig.t === "stack" ? "w-44" : "size-36"} scale={1.6} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout expanded={mode !== "practice"} visual={q.fig ? <FigView fig={q.fig} className={mode === "practice" ? (q.fig.t === "stack" ? "w-44" : "size-36") : "h-auto w-full max-w-md"} scale={mode === "practice" ? 1.6 : 5} dimensional={mode !== "practice"} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} expanded={mode !== "practice"} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;
