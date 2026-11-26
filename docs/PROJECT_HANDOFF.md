@@ -4,6 +4,8 @@
 
 Perubahan Riwayat Belajar: [Pembahasan jawaban di Aktivitas terbaru](handoff/2026-11-25-feat-history-answer-review.md).
 
+Perubahan evaluasi: [Umpan balik benar atau salah saat evaluasi](handoff/2026-11-26-feat-evaluation-correct-wrong-feedback.md).
+
 Last reviewed: 11 November 2026 (Asia/Jakarta).
 Code baseline inspected: `f6c6cf602bba9206f6a20103e3b39b652f0f4c80` on master.
 This is a snapshot. Check master and open PRs before acting.

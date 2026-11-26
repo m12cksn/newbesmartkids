@@ -77,6 +77,10 @@ try {
       await answer(q, i === 0 ? "6‖10" : q.answer);
       await fit(`evaluasi ${i + 1}`); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
       await button(i === 23 ? "Lihat hasil" : "Lanjut →").click();
+      if (i === 0) {
+        await page.getByRole("status").getByText("Salah.", { exact: true }).waitFor();
+        assert.equal(await page.getByText(/Jawaban benar/).count(), 0, "evaluasi tidak membocorkan jawaban benar");
+      }
     }
     await page.getByText("Benar 23 · Salah 1 · Skor 96/100", { exact: true }).waitFor();
     await page.getByText("Bahas jawaban yang salah", { exact: true }).click();
