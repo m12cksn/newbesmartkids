@@ -78,7 +78,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
   }, []);
 
-  return <section className={`group/quiz mx-auto rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6 ${practiceMode ? "max-w-2xl space-y-3" : "max-w-3xl space-y-4 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base"}`} data-evaluation={!practiceMode || undefined}>
+  return <section className={`group/quiz mx-auto rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6 ${expanded && !practiceMode ? "max-w-3xl space-y-4 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base" : "max-w-2xl space-y-3"}`} data-evaluation={!practiceMode || undefined}>
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-sm font-bold text-success">{title}{question && ` · ${label("Soal", "Question")} ${index + 1}/${questions.length}`}</p>
       <button className="btn btn-ghost btn-sm" onClick={close}>{label('Tutup', 'Close')}</button>
@@ -86,14 +86,14 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/>
     {question ? <>
       {renderMeta?.(question)}
-      <h2 ref={heading} tabIndex={-1} className={expanded || !practiceMode ? "break-words text-xl leading-snug font-extrabold sm:text-2xl" : "text-lg font-extrabold"}>{renderText(question.prompt)}</h2>
+      <h2 ref={heading} tabIndex={-1} className={expanded && !practiceMode ? "break-words text-xl leading-snug font-extrabold sm:text-2xl" : "text-lg font-extrabold"}>{renderText(question.prompt)}</h2>
       {renderVisual?.(question)}
       {question.mode === "order" && <div className="flex flex-wrap items-center gap-2">
         <p aria-live="polite">{selected.join(" → ") || "Ketuk angka sesuai urutan."}</p>
         <button className="btn btn-ghost btn-sm" disabled={checked || !answer} onClick={() => record(selected.slice(0, -1).join("|"))}>Batalkan pilihan terakhir</button>
       </div>}
       {question.options ? <div className="flex flex-wrap gap-2">
-        {question.options.map(option => <button key={option} className={`btn btn-outline h-auto min-h-11 min-w-0 max-w-full whitespace-normal break-words ${practiceMode ? "" : "text-base"}`}
+        {question.options.map(option => <button key={option} className={`btn btn-outline h-auto min-h-11 min-w-0 max-w-full whitespace-normal break-words ${expanded && !practiceMode ? "text-base" : ""}`}
           disabled={checked || (question.mode === "order" && selected.includes(option))}
           aria-pressed={selected.includes(option)} onClick={() => {
             if (question.mode === "order") record([...selected, option].join("|"));

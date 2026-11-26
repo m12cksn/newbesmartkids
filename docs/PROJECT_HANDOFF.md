@@ -20,7 +20,7 @@ Pratinjau lanjutan: [Ilustrasi membilang Kelas 2 Bab 1 dan 7](handoff/2026-11-26
 
 Pratinjau lanjutan: [Ilustrasi Berbagai Diagram Kelas 2 Bab 8](handoff/2026-11-26-preview-berbagai-diagram-kelas-2.md).
 
-Pembaruan Kelas 2 Bab 1–8 dan pembahasan evaluasi bersama disiapkan untuk digabung. Seluruh dataset Kelas 2 telah diperiksa ulang, masing-masing berisi 24 soal evaluasi. Status produksi mengikuti hasil merge dan deployment.
+Pembaruan Kelas 2 Bab 1–8 dan pembahasan evaluasi bersama disiapkan untuk digabung melalui [PR #206](https://github.com/m12cksn/newbesmartkids/pull/206). Seluruh dataset Kelas 2 telah diperiksa ulang, masing-masing berisi 24 soal evaluasi. Tampilan soal yang lebih besar diaktifkan untuk Kelas 2. Bab lain mempertahankan tata letak pengerjaan yang ringkas agar muat di layar pendek. Pembahasan soal asli dan navigasi evaluasi satu arah tetap berlaku lintas kelas.
 
 Last reviewed: 11 November 2026 (Asia/Jakarta).
 Code baseline inspected: `f6c6cf602bba9206f6a20103e3b39b652f0f4c80` on master.

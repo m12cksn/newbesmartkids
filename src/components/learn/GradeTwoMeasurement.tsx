@@ -198,7 +198,7 @@ export default function GradeTwoMeasurement() {
       </> : <GradeFourQuiz<MQuestion> key={`${mode}-${topic}`}
         questions={mode === "practice" ? practice[topic] : assessment}
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 6"}
-        practiceMode={mode === "practice"} close={() => setMode("learn")}
+        practiceMode={mode === "practice"} expanded={mode === "assessment"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
         renderVisual={q => q.fig ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><FigView fig={q.fig} big /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}

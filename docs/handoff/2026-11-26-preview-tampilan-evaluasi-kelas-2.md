@@ -2,6 +2,8 @@
 
 Pratinjau lokal untuk Penjumlahan dan Pengurangan serta Bentuk di Sekitar Kita. Evaluasi yang menggunakan `GradeFourQuiz.tsx` mendapat kartu dan teks soal yang lebih besar. `QuizFitLayout.tsx` memberi panel visual evaluasi satu baris penuh dan menghapus pengecilan pada layar pendek.
 
+Dalam PR #206, kartu dan teks evaluasi yang lebih besar dibatasi ke Kelas 2 sesudah pengujian lintas kelas mendapati kartu di beberapa bab lain melebihi tinggi layar 320 × 640. Susunan panel besar `QuizFitLayout.tsx` dipakai pada materi Kelas 2 yang memilih tampilan tersebut.
+
 - `GradeTwoAddSub.tsx` dan `GradeTwoAddSubArt.tsx` memperbesar gambar yang dihitung, menjaga pengelompokan, dan memberi pencahayaan pada jambu, pesawat, mobil, ikan, pisang goreng, dan kue.
 - `GradeTwoShapes.tsx` dan `ShapeVisuals.tsx` memperbesar gambar soal, pilihan bergambar, serta gambar pada aktivitas mengelompokkan dan memasangkan. Gradasi dan bayangan memberi kesan volume pada bangun ruang dan sejumlah benda, termasuk kaleng dan kelereng. Bangun datar memakai proyeksi datar agar sisi dan sudut mudah dibaca.
 - Dataset, kunci jawaban, dan alur penilaian menggunakan logika yang sudah ada.
