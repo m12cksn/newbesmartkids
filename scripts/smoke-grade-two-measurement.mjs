@@ -67,6 +67,15 @@ try {
     await button("Evaluasi 24 soal").click();
     for (const [i, q] of assessment.entries()) {
       await page.getByText(`Soal ${i + 1}/24`).waitFor();
+      if (q.fig?.t === "balance" || q.fig?.t === "balances") {
+        const scales = page.getByRole("img", { name: /^Timbangan:/ });
+        for (const scale of await scales.all()) {
+          const label = await scale.getAttribute("aria-label");
+          const difference = await scale.locator(":scope > line").evaluate(beam =>
+            Number(beam.getAttribute("y1")) - Number(beam.getAttribute("y2")));
+          assert.equal(Math.sign(difference), label.endsWith("Sisi kiri turun.") ? 1 : label.endsWith("Sisi kanan turun.") ? -1 : 0, label);
+        }
+      }
       assert.equal(await button("Lanjut →").count(), 0, `gating evaluasi ${i + 1}`);
       await answer(q, i === 0 ? "Mangga" : q.answer);
       await fit(`evaluasi ${i + 1}`); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);

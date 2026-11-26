@@ -1,3 +1,4 @@
+import { useId, type CSSProperties } from "react";
 import { objectArtNodes } from "@/components/illustrations/ObjectArt";
 import { bases, pieces, type Base, type Line, type Obj } from "@/data/grade-two-fractions";
 
@@ -55,14 +56,30 @@ function handle(base: Base, l: Line): [number, number] {
   return [l[0] + dx * t, l[1] + dy * t];
 }
 
+const materialColors: Partial<Record<Obj, string>> = {
+  apple: "#e5484d", orange: "#f59f00", egg: "#fdf6e3", balloon: "#e5484d",
+  cupcake: "#fde2b8", chick: "#fcd34d", ladybug: "#e5484d", pencil: "#f5c542",
+  donut: "#d9a066", "marble-blue": "#2f86d6", bird: "#4c9be8",
+};
+
 export function ObjIcon({ obj, className = "size-7" }: { obj: Obj; className?: string }) {
-  return <svg viewBox="0 0 48 48" className={className} aria-hidden="true">{objectArtNodes[obj]}</svg>;
+  const light = useId();
+  const color = materialColors[obj];
+  return <svg viewBox="0 0 48 48" className={`shrink-0 ${className} group-data-[evaluation=true]/quiz:[--object-art-light:var(--fraction-light)]`}
+    style={color ? { "--fraction-light": `url(#${light})` } as CSSProperties : undefined} aria-hidden="true">
+    {color && <defs><radialGradient id={light} cx="32%" cy="24%" r="80%">
+      <stop stopColor={`color-mix(in srgb, ${color}, white 48%)`} />
+      <stop offset=".50" stopColor={color} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 34%)`} />
+    </radialGradient></defs>}
+    {objectArtNodes[obj]}
+  </svg>;
 }
 export function GroupsFig({ obj, a, b, obj2, size = "size-6" }: { obj: Obj; a: number; b: number; obj2?: Obj; size?: string }) {
   return <div className="flex flex-wrap items-stretch gap-2" role="img" aria-label={`Kelompok ${a} dan ${b}`}>
-    {[[obj, a], [obj2 ?? obj, b]].map(([o, n], k) => <div key={k} className="flex max-w-40 flex-wrap content-center gap-0.5 rounded-lg border-2 border-dashed border-info/50 bg-white p-1">{Array.from({ length: n as number }, (_, i) => <ObjIcon key={i} obj={o as Obj} className={size} />)}</div>)}
+    {[[obj, a], [obj2 ?? obj, b]].map(([o, n], k) => <div key={k} className="flex max-w-40 flex-wrap content-center gap-0.5 group-data-[evaluation=true]/quiz:max-w-full rounded-lg border-2 border-dashed border-info/50 bg-white p-1">{Array.from({ length: n as number }, (_, i) => <ObjIcon key={i} obj={o as Obj} className={size} />)}</div>)}
   </div>;
 }
 export function SetFig({ obj, n }: { obj: Obj; n: number }) {
-  return <div className="flex max-w-sm flex-wrap justify-center gap-1" role="img" aria-label={`${n} benda`}>{Array.from({ length: n }, (_, i) => <ObjIcon key={i} obj={obj} className="size-8" />)}</div>;
+  return <div className="flex max-w-sm flex-wrap justify-center gap-1 group-data-[evaluation=true]/quiz:max-w-full group-data-[evaluation=true]/quiz:gap-2" role="img" aria-label={`${n} benda`}>{Array.from({ length: n }, (_, i) => <ObjIcon key={i} obj={obj} className="size-8 group-data-[evaluation=true]/quiz:size-12 sm:group-data-[evaluation=true]/quiz:size-16" />)}</div>;
 }

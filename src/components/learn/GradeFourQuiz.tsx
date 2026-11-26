@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { Question } from "@/data/grade-four-whole-numbers";
 import { EvaluationGate } from "@/components/auth/EvaluationGate";
 import { SaveResult } from "@/components/auth/SaveResult";
@@ -22,8 +22,9 @@ export default function GradeFourQuiz<Q extends Question>(props: QuizProps<Q>) {
   return <EvaluationGate close={props.close}><QuizBody {...props} /></EvaluationGate>;
 }
 
-function QuizBody<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false }: {
+function QuizBody<Q extends Question>({ questions, title, practiceMode, close, renderVisual, renderAnswer, checkAnswer = isCorrect, isReady, formatAnswer, renderText = text => text, renderMeta, english = false, expanded = false }: {
   english?: boolean;
+  expanded?: boolean;
   questions: Q[]; title: string; practiceMode: boolean; close: () => void;
   renderVisual?: (question: Q) => ReactNode;
   renderAnswer?: (question: Q, answer: string, record: (value: string) => void, checked: boolean) => ReactNode;
@@ -39,20 +40,28 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [checked, setChecked] = useState(false);
+  const [reviewNumber, setReviewNumber] = useState<number | null>(null);
+  const reviewId = useId();
+  const review = useRef<HTMLDetailsElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const question = questions[index];
   const answer = answers[index] ?? "";
   const selected = answer ? answer.split("|") : [];
   const ready = question && isReady ? isReady(question, answer) : question?.mode === "order" ? selected.length === question.options?.length : Boolean(answer.trim());
-  const incorrect = question ? [] : questions.flatMap((q, i) => checkAnswer(q, answers[i]) ? [] : [{
+  const results = question ? [] : questions.map((q, i) => ({
     number: i + 1,
     prompt: q.prompt,
     submitted: formatAnswer ? formatAnswer(q, answers[i] ?? "") : (answers[i] ?? "").replaceAll("|", ", "),
     expected: formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", "),
     explanation: q.explanation,
-  }]);
+    correct: checkAnswer(q, answers[i]),
+  }));
+  const incorrect = results.filter(item => !item.correct);
   const score = questions.length - incorrect.length;
+  const selectedResult = reviewNumber === null ? undefined : results[reviewNumber - 1];
+  const selectedQuestion = reviewNumber === null ? undefined : questions[reviewNumber - 1];
+  const showReview = !practiceMode || incorrect.length > 0;
   const record = (value: string) => setAnswers(old => ({ ...old, [index]: value }));
   const go = (i: number) => {
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
@@ -69,7 +78,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
   }, []);
 
-  return <section className="mx-auto max-w-2xl space-y-3 rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6">
+  return <section className={`group/quiz mx-auto rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6 ${expanded && !practiceMode ? "max-w-3xl space-y-4 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base" : "max-w-2xl space-y-3"}`} data-evaluation={!practiceMode || undefined}>
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-sm font-bold text-success">{title}{question && ` · ${label("Soal", "Question")} ${index + 1}/${questions.length}`}</p>
       <button className="btn btn-ghost btn-sm" onClick={close}>{label('Tutup', 'Close')}</button>
@@ -77,14 +86,14 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/>
     {question ? <>
       {renderMeta?.(question)}
-      <h2 ref={heading} tabIndex={-1} className="text-lg font-extrabold">{renderText(question.prompt)}</h2>
+      <h2 ref={heading} tabIndex={-1} className={expanded && !practiceMode ? "break-words text-xl leading-snug font-extrabold sm:text-2xl" : "text-lg font-extrabold"}>{renderText(question.prompt)}</h2>
       {renderVisual?.(question)}
       {question.mode === "order" && <div className="flex flex-wrap items-center gap-2">
         <p aria-live="polite">{selected.join(" → ") || "Ketuk angka sesuai urutan."}</p>
         <button className="btn btn-ghost btn-sm" disabled={checked || !answer} onClick={() => record(selected.slice(0, -1).join("|"))}>Batalkan pilihan terakhir</button>
       </div>}
       {question.options ? <div className="flex flex-wrap gap-2">
-        {question.options.map(option => <button key={option} className="btn btn-outline h-auto min-h-11 min-w-0 max-w-full whitespace-normal break-words"
+        {question.options.map(option => <button key={option} className={`btn btn-outline h-auto min-h-11 min-w-0 max-w-full whitespace-normal break-words ${expanded && !practiceMode ? "text-base" : ""}`}
           disabled={checked || (question.mode === "order" && selected.includes(option))}
           aria-pressed={selected.includes(option)} onClick={() => {
             if (question.mode === "order") record([...selected, option].join("|"));
@@ -102,7 +111,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
         {checkAnswer(question, answer) ? label("Benar.", "Correct.") : label("Salah.", "Incorrect.")}
       </p>}
       <div className="flex flex-wrap justify-between gap-2">
-        {index > 0 && <button className="btn btn-ghost btn-sm" onClick={() => go(index - 1)}>{label('← Sebelumnya', '← Previous')}</button>}
+        {practiceMode && index > 0 && <button className="btn btn-ghost btn-sm" onClick={() => go(index - 1)}>{label('← Sebelumnya', '← Previous')}</button>}
         {practiceMode && !checked ? <button className="btn btn-success ms-auto" disabled={!ready} onClick={() => setChecked(true)}>{label('Periksa jawaban', 'Check answer')}</button>
           : practiceMode && ready ? <button className="btn btn-success ms-auto" onClick={() => go(index + 1)}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>
           : !checked && ready && <button className="btn btn-success ms-auto" onClick={checkEvaluation}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>}
@@ -110,12 +119,39 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     </> : <>
       <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? label("Latihan selesai", "Practice complete") : label("Hasil evaluasi", "Assessment results")}</h2>
       <p className="font-bold">{label("Benar", "Correct")} {score} · {label("Salah", "Incorrect")} {questions.length - score} · {label("Skor", "Score")} {Math.round(score / questions.length * 100)}/100</p>
+      {!practiceMode && <div className="space-y-2">
+        <p>{label("Ketuk nomor untuk melihat soal dan pembahasannya.", "Select a question number to see the question and explanation.")}</p>
+        <ol aria-label={label("Hasil tiap soal", "Results by question")} className="flex flex-wrap gap-2">
+          {results.map(({ number, correct }) => {
+            const wrong = !correct;
+            const name = label(`Soal ${number}, ${wrong ? "salah" : "benar"}`, `Question ${number}, ${wrong ? "incorrect" : "correct"}`);
+            const circle = "grid size-11 place-items-center rounded-full border-2 text-base font-bold";
+            return <li key={number}><button type="button" aria-label={name} aria-controls={reviewId} aria-pressed={reviewNumber === number}
+                  onClick={() => {
+                    setReviewNumber(number);
+                    if (review.current) {
+                      review.current.open = true;
+                      review.current.scrollIntoView({ block: "nearest" });
+                    }
+                  }}
+                  className={`${circle} focus-visible:outline-2 focus-visible:outline-offset-2 aria-pressed:ring-2 ${wrong ? "border-red-300 bg-red-100 text-red-900 aria-pressed:ring-red-700" : "border-green-300 bg-green-100 text-green-900 aria-pressed:ring-green-700"}`}>{number}</button></li>;
+          })}
+        </ol>
+      </div>}
       <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} incorrect={incorrect} />
-      {score < questions.length && <details className="rounded-lg bg-base-200 p-3">
-        <summary className="cursor-pointer font-bold">{label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
-        <ol className="mt-2 space-y-3 text-sm">{questions.map((q, i) => !checkAnswer(q, answers[i]) &&
-          <li key={i}><strong>{label("Soal", "Question")} {i + 1}. {renderText(q.prompt)}</strong>
-            <p>{label('Jawabanmu ', 'Your answer: ')}{formatAnswer ? formatAnswer(q, answers[i] ?? "") : answers[i]?.replaceAll("|", ", ")}. {label("Jawaban benar ", "Correct answer: ")}{formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", ")}.</p><p>{renderText(q.explanation)}</p>
+      {showReview && <details id={reviewId} ref={review} hidden={incorrect.length === 0 && !selectedResult} onToggle={event => {
+        if (!event.currentTarget.open) setReviewNumber(null);
+      }} className="scroll-mt-24 rounded-lg bg-base-200 p-3">
+        <summary className="cursor-pointer font-bold">{selectedResult?.correct ? label("Pembahasan soal", "Question review") : label('Bahas jawaban yang salah', 'Review incorrect answers')}</summary>
+        <ol aria-live="polite" className="mt-2 space-y-3 text-sm">{(selectedResult ? [selectedResult] : incorrect).map(item =>
+          <li key={item.number}><strong>{label("Soal", "Question")} {item.number}. {renderText(item.prompt)}</strong>
+            {selectedQuestion && <div className="my-3 space-y-2">
+              {renderVisual?.(selectedQuestion)}
+              {selectedQuestion.options ? <ul className="flex flex-wrap gap-2" aria-label={label("Pilihan jawaban", "Answer choices")}>
+                {selectedQuestion.options.map(option => <li key={option} className="rounded-lg border border-base-300 bg-base-100 px-3 py-2">{option}</li>)}
+              </ul> : renderAnswer && <div inert>{renderAnswer(selectedQuestion, selectedQuestion.answer, () => {}, true)}</div>}
+            </div>}
+            <p>{label('Jawabanmu ', 'Your answer: ')}{item.submitted}. {label("Jawaban benar ", "Correct answer: ")}{item.expected}.</p><p>{renderText(item.explanation)}</p>
           </li>)}</ol>
       </details>}
       <button className="btn btn-success" onClick={close}>{label('Kembali ke materi', 'Back to lesson')}</button>

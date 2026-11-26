@@ -11,13 +11,13 @@ import {
 
 function FigView({ fig, big = false }: { fig: Fig; big?: boolean }) {
   switch (fig.t) {
-    case "balance": return <Balance left={fig.left} right={fig.right} tilt={tilt(fig, fig.w)} style={fig.style} className={big ? "w-full max-w-80" : "w-full max-w-56"} />;
-    case "balances": return <div className="grid w-full gap-1 sm:grid-cols-2">{fig.list.map((b, i) => <div key={i} className="flex items-center gap-1"><span className="text-sm font-bold">{i + 1}.</span><Balance left={b.left} right={b.right} tilt={tilt(b, fig.w)} className="w-full max-w-64" /></div>)}</div>;
-    case "clock": return fig.act ? <ActCard a={fig.act} tod={fig.tod} h={fig.h} small={!big} /> : <ClockFace h={fig.h} className={big ? "size-36" : "size-20"} />;
-    case "clocks": return <div className="flex flex-wrap justify-center gap-3">{fig.list.map(c => <figure key={c.label} className="text-center"><ClockFace h={c.h} className="size-20" /><figcaption className="text-xs font-semibold">{c.label}</figcaption></figure>)}</div>;
-    case "digital": return <Digital h={fig.h} />;
+    case "balance": return <Balance left={fig.left} right={fig.right} tilt={tilt(fig, fig.w)} style={fig.style} className={big ? "w-full max-w-80 group-data-[evaluation=true]/quiz:max-w-2xl" : "w-full max-w-56"} />;
+    case "balances": return <div className="grid w-full gap-1 sm:grid-cols-2">{fig.list.map((b, i) => <div key={i} className="flex items-center gap-1"><span className="text-sm font-bold">{i + 1}.</span><Balance left={b.left} right={b.right} tilt={tilt(b, fig.w)} className="w-full min-w-0 max-w-64 group-data-[evaluation=true]/quiz:max-w-none" /></div>)}</div>;
+    case "clock": return fig.act ? <ActCard a={fig.act} tod={fig.tod} h={fig.h} small={!big} /> : <ClockFace h={fig.h} className={big ? "size-36 group-data-[evaluation=true]/quiz:size-64" : "size-20 max-w-full group-data-[evaluation=true]/quiz:size-28"} />;
+    case "clocks": return <div className="flex flex-wrap justify-center gap-3">{fig.list.map(c => <figure key={c.label} className="text-center"><ClockFace h={c.h} className="size-20 group-data-[evaluation=true]/quiz:size-24 sm:group-data-[evaluation=true]/quiz:size-36" /><figcaption className="text-xs font-semibold">{c.label}</figcaption></figure>)}</div>;
+    case "digital": return <Digital h={fig.h} className="w-32 group-data-[evaluation=true]/quiz:w-64" />;
     case "act": return <ActCard a={fig.a} tod={fig.tod} small={!big} />;
-    case "thing": return <ThingArt t={fig.o} className={big ? "size-20" : "size-12"} />;
+    case "thing": return <ThingArt t={fig.o} className={big ? "size-20 group-data-[evaluation=true]/quiz:size-32" : "size-12 group-data-[evaluation=true]/quiz:size-20"} />;
   }
 }
 
@@ -124,7 +124,7 @@ function ExtremePart({ p, value, set, checked }: { p: Extract<Part, { kind: "ext
     <div role="group" aria-label="Warna" className="flex gap-2">{([["merah", "Paling berat", "#e5484d"], ["kuning", "Paling ringan", "#f5c542"]] as const).map(([c, label, hex]) => <button key={c} type="button" disabled={checked} aria-pressed={brush === c} aria-label={`Warna ${c}`} onClick={() => setBrush(c)}
       className={`flex items-center gap-1.5 rounded-full border-2 px-3 py-1 text-sm font-semibold ${brush === c ? "border-neutral" : "border-base-300"}`}><span className="size-4 rounded-full border border-neutral/40" style={{ background: hex }} />{c}: {label.toLowerCase()}</button>)}</div>
     <div className="flex flex-wrap gap-2">{p.items.map((it, k) => { const isH = hv === String(k), isL = lt === String(k); return <button key={k} type="button" disabled={checked} aria-label={`Warnai ${it.name}`} onClick={() => set(brush === "merah" ? `${k},${lt === String(k) ? "" : lt ?? ""}` : `${hv === String(k) ? "" : hv ?? ""},${k}`)}
-      className={`flex flex-col items-center rounded-xl border-[3px] p-1 text-xs font-semibold ${isH ? "border-red-500 bg-red-100" : isL ? "border-yellow-400 bg-yellow-100" : "border-base-300 bg-base-100"}`}><ThingArt t={(it.fig as { o: Thing }).o} className="size-14" />{it.name}</button>; })}</div>
+      className={`flex flex-col items-center rounded-xl border-[3px] p-1 text-xs font-semibold ${isH ? "border-red-500 bg-red-100" : isL ? "border-yellow-400 bg-yellow-100" : "border-base-300 bg-base-100"}`}><ThingArt t={(it.fig as { o: Thing }).o} className="size-14 group-data-[evaluation=true]/quiz:size-20" />{it.name}</button>; })}</div>
   </div>;
 }
 function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: string; set: (v: string) => void; checked: boolean }) {
@@ -144,7 +144,7 @@ function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: st
     case "extreme": return <ExtremePart p={p} value={value} set={set} checked={checked} />;
     case "order": return <OrderPart p={p} value={value} set={set} checked={checked} />;
     case "sort": return <SortPart p={p} value={value} set={set} checked={checked} />;
-    case "setClock": return <div className="grid place-items-center gap-1"><p className="text-xs text-base-content/60">Ketuk angka untuk meletakkan jarum pendek. Jarum panjang tetap di angka 12.</p><ClockFace h={value ? Number(value) : null} onPick={n => !checked && set(String(n))} className="w-full max-w-56" label="Jam yang dapat diatur" /></div>;
+    case "setClock": return <div className="grid place-items-center gap-1"><p className="text-xs text-base-content/60">Ketuk angka untuk meletakkan jarum pendek. Jarum panjang tetap di angka 12.</p><ClockFace h={value ? Number(value) : null} onPick={n => !checked && set(String(n))} className="w-full max-w-56 group-data-[evaluation=true]/quiz:max-w-96" label="Jam yang dapat diatur" /></div>;
   }
 }
 function Answer({ q, value, record, checked }: { q: MQuestion; value: string; record: (v: string) => void; checked: boolean }) {
@@ -198,7 +198,7 @@ export default function GradeTwoMeasurement() {
       </> : <GradeFourQuiz<MQuestion> key={`${mode}-${topic}`}
         questions={mode === "practice" ? practice[topic] : assessment}
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 6"}
-        practiceMode={mode === "practice"} close={() => setMode("learn")}
+        practiceMode={mode === "practice"} expanded={mode === "assessment"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
         renderVisual={q => q.fig ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><FigView fig={q.fig} big /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}

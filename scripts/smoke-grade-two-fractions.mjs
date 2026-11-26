@@ -63,6 +63,7 @@ try {
       await button("Latihan materi").click();
       let wrong = 0;
       for (const [k, q] of set.entries()) {
+        if (k > 0) assert.ok(await button("← Sebelumnya").isVisible());
         assert.ok(await button("Periksa jawaban").isDisabled(), `gating ${t}-${k}`);
         const miss = t === 0 && k === 0;
         await answer(q, miss ? "0,1" : q.answer); if (miss) wrong++;
@@ -77,14 +78,34 @@ try {
     await button("Evaluasi 24 soal").click();
     for (const [i, q] of assessment.entries()) {
       await page.getByText(`Soal ${i + 1}/24`).waitFor();
+      assert.equal(await button("← Sebelumnya").count(), 0);
       assert.equal(await button("Lanjut →").count(), 0, `gating evaluasi ${i + 1}`);
-      await answer(q, i === 0 ? "0,1" : q.answer);
+      await answer(q, i === 0 ? "0,1" : i === 1 ? "n,y" : q.answer);
       await fit(`evaluasi ${i + 1}`); await shot(`assessment-${String(i + 1).padStart(2, "0")}`);
       await button(i === 23 ? "Lihat hasil" : "Lanjut →").click();
     }
-    await page.getByText("Benar 23 · Salah 1 · Skor 96/100", { exact: true }).waitFor();
+    await page.getByText("Benar 22 · Salah 2 · Skor 92/100", { exact: true }).waitFor();
+    const outcomes = page.getByRole("list", { name: "Hasil tiap soal" });
+    assert.equal(await outcomes.getByRole("listitem").count(), 24);
+    assert.equal(await outcomes.getByRole("button", { name: /^Soal \d+, benar$/ }).count(), 22);
+    await button("Soal 3, benar").click();
+    await page.getByText(/Soal 3\. Warnai seperempat dari lingkaran ini/).waitFor();
+    assert.equal(await page.locator("details[open] svg polygon").count(), 4);
+    await button("Soal 2, salah").click();
+    await page.getByText(/Jawaban benar a benar, b salah/).waitFor();
+    const apples = page.getByRole("img", { name: "8 benda", exact: true });
+    assert.equal(await apples.locator("svg").count(), 8);
+    assert.ok(!(await page.getByText(/Jawaban benar 1 dari 2 bagian diwarnai/).isVisible()));
+    await button("Soal 1, salah").focus();
+    await page.keyboard.press("Enter");
+    await page.getByText(/Jawaban benar 1 dari 2 bagian diwarnai/).waitFor();
+    assert.equal(await page.locator("details[open] svg polygon").count(), 2);
+    assert.equal(await button("Soal 1, salah").getAttribute("aria-pressed"), "true");
+    assert.ok(!(await page.getByText(/Jawaban benar a benar, b salah/).isVisible()));
+    await page.getByText("Bahas jawaban yang salah", { exact: true }).click();
     await page.getByText("Bahas jawaban yang salah", { exact: true }).click();
     await page.getByText(/Jawaban benar 1 dari 2 bagian diwarnai/).waitFor();
+    await page.getByText(/Jawaban benar a benar, b salah/).waitFor();
     await fit("hasil"); await shot("result");
     assert.deepEqual(errors, []); await page.close();
     console.log(`PASS kelas 2 bab 5 at ${width}px: 3 lab, 12 latihan (1 salah disengaja), 24 evaluasi (warnai, garis lipat, tanda, bagikan), skor dan pembahasan`);

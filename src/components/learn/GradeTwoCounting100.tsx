@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Eraser, Minus, Plus, RotateCcw } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useId, useState, type CSSProperties, type ReactNode, type SVGProps } from "react";
 import GradeFourQuiz from "./GradeFourQuiz";
 import { objectArtNodes } from "@/components/illustrations/ObjectArt";
 import {
@@ -17,33 +17,56 @@ const o = { stroke: ink, strokeWidth: 1.6, strokeLinejoin: "round" as const };
 /* ====================================================================== */
 const thingArt: Record<Thing, ReactNode> = {
   jeruk: objectArtNodes.orange, kelereng: objectArtNodes["marble-blue"], pensil: objectArtNodes.pencil, bintang: objectArtNodes.star, apel: objectArtNodes.apple,
-  kue: <><circle cx="24" cy="26" r="16" fill="#c98a4b" {...o} /><circle cx="24" cy="24" r="10" fill="#8a5528" />{[[18, 20], [27, 19], [22, 27], [30, 26], [17, 28]].map(([x, y]) => <rect key={`${x}${y}`} x={x} y={y} width="3" height="1.6" rx=".8" fill="#fde68a" transform={`rotate(${x * 7} ${x} ${y})`} />)}</>,
-  rambutan: <><circle cx="24" cy="26" r="13" fill="#d23f4a" {...o} />{Array.from({ length: 16 }, (_, i) => { const a = (i * Math.PI) / 8; return <path key={i} d={`M${24 + 13 * Math.cos(a)} ${26 + 13 * Math.sin(a)}q${4 * Math.cos(a + 0.5)} ${4 * Math.sin(a + 0.5)} ${6 * Math.cos(a)} ${6 * Math.sin(a)}`} fill="none" stroke="#3fa16b" strokeWidth="1.6" strokeLinecap="round" />; })}</>,
-  ikan: <><path d="M8 24c6-10 22-12 30 0-8 12-24 10-30 0z" fill="#f08a24" {...o} /><path d="M38 24l8-7v14z" fill="#f08a24" {...o} /><path d="M18 16v16M26 15v18" stroke="#fff" strokeWidth="2.4" /><circle cx="13" cy="22" r="1.6" fill={ink} /></>,
-  anggur: <>{[[18, 18], [26, 18], [34, 18], [22, 25], [30, 25], [26, 32], [18, 32], [34, 32], [26, 39]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="5" fill="#8d63c7" {...o} />)}<path d="M26 13V6" stroke="#4d7c0f" strokeWidth="2.4" /></>,
+  kue: <><circle cx="24" cy="26" r="16" fill="var(--object-art-light, #c98a4b)" {...o} /><circle cx="24" cy="24" r="10" fill="#8a5528" />{[[18, 20], [27, 19], [22, 27], [30, 26], [17, 28]].map(([x, y]) => <rect key={`${x}${y}`} x={x} y={y} width="3" height="1.6" rx=".8" fill="#fde68a" transform={`rotate(${x * 7} ${x} ${y})`} />)}</>,
+  rambutan: <><circle cx="24" cy="26" r="13" fill="var(--object-art-light, #d23f4a)" {...o} />{Array.from({ length: 16 }, (_, i) => { const a = (i * Math.PI) / 8; return <path key={i} d={`M${24 + 13 * Math.cos(a)} ${26 + 13 * Math.sin(a)}q${4 * Math.cos(a + 0.5)} ${4 * Math.sin(a + 0.5)} ${6 * Math.cos(a)} ${6 * Math.sin(a)}`} fill="none" stroke="#3fa16b" strokeWidth="1.6" strokeLinecap="round" />; })}</>,
+  ikan: <><path d="M8 24c6-10 22-12 30 0-8 12-24 10-30 0z" fill="var(--object-art-light, #f08a24)" {...o} /><path d="M38 24l8-7v14z" fill="var(--object-art-light, #f08a24)" {...o} /><path d="M18 16v16M26 15v18" stroke="#fff" strokeWidth="2.4" /><circle cx="13" cy="22" r="1.6" fill={ink} /></>,
+  anggur: <>{[[18, 18], [26, 18], [34, 18], [22, 25], [30, 25], [26, 32], [18, 32], [34, 32], [26, 39]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="5" fill="var(--object-art-light, #8d63c7)" {...o} />)}<path d="M26 13V6" stroke="#4d7c0f" strokeWidth="2.4" /></>,
 };
-const Icon = ({ t, className = "size-6" }: { t: Thing; className?: string }) => <svg viewBox="0 0 48 48" className={className} aria-hidden="true">{thingArt[t]}</svg>;
+const materialColors: Record<Thing, string> = {
+  jeruk: "#f59f00", kelereng: "#2f86d6", pensil: "#f5c542", bintang: "#f5c542", apel: "#e5484d",
+  kue: "#c98a4b", rambutan: "#d23f4a", ikan: "#f08a24", anggur: "#8d63c7",
+};
+
+function Icon({ t, className = "size-6", ...placement }: { t: Thing } &
+  Pick<SVGProps<SVGSVGElement>, "className" | "x" | "y" | "width" | "height">) {
+  const light = useId(), color = materialColors[t];
+  return <svg viewBox="0 0 48 48" className={className}
+    style={{ "--object-art-light": `url(#${light})` } as CSSProperties} aria-hidden="true" {...placement}>
+    <defs><radialGradient id={light} cx="32%" cy="26%" r="80%">
+      <stop stopColor={`color-mix(in srgb, ${color}, white 44%)`} /><stop offset=".5" stopColor={color} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 31%)`} />
+    </radialGradient></defs>
+    {thingArt[t]}
+  </svg>;
+}
 
 /** Satu wadah berisi 10 benda. */
 function Pack({ thing, holder }: { thing: Thing; holder: Holder }) {
+  const light = useId();
   const grid = Array.from({ length: 10 }, (_, i) => [8 + (i % 5) * 13, holder === "gelas" ? 4 + Math.floor(i / 5) * 6 : 8 + Math.floor(i / 5) * 12]);
   const shell: Record<Holder, ReactNode> = {
-    keranjang: <path d="M2 30h72l-6 22H8z" fill="#c98a4b" stroke={ink} strokeWidth="1.4" strokeLinejoin="round" />,
-    kantong: <path d="M4 6h68l-4 46H8z" fill="#e0f2fe" fillOpacity=".6" stroke="#64748b" strokeWidth="1.4" strokeLinejoin="round" />,
-    kotak: <rect x="2" y="4" width="72" height="34" rx="4" fill="#3b2a20" stroke={ink} strokeWidth="1.4" />,
-    gelas: <path d="M14 22h48l-4 30H18z" fill="#e8559a" stroke={ink} strokeWidth="1.4" strokeLinejoin="round" />,
+    keranjang: <path d="M2 30h72l-6 22H8z" fill="var(--pack-finish, #c98a4b)" stroke={ink} strokeWidth="1.4" strokeLinejoin="round" />,
+    kantong: <path d="M4 6h68l-4 46H8z" fill="var(--pack-finish, #e0f2fe)" fillOpacity=".6" stroke="#64748b" strokeWidth="1.4" strokeLinejoin="round" />,
+    kotak: <rect x="2" y="4" width="72" height="34" rx="4" fill="var(--pack-finish, #3b2a20)" stroke={ink} strokeWidth="1.4" />,
+    gelas: <path d="M14 22h48l-4 30H18z" fill="var(--pack-finish, #e8559a)" stroke={ink} strokeWidth="1.4" strokeLinejoin="round" />,
   };
+  const color = { keranjang: "#c98a4b", kantong: "#e0f2fe", kotak: "#3b2a20", gelas: "#e8559a" }[holder];
   const front = holder === "keranjang" || holder === "gelas";
-  return <svg viewBox="0 0 76 56" className="h-12 w-16 sm:h-14 sm:w-[4.5rem]" aria-hidden="true">
+  return <svg viewBox="0 0 76 56" className="h-auto w-[4.5rem] sm:w-24 group-data-[evaluation=true]/quiz:h-auto group-data-[evaluation=true]/quiz:w-[calc((100%_-_0.75rem)/4)] sm:group-data-[evaluation=true]/quiz:w-28"
+    style={{ "--pack-finish": `url(#${light})` } as CSSProperties} aria-hidden="true">
+    <defs><linearGradient id={light}>
+      <stop stopColor={color} /><stop offset=".35" stopColor={`color-mix(in srgb, ${color}, white 35%)`} />
+      <stop offset="1" stopColor={`color-mix(in srgb, ${color}, black 30%)`} />
+    </linearGradient></defs>
     {!front && shell[holder]}
-    {grid.map(([x, y], i) => <svg key={i} x={holder === "gelas" ? 10 + (i % 5) * 11 : x - 6} y={holder === "keranjang" ? 14 + Math.floor(i / 5) * 8 : holder === "gelas" ? 0 + Math.floor(i / 5) * 6 : y - 4} width={holder === "gelas" ? 22 : 14} height={holder === "gelas" ? 26 : 14} viewBox="0 0 48 48">{thingArt[thing]}</svg>)}
+    {grid.map(([x, y], i) => <Icon key={i} t={thing} className="" x={holder === "gelas" ? 10 + (i % 5) * 11 : x - 6} y={holder === "keranjang" ? 14 + Math.floor(i / 5) * 8 : holder === "gelas" ? 0 + Math.floor(i / 5) * 6 : y - 4} width={holder === "gelas" ? 22 : 14} height={holder === "gelas" ? 26 : 14} />)}
     {front && shell[holder]}
   </svg>;
 }
 function Packs({ thing, holder, packs, loose }: { thing: Thing; holder: Holder; packs: number; loose: number }) {
-  return <div className="space-y-2" role="img" aria-label={`${packs} ${holderName[holder]} masing-masing berisi 10 ${thingName[thing]}${loose ? ` dan ${loose} ${thingName[thing]} lepas` : ""}`}>
+  return <div className="space-y-2 group-data-[evaluation=true]/quiz:w-full" role="img" aria-label={`${packs} ${holderName[holder]} masing-masing berisi 10 ${thingName[thing]}${loose ? ` dan ${loose} ${thingName[thing]} lepas` : ""}`}>
     <div className="flex flex-wrap gap-1">{Array.from({ length: packs }, (_, i) => <Pack key={i} thing={thing} holder={holder} />)}</div>
-    {loose > 0 && <div className="flex max-w-xs flex-wrap gap-0.5">{Array.from({ length: loose }, (_, i) => <Icon key={i} t={thing} className="size-6" />)}</div>}
+    {loose > 0 && <div className="flex max-w-xs flex-wrap gap-0.5">{Array.from({ length: loose }, (_, i) => <Icon key={i} t={thing} className="size-6 group-data-[evaluation=true]/quiz:size-8 sm:group-data-[evaluation=true]/quiz:size-11" />)}</div>}
   </div>;
 }
 function Scatter({ thing, n }: { thing: Thing; n: number }) {
@@ -51,7 +74,7 @@ function Scatter({ thing, n }: { thing: Thing; n: number }) {
   const cols = 12, rows = Math.ceil((n * 1.35) / cols), cells = cols * rows;
   const pos = Array.from({ length: n }, (_, i) => (i * 7 + 3) % cells).map((c, i) => [(c % cols) * 10 + 1 + ((i * 37) % 3), Math.floor(c / cols) * 10 + 1 + ((i * 53) % 3)]);
   const W = cols * 10 + 4, Hh = rows * 10 + 4;
-  return <div className="w-full max-w-md space-y-1">
+  return <div className="w-full max-w-md space-y-1 group-data-[evaluation=true]/quiz:max-w-none">
     <div className="relative w-full" style={{ aspectRatio: `${W} / ${Hh}` }}>
       {pos.map(([x, y], i) => <button key={i} type="button" aria-label={`Tandai benda ${i + 1}`} aria-pressed={marked.includes(i)} onClick={() => setMarked(m => m.includes(i) ? m.filter(z => z !== i) : [...m, i])}
         className={`absolute grid place-items-center rounded-full ${marked.includes(i) ? "bg-warning/60 ring-2 ring-warning" : ""}`} style={{ left: `${(x / W) * 100}%`, top: `${(y / Hh) * 100}%`, width: "7%", aspectRatio: "1" }}><Icon t={thing} className="size-full" /></button>)}
@@ -62,7 +85,7 @@ function Scatter({ thing, n }: { thing: Thing; n: number }) {
 const Dragonfly = ({ className }: { className?: string }) => <svg viewBox="0 0 48 48" className={className} aria-hidden="true"><path d="M24 14v28" stroke="#2f86d6" strokeWidth="4" strokeLinecap="round" /><circle cx="24" cy="11" r="4" fill="#2f86d6" {...o} /><ellipse cx="13" cy="18" rx="11" ry="4" fill="#bfe3f7" {...o} /><ellipse cx="35" cy="18" rx="11" ry="4" fill="#bfe3f7" {...o} /><ellipse cx="14" cy="25" rx="9" ry="3.4" fill="#bfe3f7" {...o} /><ellipse cx="34" cy="25" rx="9" ry="3.4" fill="#bfe3f7" {...o} /></svg>;
 function Strip({ from, to, animal, at, reveal = false }: { from: number; to: number; animal: "kupu" | "capung"; at: number; reveal?: boolean }) {
   return <div className="flex max-w-full flex-wrap gap-0.5" role="img" aria-label={`Garis bilangan ${from} sampai ${to} dengan ${animal === "kupu" ? "kupu-kupu" : "capung"} di salah satu kotak`}>
-    {Array.from({ length: to - from + 1 }, (_, i) => from + i).map(n => <span key={n} className={`grid h-10 w-9 place-items-center rounded-md border text-sm font-bold ${n === at ? "border-warning bg-warning/20" : "border-purple-200 bg-purple-50"}`}>
+    {Array.from({ length: to - from + 1 }, (_, i) => from + i).map(n => <span key={n} className={`grid h-10 w-9 group-data-[evaluation=true]/quiz:h-12 group-data-[evaluation=true]/quiz:w-11 place-items-center rounded-md border text-sm font-bold ${n === at ? "border-warning bg-warning/20" : "border-purple-200 bg-purple-50"}`}>
       {n === at && !reveal ? (animal === "kupu" ? <svg viewBox="0 0 48 48" className="size-8" aria-hidden="true">{objectArtNodes.butterfly}</svg> : <Dragonfly className="size-8" />) : n}</span>)}
   </div>;
 }
@@ -247,7 +270,7 @@ export default function GradeTwoCounting100() {
       </> : <GradeFourQuiz<CQuestion> key={`${mode}-${topic}`}
         questions={mode === "practice" ? practice[topic] : assessment}
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 7"}
-        practiceMode={mode === "practice"} close={() => setMode("learn")}
+        practiceMode={mode === "practice"} expanded={mode === "assessment"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
         renderVisual={q => q.scene ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><SceneView key={q.prompt} scene={q.scene} /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}

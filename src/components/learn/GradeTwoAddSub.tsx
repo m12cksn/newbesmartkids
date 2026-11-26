@@ -160,15 +160,20 @@ const labs = [AddLab, SubLab, StoryLab];
 /* ====================================================================== */
 /* Gambar soal                                                             */
 /* ====================================================================== */
-function SceneView({ scene }: { scene: Scene }) {
+function SceneView({ scene, expanded = false }: { scene: Scene; expanded?: boolean }) {
+  if (expanded && scene.type === "groups") return <div className="w-full space-y-4">{scene.groups.map(gr => <div key={gr.who} className="space-y-1">
+    <p className="font-bold">{gr.who}</p>
+    {gr.n === null ? <span className="grid size-12 place-items-center rounded-lg border-2 border-dashed border-orange-400 text-xl font-extrabold" aria-label="Belum diketahui">?</span>
+      : <span role="img" aria-label={`${gr.n} gambar`} className="flex flex-wrap gap-1 sm:gap-2">{Array.from({ length: gr.n }, (_, i) => <ThingArt key={i} t={gr.thing} dimensional className="size-12 shrink-0 sm:size-16" />)}</span>}
+  </div>)}</div>;
   if (scene.type === "groups") return <div className="w-full max-w-xl space-y-2">{scene.groups.map(gr => <div key={gr.who} className="flex items-center gap-2">
     <span className="w-24 shrink-0 text-xs font-bold sm:text-sm">{gr.who}</span>
     {gr.n === null ? <span className="grid h-9 w-12 place-items-center rounded-lg border-2 border-dashed border-orange-400 text-lg font-extrabold" aria-label="Belum diketahui">?</span>
       : <span role="img" aria-label={`${gr.n} gambar`} className="flex flex-wrap gap-0.5">{Array.from({ length: gr.n }, (_, i) => <ThingArt key={i} t={gr.thing} className="size-6 sm:size-7" />)}</span>}
   </div>)}</div>;
-  return <div className="space-y-2 text-sm">
+  return <div className={expanded ? "w-full space-y-3 text-base" : "space-y-2 text-sm"}>
     <div className="flex flex-wrap gap-4">{scene.legend.map(l => <span key={l.shape} className="flex items-center gap-1"><ShapeArt s={l.shape} className="size-6" />bernilai {l.value}</span>)}</div>
-    <div role="img" aria-label={scene.row.join(", ")} className="flex flex-wrap gap-2">{scene.row.map((s, i) => <ShapeArt key={i} s={s} className="size-10" />)}</div>
+    <div role="img" aria-label={scene.row.join(", ")} className="flex flex-wrap gap-2">{scene.row.map((s, i) => <ShapeArt key={i} s={s} className={expanded ? "size-12 sm:size-14" : "size-10"} />)}</div>
   </div>;
 }
 
@@ -331,9 +336,9 @@ export default function GradeTwoAddSub() {
       </> : <GradeFourQuiz<AQuestion> key={`${mode}-${topic}`}
         questions={mode === "practice" ? practice[topic] : assessment}
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 2"}
-        practiceMode={mode === "practice"} close={() => setMode("learn")}
+        practiceMode={mode === "practice"} expanded={mode !== "practice"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
-        renderAnswer={(q, value, record, checked) => <QuizFitLayout visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
+        renderAnswer={(q, value, record, checked) => <QuizFitLayout expanded={mode !== "practice"} visual={q.scene ? <SceneView key={q.prompt} scene={q.scene} expanded={mode !== "practice"} /> : null}><Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} /></QuizFitLayout>}
         checkAnswer={correct} isReady={ready} formatAnswer={formatAnswer} />}
     </div>
   </section>;

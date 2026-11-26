@@ -10,8 +10,8 @@ import {
 } from "@/data/grade-two-fractions";
 
 function FigView({ fig, big = false }: { fig: Fig; big?: boolean }) {
-  if (fig.t === "frac") return <FracFig base={fig.base} lines={fig.lines} shaded={fig.shaded} className={big ? "size-36" : "size-20"} />;
-  if (fig.t === "groups") return <GroupsFig obj={fig.obj} a={fig.a} b={fig.b} obj2={fig.obj2} size={big ? "size-7" : "size-5"} />;
+  if (fig.t === "frac") return <FracFig base={fig.base} lines={fig.lines} shaded={fig.shaded} className={big ? "size-36 max-w-full group-data-[evaluation=true]/quiz:size-72" : "size-20 max-w-full group-data-[evaluation=true]/quiz:size-28"} />;
+  if (fig.t === "groups") return <GroupsFig obj={fig.obj} a={fig.a} b={fig.b} obj2={fig.obj2} size={big ? "size-7 group-data-[evaluation=true]/quiz:size-11" : "size-5 group-data-[evaluation=true]/quiz:size-9"} />;
   return <SetFig obj={fig.obj} n={fig.n} />;
 }
 const nameOf = (share: number, equal: boolean, n: number) => !equal ? "bukan" : Math.abs(share - 0.5) < 0.005 ? "setengah" : Math.abs(share - 0.25) < 0.005 ? "seperempat" : n === 0 ? "kosong" : "lain";
@@ -132,23 +132,23 @@ function FoldPart({ p, value, set, checked }: { p: Extract<Part, { kind: "fold" 
     <p className="text-xs text-base-content/60">Pilih Tarik garis, lalu ketuk garis putus-putus yang ingin kamu tarik. Setelah itu pilih Warnai dan ketuk satu bagian.</p>
     <ModeToggle mode={mode} setMode={setMode} disabled={checked} />
     <div className="grid place-items-center"><FoldBoard mode={mode} base={p.base} guides={p.guides} chosen={r.lines} shaded={r.shaded === null ? [] : [r.shaded]} disabled={checked}
-      onGuide={g => set(enc(r.lines.includes(g) ? r.lines.filter(x => x !== g) : [...r.lines, g], null))} onPiece={i => set(enc(r.lines, i))} /></div>
+      className="w-full max-w-64 group-data-[evaluation=true]/quiz:max-w-96" onGuide={g => set(enc(r.lines.includes(g) ? r.lines.filter(x => x !== g) : [...r.lines, g], null))} onPiece={i => set(enc(r.lines, i))} /></div>
     <p role="status" className="text-center text-sm font-semibold">{r.lines.length ? `${r.ps.length} bagian, ${equalParts(r.ps) ? "sama besar" : "tidak sama besar"}.` : "Belum ada garis."}</p>
   </div>;
 }
 function PickPart({ p, value, set, checked }: { p: Extract<Part, { kind: "pick" }>; value: string; set: (v: string) => void; checked: boolean }) {
   const sel = value ? value.split(",").filter(Boolean).map(Number) : [];
   return <div className="space-y-2"><p className="text-xs text-base-content/60">Ketuk benda untuk {p.mode === "warnai" ? "mewarnainya" : "melingkarinya"}. Ketuk lagi untuk membatalkan. Terpilih {sel.length}.</p>
-    <div className="flex max-w-md flex-wrap gap-1.5">{Array.from({ length: p.n }, (_, k) => { const on = sel.includes(k); return <button key={k} type="button" disabled={checked} aria-label={`${p.label} ${k + 1}`} aria-pressed={on}
+    <div className="flex max-w-md flex-wrap gap-1.5 group-data-[evaluation=true]/quiz:max-w-full">{Array.from({ length: p.n }, (_, k) => { const on = sel.includes(k); return <button key={k} type="button" disabled={checked} aria-label={`${p.label} ${k + 1}`} aria-pressed={on}
       onClick={() => set((on ? sel.filter(x => x !== k) : [...sel, k]).sort((a, b) => a - b).join(","))}
-      className={`rounded-full p-1 ${on ? (p.mode === "lingkari" ? "ring-[3px] ring-error" : "bg-warning/50") : ""}`}><span className={!on && p.mode === "warnai" ? "block opacity-45 grayscale" : "block"}><ObjIcon obj={p.obj} className="size-9" /></span></button>; })}</div></div>;
+      className={`rounded-full p-1 ${on ? (p.mode === "lingkari" ? "ring-[3px] ring-error" : "bg-warning/50") : ""}`}><span className={!on && p.mode === "warnai" ? "block opacity-45 grayscale" : "block"}><ObjIcon obj={p.obj} className="size-9 group-data-[evaluation=true]/quiz:size-12 sm:group-data-[evaluation=true]/quiz:size-16" /></span></button>; })}</div></div>;
 }
 function SharePart({ p, value, set, checked }: { p: Extract<Part, { kind: "share" }>; value: string; set: (v: string) => void; checked: boolean }) {
   const [a, b] = value ? value.split(",").map(Number) : [0, 0], left = p.n - a - b;
   return <div className="space-y-2">
-    <div className="flex min-h-10 flex-wrap gap-0.5 rounded-xl bg-base-200/60 p-2" aria-label={`Sisa ${left}`}>{Array.from({ length: left }, (_, i) => <ObjIcon key={i} obj={p.obj} className="size-7" />)}{!left && <span className="text-sm text-base-content/60">Semua sudah dibagikan.</span>}</div>
+    <div className="flex min-h-10 flex-wrap gap-0.5 rounded-xl bg-base-200/60 p-2" aria-label={`Sisa ${left}`}>{Array.from({ length: left }, (_, i) => <ObjIcon key={i} obj={p.obj} className="size-7 group-data-[evaluation=true]/quiz:size-12" />)}{!left && <span className="text-sm text-base-content/60">Semua sudah dibagikan.</span>}</div>
     <div className="grid grid-cols-2 gap-2">{p.boxes.map((bx, k) => { const c = k ? b : a; return <div key={bx} className="rounded-xl border-2 border-dashed border-info/50 bg-info/5 p-2 text-center">
-      <p className="text-sm font-bold">{bx}: {c}</p><div className="mt-1 flex min-h-8 flex-wrap justify-center gap-0.5">{Array.from({ length: c }, (_, i) => <ObjIcon key={i} obj={p.obj} className="size-5" />)}</div>
+      <p className="text-sm font-bold">{bx}: {c}</p><div className="mt-1 flex min-h-8 flex-wrap justify-center gap-0.5">{Array.from({ length: c }, (_, i) => <ObjIcon key={i} obj={p.obj} className="size-5 group-data-[evaluation=true]/quiz:size-9" />)}</div>
       <div className="mt-1 flex justify-center gap-1">
         <button type="button" disabled={checked || !left} aria-label={`Masukkan ke ${bx}`} className="btn btn-xs btn-info" onClick={() => set(k ? `${a},${b + 1}` : `${a + 1},${b}`)}><Plus className="size-3.5" aria-hidden="true" /></button>
         <button type="button" disabled={checked || !c} aria-label={`Ambil dari ${bx}`} className="btn btn-xs btn-outline" onClick={() => set(k ? `${a},${b - 1}` : `${a - 1},${b}`)}><Minus className="size-3.5" aria-hidden="true" /></button>
@@ -181,7 +181,7 @@ function PartView({ p, i, value, set, checked }: { p: Part; i: number; value: st
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{p.options.map((o, k) => <button key={o} type="button" aria-label={o} aria-pressed={value === o} disabled={checked} onClick={() => set(o)}
         className={`flex flex-col items-center gap-1 rounded-xl border-2 p-2 font-bold ${value === o ? "border-success bg-success/10" : "border-base-300 bg-base-100 hover:border-success/40"}`}>{p.figs && <FigView fig={p.figs[k]} />}<span>{o}</span></button>)}</div></div>;
     case "shade": { const sel = value ? value.split(",").filter(Boolean).map(Number) : []; return <div className="space-y-1"><p className="text-xs text-base-content/60">Ketuk bagian untuk mewarnainya. Ketuk lagi untuk menghapus warna.</p>
-      <div className="grid place-items-center"><FracFig base={p.base} lines={p.lines} shaded={sel} label={p.label} className="w-full max-w-60" onTap={k => !checked && set((sel.includes(k) ? sel.filter(x => x !== k) : [...sel, k]).sort((a, b) => a - b).join(","))} /></div></div>; }
+      <div className="grid place-items-center"><FracFig base={p.base} lines={p.lines} shaded={sel} label={p.label} className="w-full max-w-60 group-data-[evaluation=true]/quiz:max-w-96" onTap={k => !checked && set((sel.includes(k) ? sel.filter(x => x !== k) : [...sel, k]).sort((a, b) => a - b).join(","))} /></div></div>; }
     case "fold": return <FoldPart p={p} value={value} set={set} checked={checked} />;
     case "mark": { const vals = Array.from({ length: p.items.length }, (_, k) => value.split(",")[k] ?? ""); const put = (k: number, m: string) => { const v = [...vals]; v[k] = m; set(v.join(",")); };
       return <div className="grid gap-2 sm:grid-cols-2">{p.items.map((it, k) => <div key={k} className="flex min-w-0 items-center gap-2 rounded-xl border border-base-300 bg-base-100 p-2">
@@ -249,7 +249,7 @@ export default function GradeTwoFractions() {
       </> : <GradeFourQuiz<FQuestion> key={`${mode}-${topic}`}
         questions={mode === "practice" ? practice[topic] : assessment}
         title={mode === "practice" ? `Latihan ${t.code}. ${t.short}` : "Evaluasi Bab 5"}
-        practiceMode={mode === "practice"} close={() => setMode("learn")}
+        practiceMode={mode === "practice"} expanded={mode === "assessment"} close={() => setMode("learn")}
         renderMeta={q => q.level && <p className="text-xs font-bold"><span className={`badge badge-sm ${q.level === "Sedang" ? "badge-info" : q.level === "Menantang" ? "badge-warning" : "badge-error"}`}>{q.level}</span></p>}
         renderVisual={q => q.fig ? <div className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-3"><FigView fig={q.fig} big /></div> : null}
         renderAnswer={(q, value, record, checked) => <Answer key={q.prompt + q.answer} q={q} value={value} record={record} checked={checked} />}

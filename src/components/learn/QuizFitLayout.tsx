@@ -6,7 +6,11 @@ import type { ReactNode } from "react";
  * - Gambar dibatasi tingginya (SVG paling tinggi 24vh di HP, 42vh di layar lebar), sehingga jawaban tetap terlihat.
  * - Layar pendek (tinggi ≤ 700 px): gambar dan jawaban sedikit diperkecil.
  */
-export function QuizFitLayout({ visual, children }: { visual?: ReactNode; children: ReactNode }) {
+export function QuizFitLayout({ visual, children, expanded = false }: { visual?: ReactNode; children: ReactNode; expanded?: boolean }) {
+  if (expanded) return <div className="space-y-4">
+    {visual && <div data-testid="quiz-visual" className="flex min-w-0 justify-center rounded-xl bg-base-200/60 p-2 sm:p-4">{visual}</div>}
+    <div className="min-w-0 text-base leading-relaxed [&_.text-xs]:text-sm [&_.text-sm]:text-base">{children}</div>
+  </div>;
   if (!visual) return <div className="[@media(max-height:700px)]:[zoom:0.86]">{children}</div>;
   return <div className="space-y-2 sm:grid sm:grid-cols-2 sm:items-start sm:gap-3 sm:space-y-0">
     <div data-testid="quiz-visual" className="flex min-w-0 justify-center overflow-x-auto rounded-xl bg-base-200/60 p-1.5 sm:p-2 [&_td]:py-0.5 [&_th]:py-0.5 [&_svg]:max-h-[24vh] sm:[&_svg]:max-h-[42vh] [@media(max-height:700px)]:[zoom:0.8] [@media(max-height:700px)]:[&_svg]:max-h-[34vh]">{visual}</div>
