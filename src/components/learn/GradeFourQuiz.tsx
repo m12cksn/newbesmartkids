@@ -40,6 +40,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [checked, setChecked] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const question = questions[index];
   const answer = answers[index] ?? "";
   const selected = answer ? answer.split("|") : [];
@@ -53,8 +54,20 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
   }]);
   const score = questions.length - incorrect.length;
   const record = (value: string) => setAnswers(old => ({ ...old, [index]: value }));
-  const go = (i: number) => { setChecked(false); setIndex(i); };
+  const go = (i: number) => {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    advanceTimer.current = null;
+    setChecked(false);
+    setIndex(i);
+  };
+  const checkEvaluation = () => {
+    setChecked(true);
+    advanceTimer.current = setTimeout(() => go(index + 1), 1200);
+  };
   useEffect(() => { heading.current?.focus(); }, [index]);
+  useEffect(() => () => {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+  }, []);
 
   return <section className="mx-auto max-w-2xl space-y-3 rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6">
     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -85,10 +98,14 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
       {practiceMode && checked && <p role="status" className="rounded-lg bg-info/10 p-3">
         <strong>{checkAnswer(question, answer) ? label("Tepat! ", "Correct! ") : label("Belum tepat. ", "Not quite. ")}</strong>{renderText(question.explanation)}
       </p>}
+      {!practiceMode && checked && <p role="status" className={`rounded-lg p-3 font-bold ${checkAnswer(question, answer) ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
+        {checkAnswer(question, answer) ? label("Benar.", "Correct.") : label("Salah.", "Incorrect.")}
+      </p>}
       <div className="flex flex-wrap justify-between gap-2">
         {index > 0 && <button className="btn btn-ghost btn-sm" onClick={() => go(index - 1)}>{label('← Sebelumnya', '← Previous')}</button>}
         {practiceMode && !checked ? <button className="btn btn-success ms-auto" disabled={!ready} onClick={() => setChecked(true)}>{label('Periksa jawaban', 'Check answer')}</button>
-          : ready && <button className="btn btn-success ms-auto" onClick={() => go(index + 1)}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>}
+          : practiceMode && ready ? <button className="btn btn-success ms-auto" onClick={() => go(index + 1)}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>
+          : !checked && ready && <button className="btn btn-success ms-auto" onClick={checkEvaluation}>{index + 1 === questions.length ? label("Lihat hasil", "View results") : label("Lanjut →", "Next →")}</button>}
       </div>
     </> : <>
       <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold">{practiceMode ? label("Latihan selesai", "Practice complete") : label("Hasil evaluasi", "Assessment results")}</h2>
