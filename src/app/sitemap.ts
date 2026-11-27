@@ -11,6 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...classes.map(c => page(`/kelas/${c.slug}`, 0.8, "weekly")),
     ...materials.flatMap(m => { const c = classes.find(x => x.id === m.classId); return c ? [page(`/kelas/${c.slug}/materi/${m.slug}`, 0.7)] : []; }),
     ...[1, 2, 3].flatMap(l => [page(`/mastering-penjumlahan-pengurangan/level-${l}`, 0.5, "weekly"), page(`/mastering-perkalian-pembagian/level-${l}`, 0.5, "weekly")]),
-    page("/mastering-berhitung-bersusun", 0.5, "weekly"), ...[1, 2, 3].map(l => page(`/mastering-jarimatika/level-${l}`, 0.5, "weekly")), ...[1, 2, 3].map(l => page(`/mastering-pembagian-garis/level-${l}`, 0.5, "weekly")), page("/panduan", 0.5), page("/kebijakan-privasi", 0.2, "yearly"), page("/syarat-layanan", 0.2, "yearly"),
+    page("/mastering-berhitung-bersusun", 0.5, "weekly"), ...[1, 2, 3].map(l => page(`/mastering-jarimatika/level-${l}`, 0.5, "weekly")), ...[1, 2, 3].map(l => page(`/mastering-pembagian-garis/level-${l}`, 0.5, "weekly")), page("/panduan", 0.5), page("/affiliate", 0.4), page("/kebijakan-privasi", 0.2, "yearly"), page("/syarat-layanan", 0.2, "yearly"),
   ];
 }

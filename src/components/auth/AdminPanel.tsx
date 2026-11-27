@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, Copy, FileText, KeyRound, LogOut, MessageCircle, Pencil, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
+import { BellRing, Copy, HandCoins, FileText, KeyRound, LogOut, MessageCircle, Pencil, Plus, RefreshCw, Search, UserX, UserCheck, CalendarPlus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fmtDate } from "./AccountPanel";
@@ -105,7 +105,7 @@ export function AdminPanel() {
   const shown = useMemo(() => (list ?? []).filter(a => !q || `${a.username} ${a.displayName} ${a.phone} ${a.note}`.toLowerCase().includes(q.toLowerCase())), [list, q]);
 
   return <section className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
-    <div><h1 className="text-3xl font-extrabold">Kelola akun</h1><p className="mt-1 text-sm text-base-content/70">Buat akun setelah pembayaran di Scalev masuk, lalu kirim username dan PIN ke pembeli.</p></div>
+    <div className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="text-3xl font-extrabold">Kelola akun</h1><p className="mt-1 text-sm text-base-content/70">Buat akun setelah pembayaran di Scalev masuk, lalu kirim username dan PIN ke pembeli.</p></div><Link href="/admin/affiliate" className="btn btn-outline btn-sm gap-1"><HandCoins className="size-4" aria-hidden="true" />Affiliate</Link></div>
     {error && <p role="alert" className="rounded-lg bg-error/10 p-3 text-sm font-semibold text-error">{error}</p>}
 
     <OrderForm onCreated={() => void load()} />
