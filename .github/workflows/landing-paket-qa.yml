@@ -1,0 +1,39 @@
+name: Landing Paket QA
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "public/landing/**"
+      - "scripts/landing/**"
+      - "scripts/build-landing-paket.mjs"
+      - "scripts/smoke-landing-paket.mjs"
+      - ".github/workflows/landing-paket-qa.yml"
+  push:
+    branches: [master]
+    paths:
+      - "public/landing/**"
+      - "scripts/landing/**"
+      - "scripts/build-landing-paket.mjs"
+      - "scripts/smoke-landing-paket.mjs"
+  workflow_dispatch:
+jobs:
+  landing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA (aset sinkron dengan sumber, urutan bagian, form tanpa email, QRIS bawaan)
+        run: node scripts/smoke-landing-paket.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: landing-paket-screenshots
+          path: /tmp/landing-paket-screenshots
+          if-no-files-found: ignore
