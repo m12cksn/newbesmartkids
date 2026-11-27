@@ -60,6 +60,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
     expected: formatAnswer ? formatAnswer(q, q.answer) : q.answer.replaceAll("|", ", "),
     explanation: q.explanation,
     correct: checkAnswer(q, answers[i]),
+    options: q.options,
   }));
   const incorrect = results.filter(item => !item.correct);
   const score = questions.length - incorrect.length;
@@ -142,7 +143,7 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
                   className={`${questionCircle} ${questionTone(correct)}`}>{number}</button></li>;
           })}
       </EvaluationQuestionMap>}
-      {!retry && <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} incorrect={incorrect} />}
+      {!retry && <SaveResult kind={practiceMode ? "latihan" : "evaluasi"} part={title} correct={score} total={questions.length} incorrect={incorrect} review={!practiceMode ? results : undefined} />}
       {showReview && <details id={reviewId} ref={review} hidden={incorrect.length === 0 && !selectedResult} onToggle={event => {
         if (!event.currentTarget.open) setReviewNumber(null);
       }} className="scroll-mt-24 rounded-lg bg-base-200 p-3">
