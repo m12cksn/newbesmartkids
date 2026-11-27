@@ -183,14 +183,16 @@ h4 {
 .account-grid { position: absolute; inset: 0; opacity: .6; background-image: linear-gradient(rgb(32 143 109 / .05) 1px, transparent 1px), linear-gradient(90deg, rgb(32 143 109 / .05) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent); }
 .account-hero { animation: bsk-pop-in .65s cubic-bezier(.2,.8,.2,1) both; }
 .account-hero-orbit { animation: account-orbit 36s linear infinite; transform-origin: center; }
-.account-stat-card { border: 1px solid rgb(255 255 255 / .14); border-radius: 1.25rem; background: rgb(255 255 255 / .08); padding: 1rem; backdrop-filter: blur(8px); transition: transform .2s ease, background-color .2s ease; }
-.account-stat-card:hover { transform: translateY(-4px); background: rgb(255 255 255 / .13); }
-.account-stat-icon { display: inline-flex; border-radius: .75rem; background: rgb(183 239 197 / .14); padding: .6rem; color: #b7efc5; }
+.account-class-preview { overflow: hidden; border: 1px solid rgb(23 53 42 / .12); border-radius: 1.25rem; background: #fff; box-shadow: 0 8px 0 rgb(23 53 42 / .12), 0 18px 30px -18px rgb(23 53 42 / .35); transition: transform .25s ease, box-shadow .25s ease; }
+.account-class-preview:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 11px 0 rgb(23 53 42 / .12), 0 24px 36px -18px rgb(23 53 42 / .4); }
+.account-stat-card { border: 1px solid rgb(23 53 42 / .12); border-radius: 1.1rem; background: rgb(255 255 255 / .72); padding: .85rem; backdrop-filter: blur(8px); transition: transform .2s ease, background-color .2s ease; }
+.account-stat-card:hover { transform: translateY(-3px); background: rgb(255 255 255 / .95); }
+.account-stat-icon { display: inline-flex; border-radius: .75rem; background: rgb(32 143 109 / .12); padding: .55rem; color: #208f6d; }
 .account-info-panel, .account-tip-panel { border: 1px solid var(--color-base-300); border-radius: 1.25rem; background: var(--color-base-100); padding: 1.25rem; box-shadow: 0 8px 24px -24px rgb(23 53 42 / .7); }
 .account-tip-panel { background: linear-gradient(135deg, #fff 0%, #fffaf0 100%); }
 @media (prefers-reduced-motion: reduce) {
   .account-math, .account-hero, .account-hero-orbit { animation: none !important; }
-  .account-stat-card { transition: none; }
+  .account-class-preview, .account-stat-card { transition: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
