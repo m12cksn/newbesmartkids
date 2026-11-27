@@ -35,7 +35,7 @@ export function ResultHistory() {
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">{list.map(g => {
         const best = g.evals.length ? Math.max(...g.evals.map(e => e.score)) : null, last = g.evals[0], kelas = classOf(g.path);
         const avg = g.practices.length ? Math.round(g.practices.reduce((a, p) => a + p.score, 0) / g.practices.length) : null;
-        return <li key={g.path} className="rounded-md border border-base-300 bg-base-100 p-4">
+        return <li key={g.path} className="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-[0_8px_24px_-24px_rgba(23,53,42,.7)] transition-transform hover:-translate-y-0.5">
           <p className="text-xs font-semibold text-base-content/60">{kelas ? `Kelas ${kelas}` : "Latihan harian"}</p>
           <Link href={g.path} className="mt-0.5 block font-extrabold leading-snug hover:underline">{g.title || "Bab"}</Link>
           <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
@@ -45,7 +45,7 @@ export function ResultHistory() {
           <p className="mt-2 text-xs text-base-content/60">{last ? `Evaluasi terakhir ${fmtDate(last.at)}: ${last.score}/100 (${g.evals.length}× dikerjakan).` : "Evaluasi belum dikerjakan."} Latihan selesai {g.practices.length}×.</p>
         </li>; })}</ul>
       <h3 className="mt-8 flex items-center gap-1.5 text-lg font-bold"><BookOpenCheck className="size-5 text-success" aria-hidden="true" />Aktivitas terbaru</h3>
-      <ol className="mt-2 divide-y divide-base-300 rounded-md border border-base-300 bg-base-100 text-sm">{results.slice(0, 10).map((r, i) => <li key={r.id ?? i}>
+      <ol className="mt-3 divide-y divide-base-300 overflow-hidden rounded-2xl border border-base-300 bg-base-100 text-sm shadow-[0_8px_24px_-24px_rgba(23,53,42,.7)]">{results.slice(0, 10).map((r, i) => <li key={r.id ?? i}>
         {r.kind === "evaluasi" && r.id ? <Link href={`/akun/hasil/${r.id}`} prefetch={false} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-success">
           <span className="min-w-0 break-words">
             <span className="font-semibold">{r.part || "Evaluasi"}</span>
