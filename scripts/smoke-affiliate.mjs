@@ -54,6 +54,13 @@ try {
   await other.page.getByLabel(/setuju dengan ketentuan/).check(); await other.page.getByRole("button", { name: "Daftar dan dapatkan link" }).click();
   await other.page.getByText("sudah terdaftar sebagai affiliate").waitFor(); await other.ctx.close();
 
+  // E-wallet yang sama boleh didaftarkan (bisa saja satu keluarga), tetapi admin diberi tanda sebelum membayar.
+  const dua = await open(390);
+  await dua.page.goto(`${origin}/affiliate`); await dua.page.getByLabel("Nama lengkap").fill("Bunda Sinta"); await dua.page.getByRole("textbox", { name: "Nomor WhatsApp" }).fill("081255550000");
+  await dua.page.getByLabel(/Nomor e-wallet sama dengan/).uncheck(); await dua.page.getByLabel("Nomor e-wallet", { exact: true }).fill("081299990000");
+  await dua.page.getByLabel(/setuju dengan ketentuan/).check(); await dua.page.getByRole("button", { name: "Daftar dan dapatkan link" }).click();
+  const sintaCode = (await dua.page.getByTestId("aff-code").textContent()).trim(); await dua.ctx.close();
+
   // 3. Link /r/KODE (huruf kecil pun) meneruskan ke halaman penjualan dengan UTM affiliate.
   const visitor = await open(390);
   await visitor.page.goto(`${origin}/r/${code.toLowerCase()}`); await visitor.page.getByRole("heading", { name: "Halaman penjualan tiruan" }).waitFor();
@@ -84,12 +91,14 @@ try {
   await adm.page.goto(`${origin}/masuk?lanjut=/admin`); await login(adm.page, "admin", "111111"); await adm.page.waitForURL(/\/admin$/);
   await adm.page.getByRole("link", { name: "Affiliate", exact: true }).click(); await adm.page.waitForURL(/\/admin\/affiliate$/);
   await adm.page.getByTestId("payout-request").filter({ hasText: "Rp76.546" }).waitFor();
-  await adm.page.getByTestId("affiliate-row").filter({ hasText: code }).waitFor();
+  await adm.page.getByTestId("payout-request").getByTestId("wallet-ganda").filter({ hasText: sintaCode }).waitFor();
+  assert.equal(await adm.page.getByTestId("affiliate-row").getByTestId("wallet-ganda").count(), 2, "kedua affiliate dengan e-wallet sama diberi tanda");
+  const barisRina = adm.page.getByTestId("affiliate-row").filter({ has: adm.page.getByText(code, { exact: true }) }); await barisRina.waitFor();
   await adm.page.getByRole("button", { name: "Sinkronkan pesanan Scalev" }).click(); await adm.page.getByText(/Sinkron selesai/).waitFor();
   await fit(adm.page, "admin affiliate"); await adm.page.screenshot({ path: `${folder}/1280-admin-affiliate.png`, fullPage: true });
   await adm.page.getByRole("button", { name: "Sudah dibayar" }).click();
   await adm.page.getByText("Tidak ada pengajuan yang menunggu.").waitFor();
-  await adm.page.getByTestId("affiliate-row").filter({ hasText: "Rp76.546" }).waitFor();
+  await barisRina.filter({ hasText: "Rp76.546" }).waitFor();
   await adm.ctx.close();
 
   // 7. Akun pembeli yang sudah ada mengaktifkan affiliate dari halaman akun.
