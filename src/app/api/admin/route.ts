@@ -51,6 +51,9 @@ export async function POST(request: NextRequest) {
       case "disable": return NextResponse.json(await rpc("bsk_admin_set_disabled", { p_token: token, p_account: id, p_disabled: b.disabled === true }));
       case "report": return NextResponse.json(await rpc("bsk_admin_report", { p_token: token, p_account: id }));
       case "logout": return NextResponse.json(await rpc("bsk_admin_logout_devices", { p_token: token, p_account: id }));
+      case "affiliates": return NextResponse.json(await rpc("bsk_admin_affiliates", { p_token: token }));
+      case "payout": return NextResponse.json(await rpc("bsk_admin_payout_decide", { p_token: token, p_payout: str(b.payout, 40), p_status: b.status === "paid" ? "paid" : "rejected", p_note: str(b.note, 200) }));
+      case "affiliateStatus": return NextResponse.json(await rpc("bsk_admin_affiliate_status", { p_token: token, p_account: id, p_status: b.status === "blocked" ? "blocked" : "active" }));
       default: return NextResponse.json({ error: "bad_action" }, { status: 400 });
     }
   } catch (e) {

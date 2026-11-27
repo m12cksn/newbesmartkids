@@ -63,9 +63,75 @@ const fns = {
   bsk_admin_reset_pin: ({ p_token, p_account }) => { admin(p_token); const a = byId(p_account); a.pin = pin(); for (const [t, s] of sessions) if (s.username === a.username) sessions.delete(t); return { username: a.username, pin: a.pin }; },
   bsk_admin_set_disabled: ({ p_token, p_account, p_disabled }) => { admin(p_token); const a = byId(p_account); a.disabled = p_disabled; return pub(a); },
   bsk_admin_logout_devices: ({ p_token, p_account }) => { admin(p_token); const a = byId(p_account); for (const [t, s] of sessions) if (s.username === a.username) sessions.delete(t); return pub(a); },
+
+  // ---------- Affiliate ----------
+  ...(() => {
+    const affs = new Map(); // accountId -> affiliate
+    const clicks = new Map(); // accountId -> n
+    const comms = new Map(); // orderId -> commission
+    const payouts = []; let lastSync = null;
+    const norm = p => { const d = String(p ?? "").replace(/\D/g, ""); return d.startsWith("0") ? "62" + d.slice(1) : d.startsWith("8") ? "62" + d : d; };
+    const HOLD = 3 * 864e5, now = () => Date.now();
+    const wallet = (t, n, nm) => !["DANA", "OVO", "GoPay", "ShopeePay", "LinkAja"].includes(t) ? "bad_wallet" : !/^\d{8,16}$/.test(String(n ?? "").replace(/\D/g, "")) ? "bad_wallet_number" : String(nm ?? "").trim().length < 2 ? "bad_wallet_name" : null;
+    const code = name => { const b = (String(name).toUpperCase().replace(/[^A-Z]/g, "").slice(0, 8) || "BSK").padEnd(3, "K"); let c; do c = b + String(Math.floor(Math.random() * 1000)).padStart(3, "0"); while ([...affs.values()].some(a => a.code === c)); return c; };
+    const mine = id => [...comms.values()].filter(c => c.affiliateId === id);
+    const sum = xs => xs.reduce((s, x) => s + x.amount, 0);
+    const json = f => { const cs = mine(f.accountId), live = cs.filter(c => c.status === "pending" && !c.payoutId);
+      return { code: f.code, fullName: f.fullName, phone: f.phone, walletType: f.walletType, walletNumber: f.walletNumber, walletName: f.walletName, status: f.status, createdAt: f.createdAt,
+        clicks: clicks.get(f.accountId) ?? 0, clicks30: clicks.get(f.accountId) ?? 0, sales: cs.filter(c => c.status === "pending").length,
+        held: sum(live.filter(c => now() - c.paidAt < HOLD)), available: sum(live.filter(c => now() - c.paidAt >= HOLD)),
+        requested: sum(payouts.filter(p => p.affiliateId === f.accountId && p.status === "requested")), paid: sum(payouts.filter(p => p.affiliateId === f.accountId && p.status === "paid")) }; };
+    const detail = f => ({ ...json(f), lastSync, commissions: mine(f.accountId).sort((a, b) => b.paidAt - a.paidAt).map(c => ({ orderId: c.orderId.slice(-6), orderAmount: c.orderAmount, amount: c.amount, paidAt: new Date(c.paidAt).toISOString(), availableAt: new Date(c.paidAt + HOLD).toISOString(),
+      state: c.status === "void" ? "void" : c.payoutId ? "payout" : now() - c.paidAt < HOLD ? "held" : "available" })), payouts: payouts.filter(p => p.affiliateId === f.accountId).map(({ affiliateId, ...p }) => p) });
+    const make = (acc, name, phone, t, n, nm) => { const f = { accountId: acc.id, code: code(name), fullName: name, phone, walletType: t, walletNumber: String(n).replace(/\D/g, ""), walletName: nm, status: "active", createdAt: new Date().toISOString() }; affs.set(acc.id, f); return f; };
+    const check = (name, phone, t, n, nm) => String(name ?? "").trim().length < 2 ? "bad_name" : !/^62\d{8,13}$/.test(norm(phone)) ? "bad_phone" : wallet(t, n, nm) ?? ([...affs.values()].some(a => a.phone === norm(phone)) ? "phone_used" : null);
+    const adminData = () => ({ lastSync, affiliates: [...affs.values()].map(f => ({ ...json(f), id: f.accountId, username: byId(f.accountId).username })),
+      payouts: payouts.map(p => { const f = affs.get(p.affiliateId); const { affiliateId, ...rest } = p; return { ...rest, code: f.code, fullName: f.fullName, phone: f.phone }; }) });
+    globalThis.__affCodes = () => [...affs.values()].map(f => ({ code: f.code, phone: f.phone }));
+    return {
+      bsk_affiliate_register: ({ p_name, p_phone, p_wallet_type, p_wallet_number, p_wallet_name }) => { const e = check(p_name, p_phone, p_wallet_type, p_wallet_number, p_wallet_name); if (e) return { error: e };
+        const base = (String(p_name).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 10) || "aff").padEnd(3, "f"); let u; do u = base + String(Math.floor(Math.random() * 1000)).padStart(3, "0"); while (accounts.has(u));
+        const p = pin(); add(u, p, { displayName: p_name }); const acc = accounts.get(u); acc.phone = norm(p_phone); acc.note = "Affiliate";
+        const f = make(acc, p_name, norm(p_phone), p_wallet_type, p_wallet_number, p_wallet_name); const token = randomBytes(16).toString("hex"); sessions.set(token, { username: u, at: Date.now() });
+        return { username: u, pin: p, code: f.code, token }; },
+      bsk_affiliate_join: ({ p_token, p_name, p_phone, p_wallet_type, p_wallet_number, p_wallet_name }) => { const a = who(p_token); if (!a) return { error: "session" }; if (affs.has(a.id)) return { error: "exists" };
+        const e = check(p_name, p_phone, p_wallet_type, p_wallet_number, p_wallet_name); if (e) return { error: e }; return detail(make(a, p_name, norm(p_phone), p_wallet_type, p_wallet_number, p_wallet_name)); },
+      bsk_affiliate_me: ({ p_token }) => { const a = who(p_token); if (!a) return { error: "session" }; const f = affs.get(a.id); return f ? detail(f) : { none: true, displayName: a.displayName, phone: a.phone }; },
+      bsk_affiliate_update_wallet: ({ p_token, p_wallet_type, p_wallet_number, p_wallet_name }) => { const a = who(p_token); if (!a) return { error: "session" }; const f = affs.get(a.id); if (!f) return { error: "none" };
+        const e = wallet(p_wallet_type, p_wallet_number, p_wallet_name); if (e) return { error: e }; Object.assign(f, { walletType: p_wallet_type, walletNumber: String(p_wallet_number).replace(/\D/g, ""), walletName: p_wallet_name }); return detail(f); },
+      bsk_affiliate_withdraw: ({ p_token }) => { const a = who(p_token); if (!a) return { error: "session" }; const f = affs.get(a.id); if (!f) return { error: "none" }; if (f.status !== "active") return { error: "blocked" };
+        if (payouts.some(p => p.affiliateId === f.accountId && p.status === "requested")) return { error: "open" };
+        const ready = mine(f.accountId).filter(c => c.status === "pending" && !c.payoutId && now() - c.paidAt >= HOLD), amount = sum(ready); if (amount < 50000) return { error: "min", available: amount };
+        const id = randomUUID(); payouts.unshift({ id, affiliateId: f.accountId, amount, wallet: `${f.walletType} ${f.walletNumber} a.n. ${f.walletName}`, status: "requested", note: "", requestedAt: new Date().toISOString(), decidedAt: null });
+        ready.forEach(c => (c.payoutId = id)); return detail(f); },
+      bsk_affiliate_click: ({ p_code }) => { const f = [...affs.values()].find(x => x.code === String(p_code ?? "").toUpperCase() && x.status === "active"); if (!f) return null; clicks.set(f.accountId, (clicks.get(f.accountId) ?? 0) + 1); return f.code; },
+      bsk_affiliate_record: ({ p_key, p_token, p_orders }) => { if (p_key !== "test-sync") admin(p_token); let n = 0, v = 0, k = 0;
+        for (const o of p_orders ?? []) { const f = [...affs.values()].find(x => x.code === String(o.code).toUpperCase()); if (!f) { k++; continue; }
+          if (o.paid) { if (norm(o.buyerPhone) === f.phone) { k++; continue; } if (!comms.has(o.orderId)) { comms.set(o.orderId, { orderId: o.orderId, affiliateId: f.accountId, orderAmount: o.amount, amount: Math.floor(o.amount * 16 / 100), paidAt: new Date(o.paidAt ?? Date.now()).getTime(), status: "pending", payoutId: null }); n++; } }
+          else { const c = comms.get(o.orderId); if (c && c.status === "pending" && !c.payoutId) { c.status = "void"; v++; } } }
+        lastSync = new Date().toISOString(); return { new: n, void: v, skipped: k }; },
+      bsk_affiliate_last_sync: () => lastSync,
+      bsk_admin_affiliates: ({ p_token }) => { admin(p_token); return adminData(); },
+      bsk_admin_payout_decide: ({ p_token, p_payout, p_status, p_note }) => { admin(p_token); const p = payouts.find(x => x.id === p_payout && x.status === "requested"); if (!p) return { error: "not_found" };
+        Object.assign(p, { status: p_status, note: p_note ?? "", decidedAt: new Date().toISOString() }); if (p_status === "rejected") for (const c of comms.values()) if (c.payoutId === p.id) c.payoutId = null; return adminData(); },
+      bsk_admin_affiliate_status: ({ p_token, p_account, p_status }) => { admin(p_token); const f = affs.get(p_account); if (f) f.status = p_status; return adminData(); },
+    };
+  })(),
 };
 
+// Pesanan Scalev tiruan: untuk setiap affiliate ada 4 pesanan lunas (3 sudah lewat masa tahan), 1 pembelian sendiri, 1 belum bayar, 1 batal.
+const scalevOrders = () => (globalThis.__affCodes?.() ?? []).flatMap(({ code, phone }) => {
+  const ago = d => new Date(Date.now() - d * 864e5).toISOString(), meta = { utm_source: "affiliate", utm_campaign: code };
+  const o = (id, amount, days, pay = "paid", status = "completed", ph = "08111111111") => ({ order_id: `${code}-${id}`, gross_revenue: amount, payment_status: pay, status, confirmed_time: ago(days), metadata: meta, customer: { phone: ph } });
+  return [o("A", 129000, 5), o("B", 129000, 4), o("C", 99000, 4), o("D", 79000, 0), o("SELF", 79000, 5, "paid", "completed", phone), o("UNPAID", 79000, 0, "unpaid", "pending"), o("BATAL", 79000, 1, "unpaid", "canceled")];
+});
+
 createServer((req, res) => {
+  if (req.url.startsWith("/scalev/v3/orders")) {
+    if (req.headers.authorization !== "Bearer test") { res.writeHead(401); res.end(JSON.stringify({ error: "Invalid API key" })); return; }
+    res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify({ data: scalevOrders(), has_next: false, next_cursor: null })); return;
+  }
+  if (req.url.startsWith("/lp")) { res.writeHead(200, { "Content-Type": "text/html" }); res.end("<!doctype html><title>Halaman penjualan</title><h1>Halaman penjualan tiruan</h1>"); return; }
   let body = ""; req.on("data", c => (body += c)); req.on("end", () => {
     const name = req.url.split("/rpc/")[1];
     try { const out = fns[name](JSON.parse(body || "{}")); res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify(out)); }

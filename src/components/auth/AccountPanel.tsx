@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, BookOpenCheck, ChartNoAxesCombined, CircleCheck, FileText, KeyRound, LogOut, RefreshCw, Settings, Sparkles, Target } from "lucide-react";
+import { BellRing, BookOpenCheck, ChartNoAxesCombined, CircleCheck, FileText, HandCoins, KeyRound, LogOut, RefreshCw, Settings, Sparkles, Target } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -56,6 +56,7 @@ export function AccountPanel() {
     <ChangePin />
     <div className="mt-5 flex flex-wrap gap-2 border-b border-base-300 pb-8">
       <Link href="/akun/laporan" className="btn btn-success gap-1"><FileText className="size-4" aria-hidden="true" />Laporan belajar</Link>
+      <Link href="/akun/affiliate" className="btn btn-outline gap-1"><HandCoins className="size-4" aria-hidden="true" />Affiliate</Link>
       {session.role === "admin" && <Link href="/admin" className="btn btn-outline gap-1"><Settings className="size-4" aria-hidden="true" />Kelola akun</Link>}
       <button type="button" className="btn btn-ghost gap-1" disabled={busy} onClick={logout}><LogOut className="size-4" aria-hidden="true" />Keluar</button>
     </div>

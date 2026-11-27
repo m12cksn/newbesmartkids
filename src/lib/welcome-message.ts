@@ -36,8 +36,8 @@ ${PUBLIC_URL}/masuk
 ${tutorial}${videoInfo}
 
 🎁 *Mau dapat penghasilan tambahan dari BeSmartKids?*
-Kakak juga bisa bergabung menjadi *Affiliate BeSmartKids* dan mendapatkan komisi *hingga 16% dari setiap penjualan yang berhasil* melalui rekomendasi Bunda! 💸
-Caranya gampang banget. Kalau tertarik, cukup *balas "AFFILIATE"* di chat ini. Nanti saya bantu jelaskan cara bergabungnya. 💚
+Kakak juga bisa bergabung menjadi *Affiliate BeSmartKids* dan mendapatkan komisi *16% dari setiap penjualan yang berhasil* melalui rekomendasi Bunda! 💸
+Caranya gampang: masuk ke akun BeSmartKids, buka menu *Affiliate*, lalu aktifkan. Link pribadi langsung jadi dan komisinya bisa dicairkan ke e-wallet. Info lengkap: ${PUBLIC_URL}/affiliate 💚
 
 Selamat belajar untuk ${kids}! Semoga makin semangat dan makin jago matematika. 🥰
 Kalau ada kendala saat login atau menggunakan BeSmartKids, langsung chat saya aja ya Ayah/Bunda. Kami siap bantu! 😊

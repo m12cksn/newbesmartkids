@@ -1,0 +1,45 @@
+name: Affiliate QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  affiliate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SUPABASE_URL: http://127.0.0.1:54329
+      SUPABASE_PUBLISHABLE_KEY: test
+      SCALEV_API_BASE_URL: http://127.0.0.1:54329/scalev
+      SCALEV_API_KEY: test
+      AFFILIATE_SYNC_KEY: test-sync
+      AFFILIATE_TARGET_URL: http://127.0.0.1:54329/lp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npx eslint src/lib/affiliate.ts src/lib/affiliate-sync.ts src/app/r src/app/api/affiliate src/app/affiliate src/app/akun/affiliate src/app/admin/affiliate src/components/affiliate src/app/api/admin
+      - run: node --experimental-strip-types scripts/verify-affiliate.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          node scripts/mock-supabase-auth.mjs > /tmp/mock.log 2>&1 &
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-affiliate.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node scripts/smoke-affiliate.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: affiliate-screenshots
+          path: /tmp/affiliate-screenshots
+          if-no-files-found: ignore
