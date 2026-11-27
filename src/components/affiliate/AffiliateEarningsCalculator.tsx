@@ -2,36 +2,56 @@
 
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { AFF_COMMISSION_JENJANG, AFF_COMMISSION_KELUARGA, AFF_MIN_PAYOUT, rupiah } from "@/lib/affiliate";
+import { AFF_MIN_PAYOUT, commissionFor, FAMILY_PRICE, PRICE_JENJANG, rupiah } from "@/lib/affiliate";
 
 const MAX = 99;
+/** Harga contoh saat promo; komisi turun dengan perbandingan yang sama seperti di sistem. */
+const PRICES = {
+  normal: { jenjang: PRICE_JENJANG, keluarga: FAMILY_PRICE },
+  promo: { jenjang: 59_000, keluarga: 99_000 },
+} as const;
 
-/** Kalkulator komisi: pengunjung memilih jumlah penjualan, total komisi ikut bergerak. */
+/** Kalkulator komisi: pengunjung memilih jumlah penjualan dan jenis harga, total komisi ikut bergerak. */
 export function AffiliateEarningsCalculator() {
   const [jenjang, setJenjang] = useState(3);
   const [keluarga, setKeluarga] = useState(1);
-  const total = jenjang * AFF_COMMISSION_JENJANG + keluarga * AFF_COMMISSION_KELUARGA;
+  const [mode, setMode] = useState<keyof typeof PRICES>("normal");
+  const price = PRICES[mode];
+  const each = { jenjang: commissionFor({ jenjang: 1, keluarga: 0 }, price.jenjang), keluarga: commissionFor({ jenjang: 0, keluarga: 1 }, price.keluarga) };
+  const total = jenjang * each.jenjang + keluarga * each.keluarga;
   const shown = useCountUp(total);
   const rows = [
-    { id: "jenjang", label: "Paket satu jenjang", each: AFF_COMMISSION_JENJANG, value: jenjang, set: setJenjang },
-    { id: "keluarga", label: "Paket Keluarga", each: AFF_COMMISSION_KELUARGA, value: keluarga, set: setKeluarga },
+    { id: "jenjang", label: "Paket satu jenjang", price: price.jenjang, each: each.jenjang, value: jenjang, set: setJenjang },
+    { id: "keluarga", label: "Paket Keluarga", price: price.keluarga, each: each.keluarga, value: keluarga, set: setKeluarga },
   ];
-  return <div className="grid gap-6 rounded-3xl bg-base-100 p-5 shadow-sm sm:p-8 md:grid-cols-[1fr_auto] md:items-center">
-    <div className="space-y-4">
-      {rows.map(r => <div key={r.id} className="flex flex-wrap items-center justify-between gap-3">
-        <div><p className="font-semibold" id={`calc-${r.id}`}>{r.label}</p><p className="text-sm text-base-content/60">{rupiah(r.each)} per paket</p></div>
-        <div className="flex items-center gap-2" role="group" aria-labelledby={`calc-${r.id}`}>
-          <button type="button" className="btn btn-circle btn-sm btn-outline btn-success" aria-label={`Kurangi ${r.label}`} disabled={r.value <= 0} onClick={() => r.set(v => Math.max(0, v - 1))}><Minus className="size-4" strokeWidth={2} /></button>
-          <output className="w-10 text-center text-xl font-bold tabular-nums" data-testid={`calc-${r.id}`} aria-live="polite">{r.value}</output>
-          <button type="button" className="btn btn-circle btn-sm btn-success" aria-label={`Tambah ${r.label}`} disabled={r.value >= MAX} onClick={() => r.set(v => Math.min(MAX, v + 1))}><Plus className="size-4" strokeWidth={2} /></button>
-        </div>
-      </div>)}
+  return <div className="rounded-[2rem] bg-base-100 p-5 shadow-[0_18px_40px_-24px_rgba(23,53,42,.35)] sm:p-8">
+    <div className="inline-flex rounded-full bg-[#eaf3fb] p-1" role="radiogroup" aria-label="Harga paket">
+      {(["normal", "promo"] as const).map(m => <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}
+        className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${mode === m ? "bg-base-100 text-success shadow-sm" : "text-base-content/70 hover:text-base-content"}`}>
+        {m === "normal" ? "Harga normal" : "Harga promo"}
+      </button>)}
     </div>
-    <div className="rounded-2xl bg-success/10 p-5 text-center md:min-w-64">
-      <p className="text-sm text-base-content/70">Total komisi</p>
-      <p className="mt-1 text-4xl font-extrabold tabular-nums text-success" data-testid="calc-total">{rupiah(shown)}</p>
-      <p className="mt-2 text-sm text-base-content/70" aria-live="polite">{total >= AFF_MIN_PAYOUT ? "Sudah bisa dicairkan ke e-wallet." : `Kurang ${rupiah(AFF_MIN_PAYOUT - total)} lagi untuk bisa dicairkan.`}</p>
+    <div className="mt-7 grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+      <div className="space-y-6">
+        {rows.map(r => <div key={r.id} className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="font-bold leading-snug" id={`calc-${r.id}`}>{r.label}</p>
+            <p className="mt-1.5 text-sm leading-6 text-base-content/65">Harga {rupiah(r.price)}, komisi <span className="font-semibold text-success" data-testid={`calc-each-${r.id}`}>{rupiah(r.each)}</span></p>
+          </div>
+          <div className="flex items-center gap-2" role="group" aria-labelledby={`calc-${r.id}`}>
+            <button type="button" className="btn btn-circle btn-sm btn-outline btn-success" aria-label={`Kurangi ${r.label}`} disabled={r.value <= 0} onClick={() => r.set(v => Math.max(0, v - 1))}><Minus className="size-4" strokeWidth={2} /></button>
+            <output className="w-10 text-center text-xl font-bold tabular-nums" data-testid={`calc-${r.id}`} aria-live="polite">{r.value}</output>
+            <button type="button" className="btn btn-circle btn-sm btn-success" aria-label={`Tambah ${r.label}`} disabled={r.value >= MAX} onClick={() => r.set(v => Math.min(MAX, v + 1))}><Plus className="size-4" strokeWidth={2} /></button>
+          </div>
+        </div>)}
+      </div>
+      <div className="rounded-3xl bg-[#fdf1c7] px-6 py-7 text-center md:min-w-72">
+        <p className="text-sm font-medium text-[#6b5410]">Total komisi</p>
+        <p className="mt-2 text-4xl font-extrabold leading-tight tabular-nums text-success" data-testid="calc-total">{rupiah(shown)}</p>
+        <p className="mt-3 text-sm leading-6 text-base-content/75" aria-live="polite">{total >= AFF_MIN_PAYOUT ? "Sudah bisa dicairkan ke e-wallet." : `Kurang ${rupiah(AFF_MIN_PAYOUT - total)} lagi untuk bisa dicairkan.`}</p>
+      </div>
     </div>
+    {mode === "promo" && <p className="mt-6 text-sm leading-6 text-base-content/65">Contoh harga promo Rp59.000 dan Rp99.000. Komisi turun dengan perbandingan yang sama dengan harga normal.</p>}
   </div>;
 }
 
