@@ -1,5 +1,5 @@
 // Uji browser program affiliate dengan server tiruan (scripts/mock-supabase-auth.mjs):
-// daftar, link /r/KODE, sinkron pesanan Scalev, komisi 16% + masa tahan 3 hari, pencairan, admin, dan akun lama yang bergabung.
+// daftar, link /r/KODE, sinkron pesanan Scalev, komisi tetap Rp19.900 / Rp34.900 + masa tahan 3 hari, pencairan, admin, dan akun lama yang bergabung.
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
@@ -18,8 +18,13 @@ try {
   for (const width of [320, 390, 768, 1280]) {
     const { ctx, page } = await open(width);
     await page.goto(`${origin}/`); await page.getByRole("link", { name: "Program affiliate" }).click(); await page.waitForURL(/\/affiliate$/);
-    await page.getByRole("heading", { level: 1, name: /komisi 16%/ }).waitFor();
-    await page.getByText("Rp20.640").waitFor(); await page.getByText("Rp12.640").waitFor();
+    await page.getByRole("heading", { level: 1, name: /komisi sampai Rp34\.900/ }).waitFor();
+    assert.deepEqual(await page.getByTestId("commission-card").allTextContents().then(t => t.map(x => x.match(/Rp\d+\.\d+$/)?.[0])), ["Rp19.900", "Rp34.900"]);
+    // Kalkulator: 3 jenjang + 1 keluarga = Rp94.600; dikurangi sampai 2 jenjang saja = Rp39.800 (belum bisa cair).
+    await page.getByTestId("calc-total").filter({ hasText: "Rp94.600" }).waitFor();
+    await page.getByRole("button", { name: "Kurangi Paket Keluarga" }).click(); await page.getByRole("button", { name: "Kurangi Paket satu jenjang" }).click();
+    await page.getByTestId("calc-total").filter({ hasText: "Rp39.800" }).waitFor(); await page.getByText("Kurang Rp10.200 lagi untuk bisa dicairkan.").waitFor();
+    await page.getByRole("button", { name: "Tambah Paket Keluarga" }).click(); await page.getByText("Sudah bisa dicairkan ke e-wallet.").waitFor();
     await fit(page, `affiliate ${width}`); await page.screenshot({ path: `${folder}/${width}-affiliate.png`, fullPage: true });
     await ctx.close();
   }
@@ -53,20 +58,20 @@ try {
   await visitor.page.goto(`${origin}/r/TIDAKADA999`); await visitor.page.waitForURL(/\/lp/); assert.equal(new URL(visitor.page.url()).search, "");
   await visitor.ctx.close();
 
-  // 4. Dasbor: sinkron otomatis membaca pesanan Scalev. 3 pesanan sudah lewat 3 hari (20.640 + 20.640 + 15.840),
-  //    1 masih tertahan (12.640); pembelian sendiri, belum bayar, dan batal tidak dihitung.
+  // 4. Dasbor: sinkron otomatis membaca pesanan Scalev. 3 Paket Keluarga sudah lewat 3 hari (34.900 x 3; satu dibayar diskon Rp99.000),
+  //    1 paket satu jenjang masih tertahan (19.900); pembelian sendiri, belum bayar, dan batal tidak dihitung.
   await page.locator("#daftar").getByRole("link", { name: "Buka dasbor affiliate" }).click(); await page.waitForURL(/\/akun\/affiliate$/);
   await page.getByTestId("dash-code").filter({ hasText: code }).waitFor();
-  await page.getByTestId("stat-available").filter({ hasText: "Rp57.120" }).waitFor();
-  assert.equal((await page.getByTestId("stat-held").textContent()).trim(), "Rp12.640");
+  await page.getByTestId("stat-available").filter({ hasText: "Rp104.700" }).waitFor();
+  assert.equal((await page.getByTestId("stat-held").textContent()).trim(), "Rp19.900");
   assert.equal(await page.getByTestId("commission-row").count(), 4);
   await page.getByText("Klik 30 hari").waitFor();
   await fit(page, "dasbor"); await page.screenshot({ path: `${folder}/390-dasbor.png`, fullPage: true });
 
   // 5. Ajukan pencairan.
-  await page.getByRole("button", { name: /^Cairkan Rp57\.120$/ }).click();
+  await page.getByRole("button", { name: /^Cairkan Rp104\.700$/ }).click();
   await page.getByText("Pengajuan pencairan terkirim").waitFor();
-  await page.getByText("Pengajuan Rp57.120 sedang diproses admin.").waitFor();
+  await page.getByText("Pengajuan Rp104.700 sedang diproses admin.").waitFor();
   assert.ok(await page.getByRole("button", { name: /^Cairkan/ }).isDisabled());
   await ctx.close();
 
@@ -74,13 +79,13 @@ try {
   const adm = await open(1280);
   await adm.page.goto(`${origin}/masuk?lanjut=/admin`); await login(adm.page, "admin", "111111"); await adm.page.waitForURL(/\/admin$/);
   await adm.page.getByRole("link", { name: "Affiliate", exact: true }).click(); await adm.page.waitForURL(/\/admin\/affiliate$/);
-  await adm.page.getByTestId("payout-request").filter({ hasText: "Rp57.120" }).waitFor();
+  await adm.page.getByTestId("payout-request").filter({ hasText: "Rp104.700" }).waitFor();
   await adm.page.getByTestId("affiliate-row").filter({ hasText: code }).waitFor();
   await adm.page.getByRole("button", { name: "Sinkronkan pesanan Scalev" }).click(); await adm.page.getByText(/Sinkron selesai/).waitFor();
   await fit(adm.page, "admin affiliate"); await adm.page.screenshot({ path: `${folder}/1280-admin-affiliate.png`, fullPage: true });
   await adm.page.getByRole("button", { name: "Sudah dibayar" }).click();
   await adm.page.getByText("Tidak ada pengajuan yang menunggu.").waitFor();
-  await adm.page.getByTestId("affiliate-row").filter({ hasText: "Rp57.120" }).waitFor();
+  await adm.page.getByTestId("affiliate-row").filter({ hasText: "Rp104.700" }).waitFor();
   await adm.ctx.close();
 
   // 7. Akun pembeli yang sudah ada mengaktifkan affiliate dari halaman akun.
