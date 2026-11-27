@@ -1,14 +1,16 @@
 "use client";
 
-import { Check, MessageCircle, RefreshCw, UserCheck, UserX, X } from "lucide-react";
+import { Check, MessageCircle, RefreshCw, TriangleAlert, UserCheck, UserX, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { fmtDate } from "@/components/auth/AccountPanel";
 import { rupiah, type AffiliateSummary } from "@/lib/affiliate";
 
-type Row = AffiliateSummary & { id: string; username: string };
-type Payout = { id: string; amount: number; wallet: string; status: "requested" | "paid" | "rejected"; note: string; requestedAt: string; decidedAt: string | null; code: string; fullName: string; phone: string };
+type Row = AffiliateSummary & { id: string; username: string; sharedWith: string[] };
+type Payout = { id: string; amount: number; wallet: string; status: "requested" | "paid" | "rejected"; note: string; requestedAt: string; decidedAt: string | null; code: string; fullName: string; phone: string; sharedWith: string[] };
 type Data = { affiliates: Row[]; payouts: Payout[]; lastSync: string | null };
+
+const SharedWallet = ({ codes }: { codes: string[] }) => codes.length === 0 ? null : <p data-testid="wallet-ganda" className="mt-1 flex items-start gap-1 rounded-md bg-warning/20 px-2 py-1 text-xs font-semibold text-warning-content"><TriangleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />E-wallet ini juga dipakai affiliate {codes.join(", ")}. Periksa dulu sebelum membayar.</p>;
 
 async function admin<T>(body: Record<string, unknown>) {
   const r = await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -46,7 +48,7 @@ export function AdminAffiliatePanel() {
 
     <div className="space-y-3"><h2 className="text-xl font-bold">Pengajuan pencairan <span className="text-base font-normal text-base-content/60">({open.length})</span></h2>
       {open.length === 0 ? <p className="text-sm text-base-content/60">Tidak ada pengajuan yang menunggu.</p> : <ul className="space-y-2">{open.map(p => <li key={p.id} data-testid="payout-request" className="flex flex-col gap-3 rounded-xl border border-warning/50 bg-base-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div><p className="font-bold">{p.fullName} <span className="font-normal text-base-content/60">{p.code}</span></p><p className="text-lg font-extrabold text-success">{rupiah(p.amount)}</p><p className="text-sm">{p.wallet}</p><p className="text-xs text-base-content/60">Diajukan {fmtDate(p.requestedAt)}</p></div>
+        <div><p className="font-bold">{p.fullName} <span className="font-normal text-base-content/60">{p.code}</span></p><p className="text-lg font-extrabold text-success">{rupiah(p.amount)}</p><p className="text-sm">{p.wallet}</p><p className="text-xs text-base-content/60">Diajukan {fmtDate(p.requestedAt)}</p><SharedWallet codes={p.sharedWith ?? []} /></div>
         <div className="flex flex-wrap gap-1"><a className="btn btn-xs btn-outline gap-1" href={wa(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="size-3.5" aria-hidden="true" />WhatsApp</a>
           <button type="button" className="btn btn-xs btn-success gap-1" disabled={busy} onClick={() => decide(p, "paid")}><Check className="size-3.5" aria-hidden="true" />Sudah dibayar</button>
           <button type="button" className="btn btn-xs btn-outline gap-1" disabled={busy} onClick={() => decide(p, "rejected")}><X className="size-3.5" aria-hidden="true" />Tolak</button></div></li>)}</ul>}
@@ -57,7 +59,7 @@ export function AdminAffiliatePanel() {
         <div className="overflow-x-auto rounded-xl bg-base-100"><table className="table table-sm"><thead><tr><th>Affiliate</th><th>E-wallet</th><th className="text-right">Klik</th><th className="text-right">Jual</th><th className="text-right">Tertahan</th><th className="text-right">Siap cair</th><th className="text-right">Dibayar</th><th /></tr></thead>
           <tbody>{d.affiliates.map(a => <tr key={a.id} data-testid="affiliate-row" className={a.status === "blocked" ? "opacity-60" : ""}>
             <td><p className="font-bold">{a.code}</p><p className="text-xs">{a.fullName}, @{a.username}</p><a className="text-xs text-success hover:underline" href={wa(a.phone)} target="_blank" rel="noreferrer">{a.phone}</a></td>
-            <td className="text-xs">{a.walletType} {a.walletNumber}<br />a.n. {a.walletName}</td>
+            <td className="text-xs">{a.walletType} {a.walletNumber}<br />a.n. {a.walletName}<SharedWallet codes={a.sharedWith ?? []} /></td>
             <td className="text-right">{a.clicks}</td><td className="text-right">{a.sales}</td><td className="text-right">{rupiah(a.held)}</td><td className="text-right">{rupiah(a.available)}</td><td className="text-right">{rupiah(a.paid)}</td>
             <td><button type="button" className="btn btn-xs btn-ghost gap-1" disabled={busy} onClick={() => toggle(a)}>{a.status === "active" ? <><UserX className="size-3.5" aria-hidden="true" />Nonaktifkan</> : <><UserCheck className="size-3.5" aria-hidden="true" />Aktifkan</>}</button></td></tr>)}</tbody></table></div>}
     </div>

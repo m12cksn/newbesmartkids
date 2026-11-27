@@ -85,8 +85,9 @@ const fns = {
       state: c.status === "void" ? "void" : c.payoutId ? "payout" : now() - c.paidAt < HOLD ? "held" : "available" })), payouts: payouts.filter(p => p.affiliateId === f.accountId).map(({ affiliateId, ...p }) => p) });
     const make = (acc, name, phone, t, n, nm) => { const f = { accountId: acc.id, code: code(name), fullName: name, phone, walletType: t, walletNumber: String(n).replace(/\D/g, ""), walletName: nm, status: "active", createdAt: new Date().toISOString() }; affs.set(acc.id, f); return f; };
     const check = (name, phone, t, n, nm) => String(name ?? "").trim().length < 2 ? "bad_name" : !/^62\d{8,13}$/.test(norm(phone)) ? "bad_phone" : wallet(t, n, nm) ?? ([...affs.values()].some(a => a.phone === norm(phone)) ? "phone_used" : null);
-    const adminData = () => ({ lastSync, affiliates: [...affs.values()].map(f => ({ ...json(f), id: f.accountId, username: byId(f.accountId).username })),
-      payouts: payouts.map(p => { const f = affs.get(p.affiliateId); const { affiliateId, ...rest } = p; return { ...rest, code: f.code, fullName: f.fullName, phone: f.phone }; }) });
+    const sharedWith = f => [...affs.values()].filter(o => o.accountId !== f.accountId && o.walletNumber === f.walletNumber).map(o => o.code).sort();
+    const adminData = () => ({ lastSync, affiliates: [...affs.values()].map(f => ({ ...json(f), id: f.accountId, username: byId(f.accountId).username, sharedWith: sharedWith(f) })),
+      payouts: payouts.map(p => { const f = affs.get(p.affiliateId); const { affiliateId, ...rest } = p; return { ...rest, code: f.code, fullName: f.fullName, phone: f.phone, sharedWith: sharedWith(f) }; }) });
     globalThis.__affCodes = () => [...affs.values()].map(f => ({ code: f.code, phone: f.phone }));
     return {
       bsk_affiliate_register: ({ p_name, p_phone, p_wallet_type, p_wallet_number, p_wallet_name }) => { const e = check(p_name, p_phone, p_wallet_type, p_wallet_number, p_wallet_name); if (e) return { error: e };
