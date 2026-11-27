@@ -2,9 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/access-rules";
 import { authEnabled, rpc } from "@/lib/supabase-rpc";
 
-export type IncorrectAnswer = { number: number; prompt: string; submitted: string; expected: string; explanation: string };
+export type IncorrectAnswer = { number: number; prompt: string; submitted: string; expected: string; explanation: string };\nexport type EvaluationReviewItem = IncorrectAnswer & { correct: boolean; options?: string[] };
 
-export type SavedResult = { id?: string; path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string; incorrect?: IncorrectAnswer[] | null };
+export type SavedResult = { id?: string; path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string; incorrect?: IncorrectAnswer[] | null; review?: EvaluationReviewItem[] | null };
 /** Halaman yang boleh menyimpan nilai: bab materi dan latihan harian. */
 export const RESULT_PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian|jarimatika|pembagian-garis)\/level-[1-3]$/;
 const noStore = { "Cache-Control": "no-store" };
@@ -43,8 +43,20 @@ export async function POST(request: NextRequest) {
       incorrect.push({ number, prompt: str(entry.prompt, 1000), submitted: str(entry.submitted, 500), expected: str(entry.expected, 500), explanation: str(entry.explanation, 1500) });
     }
   }
+  let review: EvaluationReviewItem[] | undefined;
+  if (b.review !== undefined) {
+    if (!Array.isArray(b.review) || b.review.length !== total) return NextResponse.json({ error: "invalid" }, { status: 400 });
+    review = [];
+    for (const item of b.review as unknown[]) {
+      const entry = item as Partial<EvaluationReviewItem> | null;
+      const number = int(entry?.number);
+      if (!entry || number < 1 || number > total || typeof entry.prompt !== "string" || typeof entry.submitted !== "string" || typeof entry.expected !== "string" || typeof entry.explanation !== "string" || typeof entry.correct !== "boolean") return NextResponse.json({ error: "invalid" }, { status: 400 });
+      if (entry.options !== undefined && (!Array.isArray(entry.options) || entry.options.some(option => typeof option !== "string"))) return NextResponse.json({ error: "invalid" }, { status: 400 });
+      review.push({ number, prompt: str(entry.prompt, 1000), submitted: str(entry.submitted, 500), expected: str(entry.expected, 500), explanation: str(entry.explanation, 1500), correct: entry.correct, options: entry.options?.map(option => option.slice(0, 300)).slice(0, 30) });
+    }
+  }
   try {
-    const r = await rpc<{ ok?: boolean; error?: string }>("bsk_save_result", { p_token: token, p_path: path, p_title: str(b.title, 160), p_kind: kind, p_part: str(b.part, 120), p_correct: correct, p_total: total, ...(incorrect === undefined ? {} : { p_incorrect: incorrect }) });
+    const r = await rpc<{ ok?: boolean; error?: string }>("bsk_save_result", { p_token: token, p_path: path, p_title: str(b.title, 160), p_kind: kind, p_part: str(b.part, 120), p_correct: correct, p_total: total, ...(incorrect === undefined ? {} : { p_incorrect: incorrect }), ...(review === undefined ? {} : { p_review: review }) });
     return NextResponse.json(r, { status: r.ok ? 200 : r.error === "session" ? 401 : r.error === "limit" ? 429 : 400 });
   } catch { return NextResponse.json({ error: "server" }, { status: 502 }); }
 }
