@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, FileText, KeyRound, LogOut, RefreshCw, Settings } from "lucide-react";
+import { BellRing, BookOpenCheck, ChartNoAxesCombined, CircleCheck, FileText, KeyRound, LogOut, RefreshCw, Settings, Sparkles, Target } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,24 +20,45 @@ export function AccountPanel() {
   if (loading) return <section className="mx-auto max-w-md px-4 py-16 text-center"><span className="loading loading-spinner text-success" aria-label="Memuat" /></section>;
   if (!session) return <section className="mx-auto max-w-md px-4 py-16"><h1 className="text-2xl font-extrabold">Anda belum masuk</h1><Link href="/masuk?lanjut=/akun" className="btn btn-success mt-4">Masuk</Link></section>;
   const opened = session.all || session.role === "admin" ? "Semua kelas" : session.classes.length ? classes.filter(c => session.classes.includes(c.id)).map(c => `Kelas ${c.id}`).join(", ") : "Belum ada paket aktif";
-  return <section className="mx-auto max-w-3xl px-4 py-10 sm:py-16"><div className="max-w-md">
-    <h1 className="text-3xl font-extrabold">Akun saya</h1>
-    <dl className="mt-6 space-y-3 rounded-xl border border-base-300 bg-base-100 p-5 text-sm">
-      <div><dt className="text-base-content/60">Nama</dt><dd className="font-bold">{session.displayName || "-"}</dd></div>
-      <div><dt className="text-base-content/60">Username</dt><dd className="font-bold">{session.username}</dd></div>
-      <div><dt className="text-base-content/60">Kelas yang terbuka</dt><dd className="font-bold">{opened}</dd></div>
-      <div><dt className="text-base-content/60">Berlaku sampai</dt><dd className="font-bold">{session.role === "admin" ? "Admin" : fmtDate(session.expiresAt)}</dd></div>
-    </dl>
+  return <section className="relative isolate overflow-hidden bg-base-200"><div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <span className="account-math account-math-one">+</span><span className="account-math account-math-two">÷</span><span className="account-math account-math-three">π</span>
+    <span className="account-grid" />
+  </div><div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <div className="account-hero relative overflow-hidden rounded-[2rem] bg-[#17352a] px-5 py-7 text-white shadow-[0_24px_60px_-28px_rgba(23,53,42,.8)] sm:px-8 sm:py-9 lg:px-12 lg:py-12">
+      <svg className="pointer-events-none absolute -right-10 -top-16 h-64 w-64 text-[#58c69d]/20 account-hero-orbit" viewBox="0 0 260 260" fill="none" aria-hidden="true"><circle cx="130" cy="130" r="92" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 9"/><circle cx="130" cy="130" r="56" stroke="currentColor" strokeWidth="1.5"/><path d="M38 130h184M130 38v184" stroke="currentColor" strokeWidth="1" opacity=".5"/><circle cx="190" cy="78" r="7" fill="#ffd34f"/></svg>
+      <div className="relative grid gap-9 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
+        <div>
+          <p className="flex items-center gap-2 text-sm font-semibold text-[#b7efc5]"><Sparkles className="size-4" aria-hidden="true" />Pusat belajar BeSmartKids</p>
+          <h1 className="mt-3 max-w-xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Halo, {session.displayName || session.username}!</h1>
+          <p className="mt-4 max-w-lg text-base leading-7 text-white/75 sm:text-lg">Lihat perjalanan belajarmu, lanjutkan latihan, dan temukan bagian yang masih perlu dikuatkan.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/#kelas" className="btn border-0 bg-[#ffd34f] text-[#17352a] shadow-none hover:bg-[#ffe07a]"><BookOpenCheck className="size-4" aria-hidden="true" />Lanjut belajar</Link>
+            <Link href="/akun/laporan" className="btn btn-outline border-white/35 bg-white/5 text-white hover:border-white hover:bg-white/10"><ChartNoAxesCombined className="size-4" aria-hidden="true" />Lihat laporan</Link>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="account-stat-card"><span className="account-stat-icon"><Target className="size-5" aria-hidden="true" /></span><span className="mt-4 block text-2xl font-extrabold">{session.role === "admin" ? "Admin" : "Aktif"}</span><span className="mt-1 block text-xs text-white/65">Status akun</span></div>
+          <div className="account-stat-card"><span className="account-stat-icon"><CircleCheck className="size-5" aria-hidden="true" /></span><span className="mt-4 block text-2xl font-extrabold">{session.all ? "Semua" : session.classes.length || 0}</span><span className="mt-1 block text-xs text-white/65">Kelas terbuka</span></div>
+        </div>
+      </div>
+    </div>
+    <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
+      <div className="account-info-panel">
+        <div><p className="text-xs font-semibold uppercase tracking-[.12em] text-base-content/55">Profil belajar</p><p className="mt-1 text-lg font-extrabold">{session.displayName || "Nama belum diatur"}</p><p className="text-sm text-base-content/65">@{session.username}</p></div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2"><div><p className="text-sm text-base-content/60">Kelas yang terbuka</p><p className="mt-1 break-words font-bold">{opened}</p></div><div><p className="text-sm text-base-content/60">Berlaku sampai</p><p className="mt-1 font-bold">{session.role === "admin" ? "Admin" : fmtDate(session.expiresAt)}</p></div></div>
+      </div>
+      <div className="account-tip-panel"><div className="flex items-start gap-3"><span className="rounded-2xl bg-warning/20 p-2.5 text-warning-content"><Sparkles className="size-5" aria-hidden="true" /></span><div><p className="font-bold">Belajar sedikit demi sedikit</p><p className="mt-1 text-sm leading-6 text-base-content/70">Selesaikan satu latihan hari ini untuk menjaga ritme belajarmu.</p></div></div></div>
+    </div>
     <RenewNotice expiresAt={session.role === "admin" ? undefined : session.expiresAt} username={session.username} />
-    <p className="mt-3 text-xs text-base-content/60">Butuh bantuan memakai BeSmartKids? <Link href="/panduan" className="link text-success">Lihat panduan</Link>. Satu akun dapat dipakai di 2 perangkat. Jika masuk di perangkat ketiga, perangkat yang paling lama otomatis keluar.</p>
+    <p className="mt-4 text-sm text-base-content/60">Butuh bantuan memakai BeSmartKids? <Link href="/panduan" className="font-semibold text-success hover:underline">Lihat panduan</Link>. Satu akun dapat dipakai di 2 perangkat. Jika masuk di perangkat ketiga, perangkat yang paling lama otomatis keluar.</p>
     <ChangePin />
-    <div className="mt-5 flex flex-wrap gap-2">
+    <div className="mt-5 flex flex-wrap gap-2 border-b border-base-300 pb-8">
       <Link href="/akun/laporan" className="btn btn-success gap-1"><FileText className="size-4" aria-hidden="true" />Laporan belajar</Link>
       {session.role === "admin" && <Link href="/admin" className="btn btn-outline gap-1"><Settings className="size-4" aria-hidden="true" />Kelola akun</Link>}
       <button type="button" className="btn btn-ghost gap-1" disabled={busy} onClick={logout}><LogOut className="size-4" aria-hidden="true" />Keluar</button>
-    </div></div>
+    </div>
     <ResultHistory />
-  </section>;
+    </div></section>;
 }
 
 /** Pemberitahuan di Akun saya jika paket berakhir dalam 14 hari atau tidak ada paket aktif. */
