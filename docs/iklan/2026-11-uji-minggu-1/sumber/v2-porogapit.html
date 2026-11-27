@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link rel="stylesheet" href="file:///home/user/newbesmartkids/.claude/skills/bsk-iklan-motion/kit/kit.css">
+<style>
+  /* V2 Porogapit (A2). Konsep: papan tulis biru tua, kapur putih, porogapit digambar langkah demi langkah dengan daftar langkah. */
+  :root { --papan: #1c2b5e; --kapur: #f5f7ff; --aksen: #9fb3ff; --kuning-kapur: #ffe08a; }
+  .stage { background: radial-gradient(ellipse at 50% 30%, #253a7a 0%, var(--papan) 70%); color: var(--kapur); }
+  .hook { font-size: 90px; font-weight: 900; line-height: 1.1; color: var(--kapur); }
+  .hook em { font-style: normal; color: var(--kuning-kapur); }
+  .k { position: absolute; width: 150px; text-align: center; font-size: 170px; font-weight: 700; line-height: 1; color: var(--kapur); }
+  .k.kuning { color: var(--kuning-kapur); }
+  .k.kecil { font-size: 150px; }
+  .lang { font-size: 58px; font-weight: 700; line-height: 1.35; }
+  .lang b { color: var(--kuning-kapur); }
+  .nomor { display: inline-flex; width: 70px; height: 70px; border-radius: 50%; background: var(--aksen); color: var(--papan); font-weight: 900; font-size: 46px; align-items: center; justify-content: center; margin-right: 22px; vertical-align: middle; }
+  .hp { border-color: #0f1a3d; }
+  .akhir { position: absolute; inset: 0; background: #3b5bdb; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; color: #fff; text-align: center; padding: 0 90px 160px; }
+  .akhir .harga { font-size: 50px; font-weight: 700; line-height: 1.35; }
+  .akhir .situs { font-size: 60px; font-weight: 900; }
+</style></head>
+<body data-detik="15.5">
+<div class="stage">
+  <!-- Adegan 1: hook (0–2.8 s) -->
+  <div class="posisi tengah" style="top:600px;padding:0 90px"><div class="m hook" data-in="pop" data-out="fade" style="--d:0s;--o:2.7s">{{HOOK}}</div></div>
+
+  <!-- Porogapit (2.8–9.8 s): pembagi 4, garis kurung digambar, 72 -->
+  <div class="m" data-in="fade" data-out="fade" style="--d:2.8s;--o:9.7s;position:absolute;inset:0">
+    <svg style="position:absolute;left:0;top:170px" width="1080" height="1920">
+      <path d="M330 360 Q300 470 330 590 M330 360 L700 360" fill="none" stroke="#f5f7ff" stroke-width="12" stroke-linecap="round" class="gores" style="--panjang:620;--d:2.9s"/>
+      <line x1="330" y1="790" x2="560" y2="790" stroke="#f5f7ff" stroke-width="10" stroke-linecap="round" class="gores" style="--panjang:240;--d:5.4s"/>
+      <line x1="430" y1="1180" x2="700" y2="1180" stroke="#f5f7ff" stroke-width="10" stroke-linecap="round" class="gores" style="--panjang:280;--d:8.3s"/>
+    </svg>
+    <div class="k" style="left:150px;top:560px">4</div>
+    <div class="k" style="left:380px;top:560px">7</div><div class="k" style="left:530px;top:560px">2</div>
+    <!-- hasil di atas -->
+    <div class="k kuning m" data-in="pop" style="--d:3.6s;left:380px;top:350px">1</div>
+    <div class="k kuning m" data-in="pop" style="--d:6.8s;left:530px;top:350px">8</div>
+    <!-- langkah 1 -->
+    <div class="k kecil m" data-in="pop" style="--d:4.6s;left:380px;top:790px">4</div>
+    <div class="m" data-in="fade" style="--d:4.6s;position:absolute;left:300px;top:810px;font-size:120px;font-weight:700">−</div>
+    <div class="k kecil m" data-in="pop" style="--d:5.7s;left:380px;top:990px">3</div>
+    <div class="k kecil kuning m" data-in="down" style="--d:6.2s;left:530px;top:990px">2</div>
+    <!-- langkah 2 -->
+    <div class="k kecil m" data-in="pop" style="--d:7.5s;left:380px;top:1180px">3</div><div class="k kecil m" data-in="pop" style="--d:7.5s;left:530px;top:1180px">2</div>
+    <div class="m" data-in="fade" style="--d:7.5s;position:absolute;left:300px;top:1200px;font-size:120px;font-weight:700">−</div>
+    <div class="k kecil m" data-in="pop" style="--d:8.5s;left:530px;top:1380px">0</div>
+  </div>
+
+  <!-- daftar langkah (2.8–9.8 s) -->
+  <div class="posisi" style="left:90px;right:150px;top:1500px">
+    <div class="m lang" data-in="left" data-out="fade" style="--d:3.4s;--o:5.3s"><span class="nomor">1</span>7 : 4 = <b>1</b>, tulis di atas</div>
+    <div class="m lang" data-in="left" data-out="fade" style="--d:4.5s;--o:5.3s"><span class="nomor">2</span>1 × 4 = <b>4</b></div>
+  </div>
+  <div class="posisi" style="left:90px;right:150px;top:1500px">
+    <div class="m lang" data-in="left" data-out="fade" style="--d:5.4s;--o:7.3s"><span class="nomor">3</span>7 − 4 = <b>3</b></div>
+    <div class="m lang" data-in="left" data-out="fade" style="--d:6.1s;--o:7.3s"><span class="nomor">4</span>Turunkan 2, jadi <b>32</b></div>
+  </div>
+  <div class="posisi" style="left:90px;right:150px;top:1500px">
+    <div class="m lang" data-in="left" data-out="fade" style="--d:7.4s;--o:9.7s"><span class="nomor">5</span>32 : 4 = <b>8</b></div>
+    <div class="m lang" data-in="left" data-out="fade" style="--d:8.3s;--o:9.7s"><span class="nomor">6</span>8 × 4 = 32, sisa <b>0</b></div>
+  </div>
+  <div class="posisi tengah" style="top:90px"><div class="m judul" data-in="pop" data-out="fade" style="--d:8.8s;--o:9.7s;color:var(--kuning-kapur)">72 : 4 = 18</div></div>
+
+  <!-- Adegan 3: bukti aplikasi (9.8–13 s) -->
+  <div class="posisi tengah" style="top:130px;padding:0 90px"><div class="m judul" data-in="down" data-out="fade" style="--d:9.8s;--o:12.9s;font-size:66px;color:var(--kapur)">Setiap kotak ada<br>petunjuknya</div></div>
+  <div class="posisi" style="left:200px;top:400px;width:680px"><div class="m hp kamera" data-in="up" data-out="fade" style="--d:9.9s;--o:12.9s;--lama:3s;--skala:1.06;--ty:-20px"><img src="../aset/app-bagi.png"></div></div>
+
+  <!-- Adegan 4: penutup (13–15.5 s) -->
+  <div class="m akhir" data-in="wipe" style="--d:13s">
+    <span class="logo-chip"><img src="https://cdn.scalev.id/uploads/1770351441/0bmLuAafT-8qSTnfBVxh5A/1770351441636-logo_horizontal_transparent.webp"></span>
+    <div class="judul">Porogapit<br>langkah demi langkah</div>
+    <div class="tombol">Coba Bab 1 gratis</div>
+    <div class="situs">besmartkids.id</div>
+    <div class="harga">Paket SD, SMP, atau SMA Rp79.000<br>akses 1 tahun</div>
+  </div>
+</div>
+</body></html>
