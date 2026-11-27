@@ -36,7 +36,7 @@ export function SavedEvaluationReport({ result }: { result: SavedResult }) {
           onClick={() => select(number === selected ? null : number)} className={`${questionCircle} ${questionTone(correct)}`}>{number}</button></li>;
       })}
     </EvaluationQuestionMap> : <p className="text-sm">Rincian jawaban belum tersedia untuk hasil ini.</p>}
-    <div id={reviewId} aria-live="polive" hidden={selected === null} className="space-y-3 break-words">
+    <div id={reviewId} aria-live="polite" hidden={selected === null} className="space-y-3 break-words">
       {selectedItem ? <ReviewCard item={selectedItem} number={selected!} /> : <div className="rounded-xl border border-warning/30 bg-warning/10 p-4 text-sm leading-6"><p className="font-bold">Rincian soal ini belum tersimpan</p><p className="mt-1">Hasil lama hanya menyimpan jumlah benar dan salah. Soal lengkap tersedia mulai dari evaluasi yang dikerjakan setelah pembaruan ini.</p></div>}
     </div>
     <Link href={result.path} className="btn btn-outline">Kembali ke materi</Link>
