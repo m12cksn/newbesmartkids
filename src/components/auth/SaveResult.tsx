@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { EvaluationReviewItem, IncorrectAnswer } from "@/app/api/hasil/route";
 import { useAccess } from "./AccessProvider";
 
-const PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian|jarimatika|pembagian-garis)\/level-[1-3]$/;
+const PATH = /^\/kelas\/[a-z0-9-]+\/materi\/[a-z0-9-]+|^\/mastering-(penjumlahan-pengurangan|perkalian-pembagian|jarimatika|pembagian-garis)\/level-[1-3]$|^\/kelas\/[a-z0-9-]+\/ujian-akhir-tahun$/;
 
 /**
  * Simpan hasil latihan atau evaluasi ke akun yang sedang masuk (sekali per penyelesaian).

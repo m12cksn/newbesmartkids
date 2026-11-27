@@ -1,0 +1,37 @@
+name: SAT Kelas 1 QA
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  sat-kelas-1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-sat-kelas-1.mjs
+      - run: npx eslint src/exams src/components/exam "src/app/kelas/[slug]/ujian-akhir-tahun/page.tsx" "src/app/kelas/[slug]/page.tsx" src/components/auth/SaveResult.tsx src/app/api/hasil/route.ts scripts/verify-sat-kelas-1.mjs scripts/smoke-sat-kelas-1.mjs
+      - run: npm run build
+      - run: npm install --no-save playwright
+      - run: npx playwright install chromium
+      - name: Browser QA
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/next-sat-kelas-1.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          node --experimental-strip-types scripts/smoke-sat-kelas-1.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sat-kelas-1-screenshots
+          path: /tmp/sat-kelas-1-screenshots
+          if-no-files-found: ignore
