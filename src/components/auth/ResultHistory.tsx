@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpenCheck, ChevronDown, ChevronRight, ClipboardCheck, PencilLine } from "lucide-react";
+import { BookOpenCheck, Check, ChevronDown, ChevronRight, CircleX, ClipboardCheck, Lightbulb, PencilLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { SavedResult } from "@/app/api/hasil/route";
@@ -70,9 +70,11 @@ export function ResultHistory() {
               <ol className="divide-y divide-base-300">
                 {r.incorrect.map(q => <li key={q.number} className="space-y-1 py-2">
                   <p className="font-semibold">Soal {q.number}. {q.prompt}</p>
-                  <p>Jawabanmu <span className="font-semibold text-error">{q.submitted || "Kosong"}</span></p>
-                  <p>Jawaban benar <span className="font-semibold text-success">{q.expected}</span></p>
-                  <p className="whitespace-pre-line">{q.explanation}</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="rounded-xl border border-error/25 bg-error/5 p-3"><p className="flex items-center gap-1.5 text-xs font-bold text-error"><CircleX className="size-4" aria-hidden="true" />Jawabanmu</p><p className="mt-1 break-words whitespace-pre-wrap text-sm leading-6">{q.submitted || "Kosong"}</p></div>
+                    <div className="rounded-xl border border-success/25 bg-success/5 p-3"><p className="flex items-center gap-1.5 text-xs font-bold text-success"><Check className="size-4" aria-hidden="true" />Jawaban benar</p><p className="mt-1 break-words whitespace-pre-wrap text-sm leading-6">{q.expected}</p></div>
+                  </div>
+                  <div className="rounded-xl border border-base-300 bg-base-100 p-3 text-sm leading-6"><p className="flex items-center gap-1.5 text-xs font-bold text-base-content/60"><Lightbulb className="size-4 text-warning-content" aria-hidden="true" />Pembahasan</p><p className="mt-1 whitespace-pre-line">{q.explanation}</p></div>
                 </li>)}
               </ol>
             </> : <p>Rincian jawaban belum tersedia untuk hasil ini.</p>}
