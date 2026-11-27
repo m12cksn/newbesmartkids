@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/access-rules";
 import { authEnabled, rpc } from "@/lib/supabase-rpc";
 
-export type IncorrectAnswer = { number: number; prompt: string; submitted: string; expected: string; explanation: string };\nexport type EvaluationReviewItem = IncorrectAnswer & { correct: boolean; options?: string[] };
+export type IncorrectAnswer = { number: number; prompt: string; submitted: string; expected: string; explanation: string };
+export type EvaluationReviewItem = IncorrectAnswer & { correct: boolean; options?: string[] };
 
 export type SavedResult = { id?: string; path: string; title: string; kind: "latihan" | "evaluasi" | "harian"; part: string; correct: number; total: number; score: number; at: string; incorrect?: IncorrectAnswer[] | null; review?: EvaluationReviewItem[] | null };
 /** Halaman yang boleh menyimpan nilai: bab materi dan latihan harian. */
