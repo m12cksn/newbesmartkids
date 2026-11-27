@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { Check, CircleX, Lightbulb } from "lucide-react";
 import type { Question } from "@/data/grade-four-whole-numbers";
 import { EvaluationGate } from "@/components/auth/EvaluationGate";
 import { SaveResult } from "@/components/auth/SaveResult";
@@ -154,7 +155,17 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
                 {selectedQuestion.options.map(option => <li key={option} className="rounded-lg border border-base-300 bg-base-100 px-3 py-2">{option}</li>)}
               </ul> : renderAnswer && <div inert>{renderAnswer(selectedQuestion, selectedQuestion.answer, () => {}, true)}</div>}
             </div>}
-            <p>{label('Jawabanmu ', 'Your answer: ')}{item.submitted}. {label("Jawaban benar ", "Correct answer: ")}{item.expected}.</p><p>{renderText(item.explanation)}</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="rounded-xl border border-error/25 bg-error/5 p-3">
+                <p className="flex items-center gap-1.5 text-xs font-bold text-error"><CircleX className="size-4" aria-hidden="true" />{label("Jawabanmu", "Your answer")}</p>
+                <p className="mt-1 break-words whitespace-pre-wrap text-sm leading-6">{item.submitted || label("Kosong", "Empty")}</p>
+              </div>
+              <div className="rounded-xl border border-success/25 bg-success/5 p-3">
+                <p className="flex items-center gap-1.5 text-xs font-bold text-success"><Check className="size-4" aria-hidden="true" />{label("Jawaban benar", "Correct answer")}</p>
+                <p className="mt-1 break-words whitespace-pre-wrap text-sm leading-6">{item.expected}</p>
+              </div>
+            </div>
+            <div className="mt-2 rounded-xl border border-base-300 bg-base-100 p-3 text-sm leading-6"><p className="flex items-center gap-1.5 text-xs font-bold text-base-content/60"><Lightbulb className="size-4 text-warning-content" aria-hidden="true" />{label("Pembahasan", "Explanation")}</p><p className="mt-1">{renderText(item.explanation)}</p></div>
           </li>)}</ol>
       </details>}
       <div className="flex flex-wrap gap-2">
