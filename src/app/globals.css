@@ -199,3 +199,23 @@ h4 {
   .bsk-drift, .bsk-spin-slow, .bsk-draw, .bsk-dash-flow, .bsk-ticker, .bsk-marquee, .bsk-pop-in, .bsk-bob, .group:hover .bsk-bob-hover, .bsk-reveal { animation: none !important; }
   .bsk-draw { stroke-dashoffset: 0; }
 }
+
+
+/* ===== Hasil evaluasi: review visual ===== */
+@keyframes bsk-report-orbit { to { transform: rotate(360deg); } }
+@keyframes bsk-report-review { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes bsk-report-score { 0% { transform: scale(.85); opacity: 0; } 70% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
+.bsk-report-hero { animation: bsk-pop-in .6s cubic-bezier(.2,.8,.2,1) both; }
+.bsk-report-grid { background-image: linear-gradient(rgb(32 143 109 / .08) 1px, transparent 1px), linear-gradient(90deg, rgb(32 143 109 / .08) 1px, transparent 1px); background-size: 24px 24px; mask-image: linear-gradient(135deg, transparent 0%, black 50%, transparent 100%); }
+.bsk-report-orbit { animation: bsk-report-orbit 24s linear infinite; transform-origin: center; }
+.bsk-report-orbit-reverse { animation-direction: reverse; animation-duration: 17s; }
+.bsk-report-score-orb { display: grid; place-items: center; width: 7.5rem; height: 7.5rem; border: 8px solid rgb(32 143 109 / .14); border-top-color: #208f6d; border-radius: 9999px; background: rgb(255 255 255 / .8); box-shadow: 0 12px 24px -16px rgb(23 53 42 / .65); animation: bsk-report-score .7s .15s both; }
+.bsk-report-score-orb strong { color: #208f6d; font-size: 2.25rem; line-height: 1; }
+.bsk-report-review { animation: bsk-report-review .42s cubic-bezier(.2,.8,.2,1) both; }
+.bsk-report-question { transition: transform .18s ease, box-shadow .18s ease; }
+.bsk-report-question:hover { transform: translateY(-2px); box-shadow: 0 5px 12px -8px rgb(23 53 42 / .7); }
+.bsk-report-question[aria-pressed="true"] { transform: translateY(-2px) scale(1.06); box-shadow: 0 0 0 4px rgb(32 143 109 / .12); }
+@media (prefers-reduced-motion: reduce) {
+  .bsk-report-hero, .bsk-report-orbit, .bsk-report-score-orb, .bsk-report-review { animation: none !important; }
+  .bsk-report-question { transition: none; }
+}
