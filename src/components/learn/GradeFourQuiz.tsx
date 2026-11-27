@@ -85,29 +85,29 @@ function QuizBody<Q extends Question>({ questions, title, practiceMode, close, r
 
   const evaluationFinished = !question && !practiceMode;
   return <>
-  <section hidden={retrying} className={`group/quiz mx-auto rounded-xl border border-base-300 bg-base-100 p-3 sm:p-6 ${evaluationFinished ? "max-w-3xl space-y-5" : expanded && !practiceMode ? "max-w-3xl space-y-4 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base" : "max-w-2xl space-y-3"}`} data-evaluation={!practiceMode || undefined}>
-    {!evaluationFinished && <><div className="flex flex-wrap items-center justify-between gap-2">
+  <section hidden={retrying} className={`question-focus-shell group/quiz mx-auto w-full rounded-2xl border border-base-300 bg-base-100 p-4 sm:p-7 ${evaluationFinished ? "max-w-4xl space-y-5" : expanded && !practiceMode ? "max-w-5xl space-y-5 text-base [&_.text-xs]:text-sm [&_.text-sm]:text-base" : "max-w-4xl space-y-4"}`} data-evaluation={!practiceMode || undefined}>
+    {!evaluationFinished && <><div className="quiz-topbar flex flex-wrap items-center justify-between gap-2">
       <p className="text-sm font-bold text-success">{title}{question && ` · ${label("Soal", "Question")} ${index + 1}/${questions.length}`}</p>
       <button className="btn btn-ghost btn-sm" onClick={close}>{label('Tutup', 'Close')}</button>
     </div>
-    <progress className="progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/></>}
+    <progress className="quiz-progress progress progress-success w-full" aria-label={label("Progres soal", "Question progress")} value={index} max={questions.length}/></>}
     {question ? <>
       {renderMeta?.(question)}
-      <h2 ref={heading} tabIndex={-1} className={expanded && !practiceMode ? "break-words text-xl leading-snug font-extrabold sm:text-2xl" : "text-lg font-extrabold"}>{renderText(question.prompt)}</h2>
+      <h2 ref={heading} tabIndex={-1} className={expanded && !practiceMode ? "question-prompt break-words text-xl font-semibold leading-8 sm:text-2xl sm:leading-9" : "question-prompt break-words text-lg font-semibold leading-8 sm:text-xl"}>{renderText(question.prompt)}</h2>
       {renderVisual?.(question)}
       {question.mode === "order" && <div className="flex flex-wrap items-center gap-2">
         <p aria-live="polite">{selected.join(" → ") || "Ketuk angka sesuai urutan."}</p>
         <button className="btn btn-ghost btn-sm" disabled={checked || !answer} onClick={() => record(selected.slice(0, -1).join("|"))}>Batalkan pilihan terakhir</button>
       </div>}
       {question.options ? <div className="flex flex-wrap gap-2">
-        {question.options.map(option => <button key={option} className={`btn btn-outline h-auto min-h-11 min-w-0 max-w-full whitespace-normal break-words ${expanded && !practiceMode ? "text-base" : ""}`}
+        {question.options.map(option => <button key={option} className={`question-option btn btn-outline h-auto min-h-12 min-w-0 max-w-full whitespace-normal break-words font-medium leading-7 ${expanded && !practiceMode ? "text-base" : "text-sm sm:text-base"}`}
           disabled={checked || (question.mode === "order" && selected.includes(option))}
           aria-pressed={selected.includes(option)} onClick={() => {
             if (question.mode === "order") record([...selected, option].join("|"));
             else if (question.mode === "multiple") record(selected.includes(option) ? selected.filter(item => item !== option).join("|") : [...selected, option].join("|"));
             else record(option);
           }}>{option}</button>)}
-      </div> : renderAnswer ? renderAnswer(question, answer, record, checked) : <label className="flex flex-wrap items-center gap-2 font-bold">Jawaban
+      </div> : renderAnswer ? renderAnswer(question, answer, record, checked) : <label className="question-answer-field flex flex-wrap items-center gap-2 font-medium">Jawaban
         <input className="input input-bordered w-36" inputMode="numeric" value={answer} disabled={checked}
           onChange={event => record(event.target.value.replace(/[^\d.]/g, ""))}/>
       </label>}
