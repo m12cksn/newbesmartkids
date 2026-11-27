@@ -1,11 +1,14 @@
 /** Aturan program affiliate BeSmartKids (harus sama dengan fungsi bsk_affiliate_* di Supabase). */
-export const AFF_RATE = 0.16;
+/** Komisi tetap per paket. Paket dikenali dari harga produk (sebelum diskon), jadi diskon tidak mengurangi komisi. */
+export const AFF_COMMISSION_JENJANG = 19_900;
+export const AFF_COMMISSION_KELUARGA = 34_900;
+export const FAMILY_PRICE = 129_000;
 export const AFF_MIN_PAYOUT = 50_000;
 export const AFF_HOLD_DAYS = 3;
 export const WALLETS = ["DANA", "OVO", "GoPay", "ShopeePay", "LinkAja"] as const;
 export type Wallet = (typeof WALLETS)[number];
 
-export const commissionFor = (price: number) => Math.floor(price * AFF_RATE);
+export const commissionFor = (productPrice: number) => (productPrice <= 0 ? 0 : productPrice >= FAMILY_PRICE ? AFF_COMMISSION_KELUARGA : AFF_COMMISSION_JENJANG);
 export const rupiah = (n: number) => `Rp${Math.round(n).toLocaleString("id-ID")}`;
 
 /** Halaman penjualan Scalev. Kode affiliate ikut tercatat di pesanan lewat parameter UTM. */
@@ -51,7 +54,7 @@ Bab 1 bisa dicoba gratis. Paket satu jenjang Rp79.000 untuk setahun, bukan bulan
 Lihat di sini: ${link}`;
 
 export type ScalevOrder = {
-  order_id: string; gross_revenue?: number | string; payment_status?: string; status?: string; created_at?: string;
+  order_id: string; gross_revenue?: number | string; product_price?: number | string; payment_status?: string; status?: string; created_at?: string;
   confirmed_time?: string | null; transfer_time?: string | null; draft_time?: string | null;
   metadata?: { utm_campaign?: string; utm_source?: string } | null; customer?: { phone?: string } | null; utm_source?: string;
 };
@@ -61,7 +64,7 @@ export type SyncResult = { error?: string; checked?: number; new?: number; void?
 const CANCELED = new Set(["canceled", "rts", "shipped_rts"]);
 const PAID = new Set(["paid", "settled"]);
 
-/** Ubah pesanan Scalev menjadi data komisi. Pesanan yang belum dibayar dilewati; yang dibatalkan dikirim agar komisinya dibatalkan. */
+/** Ubah pesanan Scalev menjadi data komisi. amount = harga produk (sebelum diskon) untuk mengenali jenis paket. Pesanan yang belum dibayar dilewati; yang dibatalkan dikirim agar komisinya dibatalkan. */
 export function toSyncOrders(orders: ScalevOrder[]): SyncOrder[] {
   const out: SyncOrder[] = [];
   for (const o of orders) {
@@ -71,7 +74,7 @@ export function toSyncOrders(orders: ScalevOrder[]): SyncOrder[] {
     const canceled = CANCELED.has(o.status ?? "");
     const paid = PAID.has(o.payment_status ?? "") && !canceled;
     if (!paid && !canceled) continue;
-    out.push({ orderId: o.order_id, code, amount: Number(o.gross_revenue) || 0, paidAt: o.confirmed_time || o.transfer_time || o.draft_time || o.created_at || null, paid, buyerPhone: o.customer?.phone ?? "" });
+    out.push({ orderId: o.order_id, code, amount: Number(o.product_price) || Number(o.gross_revenue) || 0, paidAt: o.confirmed_time || o.transfer_time || o.draft_time || o.created_at || null, paid, buyerPhone: o.customer?.phone ?? "" });
   }
   return out;
 }

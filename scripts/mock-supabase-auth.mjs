@@ -107,7 +107,7 @@ const fns = {
       bsk_affiliate_click: ({ p_code }) => { const f = [...affs.values()].find(x => x.code === String(p_code ?? "").toUpperCase() && x.status === "active"); if (!f) return null; clicks.set(f.accountId, (clicks.get(f.accountId) ?? 0) + 1); return f.code; },
       bsk_affiliate_record: ({ p_key, p_token, p_orders }) => { if (p_key !== "test-sync") admin(p_token); let n = 0, v = 0, k = 0;
         for (const o of p_orders ?? []) { const f = [...affs.values()].find(x => x.code === String(o.code).toUpperCase()); if (!f) { k++; continue; }
-          if (o.paid) { if (norm(o.buyerPhone) === f.phone) { k++; continue; } if (!comms.has(o.orderId)) { comms.set(o.orderId, { orderId: o.orderId, affiliateId: f.accountId, orderAmount: o.amount, amount: Math.floor(o.amount * 16 / 100), paidAt: new Date(o.paidAt ?? Date.now()).getTime(), status: "pending", payoutId: null }); n++; } }
+          if (o.paid) { if (norm(o.buyerPhone) === f.phone) { k++; continue; } if (!comms.has(o.orderId)) { comms.set(o.orderId, { orderId: o.orderId, affiliateId: f.accountId, orderAmount: o.amount, amount: o.amount <= 0 ? 0 : o.amount >= 129000 ? 34900 : 19900, paidAt: new Date(o.paidAt ?? Date.now()).getTime(), status: "pending", payoutId: null }); n++; } }
           else { const c = comms.get(o.orderId); if (c && c.status === "pending" && !c.payoutId) { c.status = "void"; v++; } } }
         lastSync = new Date().toISOString(); return { new: n, void: v, skipped: k }; },
       bsk_affiliate_last_sync: () => lastSync,
@@ -119,11 +119,11 @@ const fns = {
   })(),
 };
 
-// Pesanan Scalev tiruan: untuk setiap affiliate ada 4 pesanan lunas (3 sudah lewat masa tahan), 1 pembelian sendiri, 1 belum bayar, 1 batal.
+// Pesanan Scalev tiruan: untuk setiap affiliate ada 4 pesanan lunas (3 sudah lewat masa tahan; C = Paket Keluarga diskon Rp99.000), 1 pembelian sendiri, 1 belum bayar, 1 batal.
 const scalevOrders = () => (globalThis.__affCodes?.() ?? []).flatMap(({ code, phone }) => {
   const ago = d => new Date(Date.now() - d * 864e5).toISOString(), meta = { utm_source: "affiliate", utm_campaign: code };
-  const o = (id, amount, days, pay = "paid", status = "completed", ph = "08111111111") => ({ order_id: `${code}-${id}`, gross_revenue: amount, payment_status: pay, status, confirmed_time: ago(days), metadata: meta, customer: { phone: ph } });
-  return [o("A", 129000, 5), o("B", 129000, 4), o("C", 99000, 4), o("D", 79000, 0), o("SELF", 79000, 5, "paid", "completed", phone), o("UNPAID", 79000, 0, "unpaid", "pending"), o("BATAL", 79000, 1, "unpaid", "canceled")];
+  const o = (id, amount, days, pay = "paid", status = "completed", ph = "08111111111", price = amount) => ({ order_id: `${code}-${id}`, gross_revenue: amount, product_price: price, payment_status: pay, status, confirmed_time: ago(days), metadata: meta, customer: { phone: ph } });
+  return [o("A", 129000, 5), o("B", 129000, 4), o("C", 99000, 4, "paid", "completed", "08111111111", 129000), o("D", 79000, 0), o("SELF", 79000, 5, "paid", "completed", phone), o("UNPAID", 79000, 0, "unpaid", "pending"), o("BATAL", 79000, 1, "unpaid", "canceled")];
 });
 
 createServer((req, res) => {

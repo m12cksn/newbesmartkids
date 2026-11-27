@@ -39,7 +39,7 @@ export function AdminAffiliatePanel() {
   const wa = (p: string) => `https://wa.me/${p.replace(/\D/g, "")}`;
   return <section className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
     <div><h1 className="text-3xl font-extrabold">Affiliate</h1>
-      <p className="mt-1 text-sm text-base-content/70">Komisi 16% tercatat otomatis dari pesanan Scalev yang lunas lewat link affiliate. Kirim pencairan ke e-wallet, lalu tandai sudah dibayar. <Link href="/admin" className="font-semibold text-success hover:underline">Kembali ke kelola akun</Link></p></div>
+      <p className="mt-1 text-sm text-base-content/70">Komisi (Rp19.900 per paket satu jenjang, Rp34.900 per Paket Keluarga) tercatat otomatis dari pesanan Scalev yang lunas lewat link affiliate. Kirim pencairan ke e-wallet, lalu tandai sudah dibayar. <Link href="/admin" className="font-semibold text-success hover:underline">Kembali ke kelola akun</Link></p></div>
     <div className="flex flex-wrap items-center gap-3"><button type="button" className="btn btn-success btn-sm gap-1" disabled={busy} onClick={sync}><RefreshCw className="size-4" aria-hidden="true" />Sinkronkan pesanan Scalev</button>
       <span className="text-xs text-base-content/60">{d?.lastSync ? `Terakhir: ${new Date(d.lastSync).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}` : "Belum pernah disinkronkan"}</span></div>
     {msg && <p role="status" className="rounded-lg bg-base-100 p-3 text-sm font-semibold">{msg}</p>}

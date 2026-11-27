@@ -1,0 +1,32 @@
+/* Halaman /affiliate: ilustrasi alur komisi, satu putaran 10 detik.
+   Penjualan muncul di 18%, 38%, 58%; saldo dan bilah batas cair ikut naik; "Bisa dicairkan" muncul saat saldo >= Rp50.000. */
+@keyframes aff-sale-1 { 0%, 12% { opacity: 0; transform: translateY(10px) scale(.97); } 18%, 90% { opacity: 1; transform: none; } 97%, 100% { opacity: 0; transform: none; } }
+@keyframes aff-sale-2 { 0%, 32% { opacity: 0; transform: translateY(10px) scale(.97); } 38%, 90% { opacity: 1; transform: none; } 97%, 100% { opacity: 0; transform: none; } }
+@keyframes aff-sale-3 { 0%, 52% { opacity: 0; transform: translateY(10px) scale(.97); } 58%, 90% { opacity: 1; transform: none; } 97%, 100% { opacity: 0; transform: none; } }
+@keyframes aff-ticker {
+  0%, 14% { transform: translateY(0); }
+  18%, 34% { transform: translateY(-1.2em); }
+  38%, 54% { transform: translateY(-2.4em); }
+  58%, 92% { transform: translateY(-3.6em); }
+  97%, 100% { transform: translateY(0); }
+}
+@keyframes aff-bar { 0%, 14% { transform: scaleX(0); } 18%, 34% { transform: scaleX(.4); } 38%, 92% { transform: scaleX(1); } 97%, 100% { transform: scaleX(0); } }
+@keyframes aff-ready { 0%, 36% { opacity: 0; transform: scale(.8); } 40%, 92% { opacity: 1; transform: none; } 97%, 100% { opacity: 0; } }
+@keyframes aff-send { 0%, 4%, 14%, 100% { transform: none; } 8% { transform: scale(1.1); } }
+
+.aff-sale-1 { animation: aff-sale-1 10s ease-out infinite both; }
+.aff-sale-2 { animation: aff-sale-2 10s ease-out infinite both; }
+.aff-sale-3 { animation: aff-sale-3 10s ease-out infinite both; }
+.aff-ticker { animation: aff-ticker 10s cubic-bezier(.7, 0, .3, 1) infinite; }
+.aff-bar { animation: aff-bar 10s cubic-bezier(.4, 0, .2, 1) infinite; }
+.aff-ready { animation: aff-ready 10s ease-out infinite both; }
+.aff-send { animation: aff-send 10s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aff-sale-1, .aff-sale-2, .aff-sale-3, .aff-ready, .aff-send { animation: none; opacity: 1; transform: none; }
+  .aff-ticker { animation: none; transform: translateY(-3.6em); }
+  .aff-bar { animation: none; transform: scaleX(1); }
+}
+
+/* Mulai di tengah putaran agar saat halaman dibuka ilustrasi langsung terisi (3 penjualan, Rp74.700). */
+.aff-scene .aff-sale-1, .aff-scene .aff-sale-2, .aff-scene .aff-sale-3, .aff-scene .aff-ticker, .aff-scene .aff-bar, .aff-scene .aff-ready, .aff-scene .aff-send { animation-delay: -6.5s; }
