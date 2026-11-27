@@ -219,3 +219,27 @@ h4 {
   .bsk-report-hero, .bsk-report-orbit, .bsk-report-score-orb, .bsk-report-review { animation: none !important; }
   .bsk-report-question { transition: none; }
 }
+
+
+/* ===== Fokus pengerjaan soal ===== */
+.question-focus-shell { width: 100%; }
+.question-focus-card { min-height: min(72dvh, 760px); }
+.question-prompt { font-weight: 600; letter-spacing: -.01em; }
+.question-prompt-wrap { max-width: 64rem; }
+.question-options { max-width: 64rem; }
+.question-option { font-weight: 500 !important; }
+.quiz-topbar { position: sticky; top: .5rem; z-index: 20; }
+.quiz-topbar, .quiz-progress { background: rgb(255 255 255 / .94); backdrop-filter: blur(10px); }
+.quiz-action-bar { isolation: isolate; }
+@media (max-width: 639px) {
+  .question-focus-shell { border-radius: 1rem; padding: .875rem; }
+  .question-focus-card { min-height: auto; }
+  .question-prompt { font-size: 1.1rem; line-height: 1.9; }
+  .question-options { gap: .65rem; }
+  .question-option { width: 100%; justify-content: flex-start; text-align: left; padding-block: .75rem; }
+  .quiz-topbar { top: 0; margin-inline: -.25rem; padding: .5rem .25rem; border-radius: .75rem; }
+  .quiz-action-bar { bottom: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .question-option { transition: none !important; }
+}
