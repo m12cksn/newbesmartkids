@@ -14,7 +14,7 @@ export async function syncAffiliateOrders(auth: { key?: string; token?: string }
   for (let page = 0; page < maxPages; page++) {
     const u = new URL(`${base}/v3/orders`);
     u.searchParams.set("utm_source", "affiliate"); u.searchParams.set("page_size", "25");
-    u.searchParams.set("columns", "order_id,gross_revenue,product_price,payment_status,status,metadata,customer,confirmed_time,transfer_time,draft_time");
+    u.searchParams.set("columns", "order_id,gross_revenue,product_price,final_variants,payment_status,status,metadata,customer,confirmed_time,transfer_time,draft_time");
     if (cursor) u.searchParams.set("next_cursor", cursor);
     const r = await fetch(u, { headers: { Authorization: `Bearer ${apiKey}` }, cache: "no-store" });
     if (!r.ok) return { error: `scalev_${r.status}` };

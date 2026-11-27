@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAccess } from "@/components/auth/AccessProvider";
 import { fmtDate } from "@/components/auth/AccountPanel";
 import { AffiliateSignup } from "./AffiliateSignup";
-import { AFF_HOLD_DAYS, AFF_MIN_PAYOUT, affiliateErrors, rupiah, shareText, WALLETS, type AffiliateDetail, type AffiliateMe, FAMILY_PRICE } from "@/lib/affiliate";
+import { AFF_HOLD_DAYS, AFF_MIN_PAYOUT, affiliateErrors, rupiah, shareText, WALLETS, type AffiliateDetail, type AffiliateMe } from "@/lib/affiliate";
 
 const stateLabel: Record<string, string> = { held: "Tertahan", available: "Siap cair", payout: "Dicairkan", void: "Batal" };
 const payoutLabel: Record<string, string> = { requested: "Diproses", paid: "Sudah dikirim", rejected: "Ditolak" };
@@ -39,7 +39,7 @@ export function AffiliateDashboard({ origin }: { origin: string }) {
   if (err && !me) return <Shell><p role="alert" className="font-semibold text-error">{err}</p></Shell>;
   if (!me) return <Shell><span className="loading loading-spinner text-success" aria-label="Memuat" /></Shell>;
   if ("none" in me) return <Shell><h1 className="text-2xl font-extrabold">Program affiliate</h1>
-    <p className="mt-2 max-w-xl text-base-content/70">Akun ini belum terdaftar sebagai affiliate. Aktifkan sekarang untuk mendapat link pribadi dan komisi Rp19.900 sampai Rp34.900 dari setiap penjualan. <Link href="/affiliate" className="font-semibold text-success hover:underline">Baca ketentuannya</Link>.</p>
+    <p className="mt-2 max-w-xl text-base-content/70">Akun ini belum terdaftar sebagai affiliate. Aktifkan sekarang untuk mendapat link pribadi dan komisi sampai Rp34.900 dari setiap paket yang terjual. <Link href="/affiliate" className="font-semibold text-success hover:underline">Baca ketentuannya</Link>.</p>
     <div className="mt-6 max-w-lg"><AffiliateSignup origin={origin} /></div></Shell>;
 
   const a: AffiliateDetail = me;
@@ -104,8 +104,8 @@ export function AffiliateDashboard({ origin }: { origin: string }) {
       <h2 id="riwayat" className="text-lg font-bold">Riwayat penjualan</h2>
       <p className="mt-1 text-xs text-base-content/60">Data pesanan diperbarui otomatis.{a.lastSync ? ` Terakhir: ${new Date(a.lastSync).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}.` : ""}</p>
       {a.commissions.length === 0 ? <p className="mt-3 text-sm">Belum ada penjualan. Mulai bagikan link Anda.</p> :
-        <div className="mt-3 overflow-x-auto"><table className="table table-sm"><thead><tr><th>Tanggal lunas</th><th>Paket</th><th className="text-right">Komisi</th><th>Status</th></tr></thead>
-          <tbody>{a.commissions.map(c => <tr key={c.orderId + c.paidAt} data-testid="commission-row"><td>{fmtDate(c.paidAt)}</td><td>{c.orderAmount >= FAMILY_PRICE ? "Keluarga" : "Satu jenjang"}</td><td className="text-right font-semibold">{rupiah(c.amount)}</td>
+        <div className="mt-3 overflow-x-auto"><table className="table table-sm"><thead><tr><th>Tanggal lunas</th><th className="text-right">Dibayar</th><th className="text-right">Komisi</th><th>Status</th></tr></thead>
+          <tbody>{a.commissions.map(c => <tr key={c.orderId + c.paidAt} data-testid="commission-row"><td>{fmtDate(c.paidAt)}</td><td className="text-right">{rupiah(c.orderAmount)}</td><td className="text-right font-semibold">{rupiah(c.amount)}</td>
             <td>{stateLabel[c.state]}{c.state === "held" && <span className="block text-xs text-base-content/60">cair {fmtDate(c.availableAt)}</span>}</td></tr>)}</tbody></table></div>}
     </section>
     <div className="mt-6 flex flex-wrap gap-4 text-sm"><Link href="/affiliate" className="font-semibold text-success hover:underline">Ketentuan program</Link><Link href="/akun" className="font-semibold text-success hover:underline">Kembali ke akun</Link></div>
