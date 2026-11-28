@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Poppins;font-weight:700;src:url(Poppins-Bold.ttf)}
+html,body{margin:0;background:transparent}</style></head><body><canvas id="c" width="1000" height="760"></canvas>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+const MODE=location.hash.slice(1)||'warna';     // 'warna' (logo berwarna) | 'watermark' (putih transparan)
+function draw(){
+  x.clearRect(0,0,1000,760);
+  const ink=MODE==='warna'?'#18141a':'#f2eee6', skin=MODE==='warna'?'#f6f2ea':'#f2eee6', red=MODE==='warna'?'#c4302b':'#f2eee6', glow=MODE==='warna';
+  const A=MODE==='watermark'?1:1; x.globalAlpha=A;
+  // lencana kepala Pak Nawi (kacamata bulat, rambut menipis)
+  const cx=500, cy=235, R=150;
+  if(glow){const g=x.createRadialGradient(cx,cy,20,cx,cy,300);g.addColorStop(0,'rgba(255,170,70,.35)');g.addColorStop(1,'rgba(255,170,70,0)');x.fillStyle=g;x.fillRect(0,0,1000,520);}
+  x.lineWidth=12; x.strokeStyle=ink; x.fillStyle=skin; x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); if(glow) x.fill(); x.stroke();
+  x.save(); x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.clip(); x.fillStyle=MODE==='warna'?'#3a3430':ink;
+  x.beginPath(); x.moveTo(cx-R*1.1,cy-R*.25); x.quadraticCurveTo(cx-R*.6,cy-R*1.12,cx-R*.05,cy-R*1.05); x.quadraticCurveTo(cx-R*.1,cy-R*.72,cx-R*.5,cy-R*.55); x.quadraticCurveTo(cx-R*.85,cy-R*.55,cx-R*1.1,cy-R*.25); x.fill();
+  x.beginPath(); x.moveTo(cx+R*1.1,cy-R*.25); x.quadraticCurveTo(cx+R*.7,cy-R*1.1,cx+R*.12,cy-R*1.0); x.quadraticCurveTo(cx+R*.2,cy-R*.7,cx+R*.55,cy-R*.5); x.quadraticCurveTo(cx+R*.9,cy-R*.5,cx+R*1.1,cy-R*.25); x.fill(); x.restore();
+  // kacamata
+  x.lineWidth=11; x.strokeStyle=ink; for(const s of [-1,1]){x.beginPath();x.arc(cx+s*56,cy+6,42,0,Math.PI*2);x.stroke(); x.fillStyle=glow?'#fff':'rgba(255,255,255,0)'; x.beginPath();x.arc(cx+s*56,cy+6,38,0,Math.PI*2); if(glow)x.fill(); x.fillStyle=ink; x.beginPath(); x.arc(cx+s*56+s*4,cy+14,12,0,Math.PI*2); x.fill();}
+  x.lineWidth=9; x.beginPath(); x.moveTo(cx-14,cy-2); x.quadraticCurveTo(cx,cy-16,cx+14,cy-2); x.stroke();
+  // alis turun dan mulut datar (lelah)
+  x.lineWidth=9; x.beginPath(); x.moveTo(cx-92,cy-40); x.lineTo(cx-34,cy-58); x.moveTo(cx+92,cy-40); x.lineTo(cx+34,cy-58); x.stroke(); x.beginPath(); x.moveTo(cx-24,cy+88); x.lineTo(cx+24,cy+88); x.stroke();
+  // teks
+  x.textAlign='center'; x.textBaseline='middle';
+  x.font='700 190px Poppins'; x.lineWidth=14; x.strokeStyle=MODE==='warna'?'#0a0809':'rgba(0,0,0,0)'; x.lineJoin='round'; if(MODE==='warna')x.strokeText('NAWI',500,500); x.fillStyle=ink; if(MODE==='warna'){ x.fillStyle='#efe9dd'; } x.fillText('NAWI',500,500);
+  x.font='700 78px Poppins'; x.fillStyle=red; if(MODE==='warna'){x.lineWidth=10;x.strokeStyle='#0a0809';x.strokeText('HOROR STORY',500,640);} x.fillText('HOROR STORY',500,640);
+  // goresan merah seperti baret di bawah huruf
+  if(MODE==='warna'){x.strokeStyle='#c4302b';x.lineWidth=7;x.beginPath();x.moveTo(250,575);x.quadraticCurveTo(500,590,750,572);x.stroke();}
+}
+document.fonts.load('700 100px Poppins').then(()=>{draw();window.READY=1;});
+</script></body></html>

@@ -1,0 +1,8 @@
+{
+  "bed": [{"sfx": "ambience_desa_malam", "g": 0.5}],
+  "drone": {"sfx": "drone_gelap", "t": 20, "g": 0.3},
+  "cues": [
+    {"t": 0.5, "sfx": "napas_berat", "g": 0.25},
+    {"t": 2.0, "sfx": "kertas_jatuh", "g": 0.8}
+  ]
+}

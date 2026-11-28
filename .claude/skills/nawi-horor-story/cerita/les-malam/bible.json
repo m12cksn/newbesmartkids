@@ -1,0 +1,24 @@
+{
+  "slug": "les-malam",
+  "judul": "Les Malam",
+  "status": "bersambung",
+  "catatan": "Pak Nawi (38) ditolak 12 kali karena umur, menerima kerja mengajar anak di kampung sebelah. Nada serius, tanpa humor. Tanpa label fiksi (keputusan pemilik). Jangan menulis 'kisah nyata'.",
+  "tokoh": {
+    "Pak Nawi": {"tetap": true, "spec": "SPEC_NAWI di template/web/nawi.js"},
+    "Bu Sari": {"spec": {"nama": "Bu Sari", "kulit": "#f1e6d8", "rambut": {"gaya": "sanggul", "warna": "#2a2420"}, "baju": {"jenis": "daster", "warna": "#4a3b52"}, "aksesori": []}, "tinggi": 0.94, "catatan": "jarang menunjukkan wajah penuh, suara dari belakang pintu"},
+    "Dimas": {"spec": {"nama": "Dimas", "kulit": "#ece4d8", "rambut": {"gaya": "anak", "warna": "#1d1a18"}, "baju": {"jenis": "kaos", "warna": "#b9b2a2"}, "aksesori": []}, "tinggi": 0.55, "catatan": "mata menyala di adegan seram; tidak pernah disakiti"}
+  },
+  "tempat": ["teras kontrakan Pak Nawi (setTeras)", "warung (setWarung)", "kebun karet (setJalanKaret)", "ruang tamu rumah Dimas (setRuangTamu)", "kamar belakang (buat: set baru dengan pintu dan celah cahaya)"],
+  "aturan": ["Tiga aturan Bu Sari: datang setelah magrib; jangan lihat ke kamar belakang; jangan jawab kalau ada yang memanggil namamu, kecuali Dimas"],
+  "part": {
+    "1": {
+      "status": "bersambung",
+      "reel": {
+        "1": {"judul": "Tawaran", "file": "naskah-part1-reel1.json", "video": "sudah dibuat dengan gaya siluet lama; perlu dirender ulang dengan gaya realistis dan Pak Nawi baru"},
+        "2": {"judul": "Tujuh Buku", "file": "naskah-part1-reel2.json", "video": "belum dibuat"},
+        "3": {"judul": "Yang Mau Menerima", "file": "naskah-part1-reel3.json", "video": "belum dibuat", "klimaks": "godaan untuk 'diterima'; Dimas menahan; pulang; buku bertuliskan Nawi"}
+      },
+      "lanjut": "Part 2: Kamis kembali; siapa Bu Sari; apa 'bab' yang belum selesai"
+    }
+  }
+}
